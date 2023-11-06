@@ -1,0 +1,22 @@
+cmake_minimum_required(VERSION 3.0.0)
+project(SFML_Game VERSION 0.1.0)
+
+# Debug
+include(CTest)
+enable_testing()
+
+# Source Files
+# file(GLOB source_files src/*.cpp)
+file(GLOB_RECURSE source_files src/*.cpp)
+
+# CPack 
+set(CPACK_PROJECT_NAME ${PROJECT_NAME})
+set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
+include(CPack)
+
+# SFML
+find_package(SFML 2.5 COMPONENTS system window graphics network audio REQUIRED)
+link_libraries(sfml-system sfml-window sfml-graphics sfml-network sfml-audio)
+
+# Executable
+add_executable(${PROJECT_NAME} ${source_files})
