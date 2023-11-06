@@ -1,5 +1,8 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.5.0)
 project(SFML_Game VERSION 0.1.0)
+
+set(CMAKE_CXX_STANDARD 11)
+
 
 # Debug
 include(CTest)
@@ -18,5 +21,11 @@ include(CPack)
 find_package(SFML 2.5 COMPONENTS system window graphics network audio REQUIRED)
 link_libraries(sfml-system sfml-window sfml-graphics sfml-network sfml-audio)
 
+
 # Executable
 add_executable(${PROJECT_NAME} ${source_files})
+
+
+# Ruby
+include_directories(./3rd/ruby-1.8.7)
+target_link_libraries(${PROJECT_NAME} ruby)
