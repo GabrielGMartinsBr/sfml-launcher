@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.5.0)
 project(SFML_Game VERSION 0.1.0)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
 set(CMAKE_CXX_STANDARD 11)
 
 
@@ -27,5 +29,6 @@ add_executable(${PROJECT_NAME} ${source_files})
 
 
 # Ruby
-include_directories(./3rd/ruby-1.8.7)
-target_link_libraries(${PROJECT_NAME} ruby)
+find_package(RubyStatic REQUIRED)
+include_directories(${RubyStatic_INCLUDE_DIRS})
+target_link_libraries(${PROJECT_NAME} ${RubyStatic_LIBRARIES} -lcrypt)
