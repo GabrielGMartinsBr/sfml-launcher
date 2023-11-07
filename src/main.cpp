@@ -8,77 +8,17 @@
 #include <SFML/Window/Keyboard.hpp>
 #include <iostream>
 
-#include "./graphics/Graphics.hpp"
-#include "Game.h"
-#include "GameFonts.h"
 #include "GameInput.h"
-#include "ruby/RubyService.hpp"
-
-static const unsigned int w = 900;
-static const unsigned int h = 600;
-
-static const unsigned int borderStroke = 6;
-sf::Color borderColor = sf::Color::Cyan;
+#include "launcher/Launcher.hpp"
 
 GameInput game_input;
 
 int main(int, char **)
 {
-  RubyService rService;
+  // RubyService rService;
+  // rService.run();
 
-  rService.run();
-  sf::RenderWindow window(sf::VideoMode(w, h), "SFML Launcher");
+  Launcher launcher;
 
-  // GameFonts::load();
-  // Game game;
-
-  Graphics gr;
-
-  while (window.isOpen()) {
-    sf::Event event;
-
-    while (window.pollEvent(event)) {
-      switch (event.type) {
-        case sf::Event::Closed:
-          window.close();
-          break;
-
-          //     case sf::Event::KeyPressed:
-          //       game_input.changeKeyState(event.key, true);
-          //       break;
-          //     case sf::Event::KeyReleased:
-          //       game_input.changeKeyState(event.key, false);
-          //       break;
-
-          //     case sf::Event::MouseLeft:
-          //       game_input.mouseOnScreen = false;
-          //       break;
-          //     case sf::Event::MouseEntered:
-          //       game_input.mouseOnScreen = true;
-          //       break;
-          //     case sf::Event::MouseMoved:
-          //       game_input.updateCursor(event.mouseMove.x, event.mouseMove.y);
-          //       break;
-          //     case sf::Event::MouseButtonPressed:
-          //       game_input.button = true;
-          //       break;
-          //     case sf::Event::MouseButtonReleased:
-          //       game_input.button = false;
-          //       break;
-
-        default:
-          // std::cout << event.type << '\n';
-          break;
-      }
-    }
-
-    // game.update();
-    // game.draw(window);
-
-    window.clear();
-    gr.render(window);
-
-
-    window.display();
-  }
+  launcher.run();
 }

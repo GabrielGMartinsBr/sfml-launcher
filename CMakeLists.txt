@@ -13,6 +13,8 @@ enable_testing()
 # Source Files
 file(GLOB_RECURSE source_files src/*.cpp src/*.hpp)
 
+include_directories(src)
+
 # CPack 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
