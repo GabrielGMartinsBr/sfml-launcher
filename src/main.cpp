@@ -8,6 +8,7 @@
 #include <SFML/Window/Keyboard.hpp>
 #include <iostream>
 
+#include "./graphics/Graphics.hpp"
 #include "Game.h"
 #include "GameFonts.h"
 #include "GameInput.h"
@@ -26,56 +27,58 @@ int main(int, char **)
   RubyService rService;
 
   rService.run();
-  // sf::RenderWindow window(sf::VideoMode(w, h), "SFML works!");
+  sf::RenderWindow window(sf::VideoMode(w, h), "SFML Launcher");
 
   // GameFonts::load();
   // Game game;
 
-  // while (window.isOpen()) {
-  //   sf::Event event;
+  Graphics gr;
 
-  // while (window.pollEvent(event)) {
-  //   switch (event.type) {
-  //     case sf::Event::Closed:
-  //       window.close();
-  //       break;
+  while (window.isOpen()) {
+    sf::Event event;
 
-  //     case sf::Event::KeyPressed:
-  //       game_input.changeKeyState(event.key, true);
-  //       break;
-  //     case sf::Event::KeyReleased:
-  //       game_input.changeKeyState(event.key, false);
-  //       break;
+    while (window.pollEvent(event)) {
+      switch (event.type) {
+        case sf::Event::Closed:
+          window.close();
+          break;
 
-  //     case sf::Event::MouseLeft:
-  //       game_input.mouseOnScreen = false;
-  //       break;
-  //     case sf::Event::MouseEntered:
-  //       game_input.mouseOnScreen = true;
-  //       break;
-  //     case sf::Event::MouseMoved:
-  //       game_input.updateCursor(event.mouseMove.x, event.mouseMove.y);
-  //       break;
-  //     case sf::Event::MouseButtonPressed:
-  //       game_input.button = true;
-  //       break;
-  //     case sf::Event::MouseButtonReleased:
-  //       game_input.button = false;
-  //       break;
+          //     case sf::Event::KeyPressed:
+          //       game_input.changeKeyState(event.key, true);
+          //       break;
+          //     case sf::Event::KeyReleased:
+          //       game_input.changeKeyState(event.key, false);
+          //       break;
 
-  //     default:
-  //       // std::cout << event.type << '\n';
-  //       break;
-  //   }
-  // }
+          //     case sf::Event::MouseLeft:
+          //       game_input.mouseOnScreen = false;
+          //       break;
+          //     case sf::Event::MouseEntered:
+          //       game_input.mouseOnScreen = true;
+          //       break;
+          //     case sf::Event::MouseMoved:
+          //       game_input.updateCursor(event.mouseMove.x, event.mouseMove.y);
+          //       break;
+          //     case sf::Event::MouseButtonPressed:
+          //       game_input.button = true;
+          //       break;
+          //     case sf::Event::MouseButtonReleased:
+          //       game_input.button = false;
+          //       break;
 
-  // game.update();
+        default:
+          // std::cout << event.type << '\n';
+          break;
+      }
+    }
 
-  // window.clear();
-  // game.draw(window);
+    // game.update();
+    // game.draw(window);
 
-  // window.display();
-  // }
+    window.clear();
+    gr.render(window);
 
-  // std::cout << "SFML Game works!" << std::endl;
+
+    window.display();
+  }
 }
