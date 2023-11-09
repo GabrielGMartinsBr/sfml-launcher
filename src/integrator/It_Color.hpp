@@ -12,22 +12,27 @@ class Color {
 
   static void integrate()
   {
-    VALUE rbc_Color = rb_define_class("Color", rb_cObject);
+    VALUE colorClass = rb_define_class("Color", rb_cObject);
 
-    rb_define_method(rbc_Color, "initialize", RUBY_METHOD_FUNC(method_initialize), 3);
+    rb_define_method(colorClass, "initialize", RUBY_METHOD_FUNC(method_initialize), 3);
 
     // rb_define_attr(rbc_Color, "red", 1, 1);
 
-    rb_define_method(rbc_Color, "red", RUBY_METHOD_FUNC(attrGet_red), 0);
-    rb_define_method(rbc_Color, "red=", RUBY_METHOD_FUNC(attrSet_red), 1);
+    rb_define_method(colorClass, "red", RUBY_METHOD_FUNC(attrGet_red), 0);
+    rb_define_method(colorClass, "red=", RUBY_METHOD_FUNC(attrSet_red), 1);
 
-    rb_define_method(rbc_Color, "green", RUBY_METHOD_FUNC(attrGet_green), 0);
-    rb_define_method(rbc_Color, "green=", RUBY_METHOD_FUNC(attrSet_green), 1);
+    rb_define_method(colorClass, "green", RUBY_METHOD_FUNC(attrGet_green), 0);
+    rb_define_method(colorClass, "green=", RUBY_METHOD_FUNC(attrSet_green), 1);
 
-    rb_define_method(rbc_Color, "blue", RUBY_METHOD_FUNC(attrGet_blue), 0);
-    rb_define_method(rbc_Color, "blue=", RUBY_METHOD_FUNC(attrSet_blue), 1);
+    rb_define_method(colorClass, "blue", RUBY_METHOD_FUNC(attrGet_blue), 0);
+    rb_define_method(colorClass, "blue=", RUBY_METHOD_FUNC(attrSet_blue), 1);
 
-    rb_define_method(rbc_Color, "set", RUBY_METHOD_FUNC(method_set), 3);
+    rb_define_method(colorClass, "set", RUBY_METHOD_FUNC(method_set), 3);
+  }
+
+  static VALUE getRbClass()
+  {
+    return rb_const_get(rb_cObject, rb_intern("Color"));
   }
 
  private:

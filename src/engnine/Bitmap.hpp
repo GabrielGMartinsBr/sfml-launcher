@@ -1,5 +1,7 @@
 #pragma once
 
+#include <SFML/Graphics/Image.hpp>
+
 #include "engnine/Color.hpp"
 #include "engnine/Rect.hpp"
 
@@ -9,6 +11,8 @@ typedef const char* Str;
 
 class Bitmap {
   bool _disposed;
+
+  sf::Image buffer;
 
  public:
   int width;
@@ -20,6 +24,8 @@ class Bitmap {
   {
     width = _width;
     height = _height;
+
+    buffer.create(width, height);
   }
 
   void dispose();
@@ -38,9 +44,18 @@ class Bitmap {
 
   void clear();
 
-  void get_pixel(int _x, int _y);
+  Color* get_pixel(unsigned int _x, unsigned int _y)
+  {
+    sf::Color px = buffer.getPixel(_x, _y);
+    Color* color = new Color(px.r, px.g, px.b);
+    return color;
+  }
 
-  void set_pixel(int _x, int _y, Color _color);
+  void set_pixel(unsigned int _x, unsigned int _y, Color* _color)
+  {
+    sf::Color color(_color->red, _color->green, _color->blue);
+    buffer.setPixel(_x, _y, color);
+  }
 
   void hue_change(int _hue);
 
