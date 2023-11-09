@@ -2,17 +2,19 @@
 
 #include <iostream>
 
-#include "../engnine/Color.hpp"
+#include "engnine/Color.hpp"
 #include "ruby.h"
 
-class It_Color {
+namespace It {
+
+class Color {
  public:
 
   static void integrate()
   {
     VALUE rbc_Color = rb_define_class("Color", rb_cObject);
 
-    rb_define_method(rbc_Color, "initialize", RUBY_METHOD_FUNC(initialize), 3);
+    rb_define_method(rbc_Color, "initialize", RUBY_METHOD_FUNC(method_initialize), 3);
 
     // rb_define_attr(rbc_Color, "red", 1, 1);
 
@@ -35,7 +37,7 @@ class It_Color {
     return self;
   }
 
-  static VALUE initialize(VALUE self, VALUE p_r, VALUE p_g, VALUE p_b)
+  static VALUE method_initialize(VALUE self, VALUE p_r, VALUE p_g, VALUE p_b)
   {
     Check_Type(p_r, T_FIXNUM);
     Check_Type(p_g, T_FIXNUM);
@@ -45,7 +47,7 @@ class It_Color {
     int g = FIX2INT(p_g);
     int b = FIX2INT(p_b);
 
-    EngColor *instance = new EngColor(r, g, b);
+    Eng::Color *instance = new Eng::Color(r, g, b);
     DATA_PTR(self) = instance;
 
     return self;
@@ -53,7 +55,7 @@ class It_Color {
 
   static VALUE method_set(VALUE self, VALUE p_r, VALUE p_g, VALUE p_b)
   {
-    EngColor *inst = (EngColor *)DATA_PTR(self);
+    Eng::Color *inst = (Eng::Color *)DATA_PTR(self);
 
     Check_Type(p_r, T_FIXNUM);
     Check_Type(p_g, T_FIXNUM);
@@ -70,7 +72,7 @@ class It_Color {
 
   static VALUE attrGet_red(VALUE self)
   {
-    EngColor *inst = (EngColor *)DATA_PTR(self);
+    Eng::Color *inst = (Eng::Color *)DATA_PTR(self);
     return INT2NUM(inst->red);
   }
 
@@ -78,14 +80,14 @@ class It_Color {
   {
     Check_Type(value, T_FIXNUM);
     int r = NUM2INT(value);
-    EngColor *inst = (EngColor *)DATA_PTR(self);
+    Eng::Color *inst = (Eng::Color *)DATA_PTR(self);
     inst->red = r;
     return value;
   }
 
   static VALUE attrGet_green(VALUE self)
   {
-    EngColor *inst = (EngColor *)DATA_PTR(self);
+    Eng::Color *inst = (Eng::Color *)DATA_PTR(self);
     return INT2NUM(inst->green);
   }
 
@@ -93,14 +95,14 @@ class It_Color {
   {
     Check_Type(value, T_FIXNUM);
     int r = NUM2INT(value);
-    EngColor *inst = (EngColor *)DATA_PTR(self);
+    Eng::Color *inst = (Eng::Color *)DATA_PTR(self);
     inst->green = r;
     return value;
   }
 
   static VALUE attrGet_blue(VALUE self)
   {
-    EngColor *inst = (EngColor *)DATA_PTR(self);
+    Eng::Color *inst = (Eng::Color *)DATA_PTR(self);
     return INT2NUM(inst->blue);
   }
 
@@ -108,8 +110,10 @@ class It_Color {
   {
     Check_Type(value, T_FIXNUM);
     int r = NUM2INT(value);
-    EngColor *inst = (EngColor *)DATA_PTR(self);
+    Eng::Color *inst = (Eng::Color *)DATA_PTR(self);
     inst->blue = r;
     return value;
   }
 };
+
+}  // namespace It

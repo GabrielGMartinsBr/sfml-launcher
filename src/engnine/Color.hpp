@@ -2,13 +2,15 @@
 
 // TODO: Add values range automatically correction
 
-class EngColor {
+namespace Eng {
+
+class Color {
  public:
   int red = 0;
   int green = 0;
   int blue = 0;
 
-  EngColor(int r, int g, int b)
+  Color(int r, int g, int b)
   {
     set(r, g, b);
   }
@@ -20,3 +22,5 @@ class EngColor {
     blue = b;
   }
 };
+
+}  // namespace Eng

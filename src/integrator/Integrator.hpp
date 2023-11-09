@@ -25,6 +25,7 @@ class Integrator {
 
     loadScriptsPath();
 
+    It::Color::integrate();
     It_Color::integrate();
 
     require("script_02.rb");
