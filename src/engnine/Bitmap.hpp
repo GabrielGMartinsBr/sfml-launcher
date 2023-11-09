@@ -8,11 +8,12 @@ namespace Eng {
 typedef const char* Str;
 
 class Bitmap {
-  int width;
-  int height;
   bool _disposed;
 
  public:
+  int width;
+  int height;
+
   Bitmap(const char* filename);
 
   Bitmap(int _width, int _height)
@@ -24,10 +25,6 @@ class Bitmap {
   void dispose();
 
   bool disposed() { return _disposed; }
-
-  int get_width() { return width; }
-
-  int get_height() { return height; }
 
   void get_rect(){};
 
