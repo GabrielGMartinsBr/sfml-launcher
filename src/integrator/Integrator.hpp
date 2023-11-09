@@ -6,6 +6,7 @@
 
 #include "integrator/It_Color.hpp"
 #include "integrator/It_Sprite.hpp"
+#include "integrator/It_Tone.hpp"
 #include "ruby.h"
 
 typedef VALUE (*Cb)(VALUE);
@@ -27,6 +28,7 @@ class Integrator {
     loadScriptsPath();
 
     It::Color::integrate();
+    It::Tone::integrate();
     It::Sprite::integrate();
 
     require("script_02.rb");
