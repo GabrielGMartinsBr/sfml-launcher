@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <iostream>
 
+#include "integrator/It_Bitmap.hpp"
 #include "integrator/It_Color.hpp"
 #include "integrator/It_Sprite.hpp"
 #include "integrator/It_Tone.hpp"
@@ -29,6 +30,7 @@ class Integrator {
 
     It::Color::integrate();
     It::Tone::integrate();
+    It::Bitmap::integrate();
     It::Sprite::integrate();
 
     require("script_02.rb");

@@ -4,6 +4,7 @@ height = 300
 color = Color.new(55, 100, 255)
 
 sprite = Sprite.new
+bp = Bitmap.new(width, height)
 
 # sprite.bitmap = Bitmap.new(width, height)
 

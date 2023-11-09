@@ -29,6 +29,7 @@ class Sprite {
   Tone tone;
 
   Sprite() :
+      bitmap(0, 0),
       color(0, 0, 0),
       tone(0, 0, 0)
   {
