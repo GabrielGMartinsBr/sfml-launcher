@@ -4,8 +4,8 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "integrator/Color.hpp"
-#include "integrator/Sprite.hpp"
+#include "integrator/It_Color.hpp"
+#include "integrator/It_Sprite.hpp"
 #include "ruby.h"
 
 typedef VALUE (*Cb)(VALUE);
