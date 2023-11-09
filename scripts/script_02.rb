@@ -4,9 +4,12 @@ height = 300
 color = Color.new(55, 100, 255)
 
 sprite = Sprite.new
-bp = Bitmap.new(width, height)
+# bp = Bitmap.new(width, height)
 
-# sprite.bitmap = Bitmap.new(width, height)
+sprite.bitmap = Bitmap.new(width, height)
+
+puts sprite.bitmap.width;
+puts sprite.bitmap.height;
 
 # for x in 0...width
 #     sprite.bitmap.set_pixel(x, 64, color)

@@ -4,13 +4,15 @@
 #include "engnine/Color.hpp"
 #include "engnine/Rect.hpp"
 #include "engnine/Tone.hpp"
+#include "ruby.h"
 
 namespace Eng {
 
 class Sprite {
 
  public:
-  Bitmap bitmap;
+  Bitmap *bitmap = nullptr;
+  VALUE bitmap_ptr;
   Rect src_rect;
   bool visible;
   int x;
@@ -29,7 +31,6 @@ class Sprite {
   Tone tone;
 
   Sprite() :
-      bitmap(0, 0),
       color(0, 0, 0),
       tone(0, 0, 0)
   {
