@@ -2,6 +2,6 @@
 
 namespace Eng {
 
-class Rect { };
+class Tone { };
 
 }  // namespace Eng
