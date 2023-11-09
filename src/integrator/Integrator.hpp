@@ -1,8 +1,10 @@
 #pragma once
 
 #include <boost/filesystem.hpp>
+#include <cstdlib>
 #include <iostream>
 
+#include "integrator/It_Color.hpp"
 #include "ruby.h"
 
 typedef VALUE (*Cb)(VALUE);
@@ -17,15 +19,19 @@ class Integrator {
 
   void init()
   {
+    std::cout << "[Ruby]: Init\n";
+
     ruby_init();
 
     loadScriptsPath();
 
-    // require("script_02.rb");
+    It_Color::integrate();
+
+    require("script_02.rb");
 
     ruby_finalize();
 
-    std::cout << "ruby finalized\n";
+    std::cout << "[Ruby]: Finalized\n";
   }
 
   void cleanup()
@@ -40,7 +46,6 @@ class Integrator {
     FPath relativePath("../scripts");
     FPath absolutePath = boost::filesystem::canonical(relativePath);
     const char* scriptDirPath = absolutePath.c_str();
-    std::cout << scriptDirPath;
 
     VALUE loadPathArray = rb_gv_get("$LOAD_PATH");
     rb_funcall(loadPathArray, rb_intern("<<"), 1, rb_str_new2(scriptDirPath));
@@ -53,6 +58,7 @@ class Integrator {
     if (error) {
       VALUE error_message = rb_gv_get("$!");
       rb_p(error_message);
+      std::exit(1);
     }
   }
 };
