@@ -35,8 +35,8 @@ class Bitmap {
     Check_Type(_width, T_FIXNUM);
     Check_Type(_height, T_FIXNUM);
 
-    int width = INT2NUM(_width);
-    int height = INT2NUM(_height);
+    unsigned int width = FIX2INT(_width);
+    unsigned int height = FIX2INT(_height);
 
     Eng::Bitmap *inst = new Eng::Bitmap(width, height);
     DATA_PTR(self) = inst;

@@ -1,7 +1,9 @@
 #pragma once
 
+#include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Image.hpp>
 
+#include "base/Log.hpp"
 #include "engnine/Color.hpp"
 #include "engnine/Rect.hpp"
 
@@ -10,22 +12,22 @@ namespace Eng {
 typedef const char* Str;
 
 class Bitmap {
+ public:
   bool _disposed;
-
   sf::Image buffer;
 
- public:
-  int width;
-  int height;
+  unsigned int width;
+  unsigned int height;
 
   Bitmap(const char* filename);
 
-  Bitmap(int _width, int _height)
+  Bitmap(unsigned int _width, unsigned int _height) :
+      buffer()
   {
     width = _width;
     height = _height;
 
-    buffer.create(width, height);
+    buffer.create(width, height, sf::Color::Black);
   }
 
   void dispose();

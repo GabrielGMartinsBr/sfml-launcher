@@ -17,9 +17,22 @@ class Color {
 
   void set(int r, int g, int b)
   {
+    clamp(r);
+    clamp(g);
+    clamp(b);
     red = r;
     green = g;
     blue = b;
+  }
+
+ private:
+  void clamp(int& v)
+  {
+    if (v < 0) {
+      v = 0;
+    } else if (v > 255) {
+      v = 255;
+    }
   }
 };
 

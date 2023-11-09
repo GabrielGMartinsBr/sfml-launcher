@@ -5,6 +5,10 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/System/Vector2.hpp>
 
+#include "GlobalTest.h"
+#include "base/Log.hpp"
+#include "engnine/Sprite.hpp"
+
 class Graphics {
 
  public:
@@ -23,6 +27,18 @@ class Graphics {
 
   void render(sf::RenderWindow &win)
   {
-    win.draw(shape);
+    // Log::out() << globalInst.sprites.size();
+
+    Eng::Sprite *spr;
+    for (VALUE i : globalInst.sprites) {
+      spr = (Eng::Sprite *)DATA_PTR(i);
+      // if (!spr->bitmap) {
+      //   continue;
+      // }
+      // Log::out() << spr->sprite.getTexture()->;
+      spr->atualizar();
+      win.draw(spr->sprite);
+      // win.draw(shape);
+    }
   }
 };

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "GlobalTest.h"
 #include "engnine/Bitmap.hpp"
 #include "engnine/Sprite.hpp"
 #include "ruby.h"
@@ -24,7 +25,9 @@ class Sprite {
 
   static VALUE method_initialize(VALUE self)
   {
+    Log::out() << "addSprite";
     Eng::Sprite *instance = new Eng::Sprite();
+    globalInst.addSprite(self);
     DATA_PTR(self) = instance;
     return self;
   }
@@ -50,6 +53,8 @@ class Sprite {
 
     inst->bitmap = bitmap;
     inst->bitmap_ptr = value;
+
+    // inst->atualizar();
 
     return value;
   }

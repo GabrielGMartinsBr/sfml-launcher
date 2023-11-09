@@ -1,13 +1,14 @@
 #pragma once
 
-#include "base/Log.hpp"
+// #include "base/Log.hpp"
+
 namespace Eng {
 
 class Graphics {
  public:
-  static void update() {
-
-    Log::out() << "graphics update";
+  static void update()
+  {
+    // Log::out() << "graphics update";
   }
 };
 
