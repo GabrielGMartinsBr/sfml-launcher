@@ -2,8 +2,11 @@
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
+#include <iostream>
+#include <thread>
 
 #include "graphics/Graphics.hpp"
+#include "integrator/Integrator.hpp"
 
 class Launcher {
   int width = 600;
@@ -13,6 +16,7 @@ class Launcher {
   sf::VideoMode mode;
   sf::RenderWindow window;
 
+  Integrator integrator;
   Graphics gr;
 
  public:
@@ -25,16 +29,20 @@ class Launcher {
 
   void run()
   {
+    std::thread rbThread(integrator);
+
     while (window.isOpen()) {
-      pollEvent();
+      listenEvents();
       update();
       render();
     }
+
+    rbThread.join();
   }
 
  private:
 
-  void pollEvent()
+  void listenEvents()
   {
     sf::Event event;
 
@@ -44,6 +52,7 @@ class Launcher {
           handleClose();
           break;
         default:
+          // std::cout << event.type << '\n';
           break;
       }
     }

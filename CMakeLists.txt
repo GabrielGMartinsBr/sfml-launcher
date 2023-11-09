@@ -33,3 +33,11 @@ add_executable(${PROJECT_NAME} ${source_files})
 find_package(RubyStatic REQUIRED)
 include_directories(${RubyStatic_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} ${RubyStatic_LIBRARIES} -lcrypt)
+
+
+# Boost Filesystem
+find_package(Boost COMPONENTS system filesystem REQUIRED)
+target_link_libraries(${PROJECT_NAME} 
+  ${Boost_FILESYSTEM_LIBRARY}
+  ${Boost_SYSTEM_LIBRARY}
+)

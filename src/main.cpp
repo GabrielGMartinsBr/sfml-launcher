@@ -15,9 +15,6 @@ GameInput game_input;
 
 int main(int, char **)
 {
-  // RubyService rService;
-  // rService.run();
-
   Launcher launcher;
 
   launcher.run();
