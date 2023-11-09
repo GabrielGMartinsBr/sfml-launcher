@@ -7,13 +7,13 @@ sprite = Sprite.new
 
 sprite.bitmap = Bitmap.new(width, height)
 
-sprite.bitmap.set_pixel(100, 64, color)
-puts sprite.bitmap.get_pixel(100, 64).blue
+# sprite.bitmap.set_pixel(100, 64, color)
+# puts sprite.bitmap.get_pixel(100, 64).blue
 
-# for x in 0...width
-#     sprite.bitmap.set_pixel(x, 64, color)
-# end
+for x in 0...width
+    sprite.bitmap.set_pixel(x, 64, color)
+end
 
-# loop do
-#     Graphics.update
-# end
+loop do
+    Graphics.update
+end

@@ -6,6 +6,7 @@
 
 #include "integrator/It_Bitmap.hpp"
 #include "integrator/It_Color.hpp"
+#include "integrator/It_Graphics.hpp"
 #include "integrator/It_Sprite.hpp"
 #include "integrator/It_Tone.hpp"
 #include "ruby.h"
@@ -32,6 +33,7 @@ class Integrator {
     It::Tone::integrate();
     It::Bitmap::integrate();
     It::Sprite::integrate();
+    It::Graphics::integrate();
 
     require("script_02.rb");
 
