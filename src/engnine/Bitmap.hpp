@@ -3,7 +3,6 @@
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Image.hpp>
 
-#include "base/Log.hpp"
 #include "engnine/Color.hpp"
 #include "engnine/Rect.hpp"
 
@@ -18,6 +17,8 @@ class Bitmap {
 
   unsigned int width;
   unsigned int height;
+
+  bool _needsUpdate = false;
 
   Bitmap(const char* filename);
 
@@ -57,6 +58,7 @@ class Bitmap {
   {
     sf::Color color(_color->red, _color->green, _color->blue);
     buffer.setPixel(_x, _y, color);
+    _needsUpdate = true;
   }
 
   void hue_change(int _hue);

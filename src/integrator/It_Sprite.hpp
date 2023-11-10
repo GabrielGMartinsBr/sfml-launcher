@@ -35,7 +35,7 @@ class Sprite {
   static VALUE attrGet_bitmap(VALUE self)
   {
     Eng::Sprite *inst = (Eng::Sprite *)DATA_PTR(self);
-    Eng::Bitmap *bitmap = inst->bitmap;
+    Eng::Bitmap *bitmap = inst->getBitmap();
 
     if (bitmap == nullptr) {
       return Qnil;
@@ -51,7 +51,7 @@ class Sprite {
     Eng::Sprite *inst = (Eng::Sprite *)DATA_PTR(self);
     Eng::Bitmap *bitmap = (Eng::Bitmap *)DATA_PTR(value);
 
-    inst->bitmap = bitmap;
+    inst->setBitmap(bitmap);
     inst->bitmap_ptr = value;
 
     // inst->atualizar();
