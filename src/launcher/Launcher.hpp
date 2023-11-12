@@ -2,9 +2,12 @@
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
+#include <chrono>
+#include <cmath>
 #include <iostream>
 #include <thread>
 
+#include "base/Log.hpp"
 #include "graphics/Graphics.hpp"
 #include "integrator/Integrator.hpp"
 
@@ -15,6 +18,12 @@ class Launcher {
 
   sf::VideoMode mode;
   sf::RenderWindow window;
+
+  float elapsed;
+  float fps;
+  std::chrono::high_resolution_clock::time_point currentTime;
+  std::chrono::high_resolution_clock::time_point previousTime;
+  float frameTime = 1.0f / 60.0f * 1e6;
 
   Integrator integrator;
   Graphics gr;
@@ -32,9 +41,21 @@ class Launcher {
     std::thread rbThread(integrator);
 
     while (window.isOpen()) {
-      listenEvents();
-      update();
-      render();
+      currentTime = std::chrono::high_resolution_clock::now();
+      elapsed = (float)std::chrono::duration_cast<std::chrono::microseconds>(currentTime - previousTime).count();
+
+      if (elapsed >= frameTime) {
+        listenEvents();
+        update();
+        render();
+
+        fps = (float)1e6 / elapsed;
+        Log::out() << "FPS: " << std::floor(fps);
+
+        previousTime = currentTime;
+      } else {
+        std::this_thread::sleep_for(std::chrono::milliseconds(3));
+      }
     }
 
     rbThread.join();
@@ -58,7 +79,9 @@ class Launcher {
     }
   }
 
-  void update() { }
+  void update()
+  {
+  }
 
   void render()
   {
