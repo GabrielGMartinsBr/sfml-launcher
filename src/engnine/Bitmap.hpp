@@ -2,6 +2,7 @@
 
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Image.hpp>
+#include <stdexcept>
 
 #include "engnine/Color.hpp"
 #include "engnine/Rect.hpp"
@@ -62,6 +63,9 @@ class Bitmap {
 
   void set_pixel(unsigned int x, unsigned int y, Color* _color)
   {
+    if (_disposed) {
+      throw std::runtime_error("disposed bitmap");
+    }
     if (x < 0 || x > width || y < 0 || y > height) {
       return;
     }

@@ -18,12 +18,20 @@ for x in 0...width
 end
 
 acc = 0
+c = 0
 
 loop do
-    
-    acc += 1
+    c+=1
+    if acc < 500
+        acc += 1
+    end
+
+    if c > 3000000
+        sprite2.bitmap.dispose()
+    end
     sprite.bitmap.set_pixel(acc, 256, color1)
 
+    sprite2.bitmap.set_pixel(300, 300, color2)
 
     Graphics.update
 end

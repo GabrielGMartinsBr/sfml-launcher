@@ -19,6 +19,9 @@ class Sprite {
 
     rb_define_method(spriteClass, "bitmap", RUBY_METHOD_FUNC(attrGet_bitmap), 0);
     rb_define_method(spriteClass, "bitmap=", RUBY_METHOD_FUNC(attrSet_bitmap), 1);
+
+    rb_define_method(spriteClass, "dispose", RUBY_METHOD_FUNC(method_dispose), 0);
+    rb_define_method(spriteClass, "disposed", RUBY_METHOD_FUNC(method_disposed), 0);
   }
 
  private:
@@ -57,6 +60,20 @@ class Sprite {
     // inst->atualizar();
 
     return value;
+  }
+
+  static VALUE method_dispose(VALUE self)
+  {
+    Eng::Sprite *inst = (Eng::Sprite *)DATA_PTR(self);
+    inst->dispose();
+    return Qnil;
+  }
+
+  static VALUE method_disposed(VALUE self)
+  {
+    Eng::Sprite *inst = (Eng::Sprite *)DATA_PTR(self);
+    bool isDisposed = inst->disposed();
+    return isDisposed ? Qtrue : Qfalse;
   }
 };
 

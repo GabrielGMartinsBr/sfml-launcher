@@ -21,6 +21,9 @@ class Bitmap {
 
     rb_define_method(bitmapClass, "get_pixel", RUBY_METHOD_FUNC(method_get_pixel), 2);
     rb_define_method(bitmapClass, "set_pixel", RUBY_METHOD_FUNC(method_set_pixel), 3);
+
+    rb_define_method(bitmapClass, "dispose", RUBY_METHOD_FUNC(method_dispose), 0);
+    rb_define_method(bitmapClass, "disposed", RUBY_METHOD_FUNC(method_disposed), 0);
   }
 
   static VALUE getRbClass()
@@ -86,6 +89,20 @@ class Bitmap {
     inst->set_pixel(x, y, color);
 
     return Qnil;
+  }
+
+  static VALUE method_dispose(VALUE self)
+  {
+    Eng::Bitmap *inst = (Eng::Bitmap *)DATA_PTR(self);
+    inst->dispose();
+    return Qnil;
+  }
+
+  static VALUE method_disposed(VALUE self)
+  {
+    Eng::Bitmap *inst = (Eng::Bitmap *)DATA_PTR(self);
+    bool isDisposed = inst->disposed();
+    return isDisposed ? Qtrue : Qfalse;
   }
 };
 
