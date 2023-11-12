@@ -17,6 +17,7 @@ namespace Eng {
 
 class Sprite {
   Bitmap *bitmap = nullptr;
+  bool _disposed = false;
 
  public:
   sf::Sprite sprite;
@@ -68,15 +69,26 @@ class Sprite {
     }
   }
 
-  void dispose() { }
+  void dispose()
+  {
+    _disposed = true;
+  }
 
-  void disposed() { }
+  bool disposed()
+  {
+    return _disposed;
+  }
 
   void viewport() { }
 
   void update()
   {
     atualizar();
+  }
+
+  bool shouldRender()
+  {
+    return !_disposed && bitmap != nullptr && !bitmap->disposed();
   }
 };
 

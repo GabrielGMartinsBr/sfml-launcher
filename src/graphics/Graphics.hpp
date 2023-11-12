@@ -6,7 +6,6 @@
 #include <SFML/System/Vector2.hpp>
 
 #include "GlobalTest.h"
-#include "base/Log.hpp"
 #include "engnine/Sprite.hpp"
 
 class Graphics {
@@ -27,18 +26,13 @@ class Graphics {
 
   void render(sf::RenderWindow &win)
   {
-    // Log::out() << globalInst.sprites.size();
-
-    Eng::Sprite *spr;
+    Eng::Sprite *spr = nullptr;
     for (VALUE i : globalInst.sprites) {
       spr = (Eng::Sprite *)DATA_PTR(i);
-      // if (!spr->bitmap) {
-      //   continue;
-      // }
-      // Log::out() << spr->sprite.getTexture()->;
-      spr->atualizar();
-      win.draw(spr->sprite);
-      // win.draw(shape);
+      if (spr && spr->shouldRender()) {
+        spr->atualizar();
+        win.draw(spr->sprite);
+      }
     }
   }
 };

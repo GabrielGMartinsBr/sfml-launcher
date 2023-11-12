@@ -12,7 +12,7 @@ typedef const char* Str;
 
 class Bitmap {
  public:
-  bool _disposed;
+  bool _disposed = false;
   sf::Image buffer;
 
   unsigned int width;
@@ -28,12 +28,18 @@ class Bitmap {
     width = _width;
     height = _height;
 
-    buffer.create(width, height, sf::Color::Black);
+    buffer.create(width, height, sf::Color::Transparent);
   }
 
-  void dispose();
+  void dispose()
+  {
+    _disposed = true;
+  }
 
-  bool disposed() { return _disposed; }
+  bool disposed()
+  {
+    return _disposed;
+  }
 
   void get_rect(){};
 
@@ -54,10 +60,13 @@ class Bitmap {
     return color;
   }
 
-  void set_pixel(unsigned int _x, unsigned int _y, Color* _color)
+  void set_pixel(unsigned int x, unsigned int y, Color* _color)
   {
+    if (x < 0 || x > width || y < 0 || y > height) {
+      return;
+    }
     sf::Color color(_color->red, _color->green, _color->blue);
-    buffer.setPixel(_x, _y, color);
+    buffer.setPixel(x, y, color);
     _needsUpdate = true;
   }
 

@@ -35,7 +35,7 @@ class Integrator {
     It::Sprite::integrate();
     It::Graphics::integrate();
 
-    require("script_02.rb");
+    require("script_03.rb");
 
     ruby_finalize();
 
