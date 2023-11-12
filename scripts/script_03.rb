@@ -20,6 +20,8 @@ end
 acc = 0
 c = 0
 
+
+
 loop do
     c+=1
     if acc < 500
@@ -30,8 +32,7 @@ loop do
         sprite2.bitmap.dispose()
     end
     sprite.bitmap.set_pixel(acc, 256, color1)
-
-    sprite2.bitmap.set_pixel(300, 300, color2)
-
+    
+    Input.update
     Graphics.update
 end

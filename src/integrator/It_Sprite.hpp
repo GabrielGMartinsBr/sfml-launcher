@@ -1,7 +1,7 @@
 #pragma once
 
-#include "GlobalTest.h"
 #include "engnine/Bitmap.hpp"
+#include "engnine/Engine.hpp"
 #include "engnine/Sprite.hpp"
 #include "ruby.h"
 
@@ -28,10 +28,12 @@ class Sprite {
 
   static VALUE method_initialize(VALUE self)
   {
-    Log::out() << "addSprite";
     Eng::Sprite *instance = new Eng::Sprite();
-    globalInst.addSprite(self);
     DATA_PTR(self) = instance;
+
+    Eng::Engine &engine = Eng::Engine::getInstance();
+    engine.addSprite(self);
+
     return self;
   }
 

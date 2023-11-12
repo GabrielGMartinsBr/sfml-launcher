@@ -25,9 +25,7 @@ class Graphics {
   static VALUE method_update(VALUE self)
   {
     Eng::Graphics *obj = (Eng::Graphics *)DATA_PTR(self);
-
     obj->update();
-
     return Qnil;
   }
 };

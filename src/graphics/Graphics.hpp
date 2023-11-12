@@ -5,7 +5,7 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/System/Vector2.hpp>
 
-#include "GlobalTest.h"
+#include "engnine/Engine.hpp"
 #include "engnine/Sprite.hpp"
 
 class Graphics {
@@ -26,8 +26,11 @@ class Graphics {
 
   void render(sf::RenderWindow &win)
   {
+    Eng::Engine &engine = Eng::Engine::getInstance();
+
     Eng::Sprite *spr = nullptr;
-    for (VALUE i : globalInst.sprites) {
+
+    for (VALUE i : *engine.getSprites()) {
       spr = (Eng::Sprite *)DATA_PTR(i);
       if (spr && spr->shouldRender()) {
         spr->atualizar();
