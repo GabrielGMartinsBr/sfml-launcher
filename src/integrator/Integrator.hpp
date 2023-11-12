@@ -3,10 +3,12 @@
 #include <boost/filesystem.hpp>
 #include <cstdlib>
 #include <iostream>
+#include <stdexcept>
 
 #include "integrator/It_Bitmap.hpp"
 #include "integrator/It_Color.hpp"
 #include "integrator/It_Graphics.hpp"
+#include "integrator/It_Input.hpp"
 #include "integrator/It_Sprite.hpp"
 #include "integrator/It_Tone.hpp"
 #include "ruby.h"
@@ -15,6 +17,10 @@ typedef VALUE (*Cb)(VALUE);
 typedef boost::filesystem::path FPath;
 
 class Integrator {
+  bool initialized = false;
+
+  It::Input input;
+
  public:
   void operator()()
   {
@@ -23,6 +29,10 @@ class Integrator {
 
   void init()
   {
+    if (initialized) {
+      throw std::runtime_error("Can not initialize Integrator twice.");
+    }
+
     std::cout << "[Ruby]: Init\n";
 
     ruby_init();
@@ -35,11 +45,15 @@ class Integrator {
     It::Sprite::integrate();
     It::Graphics::integrate();
 
+    input.integrate();
+
     require("script_03.rb");
 
     ruby_finalize();
 
     std::cout << "[Ruby]: Finalized\n";
+
+    initialized = true;
   }
 
   void cleanup()
