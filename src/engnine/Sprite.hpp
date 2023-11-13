@@ -6,7 +6,6 @@
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
 
-#include "base/Log.hpp"
 #include "engnine/Bitmap.hpp"
 #include "engnine/Color.hpp"
 #include "engnine/Rect.hpp"
@@ -24,7 +23,7 @@ class Sprite {
   sf::Texture text;
 
   VALUE bitmap_ptr;
-  Rect src_rect;
+  Rect *src_rect = nullptr;
   bool visible;
   int x;
   int y;

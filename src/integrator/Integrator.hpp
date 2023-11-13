@@ -9,6 +9,7 @@
 #include "integrator/It_Color.hpp"
 #include "integrator/It_Graphics.hpp"
 #include "integrator/It_Input.hpp"
+#include "integrator/It_Rect.hpp"
 #include "integrator/It_Sprite.hpp"
 #include "integrator/It_Tone.hpp"
 #include "ruby.h"
@@ -37,6 +38,7 @@ class Integrator {
 
     It::Color::integrate();
     It::Tone::integrate();
+    It::Rect::integrate();
     It::Bitmap::integrate();
     It::Sprite::integrate();
     It::Graphics::integrate();
