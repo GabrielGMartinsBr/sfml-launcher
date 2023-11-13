@@ -3,6 +3,7 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/VideoMode.hpp>
+#include <stdexcept>
 #include <vector>
 
 #include "base/Log.hpp"
@@ -12,8 +13,12 @@
 namespace Eng {
 
 class Engine {
+  bool initialized = false;
   bool running = false;
+
   std::vector<VALUE> sprites;
+
+  sf::RenderWindow* window = nullptr;
 
   Engine() { }
 
@@ -34,9 +39,14 @@ class Engine {
     Log::out() << "Sprites number: " << sprites.size();
   }
 
-  void init()
+  void init(sf::RenderWindow& _window)
   {
+    if (initialized) {
+      throw std::runtime_error("Engine can be initialized only once.");
+    }
     running = true;
+    window = &_window;
+    initialized = true;
   }
 
   bool isRunning()
@@ -49,23 +59,23 @@ class Engine {
     return &sprites;
   }
 
-  void updateInput(sf::RenderWindow& window)
+  void updateInput()
   {
-    pollEvents(window);
+    pollEvents();
   }
 
-  void updateGraphics(sf::RenderWindow& window)
+  void updateGraphics()
   {
-    window.clear();
+    window->clear();
 
-    renderSprites(window);
+    renderSprites();
 
-    window.display();
+    window->display();
   }
 
 
  private:
-  void renderSprites(sf::RenderWindow& win)
+  void renderSprites()
   {
     Eng::Sprite* spr = nullptr;
 
@@ -73,15 +83,15 @@ class Engine {
       spr = (Eng::Sprite*)DATA_PTR(i);
       if (spr && spr->shouldRender()) {
         spr->atualizar();
-        win.draw(spr->sprite);
+        window->draw(spr->sprite);
       }
     }
   }
 
-  void pollEvents(sf::RenderWindow& win)
+  void pollEvents()
   {
     sf::Event event;
-    while (win.pollEvent(event)) {
+    while (window->pollEvent(event)) {
       switch (event.type) {
         case sf::Event::Closed:
           handleCloseEvent();

@@ -31,7 +31,7 @@ class Launcher {
 
   void run()
   {
-    engine.init();
+    engine.init(window);
 
     std::thread rbThread(integrator);
 
@@ -52,8 +52,8 @@ class Launcher {
  private:
   void update()
   {
-    engine.updateInput(window);
-    engine.updateGraphics(window);
+    engine.updateInput();
+    engine.updateGraphics();
 
     timer.markUpdate();
     timer.printFps();
