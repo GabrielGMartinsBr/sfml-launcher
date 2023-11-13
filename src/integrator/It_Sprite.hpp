@@ -3,6 +3,8 @@
 #include "engnine/Bitmap.hpp"
 #include "engnine/Engine.hpp"
 #include "engnine/Sprite.hpp"
+#include "engnine/Viewport.hpp"
+#include "integrator/It_Viewport.hpp"
 #include "ruby.h"
 
 namespace It {
@@ -15,7 +17,7 @@ class Sprite {
   {
     VALUE spriteClass = rb_define_class("Sprite", rb_cObject);
 
-    rb_define_method(spriteClass, "initialize", RUBY_METHOD_FUNC(method_initialize), 0);
+    rb_define_method(spriteClass, "initialize", RUBY_METHOD_FUNC(method_initialize), -1);
 
     rb_define_method(spriteClass, "x", RUBY_METHOD_FUNC(attrGet_x), 0);
     rb_define_method(spriteClass, "x=", RUBY_METHOD_FUNC(attrSet_x), 1);
@@ -26,19 +28,47 @@ class Sprite {
     rb_define_method(spriteClass, "bitmap", RUBY_METHOD_FUNC(attrGet_bitmap), 0);
     rb_define_method(spriteClass, "bitmap=", RUBY_METHOD_FUNC(attrSet_bitmap), 1);
 
+    rb_define_method(spriteClass, "viewport", RUBY_METHOD_FUNC(attrGet_viewport), 0);
+
     rb_define_method(spriteClass, "dispose", RUBY_METHOD_FUNC(method_dispose), 0);
     rb_define_method(spriteClass, "disposed", RUBY_METHOD_FUNC(method_disposed), 0);
   }
 
  private:
 
-  static VALUE method_initialize(VALUE self)
+  static VALUE method_initialize(int argc, VALUE *argv, VALUE self)
+  {
+    if (argc == 0) {
+      return overload_initialize1(self);
+    } else if (argc == 1) {
+      return overload_initialize2(argc, argv, self);
+    }
+
+    throw std::runtime_error("Failed to initialize sprite.");
+  }
+
+  static VALUE overload_initialize1(VALUE self)
   {
     Eng::Sprite *instance = new Eng::Sprite();
     DATA_PTR(self) = instance;
 
-    Eng::Engine &engine = Eng::Engine::getInstance();
-    engine.addSprite(self);
+    Eng::Engine::getInstance().addSprite(self);
+
+    return self;
+  }
+
+  static VALUE overload_initialize2(int argc, VALUE *argv, VALUE self)
+  {
+    VALUE _viewport;
+    rb_scan_args(argc, argv, "1", &_viewport);
+
+    Check_Type(_viewport, T_OBJECT);
+    Eng::Viewport *viewport = (Eng::Viewport *)DATA_PTR(_viewport);
+
+    Eng::Sprite *instance = new Eng::Sprite(viewport);
+    DATA_PTR(self) = instance;
+
+    Eng::Engine::getInstance().addSprite(self);
 
     return self;
   }
@@ -108,6 +138,23 @@ class Sprite {
     inst->bitmap_ptr = value;
 
     return value;
+  }
+
+  /*
+    Method viewport
+  */
+
+  static VALUE attrGet_viewport(VALUE self)
+  {
+    Eng::Sprite *inst = (Eng::Sprite *)DATA_PTR(self);
+    Eng::Viewport *viewport = inst->getViewport();
+
+    if (viewport == nullptr) {
+      return Qnil;
+    }
+
+    VALUE viewportClass = Viewport::getRbClass();
+    return Data_Wrap_Struct(viewportClass, 0, free, viewport);
   }
 
   /*

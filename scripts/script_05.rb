@@ -20,24 +20,26 @@ end
 class Character
     def initialize
         bp = Bitmap.new("Graphics/Characters/001-Fighter01")
-        spr = Sprite.new
-        spr.bitmap = bp
-
+        
         col = bp.width / 4
         row = bp.height / 4
-
-        # vp = Viewport.new(240, 0, col, row)
-        rect = Rect.new(240, 0, col, row)
-        vp = Viewport.new(rect)
         
-        puts "\n"
-        puts "---Rect--------------"
-        puts "x: " + vp.rect.x.to_s
-        puts "y: " + vp.rect.y.to_s
-        puts "width: " + vp.rect.width.to_s
-        puts "height: " + vp.rect.height.to_s
-        puts "---------------------"
-        puts "\n"
+        # vp = Viewport.new(240, 0, col, row)
+        rect = Rect.new(10, 0, col, row)
+        vp = Viewport.new(rect)
+
+        
+        # puts "\n"
+        # puts "---Rect--------------"
+        # puts "x: " + vp.rect.x.to_s
+        # puts "y: " + vp.rect.y.to_s
+        # puts "width: " + vp.rect.width.to_s
+        # puts "height: " + vp.rect.height.to_s
+        # puts "---------------------"
+        # puts "\n"
+
+        spr = Sprite.new(vp)
+        spr.bitmap = bp
 
     end
 end

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/VideoMode.hpp>
@@ -8,6 +9,7 @@
 
 #include "base/Log.hpp"
 #include "engnine/Sprite.hpp"
+#include "engnine/Viewport.hpp"
 #include "ruby.h"
 
 namespace Eng {
@@ -19,8 +21,12 @@ class Engine {
   std::vector<VALUE> sprites;
 
   sf::RenderWindow* window = nullptr;
+  sf::View view;
 
-  Engine() { }
+  Engine() :
+      view(sf::FloatRect(0, 0, 640, 480))
+  {
+  }
 
   Engine(const Engine&);
   Engine& operator=(const Engine&);
@@ -84,6 +90,19 @@ class Engine {
       spr = (Eng::Sprite*)DATA_PTR(i);
       if (spr && spr->shouldRender()) {
         spr->atualizar();
+
+        Viewport* vp = spr->getViewport();
+        if (vp) {
+          // spr->sprite.setPosition(10, 10);
+          spr->sprite.setTextureRect(
+            vp->textureRect()
+          );
+
+          spr->sprite.setPosition(
+            vp->getRect()->x,
+            vp->getRect()->y
+          );
+        }
         window->draw(spr->sprite);
       }
     }

@@ -23,6 +23,11 @@ class Viewport {
     rb_define_method(viewportClass, "rect=", RUBY_METHOD_FUNC(attrSet_rect), 1);
   }
 
+  static VALUE getRbClass()
+  {
+    return rb_const_get(rb_cObject, rb_intern("Viewport"));
+  }
+
  private:
 
   /*
@@ -35,9 +40,9 @@ class Viewport {
       return overload_initialize1(argc, argv, self);
     } else if (argc == 1) {
       return overload_initialize2(argc, argv, self);
-    } else {
-      throw std::runtime_error("Failed to initialize bitmap.");
     }
+
+    throw std::runtime_error("Failed to initialize bitmap.");
   }
 
   static VALUE overload_initialize1(int argc, VALUE *argv, VALUE self)

@@ -10,14 +10,19 @@
 #include "engnine/Color.hpp"
 #include "engnine/Rect.hpp"
 #include "engnine/Tone.hpp"
+#include "engnine/Viewport.hpp"
 #include "ruby.h"
 
 namespace Eng {
 
 class Sprite {
-  Bitmap *bitmap = nullptr;
-  bool _disposed = false;
   bool dirty = false;
+  bool _disposed = false;
+
+  Viewport *viewport = nullptr;
+  Bitmap *bitmap = nullptr;
+  Color *color = nullptr;
+  Tone *tone = nullptr;
 
   int x = 0;
   int y = 0;
@@ -39,13 +44,12 @@ class Sprite {
   int bush_depth;
   int opacity;
   int blend_type;
-  Color color;
-  Tone tone;
 
-  Sprite() :
-      color(0, 0, 0),
-      tone(0, 0, 0)
+  Sprite() { }
+
+  Sprite(Viewport *_viewport)
   {
+    viewport = _viewport;
   }
 
   int getX() { return x; }
@@ -98,7 +102,10 @@ class Sprite {
     return _disposed;
   }
 
-  void viewport() { }
+  Viewport *getViewport()
+  {
+    return viewport;
+  }
 
   void update()
   {
