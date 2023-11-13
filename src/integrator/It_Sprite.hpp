@@ -17,6 +17,12 @@ class Sprite {
 
     rb_define_method(spriteClass, "initialize", RUBY_METHOD_FUNC(method_initialize), 0);
 
+    rb_define_method(spriteClass, "x", RUBY_METHOD_FUNC(attrGet_x), 0);
+    rb_define_method(spriteClass, "x=", RUBY_METHOD_FUNC(attrSet_x), 1);
+
+    rb_define_method(spriteClass, "y", RUBY_METHOD_FUNC(attrGet_y), 0);
+    rb_define_method(spriteClass, "y=", RUBY_METHOD_FUNC(attrSet_y), 1);
+
     rb_define_method(spriteClass, "bitmap", RUBY_METHOD_FUNC(attrGet_bitmap), 0);
     rb_define_method(spriteClass, "bitmap=", RUBY_METHOD_FUNC(attrSet_bitmap), 1);
 
@@ -36,6 +42,48 @@ class Sprite {
 
     return self;
   }
+
+  /*
+    Attr x
+  */
+
+  static VALUE attrGet_x(VALUE self)
+  {
+    Eng::Sprite *inst = (Eng::Sprite *)DATA_PTR(self);
+    return INT2FIX(inst->getX());
+  }
+
+  static VALUE attrSet_x(VALUE self, VALUE value)
+  {
+    Check_Type(value, T_FIXNUM);
+    unsigned int x = FIX2INT(value);
+    Eng::Sprite *inst = (Eng::Sprite *)DATA_PTR(self);
+    inst->setX(x);
+    return value;
+  }
+
+  /*
+    Attr y
+  */
+
+  static VALUE attrGet_y(VALUE self)
+  {
+    Eng::Sprite *inst = (Eng::Sprite *)DATA_PTR(self);
+    return INT2FIX(inst->getY());
+  }
+
+  static VALUE attrSet_y(VALUE self, VALUE value)
+  {
+    Check_Type(value, T_FIXNUM);
+    unsigned int y = FIX2INT(value);
+    Eng::Sprite *inst = (Eng::Sprite *)DATA_PTR(self);
+    inst->setY(y);
+    return value;
+  }
+
+  /*
+    Attr bitmap
+  */
 
   static VALUE attrGet_bitmap(VALUE self)
   {

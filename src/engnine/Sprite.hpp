@@ -17,6 +17,10 @@ namespace Eng {
 class Sprite {
   Bitmap *bitmap = nullptr;
   bool _disposed = false;
+  bool dirty = false;
+
+  int x = 0;
+  int y = 0;
 
  public:
   sf::Sprite sprite;
@@ -25,8 +29,6 @@ class Sprite {
   VALUE bitmap_ptr;
   Rect *src_rect = nullptr;
   bool visible;
-  int x;
-  int y;
   int z;
   int ox;
   int oy;
@@ -46,6 +48,20 @@ class Sprite {
   {
   }
 
+  int getX() { return x; }
+  void setX(int _x)
+  {
+    x = _x;
+    dirty = true;
+  }
+
+  int getY() { return y; }
+  void setY(int _y)
+  {
+    y = _y;
+    dirty = true;
+  }
+
   void setBitmap(Bitmap *_bitmap)
   {
     bitmap = _bitmap;
@@ -62,6 +78,10 @@ class Sprite {
 
   void atualizar()
   {
+    if (dirty) {
+      sprite.setPosition(x, y);
+      dirty = false;
+    }
     if (bitmap && bitmap->_needsUpdate) {
       text.update(bitmap->buffer);
       bitmap->_needsUpdate = false;

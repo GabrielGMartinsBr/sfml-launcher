@@ -30,8 +30,8 @@ def drawRect
     c1 = Color.new(100, 100, 100)
 
     spr = Sprite.new
-    # spr.x = 100
-    # spr.y = 200
+    spr.x = 100
+    spr.y = 200
 
     rect = Rect.new(0, 0, size, size)
     spr.bitmap = Bitmap.new(size, size)
