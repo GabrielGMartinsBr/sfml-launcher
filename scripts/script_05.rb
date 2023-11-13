@@ -25,9 +25,14 @@ class Character
         row = bp.height / 4
         
         # vp = Viewport.new(240, 0, col, row)
-        rect = Rect.new(10, 0, col, row)
+        rect = Rect.new(240, 0, col, row)
         vp = Viewport.new(rect)
 
+        # puts "oy: " + vp.oy.to_s
+        # vp.oy = 3
+        # puts "oy: " + vp.oy.to_s
+        # vp.oy = 9
+        # puts "oy: " + vp.oy.to_s
         
         # puts "\n"
         # puts "---Rect--------------"

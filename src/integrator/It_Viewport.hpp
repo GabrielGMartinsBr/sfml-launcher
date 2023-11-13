@@ -21,6 +21,18 @@ class Viewport {
 
     rb_define_method(viewportClass, "rect", RUBY_METHOD_FUNC(attrGet_rect), 0);
     rb_define_method(viewportClass, "rect=", RUBY_METHOD_FUNC(attrSet_rect), 1);
+
+    rb_define_method(viewportClass, "visible", RUBY_METHOD_FUNC(attrGet_visible), 0);
+    rb_define_method(viewportClass, "visible=", RUBY_METHOD_FUNC(attrSet_visible), 1);
+
+    rb_define_method(viewportClass, "z", RUBY_METHOD_FUNC(attrGet_z), 0);
+    rb_define_method(viewportClass, "z=", RUBY_METHOD_FUNC(attrSet_z), 1);
+
+    rb_define_method(viewportClass, "ox", RUBY_METHOD_FUNC(attrGet_ox), 0);
+    rb_define_method(viewportClass, "ox=", RUBY_METHOD_FUNC(attrSet_ox), 1);
+
+    rb_define_method(viewportClass, "oy", RUBY_METHOD_FUNC(attrGet_oy), 0);
+    rb_define_method(viewportClass, "oy=", RUBY_METHOD_FUNC(attrSet_oy), 1);
   }
 
   static VALUE getRbClass()
@@ -33,6 +45,11 @@ class Viewport {
   /*
     Method initialize
   */
+
+  static Eng::Viewport *getInstance(VALUE self)
+  {
+    return (Eng::Viewport *)DATA_PTR(self);
+  }
 
   static VALUE method_initialize(int argc, VALUE *argv, VALUE self)
   {
@@ -109,6 +126,82 @@ class Viewport {
     inst->setRect(rect);
 
     return Qnil;
+  }
+
+  /*
+   Attr visible
+  */
+
+  static VALUE attrGet_visible(VALUE self)
+  {
+    bool visible = getInstance(self)->getVisible();
+    return visible ? Qtrue : Qfalse;
+  }
+
+  static VALUE attrSet_visible(VALUE self, VALUE value)
+  {
+    if (value == Qtrue) {
+      getInstance(self)->setVisible(true);
+    } else if (value == Qfalse) {
+      getInstance(self)->setVisible(false);
+    } else {
+      throw std::runtime_error("Expected a boolean value.");
+    }
+    return value;
+  }
+
+  /*
+   Attr z
+  */
+
+  static VALUE attrGet_z(VALUE self)
+  {
+    int z = getInstance(self)->getZ();
+    return INT2FIX(z);
+  }
+
+  static VALUE attrSet_z(VALUE self, VALUE value)
+  {
+    Check_Type(value, T_FIXNUM);
+    int z = FIX2INT(value);
+    getInstance(self)->setZ(z);
+    return value;
+  }
+
+  /*
+   Attr ox
+  */
+
+  static VALUE attrGet_ox(VALUE self)
+  {
+    int ox = getInstance(self)->getOx();
+    return INT2FIX(ox);
+  }
+
+  static VALUE attrSet_ox(VALUE self, VALUE value)
+  {
+    Check_Type(value, T_FIXNUM);
+    int ox = FIX2INT(value);
+    getInstance(self)->setOx(ox);
+    return value;
+  }
+
+  /*
+   Attr oy
+  */
+
+  static VALUE attrGet_oy(VALUE self)
+  {
+    int oy = getInstance(self)->getOy();
+    return INT2FIX(oy);
+  }
+
+  static VALUE attrSet_oy(VALUE self, VALUE value)
+  {
+    Check_Type(value, T_FIXNUM);
+    int oy = FIX2INT(value);
+    getInstance(self)->setOy(oy);
+    return value;
   }
 };
 
