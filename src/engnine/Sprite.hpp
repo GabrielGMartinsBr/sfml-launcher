@@ -82,9 +82,9 @@ class Sprite {
       sprite.setPosition(x, y);
       dirty = false;
     }
-    if (bitmap && bitmap->_needsUpdate) {
+    if (bitmap && bitmap->dirty) {
       text.update(bitmap->buffer);
-      bitmap->_needsUpdate = false;
+      bitmap->dirty = false;
     }
   }
 

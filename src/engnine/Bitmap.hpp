@@ -22,7 +22,7 @@ class Bitmap {
   unsigned int width;
   unsigned int height;
 
-  bool _needsUpdate = false;
+  bool dirty = false;
 
   Bitmap(const char* assetName)
   {
@@ -62,10 +62,6 @@ class Bitmap {
 
   void stretch_blt(){};
 
-  void fill_rect(int _x, int _y, int _width, int _height, Color _color){};
-
-  void fill_rect(int _rect, Color _color){};
-
   void clear();
 
   Color* get_pixel(unsigned int _x, unsigned int _y)
@@ -85,8 +81,36 @@ class Bitmap {
     }
     sf::Color color(_color->red, _color->green, _color->blue);
     buffer.setPixel(x, y, color);
-    _needsUpdate = true;
+    dirty = true;
   }
+
+  void fill_rect(int _x, int _y, int _width, int _height, Color* _color)
+  {
+    sf::Color color;
+    parseColor(color, _color);
+
+    for (int x = _x; x < _width; x++) {
+      for (int y = _x; y < _height; y++) {
+        buffer.setPixel(x, y, color);
+      }
+    }
+
+    dirty = true;
+  };
+
+  void fill_rect(Rect* _rect, Color* _color)
+  {
+    sf::Color color;
+    parseColor(color, _color);
+
+    for (int x = _rect->x; x < _rect->width; x++) {
+      for (int y = _rect->y; y < _rect->height; y++) {
+        buffer.setPixel(x, y, color);
+      }
+    }
+
+    dirty = true;
+  };
 
   void hue_change(int _hue);
 
@@ -95,6 +119,14 @@ class Bitmap {
   void draw_text(Rect _rect, Str _str, int _align);
 
   int get_text_size(Str _str);
+
+ private:
+  static void parseColor(sf::Color& dest, Color* src)
+  {
+    dest.r = src->red;
+    dest.g = src->green;
+    dest.b = src->blue;
+  }
 };
 
 }  // namespace Eng

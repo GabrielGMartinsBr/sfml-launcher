@@ -30,19 +30,14 @@ def drawRect
     c1 = Color.new(100, 100, 100)
 
     spr = Sprite.new
-    spr.x = 100
-    spr.y = 200
+    spr.x = 256
+    spr.y = 160
 
     rect = Rect.new(0, 0, size, size)
-    spr.bitmap = Bitmap.new(size, size)
-
-    for x in 0...rect.width
-        for y in 0...rect.height
-            spr.bitmap.set_pixel(x, y, c1)
-        end
-    end
+    spr.bitmap = Bitmap.new(640, 480)
 
     # spr.bitmap.fill_rect(0, 0, size, size, Color.new(255, 255, 255))
+    spr.bitmap.fill_rect(rect, Color.new(0, 155, 255))
 end
 
 

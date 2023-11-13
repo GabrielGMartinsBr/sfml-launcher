@@ -107,10 +107,12 @@ class Sprite {
     inst->setBitmap(bitmap);
     inst->bitmap_ptr = value;
 
-    // inst->atualizar();
-
     return value;
   }
+
+  /*
+    Method dispose
+  */
 
   static VALUE method_dispose(VALUE self)
   {
@@ -118,6 +120,10 @@ class Sprite {
     inst->dispose();
     return Qnil;
   }
+
+  /*
+    Method disposed
+  */
 
   static VALUE method_disposed(VALUE self)
   {
