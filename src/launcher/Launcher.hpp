@@ -3,7 +3,6 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <iostream>
-#include <thread>
 
 #include "engnine/Engine.hpp"
 #include "integrator/Integrator.hpp"
@@ -32,28 +31,25 @@ class Launcher {
   void run()
   {
     engine.init(window);
+    integrator.init();
 
-    std::thread rbThread(integrator);
-
-    while (engine.isRunning()) {
-      timer.update();
-      if (timer.shouldUpdate()) {
-        update();
-      } else {
-        timer.sleep();
-      }
-    }
+    // while (engine.isRunning()) {
+    //   timer.update();
+    //   if (timer.shouldUpdate()) {
+    //     update();
+    //   } else {
+    //     timer.sleep();
+    //   }
+    // }
 
     window.close();
-
-    rbThread.join();
   }
 
  private:
   void update()
   {
     engine.updateInput();
-    engine.updateGraphics();
+    // engine.updateGraphics();
 
     timer.markUpdate();
     timer.printFps();

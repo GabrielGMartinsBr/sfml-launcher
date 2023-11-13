@@ -1,14 +1,14 @@
 #pragma once
 
-// #include "base/Log.hpp"
-
+#include "engnine/Engine.hpp"
 namespace Eng {
 
 class Graphics {
+
  public:
   static void update()
   {
-    // Log::out() << "graphics update";
+    Engine::getInstance().updateGraphics();
   }
 };
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "engnine/Engine.hpp"
+
 namespace Eng {
 
 class Input {
@@ -8,6 +10,7 @@ class Input {
 
   void update()
   {
+    Engine::getInstance().updateInput();
   }
 };
 

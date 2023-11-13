@@ -22,10 +22,6 @@ class Integrator {
   It::Input input;
 
  public:
-  void operator()()
-  {
-    init();
-  }
 
   void init()
   {

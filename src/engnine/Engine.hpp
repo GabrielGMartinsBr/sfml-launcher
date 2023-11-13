@@ -104,6 +104,7 @@ class Engine {
 
   void handleCloseEvent()
   {
+    ruby_stop(0);
     running = false;
   }
 };
