@@ -46,6 +46,7 @@ class Engine {
     }
     running = true;
     window = &_window;
+    window->display();
     initialized = true;
   }
 
