@@ -5,14 +5,14 @@
 #include <iostream>
 #include <thread>
 
-#include "graphics/Graphics.hpp"
+#include "engnine/Engine.hpp"
 #include "integrator/Integrator.hpp"
 #include "launcher/LauncherTimer.hpp"
 
 class Launcher {
-  int width = 600;
-  int height = 500;
-  const char *title = "SFML Launcher";
+  int width = 640;
+  int height = 480;
+  const char* title = "ORM S-Launcher";
 
   sf::VideoMode mode;
   sf::RenderWindow window;
@@ -20,15 +20,14 @@ class Launcher {
   LauncherTimer timer;
 
   Integrator integrator;
-  Graphics gr;
+
+  Eng::Engine& engine = Eng::Engine::getInstance();
 
  public:
 
   Launcher() :
       mode(width, height),
-      window(mode, title)
-  {
-  }
+      window(mode, title) { }
 
   void run()
   {
@@ -77,7 +76,7 @@ class Launcher {
   {
     window.clear();
 
-    gr.render(window);
+    engine.render(window);
 
     window.display();
   }
