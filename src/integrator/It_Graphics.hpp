@@ -12,6 +12,9 @@ class Graphics {
   {
     VALUE graphicsClass = rb_define_class("Graphics", rb_cObject);
 
+    rb_define_module_function(graphicsClass, "frame_rate", RUBY_METHOD_FUNC(attrGet_frame_rate), 0);
+    rb_define_module_function(graphicsClass, "frame_rate=", RUBY_METHOD_FUNC(attrSet_frame_rate), 1);
+
     rb_define_module_function(graphicsClass, "frame_count", RUBY_METHOD_FUNC(attrGet_frame_count), 0);
     rb_define_module_function(graphicsClass, "frame_count=", RUBY_METHOD_FUNC(attrSet_frame_count), 1);
 
@@ -25,20 +28,45 @@ class Graphics {
 
  private:
 
+  /*
+    Attr frame_rate
+  */
+
+  static VALUE attrGet_frame_rate(VALUE self)
+  {
+    unsigned int count = Eng::Graphics::getInstance().frame_rate;
+    return INT2FIX(count);
+  }
+
+  static VALUE attrSet_frame_rate(VALUE self, VALUE value)
+  {
+    Check_Type(value, T_FIXNUM);
+    unsigned int count = FIX2INT(value);
+    Eng::Graphics::getInstance().frame_rate = count;
+    return value;
+  }
+
+  /*
+    Attr frame_count
+  */
+
   static VALUE attrGet_frame_count(VALUE self)
   {
-    unsigned int count = Eng::Graphics::getInstance().frame_count;
+    unsigned long count = Eng::Graphics::getInstance().frame_count;
     return INT2NUM(count);
   }
 
   static VALUE attrSet_frame_count(VALUE self, VALUE value)
   {
     Check_Type(value, T_FIXNUM);
-    unsigned int count = NUM2INT(value);
+    unsigned long count = NUM2INT(value);
     Eng::Graphics::getInstance().frame_count = count;
     return value;
   }
 
+  /*
+    Method Update
+  */
   static VALUE method_update(VALUE self)
   {
     Eng::Graphics::getInstance().update();
