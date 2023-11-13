@@ -23,6 +23,7 @@ class Graphics {
   void update()
   {
     Engine::getInstance().updateGraphics();
+    Engine::getInstance().updateInput();
     frame_count++;
   }
 
