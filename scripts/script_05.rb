@@ -22,22 +22,40 @@ class Character
         bp = Bitmap.new("Graphics/Characters/001-Fighter01")
         spr = Sprite.new
         spr.bitmap = bp
+
+        col = bp.width / 4
+        row = bp.height / 4
+
+        # vp = Viewport.new(240, 0, col, row)
+        rect = Rect.new(240, 0, col, row)
+        vp = Viewport.new(rect)
+        
+        puts "\n"
+        puts "---Rect--------------"
+        puts "x: " + vp.rect.x.to_s
+        puts "y: " + vp.rect.y.to_s
+        puts "width: " + vp.rect.width.to_s
+        puts "height: " + vp.rect.height.to_s
+        puts "---------------------"
+        puts "\n"
+
     end
 end
 
 def drawRect
-    size = 128
+    size = 200
     c1 = Color.new(100, 100, 100)
 
     spr = Sprite.new
-    spr.x = 256
-    spr.y = 160
+    spr.x = 100
+    spr.y = 100
 
     rect = Rect.new(0, 0, size, size)
     spr.bitmap = Bitmap.new(640, 480)
 
     # spr.bitmap.fill_rect(0, 0, size, size, Color.new(255, 255, 255))
-    spr.bitmap.fill_rect(rect, Color.new(0, 155, 255))
+    # spr.bitmap.fill_rect(rect, Color.new(0, 155, 255))
+    spr.bitmap.fill_rect(rect, Color.new(255, 255, 255))
 end
 
 

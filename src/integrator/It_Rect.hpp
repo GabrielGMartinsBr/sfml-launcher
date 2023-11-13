@@ -26,6 +26,11 @@ class Rect {
     rb_define_method(rectClass, "height=", RUBY_METHOD_FUNC(attrSet_height), 1);
   }
 
+  static VALUE getRbClass()
+  {
+    return rb_const_get(rb_cObject, rb_intern("Rect"));
+  }
+
  private:
 
   static VALUE method_initialize(VALUE self, VALUE _x, VALUE _y, VALUE _w, VALUE _h)

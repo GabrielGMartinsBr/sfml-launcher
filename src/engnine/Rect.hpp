@@ -17,6 +17,14 @@ class Rect {
     height = _height;
   }
 
+  Rect(Rect *_rect)
+  {
+    x = _rect->x;
+    y = _rect->y;
+    width = _rect->width;
+    height = _rect->height;
+  }
+
   void set(int _x, int _y, int _width, int _height)
   {
     x = _x;

@@ -12,6 +12,7 @@
 #include "integrator/It_Rect.hpp"
 #include "integrator/It_Sprite.hpp"
 #include "integrator/It_Tone.hpp"
+#include "integrator/It_Viewport.hpp"
 #include "ruby.h"
 
 typedef VALUE (*Cb)(VALUE);
@@ -39,6 +40,7 @@ class Integrator {
     It::Color::integrate();
     It::Tone::integrate();
     It::Rect::integrate();
+    It::Viewport::integrate();
     It::Bitmap::integrate();
     It::Sprite::integrate();
     It::Graphics::integrate();
