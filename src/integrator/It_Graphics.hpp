@@ -34,15 +34,15 @@ class Graphics {
 
   static VALUE attrGet_frame_rate(VALUE self)
   {
-    unsigned int count = Eng::Graphics::getInstance().frame_rate;
-    return INT2FIX(count);
+    unsigned int rate = Eng::Graphics::getInstance().getFrameRate();
+    return INT2FIX(rate);
   }
 
   static VALUE attrSet_frame_rate(VALUE self, VALUE value)
   {
     Check_Type(value, T_FIXNUM);
-    unsigned int count = FIX2INT(value);
-    Eng::Graphics::getInstance().frame_rate = count;
+    unsigned int rate = FIX2INT(value);
+    Eng::Graphics::getInstance().setFrameRate(rate);
     return value;
   }
 
