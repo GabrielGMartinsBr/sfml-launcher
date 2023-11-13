@@ -28,11 +28,14 @@ class Character
         rect = Rect.new(240, 0, col, row)
         vp = Viewport.new(rect)
 
-        # puts "oy: " + vp.oy.to_s
-        # vp.oy = 3
-        # puts "oy: " + vp.oy.to_s
-        # vp.oy = 9
-        # puts "oy: " + vp.oy.to_s
+        spr = Sprite.new(vp)
+        spr.bitmap = bp
+
+        # puts "z: " + spr.z.to_s
+        # spr.z = 3
+        # puts "z: " + spr.z.to_s
+        # spr.z = 9
+        # puts "z: " + spr.z.to_s
         
         # puts "\n"
         # puts "---Rect--------------"
@@ -43,8 +46,7 @@ class Character
         # puts "---------------------"
         # puts "\n"
 
-        spr = Sprite.new(vp)
-        spr.bitmap = bp
+        
 
     end
 end

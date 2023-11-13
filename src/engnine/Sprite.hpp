@@ -52,6 +52,9 @@ class Sprite {
     viewport = _viewport;
   }
 
+  /*
+    Attr x
+  */
   int getX() { return x; }
   void setX(int _x)
   {
@@ -59,11 +62,41 @@ class Sprite {
     dirty = true;
   }
 
+  /*
+    Attr y
+  */
   int getY() { return y; }
   void setY(int _y)
   {
     y = _y;
     dirty = true;
+  }
+
+  /*
+    Attr z
+  */
+  int getZ() { return z; }
+  void setZ(int _z)
+  {
+    z = _z;
+  }
+
+  /*
+    Attr ox
+  */
+  int getOx() { return ox; }
+  void setOx(int _ox)
+  {
+    ox = _ox;
+  }
+
+  /*
+    Attr oy
+  */
+  int getOy() { return oy; }
+  void setOy(int _oy)
+  {
+    oy = _oy;
   }
 
   void setBitmap(Bitmap *_bitmap)

@@ -25,6 +25,15 @@ class Sprite {
     rb_define_method(spriteClass, "y", RUBY_METHOD_FUNC(attrGet_y), 0);
     rb_define_method(spriteClass, "y=", RUBY_METHOD_FUNC(attrSet_y), 1);
 
+    rb_define_method(spriteClass, "z", RUBY_METHOD_FUNC(attrGet_z), 0);
+    rb_define_method(spriteClass, "z=", RUBY_METHOD_FUNC(attrSet_z), 1);
+
+    rb_define_method(spriteClass, "ox", RUBY_METHOD_FUNC(attrGet_ox), 0);
+    rb_define_method(spriteClass, "ox=", RUBY_METHOD_FUNC(attrSet_ox), 1);
+
+    rb_define_method(spriteClass, "oy", RUBY_METHOD_FUNC(attrGet_oy), 0);
+    rb_define_method(spriteClass, "oy=", RUBY_METHOD_FUNC(attrSet_oy), 1);
+
     rb_define_method(spriteClass, "bitmap", RUBY_METHOD_FUNC(attrGet_bitmap), 0);
     rb_define_method(spriteClass, "bitmap=", RUBY_METHOD_FUNC(attrSet_bitmap), 1);
 
@@ -35,6 +44,15 @@ class Sprite {
   }
 
  private:
+
+  static Eng::Sprite *getInstance(VALUE self)
+  {
+    return (Eng::Sprite *)DATA_PTR(self);
+  }
+
+  /*
+    Method initialize
+  */
 
   static VALUE method_initialize(int argc, VALUE *argv, VALUE self)
   {
@@ -108,6 +126,60 @@ class Sprite {
     unsigned int y = FIX2INT(value);
     Eng::Sprite *inst = (Eng::Sprite *)DATA_PTR(self);
     inst->setY(y);
+    return value;
+  }
+
+  /*
+   Attr z
+  */
+
+  static VALUE attrGet_z(VALUE self)
+  {
+    int z = getInstance(self)->getZ();
+    return INT2FIX(z);
+  }
+
+  static VALUE attrSet_z(VALUE self, VALUE value)
+  {
+    Check_Type(value, T_FIXNUM);
+    int z = FIX2INT(value);
+    getInstance(self)->setZ(z);
+    return value;
+  }
+
+  /*
+   Attr ox
+  */
+
+  static VALUE attrGet_ox(VALUE self)
+  {
+    int ox = getInstance(self)->getOx();
+    return INT2FIX(ox);
+  }
+
+  static VALUE attrSet_ox(VALUE self, VALUE value)
+  {
+    Check_Type(value, T_FIXNUM);
+    int ox = FIX2INT(value);
+    getInstance(self)->setOx(ox);
+    return value;
+  }
+
+  /*
+   Attr oy
+  */
+
+  static VALUE attrGet_oy(VALUE self)
+  {
+    int oy = getInstance(self)->getOy();
+    return INT2FIX(oy);
+  }
+
+  static VALUE attrSet_oy(VALUE self, VALUE value)
+  {
+    Check_Type(value, T_FIXNUM);
+    int oy = FIX2INT(value);
+    getInstance(self)->setOy(oy);
     return value;
   }
 

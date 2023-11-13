@@ -42,14 +42,14 @@ class Viewport {
 
  private:
 
-  /*
-    Method initialize
-  */
-
   static Eng::Viewport *getInstance(VALUE self)
   {
     return (Eng::Viewport *)DATA_PTR(self);
   }
+
+  /*
+    Method initialize
+  */
 
   static VALUE method_initialize(int argc, VALUE *argv, VALUE self)
   {
