@@ -6,7 +6,6 @@
 
 #include "engnine/Engine.hpp"
 #include "integrator/Integrator.hpp"
-#include "launcher/LauncherTimer.hpp"
 
 class Launcher {
   int width = 640;
@@ -15,8 +14,6 @@ class Launcher {
 
   sf::VideoMode mode;
   sf::RenderWindow window;
-
-  LauncherTimer timer;
 
   Integrator integrator;
 
@@ -33,30 +30,6 @@ class Launcher {
     engine.init(window);
     integrator.init();
 
-    // while (engine.isRunning()) {
-    //   timer.update();
-    //   if (timer.shouldUpdate()) {
-    //     update();
-    //   } else {
-    //     timer.sleep();
-    //   }
-    // }
-
-    window.close();
-  }
-
- private:
-  void update()
-  {
-    engine.updateInput();
-    // engine.updateGraphics();
-
-    timer.markUpdate();
-    timer.printFps();
-  }
-
-  void handleClose()
-  {
     window.close();
   }
 };
