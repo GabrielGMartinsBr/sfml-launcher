@@ -48,9 +48,9 @@ class Color {
     Check_Type(p_g, T_FIXNUM);
     Check_Type(p_b, T_FIXNUM);
 
-    int r = FIX2INT(p_r);
-    int g = FIX2INT(p_g);
-    int b = FIX2INT(p_b);
+    unsigned int r = FIX2INT(p_r);
+    unsigned int g = FIX2INT(p_g);
+    unsigned int b = FIX2INT(p_b);
 
     Eng::Color *instance = new Eng::Color(r, g, b);
     DATA_PTR(self) = instance;
@@ -66,9 +66,9 @@ class Color {
     Check_Type(p_g, T_FIXNUM);
     Check_Type(p_b, T_FIXNUM);
 
-    int r = FIX2INT(p_r);
-    int g = FIX2INT(p_g);
-    int b = FIX2INT(p_b);
+    unsigned int r = FIX2INT(p_r);
+    unsigned int g = FIX2INT(p_g);
+    unsigned int b = FIX2INT(p_b);
 
     inst->set(r, g, b);
 
@@ -78,13 +78,13 @@ class Color {
   static VALUE attrGet_red(VALUE self)
   {
     Eng::Color *inst = (Eng::Color *)DATA_PTR(self);
-    return INT2NUM(inst->red);
+    return INT2FIX(inst->red);
   }
 
   static VALUE attrSet_red(VALUE self, VALUE value)
   {
     Check_Type(value, T_FIXNUM);
-    int r = NUM2INT(value);
+    unsigned int r = FIX2INT(value);
     Eng::Color *inst = (Eng::Color *)DATA_PTR(self);
     inst->red = r;
     return value;
@@ -93,13 +93,13 @@ class Color {
   static VALUE attrGet_green(VALUE self)
   {
     Eng::Color *inst = (Eng::Color *)DATA_PTR(self);
-    return INT2NUM(inst->green);
+    return INT2FIX(inst->green);
   }
 
   static VALUE attrSet_green(VALUE self, VALUE value)
   {
     Check_Type(value, T_FIXNUM);
-    int r = NUM2INT(value);
+    unsigned int r = FIX2INT(value);
     Eng::Color *inst = (Eng::Color *)DATA_PTR(self);
     inst->green = r;
     return value;
@@ -108,13 +108,13 @@ class Color {
   static VALUE attrGet_blue(VALUE self)
   {
     Eng::Color *inst = (Eng::Color *)DATA_PTR(self);
-    return INT2NUM(inst->blue);
+    return INT2FIX(inst->blue);
   }
 
   static VALUE attrSet_blue(VALUE self, VALUE value)
   {
     Check_Type(value, T_FIXNUM);
-    int r = NUM2INT(value);
+    unsigned int r = FIX2INT(value);
     Eng::Color *inst = (Eng::Color *)DATA_PTR(self);
     inst->blue = r;
     return value;

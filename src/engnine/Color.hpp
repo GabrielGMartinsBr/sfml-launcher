@@ -6,16 +6,16 @@ namespace Eng {
 
 class Color {
  public:
-  int red = 0;
-  int green = 0;
-  int blue = 0;
+  unsigned int red = 0;
+  unsigned int green = 0;
+  unsigned int blue = 0;
 
-  Color(int r, int g, int b)
+  Color(unsigned int r, unsigned int g, unsigned int b)
   {
     set(r, g, b);
   }
 
-  void set(int r, int g, int b)
+  void set(unsigned int r, unsigned int g, unsigned int b)
   {
     clamp(r);
     clamp(g);
@@ -26,7 +26,7 @@ class Color {
   }
 
  private:
-  void clamp(int& v)
+  void clamp(unsigned int& v)
   {
     if (v < 0) {
       v = 0;
