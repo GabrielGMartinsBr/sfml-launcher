@@ -2,9 +2,12 @@
 
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Image.hpp>
+#include <SFML/System/Vector2.hpp>
 #include <stdexcept>
 
+#include "base/Log.hpp"
 #include "engnine/Color.hpp"
+#include "engnine/FileUtils.hpp"
 #include "engnine/Rect.hpp"
 
 namespace Eng {
@@ -21,7 +24,18 @@ class Bitmap {
 
   bool _needsUpdate = false;
 
-  Bitmap(const char* filename);
+  Bitmap(const char* assetName)
+  {
+    std::string filename = FileUtils::parseRtpPath(assetName);
+    bool loaded = buffer.loadFromFile(filename);
+    if (!loaded) {
+      throw std::runtime_error("Could not load image.");
+    }
+
+    sf::Vector2u size = buffer.getSize();
+    width = size.x;
+    height = size.y;
+  }
 
   Bitmap(unsigned int _width, unsigned int _height) :
       buffer()

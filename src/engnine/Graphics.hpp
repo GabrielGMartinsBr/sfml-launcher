@@ -43,7 +43,7 @@ class Graphics {
     Engine::getInstance().updateGraphics();
     Engine::getInstance().updateInput();
 
-    Timer::getInstance().printFps();
+    // Timer::getInstance().printFps();
     Timer::getInstance().controlFrameRate();
 
     frame_count++;

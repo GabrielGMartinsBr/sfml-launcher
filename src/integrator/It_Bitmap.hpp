@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdexcept>
+
 #include "engnine/Bitmap.hpp"
 #include "integrator/It_Color.hpp"
 #include "ruby.h"
@@ -14,7 +16,7 @@ class Bitmap {
   {
     VALUE bitmapClass = rb_define_class("Bitmap", rb_cObject);
 
-    rb_define_method(bitmapClass, "initialize", RUBY_METHOD_FUNC(method_initialize), 2);
+    rb_define_method(bitmapClass, "initialize", RUBY_METHOD_FUNC(method_initialize), -1);
 
     rb_define_method(bitmapClass, "width", RUBY_METHOD_FUNC(method_width), 0);
     rb_define_method(bitmapClass, "height", RUBY_METHOD_FUNC(method_height), 0);
@@ -33,17 +35,42 @@ class Bitmap {
 
  private:
 
-  static VALUE method_initialize(VALUE self, VALUE _width, VALUE _height)
+  static VALUE method_initialize(int argc, VALUE *argv, VALUE self)
+  {
+    if (argc == 2) {
+      VALUE _width, _height;
+      rb_scan_args(argc, argv, "2", &_width, &_height);
+      return initializeWithDimensions(self, _width, _height);
+    } else if (argc == 1) {
+      VALUE _fileName;
+      rb_scan_args(argc, argv, "1", &_fileName);
+      return initializeWithImage(self, _fileName);
+    } else {
+      throw std::runtime_error("Failed to initialize bitmap.");
+    }
+  }
+
+  static VALUE initializeWithDimensions(VALUE self, VALUE _width, VALUE _height)
   {
     Check_Type(_width, T_FIXNUM);
     Check_Type(_height, T_FIXNUM);
 
     unsigned int width = FIX2INT(_width);
     unsigned int height = FIX2INT(_height);
-
     Eng::Bitmap *inst = new Eng::Bitmap(width, height);
-    DATA_PTR(self) = inst;
 
+    DATA_PTR(self) = inst;
+    return self;
+  }
+
+  static VALUE initializeWithImage(VALUE self, VALUE _fileName)
+  {
+    Check_Type(_fileName, T_STRING);
+
+    const char *fileName = StringValuePtr(_fileName);
+    Eng::Bitmap *inst = new Eng::Bitmap(fileName);
+
+    DATA_PTR(self) = inst;
     return self;
   }
 
