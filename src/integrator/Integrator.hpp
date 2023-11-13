@@ -43,7 +43,7 @@ class Integrator {
 
     input.integrate();
 
-    require("script_03.rb");
+    require("script_04.rb");
 
     ruby_finalize();
 
