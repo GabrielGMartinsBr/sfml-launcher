@@ -76,7 +76,7 @@ class Bitmap {
     if (_disposed) {
       throw std::runtime_error("disposed bitmap");
     }
-    if (x < 0 || x > width || y < 0 || y > height) {
+    if (x < 0 || x >= width || y < 0 || y >= height) {
       return;
     }
     sf::Color color(_color->red, _color->green, _color->blue);
