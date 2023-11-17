@@ -24,12 +24,21 @@ class Character
         col = bp.width / 4
         row = bp.height / 4
         
-        # vp = Viewport.new(240, 0, col, row)
-        rect = Rect.new(240, 0, col, row)
+        # vp = Viewport.new(0, 0, col, row)
+        rect = Rect.new(64, 0, col, row)
         vp = Viewport.new(rect)
 
+        vp.ox = 16
+
         spr = Sprite.new(vp)
+        # spr = Sprite.new()
         spr.bitmap = bp
+
+        # spr.x = 100
+        # spr.y = 100
+        
+        # spr.ox = 64
+        # spr.oy = 0
 
         # puts "z: " + spr.z.to_s
         # spr.z = 3
@@ -70,9 +79,8 @@ end
 
 
 bg = Background.new
+# drawRect
 char = Character.new
-
-drawRect
 
 loop do
     Graphics.update

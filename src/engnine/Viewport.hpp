@@ -68,7 +68,7 @@ class Viewport {
   {
     ox = _ox;
   }
-
+  
   /*
     Attr oy
   */

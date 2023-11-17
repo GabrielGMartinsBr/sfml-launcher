@@ -37,6 +37,9 @@ class Sprite {
     rb_define_method(spriteClass, "bitmap", RUBY_METHOD_FUNC(attrGet_bitmap), 0);
     rb_define_method(spriteClass, "bitmap=", RUBY_METHOD_FUNC(attrSet_bitmap), 1);
 
+    rb_define_method(spriteClass, "src_rect", RUBY_METHOD_FUNC(attrGet_src_rect), 0);
+    rb_define_method(spriteClass, "src_rect=", RUBY_METHOD_FUNC(attrSet_src_rect), 1);
+
     rb_define_method(spriteClass, "viewport", RUBY_METHOD_FUNC(attrGet_viewport), 0);
 
     rb_define_method(spriteClass, "dispose", RUBY_METHOD_FUNC(method_dispose), 0);
@@ -207,6 +210,35 @@ class Sprite {
     Eng::Bitmap *bitmap = (Eng::Bitmap *)DATA_PTR(value);
 
     inst->setBitmap(bitmap);
+    inst->bitmap_ptr = value;
+
+    return value;
+  }
+
+  /*
+    Attr src_rect
+  */
+
+  static VALUE attrGet_src_rect(VALUE self)
+  {
+    Eng::Sprite *inst = (Eng::Sprite *)DATA_PTR(self);
+    Eng::Rect *rect = inst->getSrcRect();
+
+    if (rect == nullptr) {
+      return Qnil;
+    }
+
+    return inst->bitmap_ptr;
+  }
+
+  static VALUE attrSet_src_rect(VALUE self, VALUE value)
+  {
+    Check_Type(value, T_OBJECT);
+
+    Eng::Sprite *inst = (Eng::Sprite *)DATA_PTR(self);
+    Eng::Rect *rect = (Eng::Rect *)DATA_PTR(value);
+
+    inst->setSrcRect(rect);
     inst->bitmap_ptr = value;
 
     return value;

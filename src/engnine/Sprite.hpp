@@ -23,20 +23,21 @@ class Sprite {
   Bitmap *bitmap = nullptr;
   Color *color = nullptr;
   Tone *tone = nullptr;
+  Rect *src_rect = nullptr;
 
   int x = 0;
   int y = 0;
+  bool visible = true;
+  int z = 0;
+  int ox = 0;
+  int oy = 0;
 
  public:
   sf::Sprite sprite;
   sf::Texture text;
 
-  VALUE bitmap_ptr;
-  Rect *src_rect = nullptr;
-  bool visible;
-  int z;
-  int ox;
-  int oy;
+  VALUE bitmap_ptr;  // TODO: Remove
+
   int zoom_x;
   int zoom_y;
   int angle;
@@ -88,6 +89,7 @@ class Sprite {
   void setOx(int _ox)
   {
     ox = _ox;
+    dirty = true;
   }
 
   /*
@@ -97,15 +99,17 @@ class Sprite {
   void setOy(int _oy)
   {
     oy = _oy;
+    dirty = true;
   }
+
+  /*
+    Attr bitmap
+  */
 
   void setBitmap(Bitmap *_bitmap)
   {
     bitmap = _bitmap;
-    if (bitmap) {
-      text.loadFromImage(bitmap->buffer);
-      sprite.setTexture(text);
-    }
+    dirty = true;
   }
 
   Bitmap *getBitmap()
@@ -113,16 +117,26 @@ class Sprite {
     return bitmap;
   }
 
-  void atualizar()
+  /*
+   Attr src_rect
+  */
+
+  void setSrcRect(Rect *_src_rect)
   {
-    if (dirty) {
-      sprite.setPosition(x, y);
-      dirty = false;
-    }
-    if (bitmap && bitmap->dirty) {
-      text.update(bitmap->buffer);
-      bitmap->dirty = false;
-    }
+    src_rect = _src_rect;
+    dirty = true;
+  }
+
+  Rect *getSrcRect()
+  {
+    return src_rect;
+  }
+
+  void setSrcRect(int x, int y, int w, int h)
+  {
+    sprite.setTextureRect(
+      sf::IntRect(x, y, w, h)
+    );
   }
 
   void dispose()
@@ -140,14 +154,41 @@ class Sprite {
     return viewport;
   }
 
-  void update()
-  {
-    atualizar();
-  }
+  void update() { }
 
   bool shouldRender()
   {
     return !_disposed && bitmap != nullptr && !bitmap->disposed();
+  }
+
+  void applyChanges()
+  {
+    if (!bitmap) {
+      return;
+    }
+
+    if (bitmap->dirty) {
+      text.loadFromImage(bitmap->buffer);
+      sprite.setTexture(text);
+      bitmap->dirty = false;
+    }
+
+    if (!dirty) {
+      return;
+    }
+
+    if (src_rect) {
+      setSrcRect(
+        src_rect->x,
+        src_rect->y,
+        src_rect->width,
+        src_rect->height
+      );
+    }
+
+    sprite.setPosition(x - ox, y - oy);
+
+    dirty = false;
   }
 };
 

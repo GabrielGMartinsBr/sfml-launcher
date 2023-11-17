@@ -89,20 +89,7 @@ class Engine {
     for (VALUE i : sprites) {
       spr = (Eng::Sprite*)DATA_PTR(i);
       if (spr && spr->shouldRender()) {
-        spr->atualizar();
-
-        Viewport* vp = spr->getViewport();
-        if (vp) {
-          // spr->sprite.setPosition(10, 10);
-          spr->sprite.setTextureRect(
-            vp->textureRect()
-          );
-
-          spr->sprite.setPosition(
-            vp->getRect()->x,
-            vp->getRect()->y
-          );
-        }
+        spr->applyChanges();
         window->draw(spr->sprite);
       }
     }
