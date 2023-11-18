@@ -7,12 +7,15 @@ def drawGrid
     spr.bitmap = bit
 
     bg = Color.new(255, 255, 255)
+    centerLine = Color.new(255, 205, 205)
     line = Color.new(205, 205, 205)
-    size = 64
+    size = 32
 
     for x in 0...@w
         for y in 0...@h
-            if x % size == 0 || y % size == 0
+            if x == @w / 2 || y == @h / 2
+                bit.set_pixel(x, y, centerLine)
+            elsif x % size == 0 || y % size == 0
                 bit.set_pixel(x, y, line)
             else
                 bit.set_pixel(x, y, bg)
@@ -23,7 +26,8 @@ end
 
 def drawSprTest(dimension)
     # vp = Viewport.new(0, 0, 640, 480)
-    vp = Viewport.new(10, 10, 640, 480)
+    # vp = Viewport.new(10, 10, 640, 480)
+    vp = Viewport.new(0, 0, 320, 240)
     spr = Sprite.new(vp)
     bit = Bitmap.new(dimension + 1, dimension + 1)
     spr.bitmap = bit

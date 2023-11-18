@@ -4,10 +4,12 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/VideoMode.hpp>
+#include <memory>
 #include <stdexcept>
 #include <vector>
 
 #include "base/Log.hpp"
+#include "base/Sugars.hpp"
 #include "engnine/RGSSViewport.hpp"
 #include "engnine/Sprite.hpp"
 #include "ruby.h"
@@ -15,23 +17,6 @@
 namespace Eng {
 
 class Engine {
-  bool initialized = false;
-  bool running = false;
-
-  RGSS::Viewport defaultViewport;
-  // std::vector<RGSS::Viewport> viewports;
-  std::vector<VALUE> sprites;
-
-  sf::RenderWindow* window = nullptr;
-
-  Engine() :
-      defaultViewport(0, 0, 640, 480)
-  {
-  }
-
-  Engine(const Engine&);
-  Engine& operator=(const Engine&);
-
  public:
   static Engine& getInstance()
   {
@@ -55,10 +40,23 @@ class Engine {
     return running;
   }
 
+  /*
+    Viewports
+  */
+
   RGSS::Viewport& getDefaultViewport()
   {
     return defaultViewport;
   }
+
+  void addViewport(SharedPtr<Eng::Viewport> vp)
+  {
+    viewports.push_back(vp);
+  }
+
+  /*
+    Sprites
+  */
 
   std::vector<VALUE>* getSprites()
   {
@@ -71,6 +69,10 @@ class Engine {
     sprites.push_back(sprite);
     Log::out() << "Sprites number: " << sprites.size();
   }
+
+  /*
+    Others
+  */
 
   void updateInput()
   {
@@ -88,11 +90,36 @@ class Engine {
 
 
  private:
+  bool initialized = false;
+  bool running = false;
+
+  RGSS::Viewport defaultViewport;
+  Vector<SharedPtr<Eng::Viewport>> viewports;
+  Vector<VALUE> sprites;
+
+  sf::RenderWindow* window = nullptr;
+
+  Engine() :
+      defaultViewport(0, 0, 640, 480)
+  {
+  }
+
+  Engine(const Engine&);
+  Engine& operator=(const Engine&);
 
   void renderViewports()
   {
     updateSprites();
+
     defaultViewport.renderIn(*window);
+    defaultViewport.display();
+
+    for (SharedPtr<Eng::Viewport> vp : viewports) {
+      if (vp) {
+        vp->getRgssViewport().renderIn(*window);
+        vp->getRgssViewport().display();
+      }
+    }
   }
 
   void updateSprites()

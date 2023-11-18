@@ -1,7 +1,10 @@
 #pragma once
 
+#include <memory>
 #include <stdexcept>
 
+#include "base/Sugars.hpp"
+#include "engnine/Engine.hpp"
 #include "engnine/Rect.hpp"
 #include "engnine/Viewport.hpp"
 #include "integrator/It_Rect.hpp"
@@ -77,8 +80,10 @@ class Viewport {
     unsigned int width = FIX2INT(_width);
     unsigned int height = FIX2INT(_height);
 
-    Eng::Viewport *inst = new Eng::Viewport(x, y, width, height);
-    DATA_PTR(self) = inst;
+    SharedPtr<Eng::Viewport> inst = MakeSharedPtr<Eng::Viewport>(x, y, width, height);
+    Eng::Engine::getInstance().addViewport(inst);
+
+    DATA_PTR(self) = inst.get();
 
     return self;
   }
@@ -92,8 +97,10 @@ class Viewport {
 
     Eng::Rect *rect = (Eng::Rect *)DATA_PTR(_rect);
 
-    Eng::Viewport *inst = new Eng::Viewport(rect);
-    DATA_PTR(self) = inst;
+    SharedPtr<Eng::Viewport> inst = MakeSharedPtr<Eng::Viewport>(rect);
+    Eng::Engine::getInstance().addViewport(inst);
+
+    DATA_PTR(self) = inst.get();
 
     return self;
   }
