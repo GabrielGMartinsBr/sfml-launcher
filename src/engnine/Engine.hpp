@@ -8,8 +8,8 @@
 #include <vector>
 
 #include "base/Log.hpp"
+#include "engnine/RGSSViewport.hpp"
 #include "engnine/Sprite.hpp"
-#include "engnine/VpTest.hpp"
 #include "ruby.h"
 
 namespace Eng {
@@ -18,17 +18,15 @@ class Engine {
   bool initialized = false;
   bool running = false;
 
+  RGSS::Viewport defaultViewport;
+  // std::vector<RGSS::Viewport> viewports;
   std::vector<VALUE> sprites;
 
   sf::RenderWindow* window = nullptr;
-  sf::View view;
-
-  sf::VpTest* vpTest = nullptr;
 
   Engine() :
-      view(sf::FloatRect(0, 0, 640, 480))
+      defaultViewport(0, 0, 640, 480)
   {
-    vpTest = new sf::VpTest();
   }
 
   Engine(const Engine&);
@@ -39,13 +37,6 @@ class Engine {
   {
     static Engine instance;
     return instance;
-  }
-
-  void addSprite(VALUE sprite)
-  {
-    Log::out() << "Adding sprite";
-    sprites.push_back(sprite);
-    Log::out() << "Sprites number: " << sprites.size();
   }
 
   void init(sf::RenderWindow& _window)
@@ -69,6 +60,13 @@ class Engine {
     return &sprites;
   }
 
+  void addSprite(VALUE sprite)
+  {
+    Log::out() << "Adding sprite";
+    sprites.push_back(sprite);
+    Log::out() << "Sprites number: " << sprites.size();
+  }
+
   void updateInput()
   {
     pollEvents();
@@ -78,24 +76,28 @@ class Engine {
   {
     window->clear();
 
-    renderSprites();
-
-    vpTest->draw(*window);
+    renderViewports();
 
     window->display();
   }
 
 
  private:
-  void renderSprites()
+
+  void renderViewports()
+  {
+    updateSprites();
+    defaultViewport.renderIn(*window);
+  }
+
+  void updateSprites()
   {
     Eng::Sprite* spr = nullptr;
-
     for (VALUE i : sprites) {
       spr = (Eng::Sprite*)DATA_PTR(i);
       if (spr && spr->shouldRender()) {
         spr->applyChanges();
-        window->draw(spr->sprite);
+        defaultViewport.draw(spr->sprite);
       }
     }
   }
