@@ -4,12 +4,12 @@ namespace Eng {
 
 class Rect {
  public:
-  int x;
-  int y;
-  int width;
-  int height;
+  float x;
+  float y;
+  unsigned int width;
+  unsigned int height;
 
-  Rect(int _x, int _y, int _width, int _height)
+  Rect(float _x, float _y, unsigned int _width, unsigned int _height)
   {
     x = _x;
     y = _y;
