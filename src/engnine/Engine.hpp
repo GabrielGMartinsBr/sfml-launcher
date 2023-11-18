@@ -55,6 +55,11 @@ class Engine {
     return running;
   }
 
+  RGSS::Viewport& getDefaultViewport()
+  {
+    return defaultViewport;
+  }
+
   std::vector<VALUE>* getSprites()
   {
     return &sprites;
@@ -95,9 +100,8 @@ class Engine {
     Eng::Sprite* spr = nullptr;
     for (VALUE i : sprites) {
       spr = (Eng::Sprite*)DATA_PTR(i);
-      if (spr && spr->shouldRender()) {
-        spr->applyChanges();
-        defaultViewport.draw(spr->sprite);
+      if (spr) {
+        spr->renderInViewport(defaultViewport);
       }
     }
   }

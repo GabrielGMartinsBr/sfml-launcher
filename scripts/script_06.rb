@@ -22,7 +22,9 @@ def drawGrid
 end
 
 def drawSprTest(dimension)
-    spr = Sprite.new()
+    # vp = Viewport.new(0, 0, 640, 480)
+    vp = Viewport.new(10, 10, 640, 480)
+    spr = Sprite.new(vp)
     bit = Bitmap.new(dimension + 1, dimension + 1)
     spr.bitmap = bit
 
@@ -46,10 +48,10 @@ def drawSprTest(dimension)
         end
     end
 
-    spr.ox = 16
-    spr.oy = 32
+    #spr.ox = 16
+    #spr.oy = 32
     
-    spr.src_rect = Rect.new(0, 0, dimension / 2, dimension / 2)
+    #spr.src_rect = Rect.new(0, 0, dimension / 2, dimension / 2)
     # spr.src_rect = Rect.new(16, 31, dimension / 2, dimension / 2)
 
 

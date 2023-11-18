@@ -8,6 +8,8 @@
 
 #include "engnine/Bitmap.hpp"
 #include "engnine/Color.hpp"
+#include "engnine/Engine.hpp"
+#include "engnine/RGSSViewport.hpp"
 #include "engnine/Rect.hpp"
 #include "engnine/Tone.hpp"
 #include "engnine/Viewport.hpp"
@@ -189,6 +191,21 @@ class Sprite {
     sprite.setPosition(x - ox, y - oy);
 
     dirty = false;
+  }
+
+  void renderInViewport(RGSS::Viewport &defaultViewport)
+  {
+    if (!shouldRender()) {
+      return;
+    }
+    applyChanges();
+    if (viewport) {
+      viewport->getRgssViewport().draw(
+        sprite
+      );
+    } else {
+      defaultViewport.draw(sprite);
+    }
   }
 };
 
