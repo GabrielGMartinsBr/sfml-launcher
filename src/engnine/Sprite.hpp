@@ -8,7 +8,6 @@
 
 #include "engnine/Bitmap.hpp"
 #include "engnine/Color.hpp"
-#include "engnine/Engine.hpp"
 #include "engnine/RGSSViewport.hpp"
 #include "engnine/Rect.hpp"
 #include "engnine/Tone.hpp"
@@ -18,22 +17,6 @@
 namespace Eng {
 
 class Sprite {
-  bool dirty = false;
-  bool _disposed = false;
-
-  Viewport *viewport = nullptr;
-  Bitmap *bitmap = nullptr;
-  Color *color = nullptr;
-  Tone *tone = nullptr;
-  Rect *src_rect = nullptr;
-
-  int x = 0;
-  int y = 0;
-  bool visible = true;
-  int z = 0;
-  int ox = 0;
-  int oy = 0;
-
  public:
   sf::Sprite sprite;
   sf::Texture text;
@@ -45,7 +28,6 @@ class Sprite {
   int angle;
   int mirror;
   int bush_depth;
-  int opacity;
   int blend_type;
 
   Sprite() { }
@@ -207,6 +189,24 @@ class Sprite {
       defaultViewport.draw(sprite);
     }
   }
+
+ private:
+  bool dirty = false;
+  bool _disposed = false;
+
+  Viewport *viewport = nullptr;
+  Bitmap *bitmap = nullptr;
+  Color *color = nullptr;
+  Tone *tone = nullptr;
+  Rect *src_rect = nullptr;
+
+  float x = 0;
+  float y = 0;
+  int z = 0;
+  bool visible = true;
+  float ox = 0;
+  float oy = 0;
+  int opacity = 255;
 };
 
 }  // namespace Eng
