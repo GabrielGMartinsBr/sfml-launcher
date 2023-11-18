@@ -9,7 +9,7 @@
 
 #include "base/Log.hpp"
 #include "engnine/Sprite.hpp"
-#include "engnine/Viewport.hpp"
+#include "engnine/VpTest.hpp"
 #include "ruby.h"
 
 namespace Eng {
@@ -23,9 +23,12 @@ class Engine {
   sf::RenderWindow* window = nullptr;
   sf::View view;
 
+  sf::VpTest* vpTest = nullptr;
+
   Engine() :
       view(sf::FloatRect(0, 0, 640, 480))
   {
+    vpTest = new sf::VpTest();
   }
 
   Engine(const Engine&);
@@ -76,6 +79,8 @@ class Engine {
     window->clear();
 
     renderSprites();
+
+    vpTest->draw(*window);
 
     window->display();
   }
