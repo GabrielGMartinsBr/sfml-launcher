@@ -8,15 +8,15 @@
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/System/Vector2.hpp>
 
+#include "engnine/RGSSViewport.hpp"
+
 namespace sf {
 
 class VpTest {
   unsigned int wid = 320;
   unsigned int hei = 240;
 
-  RenderTexture vp_texture;
-  Sprite vp_spr;
-  Vector2f vp_position;
+  RGSS::Viewport viewport;
 
   Rect<int> rect;
   Sprite rect_spr;
@@ -25,28 +25,25 @@ class VpTest {
 
  public:
   VpTest() :
-      vp_position(128, 64),
-      rect(0, 0, 640 - 64, 480 - 64)
+      viewport(128, 64, wid, hei),
+      rect(64, 0, 640 - 64, 480 - 64)
   {
-    vp_spr.setPosition(vp_position);
-    vp_texture.create(wid, hei);
-    vp_texture.clear(sf::Color::Transparent);
-
     createGradientRect();
 
-    vp_texture.draw(rect_spr);
-    vp_texture.display();
+    viewport.draw(rect_spr);
 
-    // vp_texture.draw(rect_spr);
+    viewport.setPosition(0, 0);
+    viewport.setSize(640, 480);
+
+    rect_spr.setPosition(0, 0);
+
+    viewport.draw(rect_spr);
+    viewport.display();
   }
 
   void draw(RenderWindow& window)
   {
-    // vp_spr.setTexture(vp_texture.getTexture());
-    vp_spr.setTexture(vp_texture.getTexture(), true);
-    window.draw(vp_spr);
-
-    // window.draw(rect_spr);
+    viewport.renderIn(window);
   }
 
  private:
@@ -73,8 +70,7 @@ class VpTest {
     rect_tex.loadFromImage(rect_bitmap);
     rect_spr.setTexture(rect_tex);
 
-    rect_spr.setPosition(0, 0);
-    // rect_spr.setPosition(rect.left, rect.top);
+    rect_spr.setPosition(rect.left, rect.top);
   }
 };
 
