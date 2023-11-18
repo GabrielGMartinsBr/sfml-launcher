@@ -9,7 +9,7 @@ def drawGrid
     bg = Color.new(255, 255, 255)
     centerLine = Color.new(255, 205, 205)
     line = Color.new(205, 205, 205)
-    size = 32
+    size = 64
 
     for x in 0...@w
         for y in 0...@h
@@ -27,18 +27,20 @@ end
 def drawSprTest(dimension)
     # vp = Viewport.new(0, 0, 640, 480)
     # vp = Viewport.new(10, 10, 640, 480)
-    vp = Viewport.new(0, 0, 320, 240)
+    vp = Viewport.new(0, 0, 320, 480)
     spr = Sprite.new(vp)
     bit = Bitmap.new(dimension + 1, dimension + 1)
     spr.bitmap = bit
 
     bg = Color.new(255, 255, 255)
     bgAlt = Color.new(128, 128, 128)
-    line = Color.new(105, 105, 255)
+    line = Color.new(0, 0, 255)
     size = 32
 
     spr.x  = 128
     spr.y  = 128
+
+    spr.opacity = 32
 
     for x in 0..dimension
         for y in 0..dimension

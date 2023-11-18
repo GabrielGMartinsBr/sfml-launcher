@@ -1,11 +1,14 @@
 #pragma once
 
+#include <SFML/Graphics/BlendMode.hpp>
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Image.hpp>
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
+#include <algorithm>
 
+#include "base/NumberUtils.hpp"
 #include "engnine/Bitmap.hpp"
 #include "engnine/Color.hpp"
 #include "engnine/RGSSViewport.hpp"
@@ -30,9 +33,13 @@ class Sprite {
   int bush_depth;
   int blend_type;
 
-  Sprite() { }
+  Sprite() :
+      spriteColor(255, 255, 255, 255)
+  {
+  }
 
-  Sprite(Viewport *_viewport)
+  Sprite(Viewport *_viewport) :
+      Sprite()
   {
     viewport = _viewport;
   }
@@ -83,6 +90,18 @@ class Sprite {
   void setOy(int _oy)
   {
     oy = _oy;
+    dirty = true;
+  }
+
+  /*
+    Attr opacity
+  */
+  unsigned int getOpacity() { return opacity; }
+  void setOpacity(unsigned int v)
+  {
+    Num::clamp(v, 0u, 255u);
+    opacity = v;
+    spriteColor.a = v;
     dirty = true;
   }
 
@@ -152,6 +171,7 @@ class Sprite {
     }
 
     if (bitmap->dirty) {
+      // bitmap->buffer.
       text.loadFromImage(bitmap->buffer);
       sprite.setTexture(text);
       bitmap->dirty = false;
@@ -160,6 +180,8 @@ class Sprite {
     if (!dirty) {
       return;
     }
+
+    sprite.setColor(spriteColor);
 
     if (src_rect) {
       setSrcRect(
@@ -183,10 +205,12 @@ class Sprite {
     applyChanges();
     if (viewport) {
       viewport->getRgssViewport().draw(
-        sprite
+        sprite, sf::BlendNone
       );
     } else {
-      defaultViewport.draw(sprite);
+      defaultViewport.draw(
+        sprite, sf::BlendNone
+      );
     }
   }
 
@@ -207,6 +231,8 @@ class Sprite {
   float ox = 0;
   float oy = 0;
   int opacity = 255;
+
+  sf::Color spriteColor;
 };
 
 }  // namespace Eng

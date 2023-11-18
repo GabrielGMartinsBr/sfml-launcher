@@ -85,6 +85,11 @@ class Viewport {
   {
     renderTexture.display();
   }
+
+  void clear()
+  {
+    renderTexture.clear(Color::Transparent);
+  }
 };
 
 }  // namespace RGSS

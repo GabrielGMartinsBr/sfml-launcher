@@ -34,6 +34,9 @@ class Sprite {
     rb_define_method(spriteClass, "oy", RUBY_METHOD_FUNC(attrGet_oy), 0);
     rb_define_method(spriteClass, "oy=", RUBY_METHOD_FUNC(attrSet_oy), 1);
 
+    rb_define_method(spriteClass, "opacity", RUBY_METHOD_FUNC(attrGet_opacity), 0);
+    rb_define_method(spriteClass, "opacity=", RUBY_METHOD_FUNC(attrSet_opacity), 1);
+
     rb_define_method(spriteClass, "bitmap", RUBY_METHOD_FUNC(attrGet_bitmap), 0);
     rb_define_method(spriteClass, "bitmap=", RUBY_METHOD_FUNC(attrSet_bitmap), 1);
 
@@ -183,6 +186,24 @@ class Sprite {
     Check_Type(value, T_FIXNUM);
     int oy = FIX2INT(value);
     getInstance(self)->setOy(oy);
+    return value;
+  }
+
+  /*
+   Attr opacity
+  */
+
+  static VALUE attrGet_opacity(VALUE self)
+  {
+    int opacity = getInstance(self)->getOpacity();
+    return INT2FIX(opacity);
+  }
+
+  static VALUE attrSet_opacity(VALUE self, VALUE value)
+  {
+    Check_Type(value, T_FIXNUM);
+    int opacity = FIX2INT(value);
+    getInstance(self)->setOpacity(opacity);
     return value;
   }
 

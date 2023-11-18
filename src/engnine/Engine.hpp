@@ -109,6 +109,13 @@ class Engine {
 
   void renderViewports()
   {
+    defaultViewport.clear();
+    for (SharedPtr<Eng::Viewport> vp : viewports) {
+      if (vp) {
+        vp->getRgssViewport().clear();
+      }
+    }
+
     updateSprites();
 
     defaultViewport.renderIn(*window);
