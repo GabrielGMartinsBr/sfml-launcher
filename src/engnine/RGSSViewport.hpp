@@ -1,7 +1,7 @@
 #pragma once
 
 /*
- * The RGSSViewport class provides functionality
+ * The RGSS Viewport class provides functionality
  * to simulate/replicate the behavior of an
  * RGSS1 viewport within the SFML framework.
  */
@@ -11,6 +11,8 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 
+#include "engnine/Rect.hpp"
+
 namespace RGSS {
 
 using namespace sf;
@@ -19,12 +21,18 @@ class Viewport {
   RenderTexture renderTexture;
   Sprite sprite;
 
-  int x;
-  int y;
-  int width;
-  int height;
+  float x;
+  float y;
+  unsigned int width;
+  unsigned int height;
 
  public:
+
+  Viewport(const Eng::Rect& rect) :
+      Viewport(rect.x, rect.y, rect.width, rect.height)
+  {
+  }
+
   Viewport(
     float _x,
     float _y,

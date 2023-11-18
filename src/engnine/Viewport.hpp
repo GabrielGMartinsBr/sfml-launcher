@@ -2,7 +2,9 @@
 
 #include <SFML/Graphics/Rect.hpp>
 
+#include "engnine/RGSSViewport.hpp"
 #include "engnine/Rect.hpp"
+
 namespace Eng {
 
 class Viewport {
@@ -12,22 +14,24 @@ class Viewport {
   int ox = 0;
   int oy = 0;
 
+  RGSS::Viewport rgssVp;
 
  public:
   Viewport(int x, int y, int width, int height) :
-      rect(x, y, width, height) { }
+      rect(x, y, width, height),
+      rgssVp(x, y, width, height)
+  {
+  }
 
   Viewport(Rect* _rect) :
-      rect(_rect) { }
-
-  sf::IntRect textureRect()
+      rect(_rect),
+      rgssVp(rect)
   {
-    return sf::IntRect(
-      ox,
-      oy,
-      rect.width,
-      rect.height
-    );
+  }
+
+  RGSS::Viewport& getRgssViewport()
+  {
+    return rgssVp;
   }
 
   /*
@@ -68,7 +72,7 @@ class Viewport {
   {
     ox = _ox;
   }
-  
+
   /*
     Attr oy
   */
