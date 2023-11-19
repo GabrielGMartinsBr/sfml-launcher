@@ -123,10 +123,17 @@ class Engine {
 
     for (SharedPtr<Eng::Viewport> vp : viewports) {
       if (vp) {
+        // defaultViewport.draw(
+        //   vp->getRgssViewport().sprite
+        // );
         vp->getRgssViewport().renderIn(*window);
+        // vp->getRgssViewport().renderIn(defaultViewport);
         vp->getRgssViewport().display();
       }
     }
+
+    // defaultViewport.renderIn(*window);
+    // defaultViewport.display();
   }
 
   void updateSprites()

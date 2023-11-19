@@ -19,7 +19,6 @@ namespace RGSS {
 using namespace sf;
 
 class Viewport {
-  Sprite sprite;
 
   float x;
   float y;
@@ -27,6 +26,7 @@ class Viewport {
   unsigned int height;
 
  public:
+  Sprite sprite;
   RenderTexture renderTexture;
 
   Viewport(const Eng::Rect& rect) :
@@ -58,7 +58,14 @@ class Viewport {
   void renderIn(RenderWindow& window)
   {
     sprite.setTexture(renderTexture.getTexture(), true);
-    window.draw(sprite);
+    window.draw(sprite, BlendAdd);
+  }
+
+  void renderIn(Viewport& vp)
+  {
+    sprite.setTexture(renderTexture.getTexture(), true);
+    // vp.draw(sprite, BlendAlpha);
+    vp.draw(sprite, BlendMultiply);
   }
 
   void setPosition(float x, float y)

@@ -243,6 +243,10 @@ class Sprite {
       //   sprite, sf::BlendMin
       // );
       sf::Shader shader;
+      sf::Shader invertShader;
+      if (!invertShader.loadFromFile("../shaders/invert_shader.frag", sf::Shader::Fragment)) {
+        // Handle shader loading failure
+      }
 
       defaultViewport.renderTexture.display();
 
@@ -255,15 +259,23 @@ class Sprite {
       //   sprite, &shader
       // );
 
-      defaultViewport.draw(
-        sprite,
-        sf::BlendMode(
-          sf::BlendMode::One,
-          sf::BlendMode::OneMinusSrcColor,
-          sf::BlendMode::Equation::Subtract
-        )
-
+      viewport->getRgssViewport().draw(
+        sprite, &invertShader
       );
+
+      // viewport->getRgssViewport().draw(
+      //   sprite, sf::BlendAlpha
+      // );
+
+      // defaultViewport.draw(
+      //   sprite,
+      //   sf::BlendMode(
+      //     sf::BlendMode::One,
+      //     sf::BlendMode::OneMinusSrcColor,
+      //     sf::BlendMode::Equation::Subtract
+      //   )
+
+      // );
 
     } else {
       defaultViewport.draw(
