@@ -1,6 +1,8 @@
 #pragma once
 
+#include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Rect.hpp>
+#include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/VideoMode.hpp>
@@ -10,6 +12,7 @@
 
 #include "base/Log.hpp"
 #include "base/Sugars.hpp"
+#include "engnine/EngineRenderer.hpp"
 #include "engnine/RGSSViewport.hpp"
 #include "engnine/Sprite.hpp"
 #include "ruby.h"
@@ -32,7 +35,14 @@ class Engine {
     running = true;
     window = &_window;
     window->display();
+    auto size = window->getSize();
+    renderer = new EngineRenderer(size.x, size.y);
     initialized = true;
+  }
+
+  void cleanup()
+  {
+    delete renderer;
   }
 
   bool isRunning()
@@ -51,7 +61,7 @@ class Engine {
 
   void addViewport(SharedPtr<Eng::Viewport> vp)
   {
-    viewports.push_back(vp);
+    renderer->addViewport(vp);
   }
 
   /*
@@ -63,11 +73,10 @@ class Engine {
     return &sprites;
   }
 
-  void addSprite(VALUE sprite)
+  void addSprite(VALUE spriteValue)
   {
-    Log::out() << "Adding sprite";
-    sprites.push_back(sprite);
-    Log::out() << "Sprites number: " << sprites.size();
+    Eng::Sprite* spr = (Eng::Sprite*)DATA_PTR(spriteValue);
+    renderer->addSprite(spr);
   }
 
   /*
@@ -83,7 +92,7 @@ class Engine {
   {
     window->clear();
 
-    renderViewports();
+    renderer->render(window);
 
     window->display();
   }
@@ -98,6 +107,7 @@ class Engine {
   Vector<VALUE> sprites;
 
   sf::RenderWindow* window = nullptr;
+  EngineRenderer* renderer = nullptr;
 
   Engine() :
       defaultViewport(0, 0, 640, 480)

@@ -220,7 +220,7 @@ class Sprite {
     dirty = false;
   }
 
-  void renderInViewport(RGSS::Viewport &defaultViewport)
+  void renderInViewport(RGSS::Viewport &defaultVp)
   {
     if (!shouldRender()) {
       return;
@@ -248,7 +248,7 @@ class Sprite {
         // Handle shader loading failure
       }
 
-      defaultViewport.renderTexture.display();
+      defaultVp.renderTexture.display();
 
       // shader.setUniform("texture1", defaultViewport.renderTexture.getTexture());
       // shader.setUniform("texture2", sprite.getTexture());
@@ -278,7 +278,7 @@ class Sprite {
       // );
 
     } else {
-      defaultViewport.draw(
+      defaultVp.draw(
         sprite, sf::BlendNone
       );
     }

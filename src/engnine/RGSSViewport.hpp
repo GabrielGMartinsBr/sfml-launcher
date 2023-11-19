@@ -19,7 +19,6 @@ namespace RGSS {
 using namespace sf;
 
 class Viewport {
-
   float x;
   float y;
   unsigned int width;
@@ -66,6 +65,12 @@ class Viewport {
     sprite.setTexture(renderTexture.getTexture(), true);
     // vp.draw(sprite, BlendAlpha);
     vp.draw(sprite, BlendMultiply);
+  }
+
+  void renderIn(RenderTexture& target)
+  {
+    sprite.setTexture(renderTexture.getTexture(), true);
+    target.draw(sprite);
   }
 
   void setPosition(float x, float y)
