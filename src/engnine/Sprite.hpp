@@ -12,33 +12,10 @@
 #include "base/NumberUtils.hpp"
 #include "engnine/Bitmap.hpp"
 #include "engnine/Color.hpp"
-#include "engnine/RGSSViewport.hpp"
 #include "engnine/Rect.hpp"
 #include "engnine/Tone.hpp"
 #include "engnine/Viewport.hpp"
 #include "ruby.h"
-
-const std::string vertexShader = R"(
-    void main() {
-        gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-        gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
-    }
-)";
-
-const std::string fragmentShader = R"(
-    uniform sampler2D texture1;
-    uniform sampler2D texture2;
-
-    void main() {
-        vec4 color1 = texture2D(texture1, gl_TexCoord[0].xy);
-        vec4 color2 = texture2D(texture2, gl_TexCoord[0].xy);
-
-        // vec4 result = vec4(abs(color2.rgb - color1.rgb), 255);
-        vec4 result = vec4((vec3(1.0) - color2.rgb), 1.0);
-
-        gl_FragColor = result;
-    }
-)";
 
 namespace Eng {
 
@@ -127,7 +104,21 @@ class Sprite {
   {
     Num::clamp(v, 0u, 255u);
     opacity = v;
-    spriteColor.a = v;
+    // spriteColor.r = 0;
+    // spriteColor.g = 255;
+    // spriteColor.b = 0;
+    // spriteColor.a = v;
+    dirty = true;
+  }
+
+  /*
+   Attr blend_type
+ */
+  unsigned int getBlendType() { return blend_type; }
+  void setBlendType(unsigned int v)
+  {
+    Num::clamp(v, 0u, 2u);
+    blend_type = v;
     dirty = true;
   }
 
@@ -221,70 +212,6 @@ class Sprite {
     sfSprite.setPosition(x - ox, y - oy);
 
     dirty = false;
-  }
-
-  void renderInViewport(RGSS::Viewport &defaultVp)
-  {
-    if (!shouldRender()) {
-      return;
-    }
-    applyChanges();
-    // defaultViewport.draw(
-    //   sprite, sf::
-    // );
-    if (viewport) {
-      // auto add = sf::BlendMode(
-      //   sf::BlendMode::SrcColor,
-      //   sf::BlendMode::DstColor,
-      //   sf::BlendMode::Max
-      // );
-      //
-      // defaultViewport.draw(
-      //   sprite, blend
-      // );
-      // viewport->getRgssViewport().draw(
-      //   sprite, sf::BlendMin
-      // );
-      sf::Shader shader;
-      sf::Shader invertShader;
-      if (!invertShader.loadFromFile("../shaders/invert_shader.frag", sf::Shader::Fragment)) {
-        // Handle shader loading failure
-      }
-
-      defaultVp.renderTexture.display();
-
-      // shader.setUniform("texture1", defaultViewport.renderTexture.getTexture());
-      // shader.setUniform("texture2", sprite.getTexture());
-
-      // shader.loadFromMemory(vertexShader, fragmentShader);
-
-      // defaultViewport.draw(
-      //   sprite, &shader
-      // );
-
-      viewport->getRgssViewport().draw(
-        sfSprite, &invertShader
-      );
-
-      // viewport->getRgssViewport().draw(
-      //   sprite, sf::BlendAlpha
-      // );
-
-      // defaultViewport.draw(
-      //   sprite,
-      //   sf::BlendMode(
-      //     sf::BlendMode::One,
-      //     sf::BlendMode::OneMinusSrcColor,
-      //     sf::BlendMode::Equation::Subtract
-      //   )
-
-      // );
-
-    } else {
-      defaultVp.draw(
-        sfSprite, sf::BlendNone
-      );
-    }
   }
 
  private:

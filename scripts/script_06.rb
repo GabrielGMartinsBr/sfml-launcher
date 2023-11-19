@@ -25,10 +25,9 @@ def drawGrid
 end
 
 def drawSprTest(dimension)
-    # vp = Viewport.new(0, 0, 640, 480)
-    # vp = Viewport.new(10, 10, 640, 480)
     vp = Viewport.new(0, 0, 320, 480)
     spr = Sprite.new(vp)
+    # spr = Sprite.new()
     bit = Bitmap.new(dimension + 1, dimension + 1)
     spr.bitmap = bit
 
@@ -40,7 +39,8 @@ def drawSprTest(dimension)
     spr.x  = 128
     spr.y  = 128
 
-    spr.opacity = 32
+    spr.opacity = 255
+    spr.blend_type = 2
 
     for x in 0..dimension
         for y in 0..dimension

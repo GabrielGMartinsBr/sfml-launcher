@@ -51,6 +51,7 @@ class Engine {
   void addViewport(SharedPtr<Eng::Viewport> vp)
   {
     renderer->addViewport(vp);
+    b = true;
   }
 
   void addSprite(VALUE spriteValue)
@@ -64,11 +65,17 @@ class Engine {
     pollEvents();
   }
 
+  bool d = false;
+  bool b = false;
+
   void updateGraphics()
   {
-    window->clear();
+    // window->clear();
 
-    renderer->render(window);
+    if (!d && b) {
+      renderer->render(window);
+      d = true;
+    }
 
     window->display();
   }

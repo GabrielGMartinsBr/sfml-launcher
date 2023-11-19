@@ -39,7 +39,8 @@ struct EngineRenderer {
 
   void render(sf::RenderTarget* target)
   {
-    renderTexture.clear(sf::Color::Transparent);
+    // renderTexture.clear(sf::Color::Transparent);
+    renderTexture.clear();
     clearViewports();
     renderSprites();
     renderViewports();
@@ -60,11 +61,12 @@ struct EngineRenderer {
 
   sf::Shader vpNormalShader;
   sf::Shader sprNormalShader;
+  sf::Shader sprInvertShader;
 
   void createBuffer()
   {
     renderTexture.create(width, height);
-    renderTexture.clear(sf::Color::Transparent);
+    renderTexture.clear();
   }
 
   void createDefaultViewport()
@@ -77,6 +79,7 @@ struct EngineRenderer {
   {
     if (
       !sprNormalShader.loadFromFile("../shaders/sprite_normal-blend.frag", sf::Shader::Fragment)
+      || !sprInvertShader.loadFromFile("../shaders/sprite_invert-blend.frag", sf::Shader::Fragment)
       || !vpNormalShader.loadFromFile("../shaders/viewport_normal-blend.frag", sf::Shader::Fragment)
     ) {
       throw std::runtime_error("Failed to load shader.");
@@ -119,13 +122,37 @@ struct EngineRenderer {
 
     float opacity = spr->getOpacity() / 255.f;
 
-    sprNormalShader.setUniform("opacity", opacity);
-    sprNormalShader.setUniform("backTexture", renderTexture.getTexture());
+    sf::RenderStates state;
 
-    vp->getRgssViewport().draw(
-      sfSprite, &sprNormalShader
+    state.blendMode = sf::BlendNone;
+
+    if (spr->getBlendType() == 2) {
+      sprInvertShader.setUniform("opacity", opacity);
+      state.shader = &sprInvertShader;
+      state.blendMode = sf::BlendMultiply;
+      // state.blendMode = sf::BlendMode(
+      //   sf::BlendMode::Factor::SrcColor,
+      //   sf::BlendMode::Factor::DstColor,
+      //   sf::BlendMode::Equation::ReverseSubtract,
+      //   sf::BlendMode::Factor::SrcAlpha,
+      //   sf::BlendMode::Factor::SrcAlpha,
+      //   sf::BlendMode::Equation::Max
+      // );
+    } else {
+      sprNormalShader.setUniform("opacity", opacity);
+      state.shader = &sprNormalShader;
+    }
+
+    // vp->getRgssViewport().draw(
+    //   sfSprite,
+    //   state
+    // );
+    // vp->getRgssViewport().display();
+
+    renderTexture.draw(
+      sfSprite,
+      state
     );
-
     renderTexture.display();
   }
 
@@ -142,7 +169,7 @@ struct EngineRenderer {
   void renderViewport(Eng::Viewport& vp)
   {
     vp.getRgssViewport().renderIn(
-      renderTexture
+      renderTexture, sf::BlendAlpha
     );
     vp.getRgssViewport().display();
   }

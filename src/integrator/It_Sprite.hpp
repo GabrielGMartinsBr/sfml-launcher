@@ -37,6 +37,8 @@ class Sprite {
     rb_define_method(spriteClass, "opacity", RUBY_METHOD_FUNC(attrGet_opacity), 0);
     rb_define_method(spriteClass, "opacity=", RUBY_METHOD_FUNC(attrSet_opacity), 1);
 
+    rb_define_method(spriteClass, "blend_type", RUBY_METHOD_FUNC(attrGet_blend_type), 0);
+    rb_define_method(spriteClass, "blend_type=", RUBY_METHOD_FUNC(attrSet_blend_type), 1);
     rb_define_method(spriteClass, "bitmap", RUBY_METHOD_FUNC(attrGet_bitmap), 0);
     rb_define_method(spriteClass, "bitmap=", RUBY_METHOD_FUNC(attrSet_bitmap), 1);
 
@@ -204,6 +206,24 @@ class Sprite {
     Check_Type(value, T_FIXNUM);
     int opacity = FIX2INT(value);
     getInstance(self)->setOpacity(opacity);
+    return value;
+  }
+
+  /*
+   Attr blend_type
+  */
+
+  static VALUE attrGet_blend_type(VALUE self)
+  {
+    int blend_type = getInstance(self)->getBlendType();
+    return INT2FIX(blend_type);
+  }
+
+  static VALUE attrSet_blend_type(VALUE self, VALUE value)
+  {
+    Check_Type(value, T_FIXNUM);
+    int blend_type = FIX2INT(value);
+    getInstance(self)->setBlendType(blend_type);
     return value;
   }
 
