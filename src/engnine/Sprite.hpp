@@ -44,8 +44,6 @@ namespace Eng {
 
 class Sprite {
  public:
-  sf::Sprite sprite;
-  sf::Texture text;
 
   VALUE bitmap_ptr;  // TODO: Remove
 
@@ -65,6 +63,11 @@ class Sprite {
       Sprite()
   {
     viewport = _viewport;
+  }
+
+  sf::Sprite &getSfSprite()
+  {
+    return sfSprite;
   }
 
   /*
@@ -160,7 +163,7 @@ class Sprite {
 
   void setSrcRect(int x, int y, int w, int h)
   {
-    sprite.setTextureRect(
+    sfSprite.setTextureRect(
       sf::IntRect(x, y, w, h)
     );
   }
@@ -196,7 +199,7 @@ class Sprite {
     if (bitmap->dirty) {
       // bitmap->buffer.
       text.loadFromImage(bitmap->buffer);
-      sprite.setTexture(text);
+      sfSprite.setTexture(text);
       bitmap->dirty = false;
     }
 
@@ -204,7 +207,7 @@ class Sprite {
       return;
     }
 
-    sprite.setColor(spriteColor);
+    sfSprite.setColor(spriteColor);
 
     if (src_rect) {
       setSrcRect(
@@ -215,7 +218,7 @@ class Sprite {
       );
     }
 
-    sprite.setPosition(x - ox, y - oy);
+    sfSprite.setPosition(x - ox, y - oy);
 
     dirty = false;
   }
@@ -260,7 +263,7 @@ class Sprite {
       // );
 
       viewport->getRgssViewport().draw(
-        sprite, &invertShader
+        sfSprite, &invertShader
       );
 
       // viewport->getRgssViewport().draw(
@@ -279,7 +282,7 @@ class Sprite {
 
     } else {
       defaultVp.draw(
-        sprite, sf::BlendNone
+        sfSprite, sf::BlendNone
       );
     }
   }
@@ -303,6 +306,8 @@ class Sprite {
   int opacity = 255;
 
   sf::Color spriteColor;
+  sf::Sprite sfSprite;
+  sf::Texture text;
 };
 
 }  // namespace Eng

@@ -25,7 +25,7 @@ class Viewport {
   unsigned int height;
 
  public:
-  Sprite sprite;
+  Sprite drawable;
   RenderTexture renderTexture;
 
   Viewport(const Eng::Rect& rect) :
@@ -44,7 +44,7 @@ class Viewport {
       width(_width),
       height(_height)
   {
-    sprite.setPosition(x, y);
+    drawable.setPosition(x, y);
     renderTexture.create(width, height);
     renderTexture.clear(Color::Transparent);
   }
@@ -54,33 +54,20 @@ class Viewport {
     renderTexture.draw(drawable, states);
   }
 
-  void renderIn(RenderWindow& window)
+  void renderIn(sf::RenderTarget& target, const RenderStates& states = RenderStates::Default)
   {
-    sprite.setTexture(renderTexture.getTexture(), true);
-    window.draw(sprite, BlendAdd);
-  }
-
-  void renderIn(Viewport& vp)
-  {
-    sprite.setTexture(renderTexture.getTexture(), true);
-    // vp.draw(sprite, BlendAlpha);
-    vp.draw(sprite, BlendMultiply);
-  }
-
-  void renderIn(RenderTexture& target)
-  {
-    sprite.setTexture(renderTexture.getTexture(), true);
-    target.draw(sprite);
+    drawable.setTexture(renderTexture.getTexture());
+    target.draw(drawable, states);
   }
 
   void setPosition(float x, float y)
   {
-    sprite.setPosition(x, y);
+    drawable.setPosition(x, y);
   }
 
   void setPosition(const Vector2f& position)
   {
-    sprite.setPosition(position);
+    drawable.setPosition(position);
   }
 
   void setSize(unsigned int _width, unsigned int _height)

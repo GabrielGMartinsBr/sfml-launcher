@@ -1,9 +1,11 @@
 #pragma once
 
+#include <SFML/Graphics/BlendMode.hpp>
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Graphics/Sprite.hpp>
 #include <SFML/System/Vector2.hpp>
 
 #include "base/Sugars.hpp"
@@ -52,12 +54,12 @@ struct EngineRenderer {
   SharedPtr<Eng::Viewport> defaultVp;
 
   sf::Sprite bufferSprite;
-  sf::RenderTexture bufferTexture;
+  sf::RenderTexture renderTexture;
 
   void createBuffer()
   {
-    bufferTexture.create(width, height);
-    bufferTexture.clear(sf::Color::Transparent);
+    renderTexture.create(width, height);
+    renderTexture.clear(sf::Color::Transparent);
   }
 
   void clearViewports()
@@ -76,10 +78,27 @@ struct EngineRenderer {
       if (!spr) {
         continue;
       }
-      spr->renderInViewport(
-        defaultVp->getRgssViewport()
-      );
+      renderSprite(spr);
     }
+  }
+
+  void renderSprite(Eng::Sprite* spr)
+  {
+    if (!spr->shouldRender()) {
+      return;
+    }
+    spr->applyChanges();
+
+    sf::Sprite& sfSprite = spr->getSfSprite();
+    Viewport* vp = spr->getViewport();
+
+    if (!vp) {
+      vp = defaultVp.get();
+    }
+
+    vp->getRgssViewport().draw(
+      sfSprite
+    );
   }
 
   void renderViewports()
@@ -95,15 +114,15 @@ struct EngineRenderer {
   void renderViewport(Eng::Viewport& vp)
   {
     vp.getRgssViewport().renderIn(
-      bufferTexture
+      renderTexture
     );
     vp.getRgssViewport().display();
   }
 
   void renderBuffer(sf::RenderTarget* target)
   {
-    bufferTexture.display();
-    bufferSprite.setTexture(bufferTexture.getTexture());
+    renderTexture.display();
+    bufferSprite.setTexture(renderTexture.getTexture());
     target->draw(bufferSprite);
   }
 };
