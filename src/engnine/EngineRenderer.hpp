@@ -7,6 +7,7 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/System/Vector2.hpp>
+#include <stdexcept>
 
 #include "base/Sugars.hpp"
 #include "engnine/Sprite.hpp"
@@ -22,8 +23,8 @@ struct EngineRenderer {
       height(_height)
   {
     createBuffer();
-    defaultVp = MakeSharedPtr<Eng::Viewport>(0, 0, width, height);
-    viewports.push_back(defaultVp);
+    createDefaultViewport();
+    loadShaders();
   }
 
   void addViewport(SharedPtr<Eng::Viewport> vp)
@@ -38,6 +39,7 @@ struct EngineRenderer {
 
   void render(sf::RenderTarget* target)
   {
+    renderTexture.clear(sf::Color::Transparent);
     clearViewports();
     renderSprites();
     renderViewports();
@@ -56,10 +58,29 @@ struct EngineRenderer {
   sf::Sprite bufferSprite;
   sf::RenderTexture renderTexture;
 
+  sf::Shader vpNormalShader;
+  sf::Shader sprNormalShader;
+
   void createBuffer()
   {
     renderTexture.create(width, height);
     renderTexture.clear(sf::Color::Transparent);
+  }
+
+  void createDefaultViewport()
+  {
+    defaultVp = MakeSharedPtr<Eng::Viewport>(0, 0, width, height);
+    viewports.push_back(defaultVp);
+  }
+
+  void loadShaders()
+  {
+    if (
+      !sprNormalShader.loadFromFile("../shaders/sprite_normal-blend.frag", sf::Shader::Fragment)
+      || !vpNormalShader.loadFromFile("../shaders/viewport_normal-blend.frag", sf::Shader::Fragment)
+    ) {
+      throw std::runtime_error("Failed to load shader.");
+    }
   }
 
   void clearViewports()
@@ -96,9 +117,16 @@ struct EngineRenderer {
       vp = defaultVp.get();
     }
 
+    float opacity = spr->getOpacity() / 255.f;
+
+    sprNormalShader.setUniform("opacity", opacity);
+    sprNormalShader.setUniform("backTexture", renderTexture.getTexture());
+
     vp->getRgssViewport().draw(
-      sfSprite
+      sfSprite, &sprNormalShader
     );
+
+    renderTexture.display();
   }
 
   void renderViewports()
