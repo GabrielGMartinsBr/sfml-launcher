@@ -40,7 +40,7 @@ def drawSprTest(dimension)
     spr.x  = 128
     spr.y  = 128
 
-    spr.opacity = 32
+    spr.opacity = 255
 
     for x in 0..dimension
         for y in 0..dimension

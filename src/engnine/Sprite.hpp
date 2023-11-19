@@ -4,6 +4,7 @@
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Image.hpp>
 #include <SFML/Graphics/Rect.hpp>
+#include <SFML/Graphics/Shader.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
 #include <algorithm>
@@ -16,6 +17,28 @@
 #include "engnine/Tone.hpp"
 #include "engnine/Viewport.hpp"
 #include "ruby.h"
+
+const std::string vertexShader = R"(
+    void main() {
+        gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+        gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
+    }
+)";
+
+const std::string fragmentShader = R"(
+    uniform sampler2D texture1;
+    uniform sampler2D texture2;
+
+    void main() {
+        vec4 color1 = texture2D(texture1, gl_TexCoord[0].xy);
+        vec4 color2 = texture2D(texture2, gl_TexCoord[0].xy);
+
+        // vec4 result = vec4(abs(color2.rgb - color1.rgb), 255);
+        vec4 result = vec4((vec3(1.0) - color2.rgb), 1.0);
+
+        gl_FragColor = result;
+    }
+)";
 
 namespace Eng {
 
@@ -203,10 +226,45 @@ class Sprite {
       return;
     }
     applyChanges();
+    // defaultViewport.draw(
+    //   sprite, sf::
+    // );
     if (viewport) {
-      viewport->getRgssViewport().draw(
-        sprite, sf::BlendNone
+      // auto add = sf::BlendMode(
+      //   sf::BlendMode::SrcColor,
+      //   sf::BlendMode::DstColor,
+      //   sf::BlendMode::Max
+      // );
+      //
+      // defaultViewport.draw(
+      //   sprite, blend
+      // );
+      // viewport->getRgssViewport().draw(
+      //   sprite, sf::BlendMin
+      // );
+      sf::Shader shader;
+
+      defaultViewport.renderTexture.display();
+
+      // shader.setUniform("texture1", defaultViewport.renderTexture.getTexture());
+      // shader.setUniform("texture2", sprite.getTexture());
+
+      // shader.loadFromMemory(vertexShader, fragmentShader);
+
+      // defaultViewport.draw(
+      //   sprite, &shader
+      // );
+
+      defaultViewport.draw(
+        sprite,
+        sf::BlendMode(
+          sf::BlendMode::One,
+          sf::BlendMode::OneMinusSrcColor,
+          sf::BlendMode::Equation::Subtract
+        )
+
       );
+
     } else {
       defaultViewport.draw(
         sprite, sf::BlendNone

@@ -6,6 +6,7 @@
  * RGSS1 viewport within the SFML framework.
  */
 
+#include <SFML/Graphics/BlendMode.hpp>
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -18,7 +19,6 @@ namespace RGSS {
 using namespace sf;
 
 class Viewport {
-  RenderTexture renderTexture;
   Sprite sprite;
 
   float x;
@@ -27,6 +27,7 @@ class Viewport {
   unsigned int height;
 
  public:
+  RenderTexture renderTexture;
 
   Viewport(const Eng::Rect& rect) :
       Viewport(rect.x, rect.y, rect.width, rect.height)
