@@ -41,9 +41,9 @@ struct EngineRenderer {
   {
     // renderTexture.clear(sf::Color::Transparent);
     renderTexture.clear();
-    clearViewports();
+    // clearViewports();
     renderSprites();
-    renderViewports();
+    // renderViewports();
     renderBuffer(target);
   }
 
@@ -130,17 +130,10 @@ struct EngineRenderer {
       sprInvertShader.setUniform("opacity", opacity);
       state.shader = &sprInvertShader;
       state.blendMode = sf::BlendMultiply;
-      // state.blendMode = sf::BlendMode(
-      //   sf::BlendMode::Factor::SrcColor,
-      //   sf::BlendMode::Factor::DstColor,
-      //   sf::BlendMode::Equation::ReverseSubtract,
-      //   sf::BlendMode::Factor::SrcAlpha,
-      //   sf::BlendMode::Factor::SrcAlpha,
-      //   sf::BlendMode::Equation::Max
-      // );
     } else {
-      sprNormalShader.setUniform("opacity", opacity);
-      state.shader = &sprNormalShader;
+      state.blendMode = sf::BlendAlpha;
+      // sprNormalShader.setUniform("opacity", opacity);
+      // state.shader = &sprNormalShader;
     }
 
     // vp->getRgssViewport().draw(

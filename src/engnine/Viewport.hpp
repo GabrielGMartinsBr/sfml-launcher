@@ -8,14 +8,6 @@
 namespace Eng {
 
 class Viewport {
-  Rect rect;
-  bool visible = true;
-  int z = 0;
-  int ox = 0;
-  int oy = 0;
-
-  RGSS::Viewport rgssVp;
-
  public:
   Viewport(int x, int y, int width, int height) :
       rect(x, y, width, height),
@@ -81,6 +73,15 @@ class Viewport {
   {
     oy = _oy;
   }
+
+ private:
+  Rect rect;
+  bool visible = true;
+  int z = 0;
+  int ox = 0;
+  int oy = 0;
+
+  RGSS::Viewport rgssVp;
 };
 
 }  // namespace Eng

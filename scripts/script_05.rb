@@ -1,6 +1,29 @@
 $w = 640
 $h = 480
 
+def drawGrid
+    spr = Sprite.new()
+    bit = Bitmap.new($w, $h)
+    spr.bitmap = bit
+
+    bg = Color.new(64, 64, 64)
+    centerLine = Color.new(255, 172, 172)
+    line = Color.new(205, 205, 205)
+    size = 32
+
+    for x in 0...$w
+        for y in 0...$h
+            if x == $w / 2 || y == $h / 2
+                bit.set_pixel(x, y, centerLine)
+            elsif x % size == 0 || y % size == 0
+                bit.set_pixel(x, y, line)
+            else
+                bit.set_pixel(x, y, bg)
+            end
+        end
+    end
+end
+
 class Background
     def initialize
         spr = Sprite.new
@@ -25,19 +48,23 @@ class Character
         row = bp.height / 4
         
         # vp = Viewport.new(0, 0, col, row)
-        rect = Rect.new(64, 0, col, row)
+        rect = Rect.new(64, 64, col, row)
         vp = Viewport.new(rect)
 
-        vp.ox = 16
+        vp.rect.x = 32
+        vp.rect.y = 32
+
+        vp.ox = 32
 
         spr = Sprite.new(vp)
         # spr = Sprite.new()
         spr.bitmap = bp
 
-        # spr.x = 100
-        # spr.y = 100
+        spr.x = 0
+        spr.y = 0
+        spr.opacity = 255
         
-        # spr.ox = 64
+        # spr.ox = 32
         # spr.oy = 0
 
         # puts "z: " + spr.z.to_s
@@ -78,8 +105,9 @@ end
 
 
 
-bg = Background.new
+# bg = Background.new
 # drawRect
+drawGrid
 char = Character.new
 
 loop do

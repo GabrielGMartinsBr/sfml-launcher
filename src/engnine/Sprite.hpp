@@ -15,6 +15,7 @@
 #include "engnine/Rect.hpp"
 #include "engnine/Tone.hpp"
 #include "engnine/Viewport.hpp"
+#include "engnine/VpRects.hpp"
 #include "ruby.h"
 
 namespace Eng {
@@ -104,10 +105,7 @@ class Sprite {
   {
     Num::clamp(v, 0u, 255u);
     opacity = v;
-    // spriteColor.r = 0;
-    // spriteColor.g = 255;
-    // spriteColor.b = 0;
-    // spriteColor.a = v;
+    spriteColor.a = v;
     dirty = true;
   }
 
@@ -152,13 +150,6 @@ class Sprite {
     return src_rect;
   }
 
-  void setSrcRect(int x, int y, int w, int h)
-  {
-    sfSprite.setTextureRect(
-      sf::IntRect(x, y, w, h)
-    );
-  }
-
   void dispose()
   {
     _disposed = true;
@@ -187,11 +178,11 @@ class Sprite {
       return;
     }
 
-    if (bitmap->dirty) {
-      // bitmap->buffer.
+    if (!loadedBitmap || bitmap->dirty) {
       text.loadFromImage(bitmap->buffer);
       sfSprite.setTexture(text);
       bitmap->dirty = false;
+      loadedBitmap = true;
     }
 
     if (!dirty) {
@@ -200,16 +191,77 @@ class Sprite {
 
     sfSprite.setColor(spriteColor);
 
+    vp::ViewportRect vp;
+    vp::DestinyRect dst;
+
+    sf::Vector2f position(x, y);
+    sf::IntRect dstRect(
+      ox,
+      oy,
+      bitmap->width,
+      bitmap->height
+    );
+
     if (src_rect) {
-      setSrcRect(
-        src_rect->x,
-        src_rect->y,
-        src_rect->width,
-        src_rect->height
-      );
+      dstRect.left = src_rect->x + ox;
+      dstRect.top = src_rect->y + oy;
+      dstRect.width = src_rect->width;
+      dstRect.height = src_rect->height;
     }
 
-    sfSprite.setPosition(x - ox, y - oy);
+    if (viewport) {
+      auto &vpRect = *viewport->getRect();
+
+      // ---
+      vp.x = vpRect.x;
+      vp.y = vpRect.y;
+      vp.width = vpRect.width;
+      vp.height = vpRect.height;
+      dst.x = vp.x;
+      dst.y = vp.y;
+
+      int dstX = vpRect.x + x;
+      int dstY = vpRect.y + y;
+
+      if (dstX > vp.endX() || dstY > vp.endY()) {
+        return;
+      }
+
+      dst.width = vp.width;
+      dst.height = vp.height;
+
+      if (x > 0) {
+        dst.x += x;
+        dst.width -= x;
+      } else if (x < 0) {
+        dst.left -= x;
+      }
+      if (y > 0) {
+        dst.y += y;
+        dst.height -= y;
+      }
+      if (y < 0) {
+        dst.top -= y;
+      }
+
+      dst.width = std::min(dst.width, dstRect.width);
+      dst.height = std::min(dst.height, dstRect.height);
+
+      position.x = dst.x;
+      position.y = dst.y;
+
+      dstRect.width = dst.width;
+      dstRect.height = dst.height;
+
+      dstRect.left += viewport->getOx();
+      dstRect.top += viewport->getOy();
+
+      dstRect.left += dst.left;
+      dstRect.top += dst.top;
+    }
+
+    sfSprite.setPosition(position);
+    sfSprite.setTextureRect(dstRect);
 
     dirty = false;
   }
@@ -217,6 +269,7 @@ class Sprite {
  private:
   bool dirty = false;
   bool _disposed = false;
+  bool loadedBitmap = false;
 
   Viewport *viewport = nullptr;
   Bitmap *bitmap = nullptr;

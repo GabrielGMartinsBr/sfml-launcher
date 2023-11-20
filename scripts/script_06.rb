@@ -31,6 +31,8 @@ def drawSprTest(dimension)
     bit = Bitmap.new(dimension + 1, dimension + 1)
     spr.bitmap = bit
 
+    vp.rect.x = 16
+
     bg = Color.new(255, 255, 255)
     bgAlt = Color.new(128, 128, 128)
     line = Color.new(0, 0, 255)
