@@ -4,12 +4,14 @@
 
 namespace app {
 
-typedef boost::filesystem::path FilePath;
+typedef unsigned int UInt;
 
 typedef std::string String;
 typedef const char* CStr;
 
 template <typename T>
 using Vector = std::vector<T>;
+
+typedef boost::filesystem::path FilePath;
 
 }  // namespace app
