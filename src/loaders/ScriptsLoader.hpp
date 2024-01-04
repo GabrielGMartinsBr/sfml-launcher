@@ -6,7 +6,9 @@
 #include <sstream>
 
 #include "base/AppDefs.h"
-#include "base/Log.hpp"
+#include "base/RbUtils.hpp"
+#include "loaders/PlayerScript.hpp"
+#include "ruby.h"
 
 class ScriptsLoader {
  public:
@@ -16,10 +18,10 @@ class ScriptsLoader {
     return instance;
   }
 
-  void loadScripts(app::CStr rxFilePath)
+  void loadScripts(app::Vector<PlayerScript>& scripts, app::CStr rxFilePath)
   {
     app::String binContent = readFile(rxFilePath);
-    Log::out() << binContent.size();
+    parseScripts(scripts, binContent);
   }
 
  private:
@@ -45,12 +47,37 @@ class ScriptsLoader {
     char buffer[chunkSize];
     std::ostringstream oss;
 
-    while (inputFile.read(buffer, chunkSize)) {
+    while (!inputFile.eof()) {
+      inputFile.read(buffer, chunkSize);
       oss.write(buffer, inputFile.gcount());
     }
 
     inputFile.close();
 
     return oss.str();
+  }
+
+  void parseScripts(app::Vector<PlayerScript>& scripts, app::String& binContent)
+  {
+    VALUE rbArr = unserialize(binContent);
+    app::UInt arrSize = RbUtils::getArraySize(rbArr);
+
+    VALUE rbEntry, id, name, code;
+
+    for (int i = 0; i < arrSize; i++) {
+      rbEntry = rb_ary_entry(rbArr, i);
+      id = rb_ary_entry(rbEntry, 0);
+      name = rb_ary_entry(rbEntry, 1);
+      code = rb_ary_entry(rbEntry, 2);
+      scripts.push_back(
+        PlayerScript(id, name, code)
+      );
+    }
+  }
+
+  VALUE unserialize(app::String& binContent)
+  {
+    VALUE rbBinStr = RbUtils::createRbString(binContent);
+    return RbUtils::marshalLoad(rbBinStr);
   }
 };
