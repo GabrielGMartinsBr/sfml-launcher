@@ -10,12 +10,16 @@
 
 #include "GameInput.h"
 #include "launcher/Launcher.hpp"
+#include "loaders/ScriptsLoader.hpp"
 
 GameInput game_input;
 
 int main(int, char **)
 {
-  Launcher launcher;
+  // Launcher launcher;
+  ScriptsLoader::getInstance().loadScripts(
+    "../GameData/projects/project-01/Scripts.rxdata"
+  );
 
-  launcher.run();
+  // launcher.run();
 }
