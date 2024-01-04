@@ -41,3 +41,14 @@ target_link_libraries(${PROJECT_NAME}
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
 )
+
+# Zlib
+find_package(ZLIB REQUIRED)
+target_include_directories(
+  ${PROJECT_NAME} PRIVATE
+  ${ZLIB_INCLUDE_DIRS}
+)
+target_link_libraries(
+  ${PROJECT_NAME}
+  ZLIB::ZLIB
+)
