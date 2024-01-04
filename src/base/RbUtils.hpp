@@ -30,4 +30,23 @@ struct RbUtils {
   {
     return RARRAY_LEN(arr);
   }
+
+  static app::String parseString(VALUE rbStr)
+  {
+    const char* strPtr = RSTRING_PTR(rbStr);
+    long length = RSTRING_LEN(rbStr);
+    return app::String(strPtr, length);
+  }
+
+  static long parseFix(VALUE rbFixNum)
+  {
+    Check_Type(rbFixNum, T_FIXNUM);
+    return FIX2INT(rbFixNum);
+  }
+
+  static long parseNum(VALUE rbFixNum)
+  {
+    Check_Type(rbFixNum, T_FIXNUM);
+    return NUM2INT(rbFixNum);
+  }
 };
