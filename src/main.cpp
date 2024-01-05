@@ -9,13 +9,22 @@
 #include <iostream>
 
 #include "GameInput.h"
+#include "base/AppDefs.h"
+#include "base/Log.hpp"
 #include "launcher/Launcher.hpp"
 
 GameInput game_input;
 
-int main(int, char **)
+int main(int argc, char** argv)
 {
   Launcher launcher;
 
-  launcher.run();
+  Log::out() << argc;
+
+  if (argc == 2) {
+    launcher.run(argv[1]);
+  } else {
+    app::CStr devScriptPath = "../GameData/projects/project-01/Scripts.rxdata";
+    launcher.run(devScriptPath);
+  }
 }

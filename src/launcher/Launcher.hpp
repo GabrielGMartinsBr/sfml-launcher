@@ -5,6 +5,7 @@
 #include <iostream>
 #include <sstream>
 
+#include "base/AppDefs.h"
 #include "engnine/Engine.hpp"
 #include "integrator/Integrator.hpp"
 #include "loaders/PlayerScript.hpp"
@@ -28,25 +29,25 @@ class Launcher {
       mode(width, height),
       window(mode, title) { }
 
-  void run()
+  void run(app::CStr scriptsPath)
   {
     ScriptsLoader& scriptsLoader = ScriptsLoader::getInstance();
 
     engine.init(window);
     integrator.init();
 
-    loadScripts();
+    loadScripts(scriptsPath);
 
     integrator.cleanup();
     window.close();
   }
 
-  void loadScripts()
+  void loadScripts(app::CStr scriptsPath)
   {
     app::Vector<PlayerScript> scripts;
     ScriptsLoader::getInstance().loadScripts(
       scripts,
-      "../GameData/projects/project-01/Scripts.rxdata"
+      scriptsPath
     );
 
     VALUE rubyError;
