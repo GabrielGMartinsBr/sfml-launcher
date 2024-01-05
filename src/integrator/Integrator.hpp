@@ -47,17 +47,14 @@ class Integrator {
 
     input.integrate();
 
-    require("script_05.rb");
-
-    ruby_finalize();
-
-    std::cout << "[Ruby]: Finalized\n";
+    // require("script_05.rb");
 
     initialized = true;
   }
 
   void cleanup()
   {
+    std::cout << "[Ruby]: Finalized\n";
     ruby_finalize();
   }
 
