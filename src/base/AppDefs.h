@@ -5,6 +5,7 @@
 namespace app {
 
 typedef unsigned int UInt;
+typedef unsigned long ULong;
 
 typedef std::string String;
 typedef const char* CStr;

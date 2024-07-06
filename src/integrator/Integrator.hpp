@@ -34,6 +34,7 @@ class Integrator {
     std::cout << "[Ruby]: Init\n";
 
     ruby_init();
+    // ruby_init_loadpath();
 
     loadScriptsPath();
 
@@ -55,7 +56,7 @@ class Integrator {
   void cleanup()
   {
     std::cout << "[Ruby]: Finalized\n";
-    ruby_finalize();
+    ruby_cleanup(0);
   }
 
  private:

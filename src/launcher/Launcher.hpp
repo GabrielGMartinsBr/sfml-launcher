@@ -6,6 +6,7 @@
 #include <sstream>
 
 #include "base/AppDefs.h"
+#include "base/BacktraceUtils.hpp"
 #include "engnine/Engine.hpp"
 #include "integrator/Integrator.hpp"
 #include "loaders/PlayerScript.hpp"
@@ -50,19 +51,101 @@ class Launcher {
       scriptsPath
     );
 
+    int errorState;
     VALUE rubyError;
+    VALUE result;
 
-    for (const PlayerScript& script : scripts) {
-      rb_eval_string(
-        script.code.c_str()
-      );
+    std::string code;
+    app::ULong lineNumber = 0;
 
-      if (hasRubyError(rubyError)) {
-        throwErrorOnScript(script);
-      }
-
-      Log::out() << "Script \"" << script.name << "\" loaded!";
+    for (PlayerScript& script : scripts) {
+      code.append(script.code).append("\n");
+      script.setStartLine(lineNumber);
+      lineNumber = script.getEndLine();
     }
+
+    rb_eval_string_protect(code.c_str(), &errorState);
+
+    if (errorState) {
+      logError(scripts);
+      // throwErrorOnScript(script);
+    }
+  }
+
+  void logError(const app::Vector<PlayerScript>& scripts)
+  {
+    VALUE errinfo = ruby_errinfo;
+    ruby_errinfo = Qnil;
+    // rb_p(errinfo);
+
+    VALUE backtrace = rb_funcall(errinfo, rb_intern("backtrace"), 0);
+    VALUE err_message = rb_funcall(errinfo, rb_intern("message"), 0);
+    // VALUE err_class = rb_class_of(errinfo);
+    
+
+    // const char* class_name = rb_class2name(err_class);
+    
+
+    // Log::out() << "class_name: " << class_name;
+    // rb_p(backtrace);
+
+    VALUE backtrace_0 = rb_ary_entry(backtrace, 0);
+    const char* backtrace_0_str = StringValueCStr(backtrace_0);
+
+    long lineNumber = BacktraceUtils::pickLineNumber(backtrace_0_str);
+    const PlayerScript* script = getScriptLine(scripts, lineNumber);
+    if (script == nullptr) {
+      return;
+    }
+    long scriptLine = lineNumber - script->getStartLine();
+
+    std::string cleanErrorMessage;
+    const char* message = StringValueCStr(err_message);
+    BacktraceUtils::pickMessage(message, cleanErrorMessage);
+
+    Log::err() << "An error has occurred on script '"
+               << script->name << "' at line " << scriptLine << ": " << cleanErrorMessage;
+
+    VALUE err_class_path = rb_class_path(rb_obj_class(errinfo));
+    Log::err() << "\tError class: " << StringValueCStr(err_class_path);
+
+    logBacktrace(scripts, backtrace);
+  }
+
+  void logBacktrace(const app::Vector<PlayerScript>& scripts, const VALUE backtrace)
+  {
+    int length = RARRAY_LEN(backtrace);
+    VALUE backtraceEntry;
+    const char* backtrace_str;
+    const PlayerScript* script;
+    long lineNumber;
+    long scriptLine;
+    Log::err() << "\t<ExceptionBacktrace>";
+    for (int i = 0; i < length; i++) {
+      backtraceEntry = rb_ary_entry(backtrace, i);
+      backtrace_str = StringValueCStr(backtraceEntry);
+      lineNumber = BacktraceUtils::pickLineNumber(backtrace_str);
+      script = getScriptLine(scripts, lineNumber);
+      if (script == nullptr) {
+        continue;
+      }
+      scriptLine = lineNumber - script->getStartLine();
+      Log::err() << "\t\t" << script->id << ":" << script->name << ":" << scriptLine;
+    }
+    Log::err() << "\t</ExceptionBacktrace>";
+  }
+
+  const PlayerScript* getScriptLine(const app::Vector<PlayerScript>& scripts, long lineNumber)
+  {
+    for (const PlayerScript& script : scripts) {
+      if (lineNumber > script.getEndLine()) {
+        continue;
+      }
+      if (lineNumber >= script.getStartLine() && lineNumber <= script.getEndLine()) {
+        return &script;
+      }
+    }
+    return nullptr;
   }
 
   bool hasRubyError(VALUE& rubyError)

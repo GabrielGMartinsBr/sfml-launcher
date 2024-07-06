@@ -6,9 +6,7 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/VideoMode.hpp>
-#include <memory>
 #include <stdexcept>
-#include <vector>
 
 #include "base/Sugars.hpp"
 #include "engnine/EngineRenderer.hpp"
