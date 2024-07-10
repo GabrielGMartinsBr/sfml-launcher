@@ -12,6 +12,7 @@
 #include "integrator/It_Input.hpp"
 #include "integrator/It_Rect.hpp"
 #include "integrator/It_Sprite.hpp"
+#include "integrator/It_Table.hpp"
 #include "integrator/It_Tone.hpp"
 #include "integrator/It_Viewport.hpp"
 #include "ruby.h"
