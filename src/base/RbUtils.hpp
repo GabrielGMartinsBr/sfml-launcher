@@ -17,13 +17,13 @@ struct RbUtils {
 
   static VALUE marshalLoad(VALUE str)
   {
-    VALUE arr = rb_marshal_load(str);
+    VALUE obj = rb_marshal_load(str);
     VALUE errorMsg = rb_gv_get("$!");
     if (errorMsg != Qnil) {
       rb_p(errorMsg);
       throw std::runtime_error("Marshal load failed.");
     }
-    return arr;
+    return obj;
   }
 
   static long getArraySize(VALUE arr)
