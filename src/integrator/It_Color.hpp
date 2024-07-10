@@ -1,7 +1,5 @@
 #pragma once
 
-#include <iostream>
-
 #include "engnine/Color.hpp"
 #include "ruby.h"
 
@@ -13,6 +11,8 @@ class Color {
   static void integrate()
   {
     VALUE colorClass = rb_define_class("Color", rb_cObject);
+
+    rb_define_module_function(colorClass, "_load", RUBY_METHOD_FUNC(method_load), 1);
 
     rb_define_method(colorClass, "initialize", RUBY_METHOD_FUNC(method_initialize), 3);
 
@@ -36,6 +36,18 @@ class Color {
   }
 
  private:
+
+  static VALUE method_load(VALUE self, VALUE marshaled_data)
+  {
+    Check_Type(marshaled_data, T_STRING);
+    const char *data = RSTRING_PTR(marshaled_data);
+    int len = RSTRING_LEN(marshaled_data);
+
+    Eng::Color *color = Eng::Color::deserialize(data, len);
+
+    VALUE table_obj = Data_Wrap_Struct(self, NULL, free, color);
+    return table_obj;
+  }
 
   static VALUE alloc(VALUE self)
   {

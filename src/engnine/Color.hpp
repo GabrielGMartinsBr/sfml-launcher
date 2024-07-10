@@ -3,10 +3,31 @@
 // TODO: Add values range automatically correction
 
 #include <SFML/Graphics/Color.hpp>
+#include <stdexcept>
+
+#include "base/MarshalUtils.hpp"
 namespace Eng {
 
 class Color {
  public:
+
+  static Color *deserialize(const char *data, int len)
+  {
+    if (len < 32) {
+      throw std::runtime_error("Marshal error: Color has a bad file format");
+    }
+
+    Color *color = new Color();
+
+    color->red = MarshalUtils::readDouble(&data);
+    color->green = MarshalUtils::readDouble(&data);
+    color->blue = MarshalUtils::readDouble(&data);
+
+    color->syncSfColor();
+
+    return color;
+  }
+
   unsigned int red = 0;
   unsigned int green = 0;
   unsigned int blue = 0;
@@ -45,7 +66,7 @@ class Color {
     syncSfColor();
   }
 
-  sf::Color& getSfColor()
+  sf::Color &getSfColor()
   {
     return sfColor;
   }
@@ -58,7 +79,7 @@ class Color {
  private:
   sf::Color sfColor;
 
-  void clamp(unsigned int& v)
+  void clamp(unsigned int &v)
   {
     if (v < 0) {
       v = 0;
