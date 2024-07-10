@@ -16,6 +16,8 @@ class Table {
   {
     VALUE tableClass = rb_define_class("Table", rb_cObject);
 
+    rb_define_module_function(tableClass, "_load", RUBY_METHOD_FUNC(method_load), 1);
+
     rb_define_method(tableClass, "initialize", RUBY_METHOD_FUNC(method_initialize), -1);
     rb_define_method(tableClass, "[]", RUBY_METHOD_FUNC(getValue), -1);
     rb_define_method(tableClass, "[]=", RUBY_METHOD_FUNC(setValue), -1);
@@ -26,6 +28,19 @@ class Table {
   }
 
  private:
+
+  static VALUE method_load(VALUE self, VALUE marshaled_data)
+  {
+    Check_Type(marshaled_data, T_STRING);
+    const char *data = RSTRING_PTR(marshaled_data);
+    int len = RSTRING_LEN(marshaled_data);
+
+    Eng::Table *table = Eng::Table::deserialize(data, len);
+
+    VALUE table_obj = Data_Wrap_Struct(self, NULL, free, table);
+    return table_obj;
+  }
+
   static VALUE method_initialize(int argc, VALUE *argv, VALUE self)
   {
     Eng::Table *instance = nullptr;

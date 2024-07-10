@@ -2,11 +2,36 @@
 
 #include "base/AppDefs.h"
 #include "base/Log.hpp"
+#include "base/MarshalUtils.hpp"
 
 namespace Eng {
 
 class Table {
  public:
+
+  static Table *deserialize(const char *data, int len)
+  {
+    if (len < 20) {
+      throw std::runtime_error("Marshal error: Table has a bad file format");
+    }
+
+    MarshalUtils::readInt32(&data);
+    int x = MarshalUtils::readInt32(&data);
+    int y = MarshalUtils::readInt32(&data);
+    int z = MarshalUtils::readInt32(&data);
+    int size = MarshalUtils::readInt32(&data);
+
+    if (size != x * y * z) {
+      throw std::runtime_error("Marshal error: Table has a bad file format");
+    } else if (len != 20 + x * y * z * 2) {
+      throw std::runtime_error("Marshal error: Table has a bad file format");
+    }
+
+    Table *table = new Table(x, y, z);
+    memcpy(table->values.data(), data, sizeof(int16_t) * size);
+
+    return table;
+  }
 
   Table(int x, int y = 1, int z = 1) :
       xSize(x),
