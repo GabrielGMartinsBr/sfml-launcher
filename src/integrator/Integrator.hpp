@@ -47,6 +47,7 @@ class Integrator {
     It::Bitmap::integrate();
     It::Sprite::integrate();
     It::Graphics::integrate();
+    It::Table::integrate();
     It::LoadSaveData::integrate();
 
     loadBuiltInScripts();
