@@ -5,6 +5,7 @@
 #include <iostream>
 #include <stdexcept>
 
+#include "It_LoadSaveData.hpp"
 #include "integrator/It_Bitmap.hpp"
 #include "integrator/It_Color.hpp"
 #include "integrator/It_Graphics.hpp"
@@ -45,6 +46,7 @@ class Integrator {
     It::Bitmap::integrate();
     It::Sprite::integrate();
     It::Graphics::integrate();
+    It::LoadSaveData::integrate();
 
     input.integrate();
 
