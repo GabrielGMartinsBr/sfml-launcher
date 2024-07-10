@@ -18,6 +18,8 @@ class Bitmap {
 
     rb_define_method(bitmapClass, "initialize", RUBY_METHOD_FUNC(method_initialize), -1);
 
+    rb_define_method(bitmapClass, "clear", RUBY_METHOD_FUNC(method_clear), 0);
+
     rb_define_method(bitmapClass, "dispose", RUBY_METHOD_FUNC(method_dispose), 0);
     rb_define_method(bitmapClass, "disposed", RUBY_METHOD_FUNC(method_disposed), 0);
 
@@ -69,6 +71,7 @@ class Bitmap {
     unsigned int height = FIX2INT(_height);
     Eng::Bitmap *inst = new Eng::Bitmap(width, height);
 
+    inst->ptr = self;
     DATA_PTR(self) = inst;
     return self;
   }
@@ -84,8 +87,20 @@ class Bitmap {
     const char *fileName = StringValuePtr(_fileName);
     Eng::Bitmap *inst = new Eng::Bitmap(fileName);
 
+    inst->ptr = self;
     DATA_PTR(self) = inst;
     return self;
+  }
+
+  /*
+    Method clear
+  */
+
+  static VALUE method_clear(VALUE self)
+  {
+    Eng::Bitmap *inst = (Eng::Bitmap *)DATA_PTR(self);
+    inst->clear();
+    return Qnil;
   }
 
   /*

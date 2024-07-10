@@ -5,10 +5,10 @@
 #include <SFML/System/Vector2.hpp>
 #include <stdexcept>
 
-#include "base/Log.hpp"
 #include "engnine/Color.hpp"
 #include "engnine/FileUtils.hpp"
 #include "engnine/Rect.hpp"
+#include "ruby.h"
 
 namespace Eng {
 
@@ -16,6 +16,8 @@ typedef const char* Str;
 
 class Bitmap {
  public:
+  VALUE ptr;
+
   bool _disposed = false;
   sf::Image buffer;
 
@@ -62,7 +64,9 @@ class Bitmap {
 
   void stretch_blt(){};
 
-  void clear();
+  void clear()
+  {
+  }
 
   Color* get_pixel(unsigned int _x, unsigned int _y)
   {
