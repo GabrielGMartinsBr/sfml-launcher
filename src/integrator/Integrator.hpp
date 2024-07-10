@@ -61,7 +61,7 @@ class Integrator {
 
   void cleanup()
   {
-    std::cout << "[Ruby]: Finalized\n";
+    // std::cout << "[Ruby]: Finalized\n";
     ruby_cleanup(0);
   }
 
@@ -69,41 +69,7 @@ class Integrator {
 
   void loadBuiltInScripts()
   {
-    require("built-in/RPG::Cache.rb");
-    require("built-in/RPG::Sprite.rb");
-    require("built-in/RPG::Weather.rb");
-    require("built-in/RPG::Map.rb");
-    require("built-in/RPG::MapInfo.rb");
-    require("built-in/RPG::Event.rb");
-    require("built-in/RPG::Event::Page.rb");
-    require("built-in/RPG::Event::Page::Condition.rb");
-    require("built-in/RPG::Event::Page::Graphic.rb");
-    require("built-in/RPG::EventCommand.rb");
-    require("built-in/RPG::MoveRoute.rb");
-    require("built-in/RPG::MoveCommand.rb");
-    require("built-in/RPG::Actor.rb");
-    require("built-in/RPG::Class.rb");
-    require("built-in/RPG::Class::Learning.rb");
-    require("built-in/RPG::Skill.rb");
-    require("built-in/RPG::Item.rb");
-    require("built-in/RPG::Weapon.rb");
-    require("built-in/RPG::Armor.rb");
-    require("built-in/RPG::Enemy.rb");
-    require("built-in/RPG::Enemy::Action.rb");
-    require("built-in/RPG::Troop.rb");
-    require("built-in/RPG::Troop::Member.rb");
-    require("built-in/RPG::Troop::Page.rb");
-    require("built-in/RPG::Troop::Page::Condition.rb");
-    require("built-in/RPG::State.rb");
-    require("built-in/RPG::Animation.rb");
-    require("built-in/RPG::Animation::Frame.rb");
-    require("built-in/RPG::Animation::Timing.rb");
-    require("built-in/RPG::Tileset.rb");
-    require("built-in/RPG::CommonEvent.rb");
-    require("built-in/RPG::System.rb");
-    require("built-in/RPG::System::Words.rb");
-    require("built-in/RPG::AudioFile.rb");
-
+    require("built-in/RGSS-BuiltIn.rb");
   }
 
   void loadScriptsPath()
