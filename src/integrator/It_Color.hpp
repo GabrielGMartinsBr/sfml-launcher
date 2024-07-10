@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Convert.hpp"
 #include "engnine/Color.hpp"
 #include "ruby.h"
 
@@ -14,7 +15,7 @@ class Color {
 
     rb_define_module_function(colorClass, "_load", RUBY_METHOD_FUNC(method_load), 1);
 
-    rb_define_method(colorClass, "initialize", RUBY_METHOD_FUNC(method_initialize), 3);
+    rb_define_method(colorClass, "initialize", RUBY_METHOD_FUNC(method_initialize), -1);
 
     // rb_define_attr(rbc_Color, "red", 1, 1);
 
@@ -54,20 +55,39 @@ class Color {
     return self;
   }
 
-  static VALUE method_initialize(VALUE self, VALUE p_r, VALUE p_g, VALUE p_b)
+  static VALUE method_initialize(int argc, VALUE *argv, VALUE self)
   {
-    Check_Type(p_r, T_FIXNUM);
-    Check_Type(p_g, T_FIXNUM);
-    Check_Type(p_b, T_FIXNUM);
+    Eng::Color *instance;
+    VALUE rb_r, rb_g, rb_b, rb_a;
 
-    unsigned int r = FIX2INT(p_r);
-    unsigned int g = FIX2INT(p_g);
-    unsigned int b = FIX2INT(p_b);
+    if (argc == 3) {
+      rb_scan_args(argc, argv, "3", &rb_r, &rb_g, &rb_b);
+      int r = Convert::toCInt(rb_r);
+      int g = Convert::toCInt(rb_g);
+      int b = Convert::toCInt(rb_b);
 
-    Eng::Color *instance = new Eng::Color(r, g, b);
-    DATA_PTR(self) = instance;
+      instance = new Eng::Color(r, g, b);
+      instance->ptr = self;
 
-    return self;
+      DATA_PTR(self) = instance;
+      return self;
+    }
+
+    if (argc == 4) {
+      rb_scan_args(argc, argv, "4", &rb_r, &rb_g, &rb_b, &rb_a);
+      int r = Convert::toCInt(rb_r);
+      int g = Convert::toCInt(rb_g);
+      int b = Convert::toCInt(rb_b);
+      int a = Convert::toCInt(rb_a);
+
+      instance = new Eng::Color(r, g, b, a);
+      instance->ptr = self;
+
+      DATA_PTR(self) = instance;
+      return self;
+    }
+
+    return Qnil;
   }
 
   static VALUE method_set(VALUE self, VALUE p_r, VALUE p_g, VALUE p_b)

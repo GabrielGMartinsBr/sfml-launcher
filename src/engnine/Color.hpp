@@ -6,10 +6,13 @@
 #include <stdexcept>
 
 #include "base/MarshalUtils.hpp"
+#include "ruby.h"
+
 namespace Eng {
 
 class Color {
  public:
+  VALUE ptr;
 
   static Color *deserialize(const char *data, int len)
   {
