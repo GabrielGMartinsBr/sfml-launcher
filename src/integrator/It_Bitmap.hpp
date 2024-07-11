@@ -2,6 +2,7 @@
 
 #include <stdexcept>
 
+#include "base/Log.hpp"
 #include "engnine/Bitmap.hpp"
 #include "integrator/It_Color.hpp"
 #include "ruby.h"
@@ -28,6 +29,9 @@ class Bitmap {
 
     rb_define_method(bitmapClass, "get_pixel", RUBY_METHOD_FUNC(method_get_pixel), 2);
     rb_define_method(bitmapClass, "set_pixel", RUBY_METHOD_FUNC(method_set_pixel), 3);
+
+    rb_define_method(bitmapClass, "font", RUBY_METHOD_FUNC(getter_font), 0);
+    rb_define_method(bitmapClass, "font=", RUBY_METHOD_FUNC(setter_font), 1);
 
     rb_define_method(bitmapClass, "fill_rect", RUBY_METHOD_FUNC(method_fill_rect), -1);
   }
@@ -240,6 +244,34 @@ class Bitmap {
     inst->fill_rect(rect, color);
 
     return self;
+  }
+
+  /*
+    Get font
+  */
+  static VALUE getter_font(VALUE self)
+  {
+    Eng::Bitmap *inst = (Eng::Bitmap *)DATA_PTR(self);
+    Eng::Font *font = inst->getter_font();
+
+    if (font == nullptr) {
+      return Qnil;
+    }
+    Log::out() << "getter "  << font->ptr;
+    return font->ptr;
+  }
+
+  /*
+    Set font
+  */
+  static VALUE setter_font(VALUE self, VALUE value)
+  {
+    
+    Log::out() << "setter ";
+    Eng::Bitmap *inst = (Eng::Bitmap *)DATA_PTR(self);
+    Eng::Font *font = (Eng::Font *)DATA_PTR(value);
+    inst->setter_font(font);
+    return Qnil;
   }
 };
 

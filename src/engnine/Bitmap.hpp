@@ -5,8 +5,10 @@
 #include <SFML/System/Vector2.hpp>
 #include <stdexcept>
 
+#include "base/Log.hpp"
 #include "engnine/Color.hpp"
 #include "engnine/FileUtils.hpp"
+#include "engnine/Font.hpp"
 #include "engnine/Rect.hpp"
 #include "ruby.h"
 
@@ -26,7 +28,8 @@ class Bitmap {
 
   bool dirty = false;
 
-  Bitmap(const char* assetName)
+  Bitmap(const char* assetName) :
+      font(nullptr)
   {
     std::string filename = FileUtils::parseRtpPath(assetName);
     bool loaded = buffer.loadFromFile(filename);
@@ -34,17 +37,20 @@ class Bitmap {
       throw std::runtime_error("Could not load image.");
     }
 
+    createFont();
     sf::Vector2u size = buffer.getSize();
     width = size.x;
     height = size.y;
   }
 
   Bitmap(unsigned int _width, unsigned int _height) :
+      font(nullptr),
       buffer()
   {
     width = _width;
     height = _height;
 
+    createFont();
     buffer.create(width, height, sf::Color::Transparent);
   }
 
@@ -124,12 +130,33 @@ class Bitmap {
 
   int get_text_size(Str _str);
 
+  Font* getter_font()
+  {
+    Log::out() << font;
+    return font;
+  }
+
+  void setter_font(Font* v)
+  {
+    Log::out() << v;
+    font = v;
+  }
+
  private:
+  Font* font;
+
   static void parseColor(sf::Color& dest, Color* src)
   {
     dest.r = src->red;
     dest.g = src->green;
     dest.b = src->blue;
+  }
+
+  void createFont()
+  {
+    font = new Font();
+    VALUE fontClass = rb_const_get(rb_cObject, rb_intern("Font"));
+    font->ptr = Data_Wrap_Struct(fontClass, NULL, free, font);
   }
 };
 
