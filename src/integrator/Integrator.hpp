@@ -2,10 +2,11 @@
 
 #include <boost/filesystem.hpp>
 #include <cstdlib>
-#include <iostream>
 #include <stdexcept>
 
+#include "It_Font.hpp"
 #include "It_LoadSaveData.hpp"
+#include "It_Window.hpp"
 #include "integrator/It_Bitmap.hpp"
 #include "integrator/It_Color.hpp"
 #include "integrator/It_Graphics.hpp"
@@ -33,7 +34,7 @@ class Integrator {
       throw std::runtime_error("Can not initialize Integrator twice.");
     }
 
-    std::cout << "[Ruby]: Init\n";
+    // std::cout << "[Ruby]: Init\n";
 
     ruby_init();
     // ruby_init_loadpath();
@@ -47,6 +48,8 @@ class Integrator {
     It::Bitmap::integrate();
     It::Sprite::integrate();
     It::Graphics::integrate();
+    It::Window::integrate();
+    It::Font::integrate();
     It::Table::integrate();
     It::LoadSaveData::integrate();
 
