@@ -7,6 +7,7 @@
 #include "It_Font.hpp"
 #include "It_LoadSaveData.hpp"
 #include "It_Window.hpp"
+#include "integrator/It_Audio.hpp"
 #include "integrator/It_Bitmap.hpp"
 #include "integrator/It_Color.hpp"
 #include "integrator/It_Graphics.hpp"
@@ -41,13 +42,14 @@ class Integrator {
 
     loadScriptsPath();
 
+    It::Graphics::integrate();
+    It::Audio::integrate();
     It::Color::integrate();
     It::Tone::integrate();
     It::Rect::integrate();
     It::Viewport::integrate();
     It::Bitmap::integrate();
     It::Sprite::integrate();
-    It::Graphics::integrate();
     It::Window::integrate();
     It::Font::integrate();
     It::Table::integrate();
