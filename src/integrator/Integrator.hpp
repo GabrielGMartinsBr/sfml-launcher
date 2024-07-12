@@ -25,8 +25,6 @@ typedef boost::filesystem::path FPath;
 class Integrator {
   bool initialized = false;
 
-  It::Input input;
-
  public:
 
   void init()
@@ -44,6 +42,7 @@ class Integrator {
 
     It::Graphics::integrate();
     It::Audio::integrate();
+    It::Input::integrate();
     It::Color::integrate();
     It::Tone::integrate();
     It::Rect::integrate();
@@ -56,8 +55,6 @@ class Integrator {
     It::LoadSaveData::integrate();
 
     loadBuiltInScripts();
-
-    input.integrate();
 
     // require("script_05.rb");
 
