@@ -76,18 +76,16 @@ class Launcher {
   {
     VALUE errinfo = ruby_errinfo;
     ruby_errinfo = Qnil;
-    // rb_p(errinfo);
+    rb_p(errinfo);
 
     VALUE backtrace = rb_funcall(errinfo, rb_intern("backtrace"), 0);
     VALUE err_message = rb_funcall(errinfo, rb_intern("message"), 0);
-    // VALUE err_class = rb_class_of(errinfo);
-    
+    VALUE err_class = rb_class_of(errinfo);
 
-    // const char* class_name = rb_class2name(err_class);
-    
+    const char* class_name = rb_class2name(err_class);
 
-    // Log::out() << "class_name: " << class_name;
-    // rb_p(backtrace);
+    Log::out() << "class_name: " << class_name;
+    rb_p(backtrace);
 
     VALUE backtrace_0 = rb_ary_entry(backtrace, 0);
     const char* backtrace_0_str = StringValueCStr(backtrace_0);

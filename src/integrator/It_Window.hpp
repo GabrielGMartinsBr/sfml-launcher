@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Convert.hpp"
-#include "It_Bitmap.hpp"
-#include "base/Log.hpp"
+#include "It_Rect.hpp"
+#include "engnine/Rect.hpp"
 #include "engnine/Window.hpp"
 #include "ruby.h"
 
@@ -27,14 +27,29 @@ class Window {
     rb_define_method(windowClass, "windowskin", RUBY_METHOD_FUNC(getter_windowSkin), 0);
     rb_define_method(windowClass, "windowskin=", RUBY_METHOD_FUNC(setter_windowSkin), 1);
 
+    rb_define_method(windowClass, "contents", RUBY_METHOD_FUNC(getter_contents), 0);
+    rb_define_method(windowClass, "contents=", RUBY_METHOD_FUNC(setter_contents), 1);
+
+    rb_define_method(windowClass, "stretch", RUBY_METHOD_FUNC(getter_stretch), 0);
+    rb_define_method(windowClass, "stretch=", RUBY_METHOD_FUNC(setter_stretch), 1);
+
+    rb_define_method(windowClass, "cursor_rect", RUBY_METHOD_FUNC(getter_cursor_rect), 0);
+    rb_define_method(windowClass, "cursor_rect=", RUBY_METHOD_FUNC(setter_cursor_rect), 1);
+
+    rb_define_method(windowClass, "active", RUBY_METHOD_FUNC(getter_active), 0);
+    rb_define_method(windowClass, "active=", RUBY_METHOD_FUNC(setter_active), 1);
+
+    rb_define_method(windowClass, "visible", RUBY_METHOD_FUNC(getter_visible), 0);
+    rb_define_method(windowClass, "visible=", RUBY_METHOD_FUNC(setter_visible), 1);
+
+    rb_define_method(windowClass, "pause", RUBY_METHOD_FUNC(getter_pause), 0);
+    rb_define_method(windowClass, "pause=", RUBY_METHOD_FUNC(setter_pause), 1);
+
     rb_define_method(windowClass, "x", RUBY_METHOD_FUNC(getter_x), 0);
     rb_define_method(windowClass, "x=", RUBY_METHOD_FUNC(setter_x), 1);
 
     rb_define_method(windowClass, "y", RUBY_METHOD_FUNC(getter_y), 0);
     rb_define_method(windowClass, "y=", RUBY_METHOD_FUNC(setter_y), 1);
-
-    rb_define_method(windowClass, "z", RUBY_METHOD_FUNC(getter_y), 0);
-    rb_define_method(windowClass, "z=", RUBY_METHOD_FUNC(setter_y), 1);
 
     rb_define_method(windowClass, "width", RUBY_METHOD_FUNC(getter_width), 0);
     rb_define_method(windowClass, "width=", RUBY_METHOD_FUNC(setter_width), 1);
@@ -42,8 +57,23 @@ class Window {
     rb_define_method(windowClass, "height", RUBY_METHOD_FUNC(getter_height), 0);
     rb_define_method(windowClass, "height=", RUBY_METHOD_FUNC(setter_height), 1);
 
-    rb_define_method(windowClass, "contents", RUBY_METHOD_FUNC(getter_contents), 0);
-    rb_define_method(windowClass, "contents=", RUBY_METHOD_FUNC(setter_contents), 1);
+    rb_define_method(windowClass, "z", RUBY_METHOD_FUNC(getter_z), 0);
+    rb_define_method(windowClass, "z=", RUBY_METHOD_FUNC(setter_z), 1);
+
+    rb_define_method(windowClass, "ox", RUBY_METHOD_FUNC(getter_ox), 0);
+    rb_define_method(windowClass, "ox=", RUBY_METHOD_FUNC(setter_ox), 1);
+
+    rb_define_method(windowClass, "oy", RUBY_METHOD_FUNC(getter_oy), 0);
+    rb_define_method(windowClass, "oy=", RUBY_METHOD_FUNC(setter_oy), 1);
+
+    rb_define_method(windowClass, "opacity", RUBY_METHOD_FUNC(getter_opacity), 0);
+    rb_define_method(windowClass, "opacity=", RUBY_METHOD_FUNC(setter_opacity), 1);
+
+    rb_define_method(windowClass, "back_opacity", RUBY_METHOD_FUNC(getter_back_opacity), 0);
+    rb_define_method(windowClass, "back_opacity=", RUBY_METHOD_FUNC(setter_back_opacity), 1);
+
+    rb_define_method(windowClass, "contents_opacity", RUBY_METHOD_FUNC(getter_contents_opacity), 0);
+    rb_define_method(windowClass, "contents_opacity=", RUBY_METHOD_FUNC(setter_contents_opacity), 1);
   }
 
  private:
@@ -80,7 +110,7 @@ class Window {
   }
 
   /*
-      Set Attr windowSkin
+      Set windowSkin
   */
 
   static VALUE setter_windowSkin(VALUE self, VALUE value)
@@ -91,6 +121,146 @@ class Window {
     Eng::Bitmap *bp = (Eng::Bitmap *)DATA_PTR(value);
 
     inst->setWindowSkin(bp);
+
+    return Qnil;
+  }
+
+  /*
+    Get contents
+  */
+  static VALUE getter_contents(VALUE self)
+  {
+    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    Eng::Bitmap *bp = inst->getContents();
+
+    if (bp == nullptr) {
+      return Qnil;
+    }
+
+    return bp->ptr;
+  }
+
+  /*
+    Set contents
+  */
+  static VALUE setter_contents(VALUE self, VALUE value)
+  {
+    Check_Type(value, T_OBJECT);
+    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    Eng::Bitmap *bp = (Eng::Bitmap *)DATA_PTR(value);
+
+    inst->setContents(bp);
+
+    return Qnil;
+  }
+
+  /*
+   Get stretch
+  */
+  static VALUE getter_stretch(VALUE self)
+  {
+    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    return Convert::toRubyBool(inst->getter_stretch());
+  }
+
+  /*
+    Set stretch
+  */
+  static VALUE setter_stretch(VALUE self, VALUE value)
+  {
+    int v = Convert::toCBool(value);
+
+    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    inst->setter_stretch(v);
+
+    return Qnil;
+  }
+
+  /*
+   Get cursor_rect
+  */
+  static VALUE getter_cursor_rect(VALUE self)
+  {
+    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    Eng::Rect *rect = inst->getter_cursor_rect();
+    return It::Rect::getRubyObject(rect);
+  }
+
+  /*
+    Set cursor_rect
+  */
+  static VALUE setter_cursor_rect(VALUE self, VALUE value)
+  {
+    Eng::Rect *rect = (Eng::Rect *)DATA_PTR(value);
+
+    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    inst->setter_cursor_rect(rect);
+
+    return Qnil;
+  }
+
+  /*
+   Get active
+  */
+  static VALUE getter_active(VALUE self)
+  {
+    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    return Convert::toRubyBool(inst->getter_active());
+  }
+
+  /*
+    Set active
+  */
+  static VALUE setter_active(VALUE self, VALUE value)
+  {
+    int v = Convert::toCBool(value);
+
+    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    inst->setter_active(v);
+
+    return Qnil;
+  }
+
+  /*
+   Get visible
+  */
+  static VALUE getter_visible(VALUE self)
+  {
+    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    return Convert::toRubyBool(inst->getter_visible());
+  }
+
+  /*
+    Set visible
+  */
+  static VALUE setter_visible(VALUE self, VALUE value)
+  {
+    int v = Convert::toCBool(value);
+
+    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    inst->setter_visible(v);
+
+    return Qnil;
+  }
+
+  /*
+   Get pause
+  */
+  static VALUE getter_pause(VALUE self)
+  {
+    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    return Convert::toRubyBool(inst->getter_pause());
+  }
+
+  /*
+    Set pause
+  */
+  static VALUE setter_pause(VALUE self, VALUE value)
+  {
+    int v = Convert::toCBool(value);
+
+    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    inst->setter_pause(v);
 
     return Qnil;
   }
@@ -140,28 +310,6 @@ class Window {
   }
 
   /*
-   Get z
- */
-  static VALUE getter_z(VALUE self)
-  {
-    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
-    return Convert::toRubyNumber(inst->getZ());
-  }
-
-  /*
-    Set z
-  */
-  static VALUE setter_z(VALUE self, VALUE value)
-  {
-    int z = Convert::toCInt(value);
-
-    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
-    inst->setZ(z);
-
-    return Qnil;
-  }
-
-  /*
     Get width
   */
   static VALUE getter_width(VALUE self)
@@ -206,30 +354,133 @@ class Window {
   }
 
   /*
-    Get contents
+   Get z
   */
-  static VALUE getter_contents(VALUE self)
+  static VALUE getter_z(VALUE self)
   {
     Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
-    Eng::Bitmap *bp = inst->getContents();
-
-    if (bp == nullptr) {
-      return Qnil;
-    }
-
-    return bp->ptr;
+    return Convert::toRubyNumber(inst->getZ());
   }
 
   /*
-    Set contents
+    Set z
   */
-  static VALUE setter_contents(VALUE self, VALUE value)
+  static VALUE setter_z(VALUE self, VALUE value)
   {
-    Check_Type(value, T_OBJECT);
-    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
-    Eng::Bitmap *bp = (Eng::Bitmap *)DATA_PTR(value);
+    int z = Convert::toCInt(value);
 
-    inst->setContents(bp);
+    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    inst->setZ(z);
+
+    return Qnil;
+  }
+
+  /*
+   Get ox
+  */
+  static VALUE getter_ox(VALUE self)
+  {
+    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    return Convert::toRubyNumber(inst->getter_ox());
+  }
+
+  /*
+    Set ox
+  */
+  static VALUE setter_ox(VALUE self, VALUE value)
+  {
+    int z = Convert::toCInt(value);
+
+    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    inst->setter_ox(z);
+
+    return Qnil;
+  }
+
+  /*
+   Get oy
+  */
+  static VALUE getter_oy(VALUE self)
+  {
+    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    return Convert::toRubyNumber(inst->getter_oy());
+  }
+
+  /*
+    Set oy
+  */
+  static VALUE setter_oy(VALUE self, VALUE value)
+  {
+    int z = Convert::toCInt(value);
+
+    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    inst->setter_oy(z);
+
+    return Qnil;
+  }
+
+  /*
+   Get opacity
+  */
+  static VALUE getter_opacity(VALUE self)
+  {
+    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    return Convert::toRubyNumber(inst->getter_opacity());
+  }
+
+  /*
+    Set opacity
+  */
+  static VALUE setter_opacity(VALUE self, VALUE value)
+  {
+    int z = Convert::toCInt(value);
+
+    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    inst->setter_opacity(z);
+
+    return Qnil;
+  }
+
+  /*
+   Get back_opacity
+  */
+  static VALUE getter_back_opacity(VALUE self)
+  {
+    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    return Convert::toRubyNumber(inst->getter_back_opacity());
+  }
+
+  /*
+    Set back_opacity
+  */
+  static VALUE setter_back_opacity(VALUE self, VALUE value)
+  {
+    int z = Convert::toCInt(value);
+
+    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    inst->setter_back_opacity(z);
+
+    return Qnil;
+  }
+
+  /*
+   Get contents_opacity
+  */
+  static VALUE getter_contents_opacity(VALUE self)
+  {
+    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    return Convert::toRubyNumber(inst->getter_contents_opacity());
+  }
+
+  /*
+    Set contents_opacity
+  */
+  static VALUE setter_contents_opacity(VALUE self, VALUE value)
+  {
+    int z = Convert::toCInt(value);
+
+    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    inst->setter_contents_opacity(z);
 
     return Qnil;
   }

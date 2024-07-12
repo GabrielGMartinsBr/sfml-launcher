@@ -54,6 +54,18 @@ class Bitmap {
     buffer.create(width, height, sf::Color::Transparent);
   }
 
+  Font* getter_font()
+  {
+    Log::out() << font;
+    return font;
+  }
+
+  void setter_font(Font* v)
+  {
+    Log::out() << v;
+    font = v;
+  }
+
   void dispose()
   {
     _disposed = true;
@@ -124,23 +136,15 @@ class Bitmap {
 
   void hue_change(int _hue);
 
-  void draw_text(int _x, int _y, int _width, int _height, Str _str, int _align);
+  void draw_text(int x, int y, int width, int height, Str str, int align)
+  {
+    // TODO: Need to be implemented
+  }
 
   void draw_text(Rect _rect, Str _str, int _align);
 
   int get_text_size(Str _str);
 
-  Font* getter_font()
-  {
-    Log::out() << font;
-    return font;
-  }
-
-  void setter_font(Font* v)
-  {
-    Log::out() << v;
-    font = v;
-  }
 
  private:
   Font* font;

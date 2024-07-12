@@ -20,7 +20,7 @@ class LoadSaveData {
  private:
   static VALUE function_loadData(VALUE self, VALUE rb_filename)
   {
-    app::CStr filename = Convert::toCString(rb_filename);
+    app::CStr filename = Convert::toCStr(rb_filename);
     VALUE obj = RxdataLoader::load(filename);
     return obj;
   }

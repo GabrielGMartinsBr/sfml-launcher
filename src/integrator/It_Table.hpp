@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Convert.hpp"
-#include "base/Log.hpp"
 #include "engnine/Table.hpp"
 #include "ruby.h"
 

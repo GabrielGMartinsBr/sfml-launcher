@@ -19,6 +19,8 @@ class Graphics {
     rb_define_module_function(graphicsClass, "frame_count=", RUBY_METHOD_FUNC(attrSet_frame_count), 1);
 
     rb_define_module_function(graphicsClass, "update", RUBY_METHOD_FUNC(method_update), 0);
+    rb_define_module_function(graphicsClass, "transition", RUBY_METHOD_FUNC(method_transition), -1);
+    rb_define_module_function(graphicsClass, "frame_reset", RUBY_METHOD_FUNC(method_frame_reset), 0);
   }
 
   static VALUE getRbClass()
@@ -65,11 +67,29 @@ class Graphics {
   }
 
   /*
-    Method Update
+    Method update
   */
   static VALUE method_update(VALUE self)
   {
     Eng::Graphics::getInstance().update();
+    return Qnil;
+  }
+
+  /*
+    Method frame_reset
+  */
+  static VALUE method_transition(VALUE self)
+  {
+    Eng::Graphics::getInstance().transition();
+    return Qnil;
+  }
+
+  /*
+    Method frame_reset
+  */
+  static VALUE method_frame_reset(VALUE self)
+  {
+    Eng::Graphics::getInstance().frame_reset();
     return Qnil;
   }
 };

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <memory>
 #include <stdexcept>
 
 #include "base/Sugars.hpp"
@@ -38,9 +37,15 @@ class Viewport {
     rb_define_method(viewportClass, "oy=", RUBY_METHOD_FUNC(attrSet_oy), 1);
   }
 
-  static VALUE getRbClass()
+  inline static VALUE getRbClass()
   {
     return rb_const_get(rb_cObject, rb_intern("Viewport"));
+  }
+
+  inline static VALUE getRbInstance(Eng::Viewport *instPtr)
+  {
+    VALUE rubyClass;
+    return Data_Wrap_Struct(rubyClass, 0, free, instPtr);
   }
 
  private:

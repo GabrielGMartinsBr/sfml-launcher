@@ -9,7 +9,6 @@
 
 #include "GameInput.h"
 #include "base/AppDefs.h"
-#include "base/Log.hpp"
 #include "launcher/Launcher.hpp"
 
 GameInput game_input;
@@ -18,14 +17,13 @@ int main(int argc, char** argv)
 {
   Launcher launcher;
 
-  Log::out() << argc;
-
   if (argc == 2) {
     launcher.run(argv[1]);
   } else {
     // app::CStr devScriptPath = "../GameData/projects/project-01/Scripts.rxdata";
     // app::CStr devScriptPath = "../GameData/projects/project-02/Scripts.rxdata";
-    app::CStr devScriptPath = "../../projects/FullScripts.rxdata";
+    // app::CStr devScriptPath = "../../projects/FullScripts.rxdata";
+    app::CStr devScriptPath = "../../projects/Project1/Data/Scripts.rxdata";
     launcher.run(devScriptPath);
   }
 }

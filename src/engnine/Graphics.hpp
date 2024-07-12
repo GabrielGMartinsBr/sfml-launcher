@@ -51,9 +51,17 @@ class Graphics {
 
   void freeze();  // TODO: Implement this method
 
-  void transition();  // TODO: Implement this method
+  // TODO: Implement this method
+  void transition()
+  {
+    Log::out() << "Graphics transition was called, but it is not implemented yet.";
+  }
 
-  void frame_reset();  // TODO: Implement this method
+  // TODO: Implement this method
+  void frame_reset()
+  {
+    Log::out() << "Graphics frame_reset was called, but it is not implemented yet.";
+  }
 };
 
 }  // namespace Eng
