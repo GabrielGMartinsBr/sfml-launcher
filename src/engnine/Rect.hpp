@@ -1,15 +1,19 @@
 #pragma once
 
+#include "ruby.h"
+
 namespace Eng {
 
 class Rect {
  public:
+  VALUE ptr;
   float x;
   float y;
   unsigned int width;
   unsigned int height;
 
-  Rect(float _x, float _y, unsigned int _width, unsigned int _height)
+  Rect(float _x, float _y, unsigned int _width, unsigned int _height) :
+      ptr(Qnil)
   {
     x = _x;
     y = _y;
@@ -17,7 +21,8 @@ class Rect {
     height = _height;
   }
 
-  Rect(Rect *_rect)
+  Rect(Rect *_rect) :
+      ptr(Qnil)
   {
     x = _rect->x;
     y = _rect->y;
