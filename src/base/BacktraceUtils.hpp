@@ -5,7 +5,7 @@
 class BacktraceUtils {
 
  public:
-  static long pickLineNumber(const char* message)
+  static void pickLineNumber(const char* message, long& result)
   {
     std::regex pattern(R"(^[^:]+:(\d+))");
     std::cmatch match;
@@ -14,21 +14,38 @@ class BacktraceUtils {
     if (ok && match.size() > 1) {
       std::string str = match.str(1);
       long lineNumber = std::stoll(str);
-      return lineNumber + 1;
+      result = lineNumber + 1;
+    } else {
+      result = -1;
     }
-
-    return -1;
   }
 
-  static bool pickMessage(const char* message, std::string& result)
+  static bool pickMessage(std::string& message, std::string& result)
   {
     std::regex pattern(R"(^[^:]+:\d+:([^:]*:)? (.+))");
     std::cmatch match;
 
-    if (std::regex_search(message, match, pattern) && match.size() > 2) {
+    if (std::regex_search(message.c_str(), match, pattern) && match.size() > 2) {
       result = match.str(2);
       return true;
     }
+
+    result = message;
+
+    return false;
+  }
+
+  static bool pickMethod(const char* message, std::string& result)
+  {
+    std::regex pattern(R"(^[^:]+:\d+:([^:]*$))");
+    std::cmatch match;
+
+    if (std::regex_search(message, match, pattern) && match.size() > 1) {
+      result = ":" + match.str(1);
+      return true;
+    }
+
+    result = "";
 
     return false;
   }
