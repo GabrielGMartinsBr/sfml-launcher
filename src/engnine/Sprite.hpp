@@ -4,6 +4,7 @@
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Image.hpp>
 #include <SFML/Graphics/Rect.hpp>
+#include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/Shader.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
@@ -51,18 +52,18 @@ class Sprite {
   /*
     Attr x
   */
-  int getX() { return x; }
-  void setX(int _x)
+  int getter_x() { return x; }
+  void setter_x(int x)
   {
-    x = _x;
+    this->x = x;
     dirty = true;
   }
 
   /*
     Attr y
   */
-  int getY() { return y; }
-  void setY(int _y)
+  int getter_y() { return y; }
+  void setter_y(int _y)
   {
     y = _y;
     dirty = true;
@@ -71,8 +72,8 @@ class Sprite {
   /*
     Attr z
   */
-  int getZ() { return z; }
-  void setZ(int _z)
+  int getter_z() { return z; }
+  void setter_z(int _z)
   {
     z = _z;
   }
@@ -80,8 +81,8 @@ class Sprite {
   /*
     Attr ox
   */
-  int getOx() { return ox; }
-  void setOx(int _ox)
+  int getter_ox() { return ox; }
+  void setter_ox(int _ox)
   {
     ox = _ox;
     dirty = true;
@@ -90,8 +91,8 @@ class Sprite {
   /*
     Attr oy
   */
-  int getOy() { return oy; }
-  void setOy(int _oy)
+  int getter_oy() { return oy; }
+  void setter_oy(int _oy)
   {
     oy = _oy;
     dirty = true;
@@ -100,8 +101,8 @@ class Sprite {
   /*
     Attr opacity
   */
-  unsigned int getOpacity() { return opacity; }
-  void setOpacity(unsigned int v)
+  unsigned int getter_opacity() { return opacity; }
+  void setter_opacity(unsigned int v)
   {
     Num::clamp(v, 0u, 255u);
     opacity = v;
@@ -179,9 +180,10 @@ class Sprite {
     }
 
     if (!loadedBitmap || bitmap->dirty) {
-      text.loadFromImage(bitmap->buffer);
-      sfSprite.setTexture(text);
-      bitmap->dirty = false;
+      sfSprite.setTexture(
+        bitmap->renderTexture.getTexture()
+      );
+
       loadedBitmap = true;
     }
 

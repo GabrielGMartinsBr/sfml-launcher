@@ -1,7 +1,10 @@
 #pragma once
 
 #include <stdexcept>
+#include <string>
 
+#include "Convert.hpp"
+#include "app.h"
 #include "base/Log.hpp"
 #include "engnine/Bitmap.hpp"
 #include "integrator/It_Color.hpp"
@@ -17,7 +20,7 @@ class Bitmap {
   {
     VALUE bitmapClass = rb_define_class("Bitmap", rb_cObject);
 
-    rb_define_method(bitmapClass, "initialize", RUBY_METHOD_FUNC(method_initialize), -1);
+    rb_define_method(bitmapClass, "initialize", RUBY_METHOD_FUNC(initialize), -1);
 
     rb_define_method(bitmapClass, "font", RUBY_METHOD_FUNC(getter_font), 0);
     rb_define_method(bitmapClass, "font=", RUBY_METHOD_FUNC(setter_font), 1);
@@ -49,18 +52,21 @@ class Bitmap {
     Method initialize
   */
 
-  static VALUE method_initialize(int argc, VALUE *argv, VALUE self)
+  static VALUE initialize(int argc, VALUE *argv, VALUE self)
   {
     if (argc == 2) {
       VALUE _width, _height;
       rb_scan_args(argc, argv, "2", &_width, &_height);
-      return initializeWithDimensions(self, _width, _height);
+      return initializeSize(self, _width, _height);
     } else if (argc == 1) {
       VALUE _fileName;
       rb_scan_args(argc, argv, "1", &_fileName);
-      return initializeWithImage(self, _fileName);
+      return initializeImage(self, _fileName);
     } else {
-      throw std::runtime_error("Failed to initialize bitmap.");
+      RbUtils::raiseRuntimeException(
+        "Bitmap initializer takes 1 or 2 arguments, but " + std::to_string(argc) + " were received."
+      );
+      return Qnil;
     }
   }
 
@@ -68,7 +74,7 @@ class Bitmap {
     Initializer with dimensions
   */
 
-  static VALUE initializeWithDimensions(VALUE self, VALUE _width, VALUE _height)
+  static VALUE initializeSize(VALUE self, VALUE _width, VALUE _height)
   {
     Check_Type(_width, T_FIXNUM);
     Check_Type(_height, T_FIXNUM);
@@ -86,7 +92,7 @@ class Bitmap {
     Initializer with image
   */
 
-  static VALUE initializeWithImage(VALUE self, VALUE _fileName)
+  static VALUE initializeImage(VALUE self, VALUE _fileName)
   {
     Check_Type(_fileName, T_STRING);
 
@@ -229,7 +235,10 @@ class Bitmap {
     } else if (argc == 2) {
       return overload_fill_rect2(argc, argv, self);
     } else {
-      throw std::runtime_error("Failed to initialize bitmap.");
+      RbUtils::raiseRuntimeException(
+        "Bitmap fill_rect takes 2 or 5 arguments, but " + std::to_string(argc) + " were received."
+      );
+      return Qnil;
     }
   }
 
@@ -238,16 +247,10 @@ class Bitmap {
     VALUE _x, _y, _width, _height, _color;
     rb_scan_args(argc, argv, "5", &_x, &_y, &_width, &_height, &_color);
 
-    Check_Type(_x, T_FIXNUM);
-    Check_Type(_y, T_FIXNUM);
-    Check_Type(_width, T_FIXNUM);
-    Check_Type(_height, T_FIXNUM);
-    Check_Type(_color, T_OBJECT);
-
-    int x = FIX2INT(_x);
-    int y = FIX2INT(_y);
-    unsigned int width = FIX2INT(_width);
-    unsigned int height = FIX2INT(_height);
+    int x = Convert::toCInt(_x);
+    int y = Convert::toCInt(_y);
+    unsigned int width = Convert::toCInt(_width);
+    unsigned int height = Convert::toCInt(_height);
 
     Eng::Bitmap *inst = (Eng::Bitmap *)DATA_PTR(self);
     Eng::Color *color = (Eng::Color *)DATA_PTR(_color);
@@ -278,6 +281,7 @@ class Bitmap {
   static VALUE method_draw_text(int argc, VALUE *argv, VALUE self)
   {
     VALUE _x, _y, _width, _height, _rect, _str, _align;
+    Eng::Bitmap *inst = (Eng::Bitmap *)DATA_PTR(self);
 
     switch (argc) {
       case 2: {
@@ -285,15 +289,21 @@ class Bitmap {
         break;
       }
       case 3: {
-        rb_scan_args(argc, argv, "2", &_rect, &_str, &_align);
+        rb_scan_args(argc, argv, "3", &_rect, &_str, &_align);
         break;
       }
       case 5: {
-        rb_scan_args(argc, argv, "2", &_x, &_y, &_width, &_height, &_str);
+        rb_scan_args(argc, argv, "5", &_x, &_y, &_width, &_height, &_str);
+        int x = Convert::toCInt(_x);
+        int y = Convert::toCInt(_y);
+        int width = Convert::toCInt(_width);
+        int height = Convert::toCInt(_height);
+        app::CStr str = Convert::toCStr(_str);
+        inst->draw_text(x, y, width, height, str);
         break;
       }
       case 6: {
-        rb_scan_args(argc, argv, "2", &_x, &_y, &_width, &_height, &_str, &_align);
+        rb_scan_args(argc, argv, "6", &_x, &_y, &_width, &_height, &_str, &_align);
         break;
       }
       default: {

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "app.h"
 #include "engnine/Bitmap.hpp"
 #include "engnine/Engine.hpp"
 #include "engnine/Sprite.hpp"
@@ -17,7 +18,7 @@ class Sprite {
   {
     VALUE spriteClass = rb_define_class("Sprite", rb_cObject);
 
-    rb_define_method(spriteClass, "initialize", RUBY_METHOD_FUNC(method_initialize), -1);
+    rb_define_method(spriteClass, "initialize", RUBY_METHOD_FUNC(initialize), -1);
 
     rb_define_method(spriteClass, "x", RUBY_METHOD_FUNC(attrGet_x), 0);
     rb_define_method(spriteClass, "x=", RUBY_METHOD_FUNC(attrSet_x), 1);
@@ -62,15 +63,18 @@ class Sprite {
     Method initialize
   */
 
-  static VALUE method_initialize(int argc, VALUE *argv, VALUE self)
+  static VALUE initialize(int argc, VALUE *argv, VALUE self)
   {
     if (argc == 0) {
       return overload_initialize1(self);
     } else if (argc == 1) {
       return overload_initialize2(argc, argv, self);
+    } else {
+      RbUtils::raiseRuntimeException(
+        "Sprite initialize takes 0 or 1 argument, but " + std::to_string(argc) + " were received."
+      );
+      return Qnil;
     }
-
-    throw std::runtime_error("Failed to initialize sprite.");
   }
 
   static VALUE overload_initialize1(VALUE self)
@@ -87,6 +91,12 @@ class Sprite {
   {
     VALUE _viewport;
     rb_scan_args(argc, argv, "1", &_viewport);
+
+    if (!It::Viewport::isInstanceOf(_viewport)) {
+      VALUE from = rb_class_of(_viewport);
+      VALUE to = It::Viewport::getRbClass();
+      RbUtils::raiseCantConvertError(from, to);
+    }
 
     Check_Type(_viewport, T_OBJECT);
     Eng::Viewport *viewport = (Eng::Viewport *)DATA_PTR(_viewport);
@@ -106,7 +116,7 @@ class Sprite {
   static VALUE attrGet_x(VALUE self)
   {
     Eng::Sprite *inst = (Eng::Sprite *)DATA_PTR(self);
-    return INT2FIX(inst->getX());
+    return INT2FIX(inst->getter_x());
   }
 
   static VALUE attrSet_x(VALUE self, VALUE value)
@@ -114,7 +124,7 @@ class Sprite {
     Check_Type(value, T_FIXNUM);
     unsigned int x = FIX2INT(value);
     Eng::Sprite *inst = (Eng::Sprite *)DATA_PTR(self);
-    inst->setX(x);
+    inst->setter_x(x);
     return value;
   }
 
@@ -125,7 +135,7 @@ class Sprite {
   static VALUE attrGet_y(VALUE self)
   {
     Eng::Sprite *inst = (Eng::Sprite *)DATA_PTR(self);
-    return INT2FIX(inst->getY());
+    return INT2FIX(inst->getter_y());
   }
 
   static VALUE attrSet_y(VALUE self, VALUE value)
@@ -133,7 +143,7 @@ class Sprite {
     Check_Type(value, T_FIXNUM);
     unsigned int y = FIX2INT(value);
     Eng::Sprite *inst = (Eng::Sprite *)DATA_PTR(self);
-    inst->setY(y);
+    inst->setter_y(y);
     return value;
   }
 
@@ -143,7 +153,7 @@ class Sprite {
 
   static VALUE attrGet_z(VALUE self)
   {
-    int z = getInstance(self)->getZ();
+    int z = getInstance(self)->getter_z();
     return INT2FIX(z);
   }
 
@@ -151,7 +161,7 @@ class Sprite {
   {
     Check_Type(value, T_FIXNUM);
     int z = FIX2INT(value);
-    getInstance(self)->setZ(z);
+    getInstance(self)->setter_z(z);
     return value;
   }
 
@@ -161,7 +171,7 @@ class Sprite {
 
   static VALUE attrGet_ox(VALUE self)
   {
-    int ox = getInstance(self)->getOx();
+    int ox = getInstance(self)->getter_ox();
     return INT2FIX(ox);
   }
 
@@ -169,7 +179,7 @@ class Sprite {
   {
     Check_Type(value, T_FIXNUM);
     int ox = FIX2INT(value);
-    getInstance(self)->setOx(ox);
+    getInstance(self)->setter_ox(ox);
     return value;
   }
 
@@ -179,7 +189,7 @@ class Sprite {
 
   static VALUE attrGet_oy(VALUE self)
   {
-    int oy = getInstance(self)->getOy();
+    int oy = getInstance(self)->getter_oy();
     return INT2FIX(oy);
   }
 
@@ -187,7 +197,7 @@ class Sprite {
   {
     Check_Type(value, T_FIXNUM);
     int oy = FIX2INT(value);
-    getInstance(self)->setOy(oy);
+    getInstance(self)->setter_oy(oy);
     return value;
   }
 
@@ -197,7 +207,7 @@ class Sprite {
 
   static VALUE attrGet_opacity(VALUE self)
   {
-    int opacity = getInstance(self)->getOpacity();
+    int opacity = getInstance(self)->getter_opacity();
     return INT2FIX(opacity);
   }
 
@@ -205,7 +215,7 @@ class Sprite {
   {
     Check_Type(value, T_FIXNUM);
     int opacity = FIX2INT(value);
-    getInstance(self)->setOpacity(opacity);
+    getInstance(self)->setter_opacity(opacity);
     return value;
   }
 

@@ -1,8 +1,13 @@
 #pragma once
 
+#include <SFML/Graphics/BlendMode.hpp>
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Image.hpp>
+#include <SFML/Graphics/RenderTexture.hpp>
+#include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/Texture.hpp>
 #include <SFML/System/Vector2.hpp>
+#include <cstdlib>
 #include <stdexcept>
 
 #include "base/Log.hpp"
@@ -10,9 +15,16 @@
 #include "engnine/FileUtils.hpp"
 #include "engnine/Font.hpp"
 #include "engnine/Rect.hpp"
+#include "engnine/internal/Texts.hpp"
 #include "ruby.h"
 
 namespace Eng {
+
+enum TextAlign {
+  TEXT_LEFT,
+  TEXT_CENTER,
+  TEXT_RIGHT
+};
 
 typedef const char* Str;
 
@@ -21,7 +33,8 @@ class Bitmap {
   VALUE ptr;
 
   bool _disposed = false;
-  sf::Image buffer;
+  sf::RenderTexture renderTexture;
+  // sf::Image image;
 
   unsigned int width;
   unsigned int height;
@@ -29,29 +42,47 @@ class Bitmap {
   bool dirty = false;
 
   Bitmap(const char* assetName) :
-      font(nullptr)
+      font(nullptr),
+      renderTexture()
   {
     std::string filename = FileUtils::parseRtpPath(assetName);
-    bool loaded = buffer.loadFromFile(filename);
+    sf::Image image;
+    bool loaded = image.loadFromFile(filename);
     if (!loaded) {
       throw std::runtime_error("Could not load image.");
     }
-
     createFont();
-    sf::Vector2u size = buffer.getSize();
+
+    sf::Vector2u size = image.getSize();
     width = size.x;
     height = size.y;
+    sf::ContextSettings settings;
+    settings.antialiasingLevel = 0;
+    renderTexture.create(width, height, settings);
+    renderTexture.clear(sf::Color::Transparent);
+
+    sf::Sprite spr;
+    sf::Texture texture;
+    texture.loadFromImage(image);
+    spr.setTexture(texture);
+    renderTexture.draw(spr, sf::BlendAlpha);
+    renderTexture.display();
   }
 
   Bitmap(unsigned int _width, unsigned int _height) :
       font(nullptr),
-      buffer()
+      renderTexture()
   {
     width = _width;
     height = _height;
 
     createFont();
-    buffer.create(width, height, sf::Color::Transparent);
+    // image.create(width, height, sf::Color::Transparent);
+    sf::ContextSettings settings;
+    settings.antialiasingLevel = 0;
+    renderTexture.create(width, height, settings);
+    renderTexture.setSmooth(false);
+    renderTexture.clear(sf::Color::Transparent);
   }
 
   Font* getter_font()
@@ -88,7 +119,9 @@ class Bitmap {
 
   Color* get_pixel(unsigned int _x, unsigned int _y)
   {
-    sf::Color px = buffer.getPixel(_x, _y);
+    sf::Texture texture = renderTexture.getTexture();
+    sf::Image image = texture.copyToImage();
+    sf::Color px = image.getPixel(_x, _y);
     Color* color = new Color(px.r, px.g, px.b);
     return color;
   }
@@ -101,47 +134,62 @@ class Bitmap {
     if (x < 0 || x >= width || y < 0 || y >= height) {
       return;
     }
+    sf::Texture texture = renderTexture.getTexture();
+    sf::Image image = texture.copyToImage();
     sf::Color color(_color->red, _color->green, _color->blue);
-    buffer.setPixel(x, y, color);
+    image.setPixel(x, y, color);
+    sf::Sprite sprite;
+    sprite.setTexture(texture);
+    renderTexture.draw(sprite);
     dirty = true;
   }
 
-  void fill_rect(int _x, int _y, int _width, int _height, Color* _color)
+  void fill_rect(int x, int y, int width, int height, Color* color)
   {
-    sf::Color color;
-    parseColor(color, _color);
+    sf::Sprite sprite;
+    sf::Image img;
+    sf::Texture text;
+    sf::Color sfColor;
 
-    for (int x = _x; x < _width; x++) {
-      for (int y = _x; y < _height; y++) {
-        buffer.setPixel(x, y, color);
+    parseColor(sfColor, color);
+
+    img.create(this->width, this->height, sf::Color::Transparent);
+
+    int limitX = x + width;
+    int limitY = y + height;
+
+    for (int i = x; i < limitX; i++) {
+      for (int j = y; j < limitY; j++) {
+        img.setPixel(i, j, sfColor);
+        // image.setPixel(i, j, sfColor);
       }
     }
+
+    text.loadFromImage(img);
+    sprite.setTexture(text);
+    renderTexture.draw(sprite, sf::BlendAlpha);
+    renderTexture.display();
 
     dirty = true;
   };
 
   void fill_rect(Rect* _rect, Color* _color)
   {
-    sf::Color color;
-    parseColor(color, _color);
-
-    for (int x = _rect->x; x < _rect->width; x++) {
-      for (int y = _rect->y; y < _rect->height; y++) {
-        buffer.setPixel(x, y, color);
-      }
-    }
-
-    dirty = true;
+    fill_rect(_rect->x, _rect->y, _rect->width, _rect->height, _color);
   };
 
   void hue_change(int _hue);
 
-  void draw_text(int x, int y, int width, int height, Str str, int align)
+  void draw_text(int x, int y, int width, int height, Str str, TextAlign align = TextAlign::TEXT_LEFT)
   {
-    // TODO: Need to be implemented
+    Texts::drawText(renderTexture, x, y, *font, str);
+    renderTexture.display();
   }
 
-  void draw_text(Rect _rect, Str _str, int _align);
+  void draw_text(Rect rect, Str str, TextAlign align = TextAlign::TEXT_LEFT)
+  {
+    Texts::drawText(renderTexture, rect.x, rect.y, *font, str);
+  }
 
   int get_text_size(Str _str);
 

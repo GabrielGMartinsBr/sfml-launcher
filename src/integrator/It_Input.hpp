@@ -16,6 +16,7 @@ class Input {
 
     rb_define_module_function(inputClass, "update", RUBY_METHOD_FUNC(method_Update), 0);
     rb_define_module_function(inputClass, "trigger?", RUBY_METHOD_FUNC(method_trigger), 1);
+    rb_define_module_function(inputClass, "repeat?", RUBY_METHOD_FUNC(method_repeat), 1);
 
     rb_define_const(inputClass, "DOWN", Convert::toRubyNumber(Eng::InputKey::DOWN));
     rb_define_const(inputClass, "LEFT", Convert::toRubyNumber(Eng::InputKey::LEFT));
@@ -47,6 +48,11 @@ class Input {
   }
 
   static VALUE method_trigger(VALUE self, VALUE num)
+  {
+    return Qfalse;
+  }
+
+  static VALUE method_repeat(VALUE self, VALUE num)
   {
     return Qfalse;
   }

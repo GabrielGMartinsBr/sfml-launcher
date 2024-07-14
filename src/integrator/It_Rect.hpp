@@ -36,8 +36,7 @@ class Rect {
 
   static VALUE createRubyObject(Eng::Rect *rect)
   {
-    VALUE rectClass = Rect::getRbClass();
-    return Data_Wrap_Struct(rectClass, 0, free, rect);
+    return Data_Wrap_Struct(getRbClass(), 0, free, rect);
   }
 
   static VALUE getRubyObject(Eng::Rect *rect)
@@ -46,7 +45,7 @@ class Rect {
       return Qnil;
     }
     if (rect->ptr == Qnil) {
-      rect->ptr = It::Rect::createRubyObject(rect);
+      rect->ptr = createRubyObject(rect);
     }
     return rect->ptr;
   }

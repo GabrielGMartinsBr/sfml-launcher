@@ -348,7 +348,7 @@ class Window {
     int height = Convert::toCInt(value);
 
     Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
-    inst->setWidth(height);
+    inst->setHeight(height);
 
     return Qnil;
   }

@@ -47,6 +47,11 @@ struct EngineRenderer {
     renderBuffer(target);
   }
 
+  sf::RenderTexture& getRenderTexture()
+  {
+    return renderTexture;
+  }
+
  private:
   unsigned int width;
   unsigned int height;
@@ -65,8 +70,10 @@ struct EngineRenderer {
 
   void createBuffer()
   {
-    renderTexture.create(width, height);
-    renderTexture.clear();
+    sf::ContextSettings settings;
+    // settings.antialiasingLevel = 0;
+    renderTexture.create(width, height, settings);
+    renderTexture.clear(sf::Color::Transparent);
   }
 
   void createDefaultViewport()
@@ -120,7 +127,7 @@ struct EngineRenderer {
       vp = defaultVp.get();
     }
 
-    float opacity = spr->getOpacity() / 255.f;
+    float opacity = spr->getter_opacity() / 255.f;
 
     sf::RenderStates state;
 

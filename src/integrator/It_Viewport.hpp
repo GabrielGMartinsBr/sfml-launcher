@@ -42,10 +42,30 @@ class Viewport {
     return rb_const_get(rb_cObject, rb_intern("Viewport"));
   }
 
-  inline static VALUE getRbInstance(Eng::Viewport *instPtr)
+  static inline VALUE createRubyObject(Eng::Viewport *instPtr)
   {
-    VALUE rubyClass;
-    return Data_Wrap_Struct(rubyClass, 0, free, instPtr);
+    return Data_Wrap_Struct(getRbClass(), 0, free, instPtr);
+  }
+
+  static VALUE getRubyObject(Eng::Viewport *viewport)
+  {
+    if (viewport == nullptr) {
+      return Qnil;
+    }
+    if (viewport->ptr == Qnil) {
+      viewport->ptr = createRubyObject(viewport);
+    }
+    return viewport->ptr;
+  }
+
+  static inline Eng::Viewport *getObjectValue(VALUE self)
+  {
+    return (Eng::Viewport *)DATA_PTR(self);
+  }
+
+  static inline bool isInstanceOf(VALUE inst)
+  {
+    return rb_class_of(inst) == getRbClass();
   }
 
  private:

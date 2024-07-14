@@ -2,7 +2,8 @@
 
 #include <stdexcept>
 
-#include "base/AppDefs.h"
+#include "AppDefs.h"
+#include "app.h"
 #include "ruby.h"
 
 struct RbUtils {
@@ -48,5 +49,20 @@ struct RbUtils {
   {
     Check_Type(rbFixNum, T_FIXNUM);
     return NUM2INT(rbFixNum);
+  }
+
+  static void raiseRuntimeException(app::String msg)
+  {
+    VALUE exceptionClass = rb_eRuntimeError;
+    VALUE ex = rb_exc_new2(exceptionClass, msg.c_str());
+    rb_exc_raise(ex);
+  }
+
+  static void raiseCantConvertError(VALUE from, VALUE to)
+  {
+    app::String fromName = Convert::toCStr(rb_class_name(from));
+    app::String toName = Convert::toCStr(rb_class_name(to));
+    app::String msg = "Can't convert " + fromName + " into " + toName;
+    raiseRuntimeException(msg);
   }
 };

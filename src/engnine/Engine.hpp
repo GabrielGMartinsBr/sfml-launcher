@@ -11,6 +11,7 @@
 #include "base/Sugars.hpp"
 #include "engnine/EngineRenderer.hpp"
 #include "engnine/Sprite.hpp"
+#include "engnine/internal/Texts.hpp"
 #include "ruby.h"
 
 namespace Eng {
@@ -30,10 +31,19 @@ class Engine {
     }
     running = true;
     window = &_window;
-    window->display();
+
+    Texts::loadFonts();
     auto size = window->getSize();
+
+    window->display();
+
     renderer = new EngineRenderer(size.x, size.y);
     initialized = true;
+  }
+
+  EngineRenderer* getRenderer()
+  {
+    return renderer;
   }
 
   void cleanup()
@@ -57,6 +67,11 @@ class Engine {
     renderer->addSprite(spr);
   }
 
+  void addSprite(Eng::Sprite* spr)
+  {
+    renderer->addSprite(spr);
+  }
+
   void updateInput()
   {
     pollEvents();
@@ -64,7 +79,7 @@ class Engine {
 
   void updateGraphics()
   {
-    // window->clear();
+    window->clear();
 
     renderer->render(window);
 

@@ -4,11 +4,14 @@
 
 #include "engnine/RGSSViewport.hpp"
 #include "engnine/Rect.hpp"
+#include "ruby.h"
 
 namespace Eng {
 
 class Viewport {
  public:
+  VALUE ptr;
+
   Viewport(int x, int y, int width, int height) :
       rect(x, y, width, height),
       rgssVp(x, y, width, height)
