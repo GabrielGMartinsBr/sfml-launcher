@@ -7,16 +7,15 @@
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
 
-#include "Color.hpp"
 #include "engnine/Bitmap.hpp"
+#include "engnine/Drawable.hpp"
 #include "engnine/Engine.hpp"
 #include "engnine/Rect.hpp"
-#include "engnine/Sprite.hpp"
 #include "engnine/Viewport.hpp"
 
 namespace Eng {
 
-class Window {
+class Window : Drawable {
  public:
 
   Window(Viewport *viewport = 0) :
@@ -24,15 +23,37 @@ class Window {
       height(0),
       windowSkin(nullptr),
       contents(nullptr),
-      sprContents(),
-      backgroundSprite(),
       cursor_rect(new Rect(0, 0, 16, 16))
   {
-    Eng::Engine::getInstance().addSprite(&backgroundSprite);
-    Eng::Engine::getInstance().addSprite(&sprContents);
+    Eng::Engine::getInstance().addDrawable(this);
+    dirty = true;
   }
 
-  Bitmap *getWindowSkin() { return windowSkin; }
+  int getZPosition() override
+  {
+    return z;
+  }
+
+  void update() override
+  {
+    if (!dirty) {
+      return;
+    }
+    updateBackgroundSprite();
+    updateContentsSprite();
+    dirty = false;
+  }
+
+  void draw(sf::RenderTexture &rd) override
+  {
+    rd.draw(backgroundSprite);
+    rd.draw(contentsSprite);
+  }
+
+  Bitmap *getWindowSkin()
+  {
+    return windowSkin;
+  }
   void setWindowSkin(Bitmap *value)
   {
     if (windowSkin == value) {
@@ -40,12 +61,6 @@ class Window {
     }
 
     windowSkin = value;
-
-    if (value == nullptr) {
-      return;
-    }
-
-    drawSkin();
   }
 
   Bitmap *getContents()
@@ -59,12 +74,6 @@ class Window {
     }
 
     contents = v;
-
-    if (v == nullptr) {
-      return;
-    }
-
-    drawContents();
   }
 
   bool getter_stretch() { return stretch; }
@@ -86,32 +95,24 @@ class Window {
   void setX(int v)
   {
     x = v;
-    drawSkin();
-    drawContents();
   }
 
   int getY() { return y; }
   void setY(int v)
   {
     y = v;
-    drawSkin();
-    drawContents();
   }
 
   int getWidth() { return width; }
   void setWidth(int v)
   {
     width = v;
-    drawSkin();
-    drawContents();
   }
 
   int getHeight() { return height; }
   void setHeight(int v)
   {
     height = v;
-    drawSkin();
-    drawContents();
   }
 
   int getZ() { return z; }
@@ -135,8 +136,6 @@ class Window {
  private:
   Bitmap *windowSkin;
   Bitmap *contents;
-  Sprite sprContents;
-  Sprite backgroundSprite;
   bool stretch;
   Rect *cursor_rect;
   bool active;
@@ -153,65 +152,42 @@ class Window {
   int back_opacity;
   int contents_opacity;
 
-  void drawSkin()
+  sf::Sprite backgroundSprite;
+  sf::Sprite contentsSprite;
+  bool dirty;
+
+  void updateBackgroundSprite()
   {
     if (width < 1 || height < 1 || windowSkin == nullptr) {
       return;
     }
 
-    sf::Sprite spr;
-    sf::Texture texture = windowSkin->renderTexture.getTexture();
-    spr.setTexture(texture);
-
-    sf::Vector2u textureSize = texture.getSize();
     float scaleX = width / 128.0;
     float scaleY = height / 128.0;
-    spr.setScale(scaleX, scaleY);
+
+    backgroundSprite.setTexture(
+      windowSkin->renderTexture.getTexture()
+    );
 
     sf::IntRect dstRect(0, 0, 128, 128);
-    spr.setTextureRect(dstRect);
+    backgroundSprite.setTextureRect(dstRect);
 
-    spr.setPosition(x, y);
+    backgroundSprite.setScale(scaleX, scaleY);
+    backgroundSprite.setPosition(x, y);
 
-    Bitmap *bg = new Bitmap(width, height);
-    // bg->renderTexture.setSmooth(true);
-    bg->renderTexture.draw(spr);
-    bg->renderTexture.display();
-
-    backgroundSprite.setBitmap(bg);
-
-    // sf::RenderTexture &render = Eng::Engine::getInstance().getRenderer()->getRenderTexture();
-    // render.draw(spr);
-    // render.setSmooth(false);
-    // render.display();
+    Log::out() << "update()";
   }
 
-  void drawContents()
+  void updateContentsSprite()
   {
     if (width < 1 || height < 1 || contents == nullptr) {
       return;
     }
 
-    sf::Sprite spr;
-    sf::Texture texture = contents->renderTexture.getTexture();
-    spr.setTexture(texture);
+    const sf::Texture &texture = contents->renderTexture.getTexture();
+    contentsSprite.setTexture(texture);
 
-    // sf::Vector2u textureSize = texture.getSize();
-    // float scaleX = (float)width / textureSize.x;
-    // float scaleY = (float)height / textureSize.y;
-    // spr.setScale(scaleX, scaleY);
-
-    // sf::IntRect dstRect(0, 0, 128, 128);
-    // spr.setTextureRect(dstRect);
-
-    spr.setPosition(x, y);
-
-    Bitmap *bp = new Bitmap(width, height);
-    // bg->renderTexture.setSmooth(true);
-    bp->renderTexture.draw(spr, sf::BlendNone);
-    bp->renderTexture.display();
-
-    sprContents.setBitmap(bp);
+    contentsSprite.setPosition(x, y);
   }
 };
 

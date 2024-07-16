@@ -13,6 +13,8 @@
 #include "base/NumberUtils.hpp"
 #include "engnine/Bitmap.hpp"
 #include "engnine/Color.hpp"
+#include "engnine/Drawable.hpp"
+#include "engnine/Engine.hpp"
 #include "engnine/Rect.hpp"
 #include "engnine/Tone.hpp"
 #include "engnine/Viewport.hpp"
@@ -21,7 +23,7 @@
 
 namespace Eng {
 
-class Sprite {
+class Sprite : Drawable {
  public:
 
   VALUE bitmap_ptr;  // TODO: Remove
@@ -36,12 +38,49 @@ class Sprite {
   Sprite() :
       spriteColor(255, 255, 255, 255)
   {
+    Eng::Engine::getInstance().addDrawable(this);
   }
 
   Sprite(Viewport *_viewport) :
       Sprite()
   {
     viewport = _viewport;
+  }
+
+  inline int getZPosition() override
+  {
+    return z;
+  }
+
+  void update() override
+  {
+    applyChanges();
+  }
+
+  void draw(sf::RenderTexture &renderTexture) override
+  {
+    if (!shouldRender()) {
+      return;
+    }
+
+    float opacity = getter_opacity() / 255.f;
+
+    sf::RenderStates state;
+    state.blendMode = sf::BlendNone;
+
+    if (getBlendType() == 2) {
+      Engine::getInstance().blendShaders.sprInvertShader.setUniform("opacity", opacity);
+      state.shader = &Engine::getInstance().blendShaders.sprInvertShader;
+      state.blendMode = sf::BlendMultiply;
+    } else {
+      state.blendMode = sf::BlendAlpha;
+    }
+
+    renderTexture.draw(
+      sfSprite,
+      state
+    );
+    renderTexture.display();
   }
 
   sf::Sprite &getSfSprite()
@@ -166,8 +205,6 @@ class Sprite {
     return viewport;
   }
 
-  void update() { }
-
   bool shouldRender()
   {
     return !_disposed && bitmap != nullptr && !bitmap->disposed();
@@ -175,7 +212,7 @@ class Sprite {
 
   void applyChanges()
   {
-    if (!bitmap) {
+    if (!dirty || !bitmap) {
       return;
     }
 
@@ -185,10 +222,6 @@ class Sprite {
       );
 
       loadedBitmap = true;
-    }
-
-    if (!dirty) {
-      return;
     }
 
     sfSprite.setColor(spriteColor);
@@ -267,6 +300,10 @@ class Sprite {
 
     dirty = false;
   }
+
+  /*
+   *   Private
+   */
 
  private:
   bool dirty = false;

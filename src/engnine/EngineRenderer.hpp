@@ -7,11 +7,9 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/System/Vector2.hpp>
-#include <stdexcept>
 
 #include "base/Sugars.hpp"
 #include "engnine/Drawable.hpp"
-#include "engnine/Sprite.hpp"
 #include "engnine/Viewport.hpp"
 
 namespace Eng {
@@ -25,17 +23,11 @@ struct EngineRenderer {
   {
     createBuffer();
     createDefaultViewport();
-    loadShaders();
   }
 
   void addViewport(SharedPtr<Eng::Viewport> vp)
   {
     viewports.push_back(vp);
-  }
-
-  void addSprite(Eng::Sprite* spr)
-  {
-    sprites.push_back(spr);
   }
 
   void addDrawable(Eng::Drawable* drawable)
@@ -48,7 +40,6 @@ struct EngineRenderer {
     // renderTexture.clear(sf::Color::Transparent);
     renderTexture.clear();
     // clearViewports();
-    renderSprites();
     renderDrawables();
     // renderViewports();
     renderBuffer(target);
@@ -71,16 +62,11 @@ struct EngineRenderer {
 
   sf::RenderWindow* window;
   Vector<SharedPtr<Eng::Viewport>> viewports;
-  Vector<Eng::Sprite*> sprites;
   Vector<Eng::Drawable*> drawables;
   SharedPtr<Eng::Viewport> defaultVp;
 
   sf::Sprite bufferSprite;
   sf::RenderTexture renderTexture;
-
-  sf::Shader vpNormalShader;
-  sf::Shader sprNormalShader;
-  sf::Shader sprInvertShader;
 
   void createBuffer()
   {
@@ -94,17 +80,6 @@ struct EngineRenderer {
   {
     defaultVp = MakeSharedPtr<Eng::Viewport>(0, 0, width, height);
     viewports.push_back(defaultVp);
-  }
-
-  void loadShaders()
-  {
-    if (
-      !sprNormalShader.loadFromFile("../shaders/sprite_normal-blend.frag", sf::Shader::Fragment)
-      || !sprInvertShader.loadFromFile("../shaders/sprite_invert-blend.frag", sf::Shader::Fragment)
-      || !vpNormalShader.loadFromFile("../shaders/viewport_normal-blend.frag", sf::Shader::Fragment)
-    ) {
-      throw std::runtime_error("Failed to load shader.");
-    }
   }
 
   void clearViewports()
@@ -123,59 +98,6 @@ struct EngineRenderer {
       drawable->update();
       drawable->draw(renderTexture);
     }
-  }
-
-  void renderSprites()
-  {
-    for (Eng::Sprite* spr : sprites) {
-      if (!spr) {
-        continue;
-      }
-      renderSprite(spr);
-    }
-  }
-
-  void renderSprite(Eng::Sprite* spr)
-  {
-    if (!spr->shouldRender()) {
-      return;
-    }
-    spr->applyChanges();
-
-    sf::Sprite& sfSprite = spr->getSfSprite();
-    Viewport* vp = spr->getViewport();
-
-    if (!vp) {
-      vp = defaultVp.get();
-    }
-
-    float opacity = spr->getter_opacity() / 255.f;
-
-    sf::RenderStates state;
-
-    state.blendMode = sf::BlendNone;
-
-    if (spr->getBlendType() == 2) {
-      sprInvertShader.setUniform("opacity", opacity);
-      state.shader = &sprInvertShader;
-      state.blendMode = sf::BlendMultiply;
-    } else {
-      state.blendMode = sf::BlendAlpha;
-      // sprNormalShader.setUniform("opacity", opacity);
-      // state.shader = &sprNormalShader;
-    }
-
-    // vp->getRgssViewport().draw(
-    //   sfSprite,
-    //   state
-    // );
-    // vp->getRgssViewport().display();
-
-    renderTexture.draw(
-      sfSprite,
-      state
-    );
-    renderTexture.display();
   }
 
   void renderViewports()

@@ -2,7 +2,6 @@
 
 #include "app.h"
 #include "engnine/Bitmap.hpp"
-#include "engnine/Engine.hpp"
 #include "engnine/Sprite.hpp"
 #include "engnine/Viewport.hpp"
 #include "integrator/It_Viewport.hpp"
@@ -81,9 +80,6 @@ class Sprite {
   {
     Eng::Sprite *instance = new Eng::Sprite();
     DATA_PTR(self) = instance;
-
-    Eng::Engine::getInstance().addSprite(self);
-
     return self;
   }
 
@@ -103,9 +99,6 @@ class Sprite {
 
     Eng::Sprite *instance = new Eng::Sprite(viewport);
     DATA_PTR(self) = instance;
-
-    Eng::Engine::getInstance().addSprite(self);
-
     return self;
   }
 

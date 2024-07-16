@@ -8,10 +8,10 @@
 #include <SFML/Window/VideoMode.hpp>
 #include <stdexcept>
 
-#include "Drawable.hpp"
 #include "base/Sugars.hpp"
+#include "engnine/BlenShaders.hpp"
+#include "engnine/Drawable.hpp"
 #include "engnine/EngineRenderer.hpp"
-#include "engnine/Sprite.hpp"
 #include "engnine/internal/Texts.hpp"
 #include "ruby.h"
 
@@ -25,6 +25,8 @@ class Engine {
     return instance;
   }
 
+  BlenShaders blendShaders;
+
   void init(sf::RenderWindow& _window)
   {
     if (initialized) {
@@ -32,6 +34,8 @@ class Engine {
     }
     running = true;
     window = &_window;
+
+    blendShaders.loadShaders();
 
     Texts::loadFonts();
     auto size = window->getSize();
@@ -60,17 +64,6 @@ class Engine {
   void addViewport(SharedPtr<Eng::Viewport> vp)
   {
     renderer->addViewport(vp);
-  }
-
-  void addSprite(VALUE spriteValue)
-  {
-    Eng::Sprite* spr = (Eng::Sprite*)DATA_PTR(spriteValue);
-    renderer->addSprite(spr);
-  }
-
-  void addSprite(Eng::Sprite* spr)
-  {
-    renderer->addSprite(spr);
   }
 
   void addDrawable(Eng::Drawable* drawable)
