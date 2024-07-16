@@ -8,6 +8,7 @@
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/System/Vector2.hpp>
 
+#include "base/Log.hpp"
 #include "base/Sugars.hpp"
 #include "engnine/Drawable.hpp"
 #include "engnine/Viewport.hpp"
@@ -19,7 +20,8 @@ struct EngineRenderer {
     unsigned int _width, unsigned int _height
   ) :
       width(_width),
-      height(_height)
+      height(_height),
+      zDirty(false)
   {
     createBuffer();
     createDefaultViewport();
@@ -33,6 +35,12 @@ struct EngineRenderer {
   void addDrawable(Eng::Drawable* drawable)
   {
     drawables.push_back(drawable);
+    zDirty = true;
+  }
+
+  void markZOrderDirty()
+  {
+    zDirty = true;
   }
 
   void render(sf::RenderTarget* target)
@@ -59,6 +67,7 @@ struct EngineRenderer {
  private:
   unsigned int width;
   unsigned int height;
+  bool zDirty;
 
   sf::RenderWindow* window;
   Vector<SharedPtr<Eng::Viewport>> viewports;
@@ -94,6 +103,9 @@ struct EngineRenderer {
 
   void renderDrawables()
   {
+    if (zDirty) {
+      sortZ();
+    }
     for (Eng::Drawable* drawable : drawables) {
       drawable->update();
       drawable->draw(renderTexture);
@@ -123,6 +135,18 @@ struct EngineRenderer {
     renderTexture.display();
     bufferSprite.setTexture(renderTexture.getTexture());
     target->draw(bufferSprite);
+  }
+
+  static bool compareZ(const Drawable* a, const Drawable* b)
+  {
+    return a->getZPosition() < b->getZPosition();
+  }
+
+  void sortZ()
+  {
+    Log::out() << "sort";
+    std::sort(drawables.begin(), drawables.end(), compareZ);
+    zDirty = false;
   }
 };
 

@@ -47,7 +47,7 @@ class Sprite : Drawable {
     viewport = _viewport;
   }
 
-  inline int getZPosition() override
+  inline int getZPosition() const override
   {
     return z;
   }
@@ -115,6 +115,7 @@ class Sprite : Drawable {
   void setter_z(int _z)
   {
     z = _z;
+    Eng::Engine::getInstance().markZOrderDirty();
   }
 
   /*

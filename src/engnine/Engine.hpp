@@ -71,6 +71,11 @@ class Engine {
     renderer->addDrawable(drawable);
   }
 
+  void markZOrderDirty()
+  {
+    renderer->markZOrderDirty();
+  }
+
   void updateInput()
   {
     pollEvents();

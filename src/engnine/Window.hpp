@@ -29,7 +29,7 @@ class Window : Drawable {
     dirty = true;
   }
 
-  int getZPosition() override
+  int getZPosition() const override
   {
     return z;
   }
@@ -116,7 +116,11 @@ class Window : Drawable {
   }
 
   int getZ() { return z; }
-  void setZ(int v) { z = v; }
+  void setZ(int v)
+  {
+    z = v;
+    Eng::Engine::getInstance().markZOrderDirty();
+  }
 
   int getter_ox() { return ox; }
   void setter_ox(int v) { ox = v; }

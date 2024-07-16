@@ -4,7 +4,7 @@
 namespace Eng {
 
 struct Drawable {
-  virtual int getZPosition() = 0;
+  virtual inline int getZPosition() const = 0;
 
   virtual void update() = 0;
 
