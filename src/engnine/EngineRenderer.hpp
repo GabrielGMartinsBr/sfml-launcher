@@ -10,6 +10,7 @@
 #include <stdexcept>
 
 #include "base/Sugars.hpp"
+#include "engnine/Drawable.hpp"
 #include "engnine/Sprite.hpp"
 #include "engnine/Viewport.hpp"
 
@@ -37,12 +38,18 @@ struct EngineRenderer {
     sprites.push_back(spr);
   }
 
+  void addDrawable(Eng::Drawable* drawable)
+  {
+    drawables.push_back(drawable);
+  }
+
   void render(sf::RenderTarget* target)
   {
     // renderTexture.clear(sf::Color::Transparent);
     renderTexture.clear();
     // clearViewports();
     renderSprites();
+    renderDrawables();
     // renderViewports();
     renderBuffer(target);
   }
@@ -52,6 +59,12 @@ struct EngineRenderer {
     return renderTexture;
   }
 
+  /**
+   *
+   *  Private starts here
+   *
+   */
+
  private:
   unsigned int width;
   unsigned int height;
@@ -59,6 +72,7 @@ struct EngineRenderer {
   sf::RenderWindow* window;
   Vector<SharedPtr<Eng::Viewport>> viewports;
   Vector<Eng::Sprite*> sprites;
+  Vector<Eng::Drawable*> drawables;
   SharedPtr<Eng::Viewport> defaultVp;
 
   sf::Sprite bufferSprite;
@@ -100,6 +114,14 @@ struct EngineRenderer {
         continue;
       }
       vp->getRgssViewport().clear();
+    }
+  }
+
+  void renderDrawables()
+  {
+    for (Eng::Drawable* drawable : drawables) {
+      drawable->update();
+      drawable->draw(renderTexture);
     }
   }
 

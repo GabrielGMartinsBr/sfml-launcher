@@ -8,6 +8,7 @@
 #include <SFML/Window/VideoMode.hpp>
 #include <stdexcept>
 
+#include "Drawable.hpp"
 #include "base/Sugars.hpp"
 #include "engnine/EngineRenderer.hpp"
 #include "engnine/Sprite.hpp"
@@ -70,6 +71,11 @@ class Engine {
   void addSprite(Eng::Sprite* spr)
   {
     renderer->addSprite(spr);
+  }
+
+  void addDrawable(Eng::Drawable* drawable)
+  {
+    renderer->addDrawable(drawable);
   }
 
   void updateInput()
