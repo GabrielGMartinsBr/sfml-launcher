@@ -2,10 +2,12 @@
 
 #include <SFML/Graphics/BlendMode.hpp>
 #include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/Image.hpp>
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
+#include <cmath>
 
 #include "engnine/Bitmap.hpp"
 #include "engnine/Drawable.hpp"
@@ -43,6 +45,7 @@ class Window : Drawable {
       return;
     }
     updateBackgroundSprite();
+    updateBorder();
     updateCursorRect();
     updateContentsSprite();
     dirty = false;
@@ -51,6 +54,7 @@ class Window : Drawable {
   void draw(sf::RenderTexture &rd) override
   {
     rd.draw(backgroundSprite, sf::BlendAlpha);
+    rd.draw(borderSprite, sf::BlendAlpha);
     rd.draw(cursorSprite, sf::BlendAlpha);
     rd.draw(contentsSprite, sf::BlendAlpha);
   }
@@ -100,24 +104,28 @@ class Window : Drawable {
   void setX(int v)
   {
     x = v;
+    dirty = true;
   }
 
   int getY() { return y; }
   void setY(int v)
   {
     y = v;
+    dirty = true;
   }
 
   int getWidth() { return width; }
   void setWidth(int v)
   {
     width = v;
+    dirty = true;
   }
 
   int getHeight() { return height; }
   void setHeight(int v)
   {
     height = v;
+    dirty = true;
   }
 
   int getZ() { return z; }
@@ -128,10 +136,19 @@ class Window : Drawable {
   }
 
   int getter_ox() { return ox; }
-  void setter_ox(int v) { ox = v; }
+  void setter_ox(int v)
+  {
+    ox = v;
+    dirty = true;
+    Log::out() << "(setter_ox)";
+  }
 
   int getter_oy() { return oy; }
-  void setter_oy(int v) { oy = v; }
+  void setter_oy(int v)
+  {
+    oy = v;
+    Log::out() << "(setter_oy)";
+  }
 
   int getter_opacity() { return opacity; }
   void setter_opacity(int v) { opacity = v; }
@@ -167,16 +184,19 @@ class Window : Drawable {
   sf::Sprite cursorSprite;
   sf::Texture cursorTexture;
 
+  sf::Sprite borderSprite;
+  sf::Texture borderTexture;
+
   bool dirty;
 
   void updateBackgroundSprite()
   {
-    if (width < 1 || height < 1 || windowSkin == nullptr) {
+    if (windowSkin == nullptr) {
       return;
     }
 
-    float scaleX = width / 128.0;
-    float scaleY = height / 128.0;
+    float scaleX = (width - 2) / 128.0;
+    float scaleY = (height - 2) / 128.0;
 
     backgroundSprite.setTexture(
       windowSkin->renderTexture.getTexture()
@@ -186,19 +206,37 @@ class Window : Drawable {
     backgroundSprite.setTextureRect(dstRect);
 
     backgroundSprite.setScale(scaleX, scaleY);
-    backgroundSprite.setPosition(x, y);
+    backgroundSprite.setPosition(x + 1, y + 1);
 
     Log::out() << "update()";
+    Log::out() << "Rect width: " << cursor_rect->width;
+    Log::out() << "Rect height: " << cursor_rect->height;
   }
 
   void updateContentsSprite()
   {
-    if (width < 1 || height < 1 || contents == nullptr) {
+    if (contents == nullptr) {
       return;
     }
 
     const sf::Texture &texture = contents->renderTexture.getTexture();
 
+    sf::RenderTexture *rd = new sf::RenderTexture();
+    rd->create(width, height);
+    rd->clear(sf::Color::Transparent);
+    // rd.draw(texture);
+
+    sf::Sprite *spr = new sf::Sprite();
+    spr->setTexture(texture);
+    // spr->setPosition(x, y);
+
+    rd->draw(*spr);
+    rd->display();
+    const sf::Texture *tex = &rd->getTexture();
+    contentsSprite.setTexture(*tex);
+
+    contentsSprite.setPosition(x + 16, y + 16);
+  }
 
   void updateCursorRect()
   {
@@ -243,6 +281,158 @@ class Window : Drawable {
     cursorSprite.setPosition(x + 16 + cursor_rect->x, y + 16 + cursor_rect->y);
     cursorSprite.setTexture(cursorTexture);
   }
+
+  void updateBorder()
+  {
+    if (windowSkin == nullptr) {
+      return;
+    }
+    constexpr int BORDER_START_X = 128;
+    constexpr int BORDER_START_Y = 0;
+    constexpr int BORDER_END_X = 192;
+    constexpr int BORDER_END_Y = 64;
+    constexpr int CORNER_SIZE = 16;
+    constexpr int BORDER_THICK = 16;
+    constexpr int BORDER_SIZE = 64;
+    constexpr int BORDER_LINE = BORDER_SIZE - CORNER_SIZE * 2;
+
+    sf::Image src = windowSkin->renderTexture.getTexture().copyToImage();
+    sf::Texture srcTexture;
+    srcTexture.loadFromImage(src);
+
+    sf::RenderTexture rd;
+    rd.create(width, height);
+    rd.clear(sf::Color::Transparent);
+
+    sf::IntRect dstRect(BORDER_START_X, BORDER_START_Y, CORNER_SIZE, CORNER_SIZE);
+
+    sf::Sprite leftTop;
+    leftTop.setTexture(srcTexture);
+    leftTop.setTextureRect(dstRect);
+    leftTop.setPosition(0, 0);
+    rd.draw(leftTop);
+    rd.display();
+
+    sf::Sprite rightTop;
+    rightTop.setTexture(srcTexture);
+    dstRect.left = BORDER_END_X - CORNER_SIZE;
+    rightTop.setTextureRect(dstRect);
+    rightTop.setPosition(width - CORNER_SIZE, 0);
+    rd.draw(rightTop);
+    rd.display();
+
+    sf::Sprite rightBottom;
+    rightBottom.setTexture(srcTexture);
+    dstRect.left = BORDER_END_X - CORNER_SIZE;
+    dstRect.top = BORDER_END_Y - CORNER_SIZE;
+    rightBottom.setTextureRect(dstRect);
+    rightBottom.setPosition(width - CORNER_SIZE, height - CORNER_SIZE);
+    rd.draw(rightBottom);
+    rd.display();
+
+    sf::Sprite leftBottom;
+    leftBottom.setTexture(srcTexture);
+    dstRect.left = BORDER_START_X;
+    dstRect.top = BORDER_END_Y - CORNER_SIZE;
+    leftBottom.setTextureRect(dstRect);
+    leftBottom.setPosition(0, height - CORNER_SIZE);
+    rd.draw(leftBottom);
+    rd.display();
+
+    sf::Sprite top;
+    top.setTexture(srcTexture);
+    dstRect = sf::IntRect(
+      BORDER_START_X + CORNER_SIZE,
+      BORDER_START_Y,
+      BORDER_LINE,
+      BORDER_THICK
+    );
+    top.setTextureRect(dstRect);
+    int limitX = std::floor((width - CORNER_SIZE * 2) / BORDER_LINE);
+    for (int i = 0; i < limitX; i++) {
+      top.setPosition(CORNER_SIZE + BORDER_LINE * i, 0);
+      rd.draw(top);
+      rd.display();
+    }
+    int stopX = CORNER_SIZE + BORDER_LINE * limitX;
+    int missingX = width - CORNER_SIZE - stopX;
+    if (missingX > 0) {
+      dstRect.width = missingX;
+      top.setTextureRect(dstRect);
+      top.setPosition(stopX, 0);
+      rd.draw(top);
+      rd.display();
+    }
+
+    sf::Sprite bottom;
+    bottom.setTexture(srcTexture);
+    dstRect = sf::IntRect(
+      BORDER_START_X + CORNER_SIZE,
+      BORDER_END_Y - CORNER_SIZE,
+      BORDER_LINE,
+      BORDER_THICK
+    );
+    bottom.setTextureRect(dstRect);
+    limitX = std::floor((width - CORNER_SIZE * 2) / BORDER_LINE);
+    int _y = height - CORNER_SIZE;
+    for (int i = 0; i < limitX; i++) {
+      bottom.setPosition(CORNER_SIZE + BORDER_LINE * i, _y);
+      rd.draw(bottom);
+      rd.display();
+    }
+    stopX = CORNER_SIZE + BORDER_LINE * limitX;
+    missingX = width - CORNER_SIZE - stopX;
+    if (missingX > 0) {
+      dstRect.width = missingX;
+      bottom.setTextureRect(dstRect);
+      bottom.setPosition(stopX, _y);
+      rd.draw(bottom);
+      rd.display();
+    }
+
+    sf::Sprite left;
+    dstRect = sf::IntRect(BORDER_START_X, BORDER_START_Y + CORNER_SIZE, BORDER_THICK, BORDER_LINE);
+    left.setTexture(srcTexture);
+    left.setTextureRect(dstRect);
+    int limitY = std::floor((height - CORNER_SIZE * 2) / BORDER_LINE);
+    for (int i = 0; i < limitY; i++) {
+      left.setPosition(0, CORNER_SIZE + BORDER_LINE * i);
+      rd.draw(left);
+      rd.display();
+    }
+    int stopY = CORNER_SIZE + BORDER_LINE * limitY;
+    int missingY = height - CORNER_SIZE - stopY;
+    if (missingY > 0) {
+      dstRect.height = missingY;
+      left.setTextureRect(dstRect);
+      left.setPosition(0, stopY);
+      rd.draw(left);
+      rd.display();
+    }
+
+    sf::Sprite right;
+    dstRect = sf::IntRect(BORDER_END_X - BORDER_THICK, BORDER_START_Y + CORNER_SIZE, BORDER_THICK, BORDER_LINE);
+    right.setTexture(srcTexture);
+    right.setTextureRect(dstRect);
+    int _x = width - BORDER_THICK;
+    for (int i = 0; i < limitY; i++) {
+      right.setPosition(_x, CORNER_SIZE + BORDER_LINE * i);
+      rd.draw(right);
+      rd.display();
+    }
+    stopY = CORNER_SIZE + BORDER_LINE * limitY;
+    missingY = height - CORNER_SIZE - stopY;
+    if (missingY > 0) {
+      dstRect.height = missingY;
+      right.setTextureRect(dstRect);
+      right.setPosition(_x, stopY);
+      rd.draw(right);
+      rd.display();
+    }
+
+    borderTexture = rd.getTexture();
+    borderSprite.setTexture(borderTexture);
+    borderSprite.setPosition(x, y);
   }
 };
 
