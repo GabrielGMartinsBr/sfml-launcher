@@ -286,6 +286,9 @@ class Bitmap {
     switch (argc) {
       case 2: {
         rb_scan_args(argc, argv, "2", &_rect, &_str);
+        Eng::Rect *rect = (Eng::Rect *)DATA_PTR(_rect);
+        app::CStr str = Convert::toCStr(_str);
+        inst->draw_text(rect, str);
         break;
       }
       case 3: {

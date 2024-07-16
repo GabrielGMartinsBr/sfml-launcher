@@ -3,6 +3,8 @@
 #include <SFML/Graphics/BlendMode.hpp>
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Image.hpp>
+#include <SFML/Graphics/Rect.hpp>
+#include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
@@ -161,7 +163,6 @@ class Bitmap {
     for (int i = x; i < limitX; i++) {
       for (int j = y; j < limitY; j++) {
         img.setPixel(i, j, sfColor);
-        // image.setPixel(i, j, sfColor);
       }
     }
 
@@ -189,6 +190,7 @@ class Bitmap {
   void draw_text(Rect rect, Str str, TextAlign align = TextAlign::TEXT_LEFT)
   {
     Texts::drawText(renderTexture, rect.x, rect.y, *font, str);
+    renderTexture.display();
   }
 
   int get_text_size(Str _str);
@@ -202,6 +204,7 @@ class Bitmap {
     dest.r = src->red;
     dest.g = src->green;
     dest.b = src->blue;
+    dest.a = src->alpha;
   }
 
   void createFont()
