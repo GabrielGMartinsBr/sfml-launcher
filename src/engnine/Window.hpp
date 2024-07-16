@@ -23,7 +23,7 @@ class Window : Drawable {
       height(0),
       windowSkin(nullptr),
       contents(nullptr),
-      cursor_rect(new Rect(0, 0, 16, 16))
+      cursor_rect(new Rect(0, 0, 0, 0))
   {
     Eng::Engine::getInstance().addDrawable(this);
     dirty = true;
@@ -39,15 +39,20 @@ class Window : Drawable {
     if (!dirty) {
       return;
     }
+    if (width < 1 || height < 1) {
+      return;
+    }
     updateBackgroundSprite();
+    updateCursorRect();
     updateContentsSprite();
     dirty = false;
   }
 
   void draw(sf::RenderTexture &rd) override
   {
-    rd.draw(backgroundSprite);
-    rd.draw(contentsSprite);
+    rd.draw(backgroundSprite, sf::BlendAlpha);
+    rd.draw(cursorSprite, sf::BlendAlpha);
+    rd.draw(contentsSprite, sf::BlendAlpha);
   }
 
   Bitmap *getWindowSkin()
@@ -158,6 +163,10 @@ class Window : Drawable {
 
   sf::Sprite backgroundSprite;
   sf::Sprite contentsSprite;
+
+  sf::Sprite cursorSprite;
+  sf::Texture cursorTexture;
+
   bool dirty;
 
   void updateBackgroundSprite()
@@ -189,9 +198,51 @@ class Window : Drawable {
     }
 
     const sf::Texture &texture = contents->renderTexture.getTexture();
-    contentsSprite.setTexture(texture);
 
-    contentsSprite.setPosition(x, y);
+
+  void updateCursorRect()
+  {
+    if (windowSkin == nullptr || cursor_rect->width < 1 || cursor_rect->height < 1) {
+      return;
+    }
+
+    sf::Image src = windowSkin->renderTexture.getTexture().copyToImage();
+
+    sf::Image buff;
+    buff.create(cursor_rect->width, cursor_rect->height, sf::Color::Transparent);
+
+    float xa = cursor_rect->width / 32.0;
+    float ya = cursor_rect->height / 32.0;
+
+    int lastLine = cursor_rect->height - 1;
+    for (int i = 0; i < cursor_rect->width; i++) {
+      buff.setPixel(i, 0, src.getPixel(128 + i / xa, 64));
+      buff.setPixel(i, lastLine, src.getPixel(128 + i / xa, 95));
+    }
+
+    int lastCol = cursor_rect->width - 1;
+    for (int i = 0; i < cursor_rect->height; i++) {
+      buff.setPixel(0, i, src.getPixel(128, 64 + i / ya));
+      buff.setPixel(lastCol, i, src.getPixel(159, 64 + i / ya));
+    }
+
+    int limitX = cursor_rect->width - 1;
+    int limitY = cursor_rect->height - 1;
+    xa = 30.0 / (limitX - 1);
+    ya = 30.0 / (limitY - 1);
+    for (int i = 1; i < limitX; i++) {
+      for (int j = 1; j < limitY; j++) {
+        buff.setPixel(
+          i, j, src.getPixel(129 + std::floor((i - 1) * xa), 65 + std::floor((j - 1) * ya))
+        );
+      }
+    }
+
+    cursorTexture.loadFromImage(buff);
+
+    cursorSprite.setPosition(x + 16 + cursor_rect->x, y + 16 + cursor_rect->y);
+    cursorSprite.setTexture(cursorTexture);
+  }
   }
 };
 
