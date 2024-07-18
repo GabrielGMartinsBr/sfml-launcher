@@ -109,7 +109,10 @@ class Bitmap {
     return _disposed;
   }
 
-  void get_rect(){};
+  Rect get_rect() const
+  {
+    return Rect(0, 0, width, height);
+  };
 
   void blt(){};
 

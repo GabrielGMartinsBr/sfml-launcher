@@ -1,6 +1,5 @@
 #pragma once
 
-#include <stdexcept>
 #include <string>
 
 #include "Convert.hpp"
@@ -8,6 +7,7 @@
 #include "base/Log.hpp"
 #include "engnine/Bitmap.hpp"
 #include "integrator/It_Color.hpp"
+#include "integrator/It_Rect.hpp"
 #include "ruby.h"
 
 namespace It {
@@ -28,7 +28,7 @@ class Bitmap {
     rb_define_method(bitmapClass, "clear", RUBY_METHOD_FUNC(method_clear), 0);
 
     rb_define_method(bitmapClass, "dispose", RUBY_METHOD_FUNC(method_dispose), 0);
-    rb_define_method(bitmapClass, "disposed", RUBY_METHOD_FUNC(method_disposed), 0);
+    rb_define_method(bitmapClass, "disposed?", RUBY_METHOD_FUNC(method_disposed), 0);
 
     rb_define_method(bitmapClass, "width", RUBY_METHOD_FUNC(method_width), 0);
     rb_define_method(bitmapClass, "height", RUBY_METHOD_FUNC(method_height), 0);
@@ -39,6 +39,10 @@ class Bitmap {
     rb_define_method(bitmapClass, "fill_rect", RUBY_METHOD_FUNC(method_fill_rect), -1);
 
     rb_define_method(bitmapClass, "draw_text", RUBY_METHOD_FUNC(method_draw_text), -1);
+
+    rb_define_method(bitmapClass, "text_size", RUBY_METHOD_FUNC(method_text_size), 1);
+
+    rb_define_method(bitmapClass, "rect", RUBY_METHOD_FUNC(getter_rect), 0);
   }
 
   static VALUE getRbClass()
@@ -129,6 +133,17 @@ class Bitmap {
     Eng::Font *font = (Eng::Font *)DATA_PTR(value);
     inst->setter_font(font);
     return Qnil;
+  }
+
+  /*
+   Get rect
+  */
+  static VALUE getter_rect(VALUE self)
+  {
+    Eng::Bitmap *inst = (Eng::Bitmap *)DATA_PTR(self);
+    Eng::Rect *rect = new Eng::Rect(inst->get_rect());
+    VALUE rectObj = It::Rect::getRubyObject(rect);
+    return rectObj;
   }
 
   /*
@@ -302,6 +317,7 @@ class Bitmap {
         int width = Convert::toCInt(_width);
         int height = Convert::toCInt(_height);
         app::CStr str = Convert::toCStr(_str);
+        Log::out() << str;
         inst->draw_text(x, y, width, height, str);
         break;
       }
@@ -310,11 +326,22 @@ class Bitmap {
         break;
       }
       default: {
-        throw std::runtime_error("Bad number of arguments was receive.");
+        Log::out() << "argc: " << argc;
+        RbUtils::raiseRuntimeException("Bad number of arguments was receive.");
+        return Qnil;
       }
     }
 
     return Qnil;
+  }
+
+  static VALUE method_text_size(VALUE self, VALUE _str)
+  {
+    Eng::Bitmap *inst = (Eng::Bitmap *)DATA_PTR(self);
+    app::CStr str = Convert::toCStr(_str);
+    Eng::Rect *rect = inst->get_text_size(str);
+    VALUE rectObj = It::Rect::getRubyObject(rect);
+    return rectObj;
   }
 };
 
