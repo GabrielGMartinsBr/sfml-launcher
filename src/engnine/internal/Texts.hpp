@@ -21,14 +21,14 @@ class Texts {
   static void loadFonts()
   {
     static sf::Font font;
-    if (!font.loadFromFile("../assets/arial.ttf")) {
+    if (!font.loadFromFile("/run/media/home/common/gabrielmartins.dev/dev/cpp/orm-xp/sfml-launcher/assets/arial.ttf")) {
       throw std::runtime_error("Load fonts failed");
     }
   }
 
   static void loadFont(sf::Font &font)
   {
-    if (!font.loadFromFile("../assets/arial.ttf")) {
+    if (!font.loadFromFile("/run/media/home/common/gabrielmartins.dev/dev/cpp/orm-xp/sfml-launcher/assets/arial.ttf")) {
       throw std::runtime_error("Load fonts failed");
     }
   }

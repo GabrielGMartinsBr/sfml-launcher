@@ -13,9 +13,9 @@ struct BlenShaders {
   void loadShaders()
   {
     if (
-      !sprNormalShader.loadFromFile("../shaders/sprite_normal-blend.frag", sf::Shader::Fragment)
-      || !sprInvertShader.loadFromFile("../shaders/sprite_invert-blend.frag", sf::Shader::Fragment)
-      || !vpNormalShader.loadFromFile("../shaders/viewport_normal-blend.frag", sf::Shader::Fragment)
+      !sprNormalShader.loadFromFile("/run/media/home/common/gabrielmartins.dev/dev/cpp/orm-xp/sfml-launcher/shaders/sprite_normal-blend.frag", sf::Shader::Fragment)
+      || !sprInvertShader.loadFromFile("/run/media/home/common/gabrielmartins.dev/dev/cpp/orm-xp/sfml-launcher/shaders/sprite_invert-blend.frag", sf::Shader::Fragment)
+      || !vpNormalShader.loadFromFile("/run/media/home/common/gabrielmartins.dev/dev/cpp/orm-xp/sfml-launcher/shaders/viewport_normal-blend.frag", sf::Shader::Fragment)
     ) {
       throw std::runtime_error("Load blend shaders failed.");
     }

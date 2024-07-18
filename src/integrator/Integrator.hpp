@@ -41,7 +41,7 @@ class Integrator {
 
     loadScriptsPath();
 
-    It::FileTest::integrate();
+    // It::FileTest::integrate();
     It::LoadSaveData::integrate();
     It::Graphics::integrate();
     It::Audio::integrate();
@@ -78,7 +78,7 @@ class Integrator {
 
   void loadScriptsPath()
   {
-    FPath relativePath("../scripts");
+    FPath relativePath("/run/media/home/common/gabrielmartins.dev/dev/cpp/orm-xp/sfml-launcher/scripts");
     FPath absolutePath = boost::filesystem::canonical(relativePath);
     const char* scriptDirPath = absolutePath.c_str();
 
