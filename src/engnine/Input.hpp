@@ -3,6 +3,7 @@
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include <bitset>
+
 namespace Eng {
 
 enum InputKey {
@@ -57,11 +58,35 @@ class Input {
 
   void update()
   {
+    // pressStates = keyStates;
+    // Log::out() << "update";
+    for (int i = 1; i < InputKey::NUM_KEYS; i++) {
+      previousKeyStates[i] = pressStates[i];
+      pressStates[i] = keyStates[i];
+      if (pressStates[i]) {
+        keyTimes[i] = keyTimes[i] + 1;
+        if (keyTimes[i] > 6) {
+          keyTimes[i] = 0;
+        }
+      } else if (keyTimes[i] > 0) {
+        keyTimes[i] = 0;
+      }
+    }
   }
 
   bool isPressed(InputKey key)
   {
-    return keyStates.test(key);
+    return pressStates[key];
+  }
+
+  bool isTriggered(InputKey key)
+  {
+    return pressStates[key] && !previousKeyStates[key];
+  }
+
+  bool isRepeated(InputKey key)
+  {
+    return pressStates[key] && keyTimes[key] == 1;
   }
 
   bool isValidKey(int num)
@@ -76,8 +101,16 @@ class Input {
 
  private:
   std::bitset<InputKey::NUM_KEYS> keyStates;
+  bool previousKeyStates[InputKey::NUM_KEYS];
+  bool pressStates[InputKey::NUM_KEYS];
+  unsigned short keyTimes[InputKey::NUM_KEYS];
 
-  Input() { }
+  Input()
+  {
+    for (int i = 1; i < InputKey::NUM_KEYS; i++) {
+      keyTimes[i] = 0;
+    }
+  }
 
   Input(const Input&);
   Input& operator=(const Input&);

@@ -64,7 +64,7 @@ class Input {
     if (!key) {
       return Qnil;
     }
-    bool isPressed = Eng::Input::getInstance().isPressed(key);
+    bool isPressed = Eng::Input::getInstance().isTriggered(key);
     return isPressed ? Qtrue : Qfalse;
   }
 
@@ -75,7 +75,7 @@ class Input {
     if (!key) {
       return Qnil;
     }
-    bool isPressed = Eng::Input::getInstance().isPressed(key);
+    bool isPressed = Eng::Input::getInstance().isRepeated(key);
     return isPressed ? Qtrue : Qfalse;
   }
 
