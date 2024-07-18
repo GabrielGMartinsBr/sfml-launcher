@@ -160,8 +160,8 @@ class Bitmap {
 
     img.create(this->width, this->height, sf::Color::Transparent);
 
-    int limitX = x + width;
-    int limitY = y + height;
+    int limitX = std::min<int>(x + width, this->width);
+    int limitY = std::min<int>(y + height, this->height);
 
     for (int i = x; i < limitX; i++) {
       for (int j = y; j < limitY; j++) {

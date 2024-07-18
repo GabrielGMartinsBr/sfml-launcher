@@ -1,9 +1,7 @@
 #pragma once
 
-#include <string>
-
 #include "Convert.hpp"
-#include "app.h"
+#include "RbUtils.hpp"
 #include "base/Log.hpp"
 #include "engnine/Bitmap.hpp"
 #include "integrator/It_Color.hpp"
