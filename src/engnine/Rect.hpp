@@ -36,17 +36,21 @@ class Rect {
 
     width = other.width;
     height = other.height;
-    dirty = other.dirty;
+    dirty = true;
 
     return *this;
   }
 
   void set(int _x, int _y, int _width, int _height)
   {
+    if (_x == x && y == _y && _width == width && _height == height) {
+      return;
+    }
     x = _x;
     y = _y;
     width = _width;
     height = _height;
+    dirty = true;
   }
 
   inline int getter_x() const

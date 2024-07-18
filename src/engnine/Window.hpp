@@ -29,7 +29,9 @@ class Window : Drawable {
       cursor_rect(new Rect(0, 0, 0, 0))
   {
     Eng::Engine::getInstance().addDrawable(this);
-    dirty = true;
+    // dirty = true;
+    contentsDirty = true;
+    skinDirty = true;
   }
 
   ~Window()
@@ -46,17 +48,25 @@ class Window : Drawable {
 
   void update() override
   {
-    if (!dirty && !cursor_rect->isDirty()) {
-      return;
-    }
     if (width < 1 || height < 1) {
       return;
     }
-    updateBackgroundSprite();
-    updateBorder();
-    updateCursorRect();
-    updateContentsSprite();
-    dirty = false;
+    if (skinDirty) {
+      updateBackgroundSprite();
+      updateBorder();
+      updateCursorRect();
+      skinDirty = false;
+      cursor_rect->markAsClean();
+    }
+    if (cursor_rect->isDirty()) {
+      Log::out() << "updateCursorRect";
+      updateCursorRect();
+      cursor_rect->markAsClean();
+    }
+    if (contentsDirty) {
+      updateContentsSprite();
+      contentsDirty = false;
+    }
   }
 
   void draw(sf::RenderTexture &rd) override
@@ -112,28 +122,28 @@ class Window : Drawable {
   void setX(int v)
   {
     x = v;
-    dirty = true;
+    skinDirty = true;
   }
 
   int getY() { return y; }
   void setY(int v)
   {
     y = v;
-    dirty = true;
+    skinDirty = true;
   }
 
   int getWidth() { return width; }
   void setWidth(int v)
   {
     width = v;
-    dirty = true;
+    skinDirty = true;
   }
 
   int getHeight() { return height; }
   void setHeight(int v)
   {
     height = v;
-    dirty = true;
+    skinDirty = true;
   }
 
   int getZ() { return z; }
@@ -147,7 +157,7 @@ class Window : Drawable {
   void setter_ox(int v)
   {
     ox = v;
-    dirty = true;
+    contentsDirty = true;
     Log::out() << "(setter_ox)";
   }
 
@@ -155,6 +165,7 @@ class Window : Drawable {
   void setter_oy(int v)
   {
     oy = v;
+    contentsDirty = true;
     Log::out() << "(setter_oy)";
   }
 
@@ -195,7 +206,9 @@ class Window : Drawable {
   sf::Sprite borderSprite;
   sf::Texture borderTexture;
 
-  bool dirty;
+  // bool dirty;
+  bool skinDirty;
+  bool contentsDirty;
 
   void updateBackgroundSprite()
   {
@@ -296,6 +309,7 @@ class Window : Drawable {
     if (windowSkin == nullptr) {
       return;
     }
+    Log::out() << " - [[updateBorder]]";
     constexpr int BORDER_START_X = 128;
     constexpr int BORDER_START_Y = 0;
     constexpr int BORDER_END_X = 192;
