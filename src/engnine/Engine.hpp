@@ -12,6 +12,7 @@
 #include "engnine/BlenShaders.hpp"
 #include "engnine/Drawable.hpp"
 #include "engnine/EngineRenderer.hpp"
+#include "engnine/Input.hpp"
 #include "engnine/internal/Texts.hpp"
 #include "ruby.h"
 
@@ -94,11 +95,13 @@ class Engine {
  private:
   bool initialized = false;
   bool running = false;
+  Input& input;
 
   sf::RenderWindow* window = nullptr;
   EngineRenderer* renderer = nullptr;
 
-  Engine()
+  Engine() :
+      input(Input::getInstance())
   {
   }
 
@@ -112,6 +115,12 @@ class Engine {
       switch (event.type) {
         case sf::Event::Closed:
           handleCloseEvent();
+          break;
+        case sf::Event::KeyPressed:
+          input.handleKeyPressed(event.key);
+          break;
+        case sf::Event::KeyReleased:
+          input.handleKeyRelease(event.key);
           break;
         default:
           break;

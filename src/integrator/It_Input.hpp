@@ -15,6 +15,7 @@ class Input {
     VALUE inputClass = rb_define_class("Input", rb_cObject);
 
     rb_define_module_function(inputClass, "update", RUBY_METHOD_FUNC(method_Update), 0);
+    rb_define_module_function(inputClass, "press?", RUBY_METHOD_FUNC(method_press), 1);
     rb_define_module_function(inputClass, "trigger?", RUBY_METHOD_FUNC(method_trigger), 1);
     rb_define_module_function(inputClass, "repeat?", RUBY_METHOD_FUNC(method_repeat), 1);
 
@@ -42,19 +43,42 @@ class Input {
 
   static VALUE method_Update(VALUE self)
   {
-    Eng::Input *obj = (Eng::Input *)DATA_PTR(self);
-    obj->update();
+    Eng::Input::getInstance().update();
     return Qnil;
   }
 
-  static VALUE method_trigger(VALUE self, VALUE num)
+  static VALUE method_press(VALUE self, VALUE _num)
   {
-    return Qfalse;
+    Eng::InputKey key = convertKeyCode(_num);
+    if (!key) {
+      return Qnil;
+    }
+    bool isPressed = Eng::Input::getInstance().isPressed(key);
+    return isPressed ? Qtrue : Qfalse;
+  }
+
+  static VALUE method_trigger(VALUE self, VALUE _num)
+  {
+    Eng::InputKey key = convertKeyCode(_num);
+    if (!key) {
+      return Qnil;
+    }
+    bool isPressed = Eng::Input::getInstance().isPressed(key);
+    return isPressed ? Qtrue : Qfalse;
   }
 
   static VALUE method_repeat(VALUE self, VALUE num)
   {
     return Qfalse;
+  }
+
+  static Eng::InputKey convertKeyCode(VALUE _num)
+  {
+    int num = Convert::toCInt(_num);
+    if (Eng::Input::getInstance().isValidKey(num)) {
+      return (Eng::InputKey)num;
+    }
+    return Eng::InputKey::UNKNOW;
   }
 };
 
