@@ -35,10 +35,7 @@ class Viewport {
   Rect* getRect() { return &rect; }
   void setRect(Rect* _rect)
   {
-    rect.x = _rect->x;
-    rect.y = _rect->y;
-    rect.width = _rect->width;
-    rect.height = _rect->height;
+    rect = *_rect;
   }
 
   /*

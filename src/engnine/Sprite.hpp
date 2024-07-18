@@ -66,15 +66,22 @@ class Sprite : Drawable {
     float opacity = getter_opacity() / 255.f;
 
     sf::RenderStates state;
-    state.blendMode = sf::BlendNone;
+    // state.blendMode = sf::BlendNone;
 
     if (getBlendType() == 2) {
       Engine::getInstance().blendShaders.sprInvertShader.setUniform("opacity", opacity);
       state.shader = &Engine::getInstance().blendShaders.sprInvertShader;
       state.blendMode = sf::BlendMultiply;
     } else {
+      Engine::getInstance().blendShaders.sprNormalShader.setUniform("opacity", opacity);
+      state.shader = &Engine::getInstance().blendShaders.sprNormalShader;
       state.blendMode = sf::BlendAlpha;
     }
+    // Engine::getInstance().blendShaders.sprInvertShader.setUniform("opacity", opacity);
+    // state.shader = &Engine::getInstance().blendShaders.sprInvertShader;
+    // state.blendMode = sf::BlendMultiply;
+      // state.blendMode = sf::BlendAlpha;
+
 
     renderTexture.draw(
       sfSprite,
@@ -239,25 +246,25 @@ class Sprite : Drawable {
     );
 
     if (src_rect) {
-      dstRect.left = src_rect->x + ox;
-      dstRect.top = src_rect->y + oy;
-      dstRect.width = src_rect->width;
-      dstRect.height = src_rect->height;
+      dstRect.left = src_rect->getter_x() + ox;
+      dstRect.top = src_rect->getter_y() + oy;
+      dstRect.width = src_rect->getter_width();
+      dstRect.height = src_rect->getter_height();
     }
 
     if (viewport) {
       auto &vpRect = *viewport->getRect();
 
       // ---
-      vp.x = vpRect.x;
-      vp.y = vpRect.y;
-      vp.width = vpRect.width;
-      vp.height = vpRect.height;
+      vp.x = vpRect.getter_x();
+      vp.y = vpRect.getter_y();
+      vp.width = vpRect.getter_width();
+      vp.height = vpRect.getter_height();
       dst.x = vp.x;
       dst.y = vp.y;
 
-      int dstX = vpRect.x + x;
-      int dstY = vpRect.y + y;
+      int dstX = vpRect.getter_x() + x;
+      int dstY = vpRect.getter_y() + y;
 
       if (dstX > vp.endX() || dstY > vp.endY()) {
         return;

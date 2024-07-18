@@ -8,6 +8,7 @@
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
 #include <cmath>
+#include <cstdlib>
 
 #include "engnine/Bitmap.hpp"
 #include "engnine/Drawable.hpp"
@@ -31,6 +32,13 @@ class Window : Drawable {
     dirty = true;
   }
 
+  ~Window()
+  {
+    free(windowSkin);
+    free(contents);
+    free(cursor_rect);
+  }
+
   int getZPosition() const override
   {
     return z;
@@ -38,7 +46,7 @@ class Window : Drawable {
 
   void update() override
   {
-    if (!dirty) {
+    if (!dirty && !cursor_rect->isDirty()) {
       return;
     }
     if (width < 1 || height < 1) {
@@ -209,8 +217,8 @@ class Window : Drawable {
     backgroundSprite.setPosition(x + 1, y + 1);
 
     Log::out() << "update()";
-    Log::out() << "Rect width: " << cursor_rect->width;
-    Log::out() << "Rect height: " << cursor_rect->height;
+    Log::out() << "Rect width: " << cursor_rect->getter_width();
+    Log::out() << "Rect height: " << cursor_rect->getter_height();
   }
 
   void updateContentsSprite()
@@ -240,32 +248,32 @@ class Window : Drawable {
 
   void updateCursorRect()
   {
-    if (windowSkin == nullptr || cursor_rect->width < 1 || cursor_rect->height < 1) {
+    if (windowSkin == nullptr || cursor_rect->getter_width() < 1 || cursor_rect->getter_height() < 1) {
       return;
     }
 
     sf::Image src = windowSkin->renderTexture.getTexture().copyToImage();
 
     sf::Image buff;
-    buff.create(cursor_rect->width, cursor_rect->height, sf::Color::Transparent);
+    buff.create(cursor_rect->getter_width(), cursor_rect->getter_height(), sf::Color::Transparent);
 
-    float xa = cursor_rect->width / 32.0;
-    float ya = cursor_rect->height / 32.0;
+    float xa = cursor_rect->getter_width() / 32.0;
+    float ya = cursor_rect->getter_height() / 32.0;
 
-    int lastLine = cursor_rect->height - 1;
-    for (int i = 0; i < cursor_rect->width; i++) {
+    int lastLine = cursor_rect->getter_height() - 1;
+    for (int i = 0; i < cursor_rect->getter_width(); i++) {
       buff.setPixel(i, 0, src.getPixel(128 + i / xa, 64));
       buff.setPixel(i, lastLine, src.getPixel(128 + i / xa, 95));
     }
 
-    int lastCol = cursor_rect->width - 1;
-    for (int i = 0; i < cursor_rect->height; i++) {
+    int lastCol = cursor_rect->getter_width() - 1;
+    for (int i = 0; i < cursor_rect->getter_height(); i++) {
       buff.setPixel(0, i, src.getPixel(128, 64 + i / ya));
       buff.setPixel(lastCol, i, src.getPixel(159, 64 + i / ya));
     }
 
-    int limitX = cursor_rect->width - 1;
-    int limitY = cursor_rect->height - 1;
+    int limitX = cursor_rect->getter_width() - 1;
+    int limitY = cursor_rect->getter_height() - 1;
     xa = 30.0 / (limitX - 1);
     ya = 30.0 / (limitY - 1);
     for (int i = 1; i < limitX; i++) {
@@ -278,8 +286,9 @@ class Window : Drawable {
 
     cursorTexture.loadFromImage(buff);
 
-    cursorSprite.setPosition(x + 16 + cursor_rect->x, y + 16 + cursor_rect->y);
+    cursorSprite.setPosition(x + 16 + cursor_rect->getter_x(), y + 16 + cursor_rect->getter_y());
     cursorSprite.setTexture(cursorTexture);
+    cursor_rect->markAsClean();
   }
 
   void updateBorder()

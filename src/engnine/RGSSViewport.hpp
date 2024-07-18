@@ -29,7 +29,7 @@ class Viewport {
   RenderTexture renderTexture;
 
   Viewport(const Eng::Rect& rect) :
-      Viewport(rect.x, rect.y, rect.width, rect.height)
+      Viewport(rect.getter_x(), rect.getter_y(), rect.getter_width(), rect.getter_height())
   {
   }
 

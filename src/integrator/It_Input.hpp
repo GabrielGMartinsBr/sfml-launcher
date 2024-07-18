@@ -1,5 +1,6 @@
 #pragma once
 
+#include "base/Log.hpp"
 #include "engnine/Input.hpp"
 #include "integrator/Convert.hpp"
 #include "ruby.h"
@@ -67,9 +68,15 @@ class Input {
     return isPressed ? Qtrue : Qfalse;
   }
 
-  static VALUE method_repeat(VALUE self, VALUE num)
+  static VALUE method_repeat(VALUE self, VALUE _num)
   {
-    return Qfalse;
+    // Log::out() << "repeat";
+    Eng::InputKey key = convertKeyCode(_num);
+    if (!key) {
+      return Qnil;
+    }
+    bool isPressed = Eng::Input::getInstance().isPressed(key);
+    return isPressed ? Qtrue : Qfalse;
   }
 
   static Eng::InputKey convertKeyCode(VALUE _num)

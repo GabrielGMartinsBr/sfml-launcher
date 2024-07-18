@@ -7,13 +7,10 @@ namespace Eng {
 class Rect {
  public:
   VALUE ptr;
-  float x;
-  float y;
-  unsigned int width;
-  unsigned int height;
 
   Rect(float _x, float _y, unsigned int _width, unsigned int _height) :
-      ptr(Qnil)
+      ptr(Qnil),
+      dirty(false)
   {
     x = _x;
     y = _y;
@@ -21,13 +18,27 @@ class Rect {
     height = _height;
   }
 
-  Rect(Rect *_rect) :
-      ptr(Qnil)
+  Rect(Rect* _rect) :
+      ptr(Qnil),
+      dirty(false)
   {
     x = _rect->x;
     y = _rect->y;
     width = _rect->width;
     height = _rect->height;
+  }
+
+  Rect& operator=(const Rect& other)
+  {
+    if (this == &other) {
+      return *this;
+    }
+
+    width = other.width;
+    height = other.height;
+    dirty = other.dirty;
+
+    return *this;
   }
 
   void set(int _x, int _y, int _width, int _height)
@@ -37,6 +48,85 @@ class Rect {
     width = _width;
     height = _height;
   }
+
+  inline int getter_x() const
+  {
+    return x;
+  }
+
+  inline int getter_y() const
+  {
+    return y;
+  }
+
+  inline int getter_width() const
+  {
+    return width;
+  }
+
+  inline int getter_height() const
+  {
+    return height;
+  }
+
+  void setter_x(int v)
+  {
+    if (x == v) {
+      return;
+    }
+    x = v;
+    dirty = true;
+  }
+
+  void setter_y(int v)
+  {
+    if (y == v) {
+      return;
+    }
+    y = v;
+    dirty = true;
+  }
+
+  void setter_width(int v)
+  {
+    if (width == v) {
+      return;
+    }
+    width = v;
+    dirty = true;
+  }
+
+  void setter_height(int v)
+  {
+    if (height == v) {
+      return;
+    }
+    height = v;
+    dirty = true;
+  }
+
+  void markAsDirty()
+  {
+    dirty = true;
+  }
+
+  void markAsClean()
+  {
+    dirty = false;
+  }
+
+  inline bool isDirty() const
+  {
+    return dirty;
+  }
+
+
+ private:
+  bool dirty;
+  float x;
+  float y;
+  unsigned int width;
+  unsigned int height;
 };
 
 }  // namespace Eng

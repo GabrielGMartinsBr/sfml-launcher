@@ -176,7 +176,7 @@ class Bitmap {
 
   void fill_rect(Rect* _rect, Color* _color)
   {
-    fill_rect(_rect->x, _rect->y, _rect->width, _rect->height, _color);
+    fill_rect(_rect->getter_x(), _rect->getter_y(), _rect->getter_width(), _rect->getter_height(), _color);
   };
 
   void hue_change(int _hue);
@@ -189,7 +189,7 @@ class Bitmap {
 
   void draw_text(Rect rect, Str str, TextAlign align = TextAlign::TEXT_LEFT)
   {
-    Texts::drawText(renderTexture, rect.x, rect.y, *font, str);
+    Texts::drawText(renderTexture, rect.getter_x(), rect.getter_y(), *font, str);
     renderTexture.display();
   }
 

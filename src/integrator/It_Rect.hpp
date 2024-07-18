@@ -77,14 +77,14 @@ class Rect {
   static VALUE getter_x(VALUE self)
   {
     auto inst = It::Rect::getObjectValue(self);
-    return Convert::toRubyNumber(inst->x);
+    return Convert::toRubyNumber(inst->getter_x());
   }
 
   static VALUE setter_x(VALUE self, VALUE value)
   {
     unsigned int x = Convert::toCInt(value);
     auto inst = It::Rect::getObjectValue(self);
-    inst->x = x;
+    inst->setter_x(x);
     return value;
   }
 
@@ -95,14 +95,14 @@ class Rect {
   static VALUE getter_y(VALUE self)
   {
     auto inst = It::Rect::getObjectValue(self);
-    return Convert::toRubyNumber(inst->y);
+    return Convert::toRubyNumber(inst->getter_y());
   }
 
   static VALUE setter_y(VALUE self, VALUE value)
   {
     unsigned int y = Convert::toCInt(value);
     auto inst = It::Rect::getObjectValue(self);
-    inst->y = y;
+    inst->setter_y(y);
     return value;
   }
 
@@ -113,14 +113,14 @@ class Rect {
   static VALUE getter_width(VALUE self)
   {
     auto inst = It::Rect::getObjectValue(self);
-    return Convert::toRubyNumber(inst->width);
+    return Convert::toRubyNumber(inst->getter_width());
   }
 
   static VALUE setter_width(VALUE self, VALUE value)
   {
     unsigned int width = Convert::toCInt(value);
     auto inst = It::Rect::getObjectValue(self);
-    inst->width = width;
+    inst->setter_width(width);
     return value;
   }
 
@@ -131,14 +131,14 @@ class Rect {
   static VALUE getter_height(VALUE self)
   {
     auto inst = It::Rect::getObjectValue(self);
-    return Convert::toRubyNumber(inst->height);
+    return Convert::toRubyNumber(inst->getter_height());
   }
 
   static VALUE setter_height(VALUE self, VALUE value)
   {
     unsigned int height = Convert::toCInt(value);
     auto inst = It::Rect::getObjectValue(self);
-    inst->height = height;
+    inst->setter_height(height);
     return value;
   }
 
