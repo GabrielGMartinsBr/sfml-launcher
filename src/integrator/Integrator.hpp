@@ -10,6 +10,7 @@
 #include "integrator/It_Audio.hpp"
 #include "integrator/It_Bitmap.hpp"
 #include "integrator/It_Color.hpp"
+#include "integrator/It_FileTest.hpp"
 #include "integrator/It_Graphics.hpp"
 #include "integrator/It_Input.hpp"
 #include "integrator/It_Rect.hpp"
@@ -40,6 +41,8 @@ class Integrator {
 
     loadScriptsPath();
 
+    It::FileTest::integrate();
+    It::LoadSaveData::integrate();
     It::Graphics::integrate();
     It::Audio::integrate();
     It::Input::integrate();
@@ -52,7 +55,6 @@ class Integrator {
     It::Window::integrate();
     It::Font::integrate();
     It::Table::integrate();
-    It::LoadSaveData::integrate();
 
     loadBuiltInScripts();
 
