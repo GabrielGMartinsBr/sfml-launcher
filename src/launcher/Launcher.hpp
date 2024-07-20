@@ -33,6 +33,13 @@ class Launcher {
 
   void run(app::CStr scriptsPath)
   {
+    sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
+    sf::Vector2i winPos(
+      (desktop.width - width) / 2,
+      (desktop.height - height) / 2
+    );
+    window.setPosition(winPos);
+
     ScriptsLoader& scriptsLoader = ScriptsLoader::getInstance();
 
     engine.init(window);
