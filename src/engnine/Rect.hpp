@@ -1,5 +1,8 @@
 #pragma once
 
+#include <SFML/Graphics/Rect.hpp>
+
+#include "Log.hpp"
 #include "ruby.h"
 
 namespace Eng {
@@ -43,9 +46,11 @@ class Rect {
 
   void set(int _x, int _y, int _width, int _height)
   {
+    // Log::out() << "Rect.set y: " << _y;
     if (_x == x && y == _y && _width == width && _height == height) {
       return;
     }
+    Log::out() << "Rect.set";
     x = _x;
     y = _y;
     width = _width;
@@ -107,6 +112,23 @@ class Rect {
     }
     height = v;
     dirty = true;
+  }
+
+  void method_empty()
+  {
+    width = 0;
+    height = 0;
+    dirty = true;
+  }
+
+  inline bool isEmpty() const
+  {
+    return width == 0 || height == 0;
+  }
+
+  inline sf::IntRect sfRect() const
+  {
+    return sf::IntRect(x, y, width, height);
   }
 
   void markAsDirty()

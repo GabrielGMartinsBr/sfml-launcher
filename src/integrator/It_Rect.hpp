@@ -27,6 +27,7 @@ class Rect {
     rb_define_method(rectClass, "height=", RUBY_METHOD_FUNC(setter_height), 1);
 
     rb_define_method(rectClass, "set", RUBY_METHOD_FUNC(method_set), 4);
+    rb_define_method(rectClass, "empty", RUBY_METHOD_FUNC(method_empty), 0);
   }
 
   static VALUE getRbClass()
@@ -154,6 +155,14 @@ class Rect {
     inst->set(x, y, width, height);
 
     return Qnil;
+  }
+
+  // Method empty
+  static VALUE method_empty(VALUE self)
+  {
+    auto inst = It::Rect::getObjectValue(self);
+    inst->method_empty();
+    return self;
   }
 };
 

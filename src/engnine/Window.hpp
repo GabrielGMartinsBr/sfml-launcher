@@ -73,7 +73,9 @@ class Window : Drawable {
   {
     rd.draw(backgroundSprite, sf::BlendAlpha);
     rd.draw(borderSprite, sf::BlendAlpha);
+    if (!cursor_rect->isEmpty()) {
     rd.draw(cursorSprite, sf::BlendAlpha);
+    }
     rd.draw(contentsSprite, sf::BlendAlpha);
   }
 
@@ -261,7 +263,7 @@ class Window : Drawable {
 
   void updateCursorRect()
   {
-    if (windowSkin == nullptr || cursor_rect->getter_width() < 1 || cursor_rect->getter_height() < 1) {
+    if (windowSkin == nullptr || cursor_rect->isEmpty()) {
       return;
     }
 
