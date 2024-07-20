@@ -4,6 +4,7 @@
 #include <string>
 
 #include "engnine/Audio.hpp"
+#include "integrator/Convert.hpp"
 #include "ruby.h"
 
 namespace It {
@@ -16,15 +17,19 @@ class Audio {
 
     rb_define_module_function(audioModule, "bgm_play", RUBY_METHOD_FUNC(bgm_play), -1);
     rb_define_module_function(audioModule, "bgm_stop", RUBY_METHOD_FUNC(bgm_stop), 0);
+    rb_define_module_function(audioModule, "bgm_fade", RUBY_METHOD_FUNC(bgm_fade), 1);
 
     rb_define_module_function(audioModule, "bgs_play", RUBY_METHOD_FUNC(bgs_play), -1);
     rb_define_module_function(audioModule, "bgs_stop", RUBY_METHOD_FUNC(bgs_stop), 0);
+    rb_define_module_function(audioModule, "bgs_fade", RUBY_METHOD_FUNC(bgs_fade), 1);
 
     rb_define_module_function(audioModule, "me_play", RUBY_METHOD_FUNC(me_play), -1);
     rb_define_module_function(audioModule, "me_stop", RUBY_METHOD_FUNC(me_stop), 0);
+    rb_define_module_function(audioModule, "me_fade", RUBY_METHOD_FUNC(me_fade), 1);
 
     rb_define_module_function(audioModule, "se_play", RUBY_METHOD_FUNC(se_play), -1);
     rb_define_module_function(audioModule, "se_stop", RUBY_METHOD_FUNC(se_stop), 0);
+    rb_define_module_function(audioModule, "se_fade", RUBY_METHOD_FUNC(se_fade), 1);
   }
 
  private:
@@ -65,6 +70,14 @@ class Audio {
     return Qnil;
   }
 
+  static VALUE bgm_fade(VALUE self, VALUE _time)
+  {
+    int time = Convert::toCInt(_time);
+
+    Eng::Audio::bgm_fade(time);
+    return Qnil;
+  }
+
   /*
     BGS
   */
@@ -98,6 +111,14 @@ class Audio {
   static VALUE bgs_stop(VALUE self)
   {
     Eng::Audio::bgs_stop();
+    return Qnil;
+  }
+
+  static VALUE bgs_fade(VALUE self, VALUE _time)
+  {
+    int time = Convert::toCInt(_time);
+
+    Eng::Audio::bgs_fade(time);
     return Qnil;
   }
 
@@ -137,6 +158,14 @@ class Audio {
     return Qnil;
   }
 
+  static VALUE me_fade(VALUE self, VALUE _time)
+  {
+    int time = Convert::toCInt(_time);
+
+    Eng::Audio::me_fade(time);
+    return Qnil;
+  }
+
   /*
     SE
   */
@@ -170,6 +199,14 @@ class Audio {
   static VALUE se_stop(VALUE self)
   {
     Eng::Audio::se_stop();
+    return Qnil;
+  }
+
+  static VALUE se_fade(VALUE self, VALUE _time)
+  {
+    int time = Convert::toCInt(_time);
+
+    Eng::Audio::se_fade(time);
     return Qnil;
   }
 };
