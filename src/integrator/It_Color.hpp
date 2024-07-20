@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Convert.hpp"
+#include "RbUtils.hpp"
 #include "engnine/Color.hpp"
 #include "ruby.h"
 
@@ -65,29 +66,24 @@ class Color {
       int r = Convert::toCInt(rb_r);
       int g = Convert::toCInt(rb_g);
       int b = Convert::toCInt(rb_b);
-
       instance = new Eng::Color(r, g, b);
-      instance->ptr = self;
-
-      DATA_PTR(self) = instance;
-      return self;
-    }
-
-    if (argc == 4) {
+    } else if (argc == 4) {
       rb_scan_args(argc, argv, "4", &rb_r, &rb_g, &rb_b, &rb_a);
       int r = Convert::toCInt(rb_r);
       int g = Convert::toCInt(rb_g);
       int b = Convert::toCInt(rb_b);
       int a = Convert::toCInt(rb_a);
-
       instance = new Eng::Color(r, g, b, a);
-      instance->ptr = self;
-
-      DATA_PTR(self) = instance;
-      return self;
+    } else {
+      RbUtils::raiseRuntimeException(
+        "Color initialize takes 3 or 4 argument, but " + std::to_string(argc) + " were received."
+      );
+      return Qnil;
     }
 
-    return Qnil;
+    instance->ptr = self;
+    DATA_PTR(self) = instance;
+    return self;
   }
 
   static VALUE method_set(VALUE self, VALUE p_r, VALUE p_g, VALUE p_b)
