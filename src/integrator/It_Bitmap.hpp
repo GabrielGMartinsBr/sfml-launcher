@@ -44,6 +44,8 @@ class Bitmap {
     rb_define_method(bitmapClass, "rect", RUBY_METHOD_FUNC(getter_rect), 0);
 
     rb_define_method(bitmapClass, "blt", RUBY_METHOD_FUNC(method_blt), -1);
+
+    rb_define_method(bitmapClass, "stretch_blt", RUBY_METHOD_FUNC(method_stretch_blt), -1);
   }
 
   static VALUE getRbClass()
@@ -372,6 +374,40 @@ class Bitmap {
       Eng::Rect *src_rect = (Eng::Rect *)DATA_PTR(_src_rect);
 
       inst->blt(x, y, src_bitmap, src_rect, opacity);
+
+      return Qnil;
+    }
+
+    RbUtils::raiseRuntimeException("Bad number of arguments was receive.");
+
+    return Qnil;
+  }
+
+  static VALUE method_stretch_blt(int argc, VALUE *argv, VALUE self)
+  {
+    Eng::Bitmap *inst = (Eng::Bitmap *)DATA_PTR(self);
+    VALUE _dst_rect, _src_bitmap, _src_rect, _opacity;
+
+    if (argc == 3) {
+      rb_scan_args(argc, argv, "3", &_dst_rect, &_src_bitmap, &_src_rect);
+
+      Eng::Rect *dst_rect = (Eng::Rect *)DATA_PTR(_dst_rect);
+      Eng::Bitmap *src_bitmap = (Eng::Bitmap *)DATA_PTR(_src_bitmap);
+      Eng::Rect *src_rect = (Eng::Rect *)DATA_PTR(_src_rect);
+
+      inst->stretch_blt(dst_rect, src_bitmap, src_rect);
+      return Qnil;
+    }
+
+    if (argc == 4) {
+      rb_scan_args(argc, argv, "4", &_dst_rect, &_src_bitmap, &_src_rect, &_opacity);
+
+      Eng::Rect *dst_rect = (Eng::Rect *)DATA_PTR(_dst_rect);
+      int opacity = Convert::toCInt(_opacity);
+      Eng::Bitmap *src_bitmap = (Eng::Bitmap *)DATA_PTR(_src_bitmap);
+      Eng::Rect *src_rect = (Eng::Rect *)DATA_PTR(_src_rect);
+
+      inst->stretch_blt(dst_rect, src_bitmap, src_rect, opacity);
 
       return Qnil;
     }

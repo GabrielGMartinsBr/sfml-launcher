@@ -126,6 +126,27 @@ class Bitmap {
     dirty = true;
   };
 
+  void stretch_blt(Rect* dst_rect, Bitmap* src_bitmap, Rect* src_rect, int opacity = 255)
+  {
+    sf::IntRect srcRect = src_rect->sfRect();
+    sf::IntRect dstRect = dst_rect->sfRect();
+
+    sf::Texture srcText = src_bitmap->renderTexture.getTexture();
+    sf::Sprite spr(srcText, srcRect);
+    sf::Color color(255, 255, 255, opacity);
+
+    float scaleX = (float)dstRect.width / (float)srcRect.width;
+    float scaleY = (float)dstRect.height / (float)srcRect.height;
+
+    spr.setPosition(dstRect.left, dstRect.top);
+    spr.setScale(scaleX, scaleY);
+    spr.setColor(color);
+
+    renderTexture.draw(spr, sf::BlendNone);
+    renderTexture.display();
+    dirty = true;
+  };
+
   void stretch_blt(){};
 
   void clear()
