@@ -151,6 +151,9 @@ class Bitmap {
 
   void clear()
   {
+    renderTexture.clear(sf::Color::Transparent);
+    renderTexture.display();
+    dirty = true;
   }
 
   Color* get_pixel(unsigned int _x, unsigned int _y)
