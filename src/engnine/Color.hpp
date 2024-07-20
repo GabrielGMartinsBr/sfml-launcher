@@ -12,8 +12,6 @@ namespace Eng {
 
 class Color {
  public:
-  VALUE ptr;
-
   static Color *deserialize(const char *data, int len)
   {
     if (len < 32) {
@@ -25,11 +23,14 @@ class Color {
     color->red = MarshalUtils::readDouble(&data);
     color->green = MarshalUtils::readDouble(&data);
     color->blue = MarshalUtils::readDouble(&data);
+    color->alpha = MarshalUtils::readDouble(&data);
 
     color->syncSfColor();
 
     return color;
   }
+
+  VALUE ptr;
 
   unsigned int red = 0;
   unsigned int green = 0;

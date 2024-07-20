@@ -1,8 +1,8 @@
 #pragma once
 
-#include <iostream>
-
+#include "RbUtils.hpp"
 #include "engnine/Tone.hpp"
+#include "integrator/Convert.hpp"
 #include "ruby.h"
 
 namespace It {
@@ -14,7 +14,9 @@ class Tone {
   {
     VALUE rbc_Tone = rb_define_class("Tone", rb_cObject);
 
-    rb_define_method(rbc_Tone, "initialize", RUBY_METHOD_FUNC(method_initialize), 3);
+    rb_define_module_function(rbc_Tone, "_load", RUBY_METHOD_FUNC(method_load), 1);
+
+    rb_define_method(rbc_Tone, "initialize", RUBY_METHOD_FUNC(method_initialize), -1);
 
     rb_define_method(rbc_Tone, "red", RUBY_METHOD_FUNC(attrGet_red), 0);
     rb_define_method(rbc_Tone, "red=", RUBY_METHOD_FUNC(attrSet_red), 1);
@@ -29,25 +31,44 @@ class Tone {
   }
 
  private:
-
-  static VALUE alloc(VALUE self)
+  static VALUE method_load(VALUE self, VALUE marshaled_data)
   {
-    return self;
+    Check_Type(marshaled_data, T_STRING);
+    const char *data = RSTRING_PTR(marshaled_data);
+    int len = RSTRING_LEN(marshaled_data);
+
+    Eng::Tone *tone = Eng::Tone::deserialize(data, len);
+
+    VALUE table_obj = Data_Wrap_Struct(self, NULL, free, tone);
+    return table_obj;
   }
 
-  static VALUE method_initialize(VALUE self, VALUE p_r, VALUE p_g, VALUE p_b)
+  static VALUE method_initialize(int argc, VALUE *argv, VALUE self)
   {
-    Check_Type(p_r, T_FIXNUM);
-    Check_Type(p_g, T_FIXNUM);
-    Check_Type(p_b, T_FIXNUM);
+    VALUE _red, _green, _blue, _gray;
+    Eng::Tone *instance;
 
-    int r = FIX2INT(p_r);
-    int g = FIX2INT(p_g);
-    int b = FIX2INT(p_b);
+    if (argc == 3) {
+      rb_scan_args(argc, argv, "3", &_red, &_green, &_blue);
+      int red = Convert::toCInt(_red);
+      int green = Convert::toCInt(_green);
+      int blue = Convert::toCInt(_blue);
+      instance = new Eng::Tone(red, green, blue);
+    } else if (argc == 4) {
+      rb_scan_args(argc, argv, "4", &_red, &_green, &_blue, &_gray);
+      int red = Convert::toCInt(_red);
+      int green = Convert::toCInt(_green);
+      int blue = Convert::toCInt(_blue);
+      int gray = Convert::toCInt(_gray);
+      instance = new Eng::Tone(red, green, blue, gray);
+    } else {
+      RbUtils::raiseRuntimeException(
+        "Tone initialize takes 3 or 4 argument, but " + std::to_string(argc) + " were received."
+      );
+      return Qnil;
+    }
 
-    Eng::Tone *instance = new Eng::Tone(r, g, b);
     DATA_PTR(self) = instance;
-
     return self;
   }
 
