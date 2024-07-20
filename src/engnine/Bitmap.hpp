@@ -114,7 +114,17 @@ class Bitmap {
     return Rect(0, 0, width, height);
   };
 
-  void blt(){};
+  void blt(int x, int y, Bitmap* src_bitmap, Rect* src_rect, int opacity = 255)
+  {
+    sf::Texture srcText = src_bitmap->renderTexture.getTexture();
+    sf::Sprite spr(srcText, src_rect->sfRect());
+    sf::Color color(255, 255, 255, opacity);
+    spr.setPosition(x, y);
+    spr.setColor(color);
+    renderTexture.draw(spr, sf::BlendNone);
+    renderTexture.display();
+    dirty = true;
+  };
 
   void stretch_blt(){};
 

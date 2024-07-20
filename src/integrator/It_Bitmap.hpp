@@ -4,6 +4,7 @@
 #include "RbUtils.hpp"
 #include "base/Log.hpp"
 #include "engnine/Bitmap.hpp"
+#include "engnine/Rect.hpp"
 #include "integrator/It_Color.hpp"
 #include "integrator/It_Rect.hpp"
 #include "ruby.h"
@@ -41,6 +42,8 @@ class Bitmap {
     rb_define_method(bitmapClass, "text_size", RUBY_METHOD_FUNC(method_text_size), 1);
 
     rb_define_method(bitmapClass, "rect", RUBY_METHOD_FUNC(getter_rect), 0);
+
+    rb_define_method(bitmapClass, "blt", RUBY_METHOD_FUNC(method_blt), -1);
   }
 
   static VALUE getRbClass()
@@ -340,6 +343,42 @@ class Bitmap {
     Eng::Rect *rect = inst->get_text_size(str);
     VALUE rectObj = It::Rect::getRubyObject(rect);
     return rectObj;
+  }
+
+  static VALUE method_blt(int argc, VALUE *argv, VALUE self)
+  {
+    Eng::Bitmap *inst = (Eng::Bitmap *)DATA_PTR(self);
+    VALUE _x, _y, _src_bitmap, _src_rect, _opacity;
+
+    if (argc == 4) {
+      rb_scan_args(argc, argv, "4", &_x, &_y, &_src_bitmap, &_src_rect);
+
+      int x = Convert::toCInt(_x);
+      int y = Convert::toCInt(_y);
+      Eng::Bitmap *src_bitmap = (Eng::Bitmap *)DATA_PTR(_src_bitmap);
+      Eng::Rect *src_rect = (Eng::Rect *)DATA_PTR(_src_rect);
+
+      inst->blt(x, y, src_bitmap, src_rect);
+      return Qnil;
+    }
+
+    if (argc == 5) {
+      rb_scan_args(argc, argv, "5", &_x, &_y, &_src_bitmap, &_src_rect, &_opacity);
+
+      int x = Convert::toCInt(_x);
+      int y = Convert::toCInt(_y);
+      int opacity = Convert::toCInt(_opacity);
+      Eng::Bitmap *src_bitmap = (Eng::Bitmap *)DATA_PTR(_src_bitmap);
+      Eng::Rect *src_rect = (Eng::Rect *)DATA_PTR(_src_rect);
+
+      inst->blt(x, y, src_bitmap, src_rect, opacity);
+
+      return Qnil;
+    }
+
+    RbUtils::raiseRuntimeException("Bad number of arguments was receive.");
+
+    return Qnil;
   }
 };
 
