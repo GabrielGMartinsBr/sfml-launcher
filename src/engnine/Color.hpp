@@ -6,11 +6,11 @@
 #include <stdexcept>
 
 #include "base/MarshalUtils.hpp"
-#include "ruby.h"
+#include "engnine/EngineBase.hpp"
 
 namespace Eng {
 
-class Color {
+class Color : public EngineBase {
  public:
   static Color *deserialize(const char *data, int len)
   {
@@ -30,8 +30,6 @@ class Color {
     return color;
   }
 
-  VALUE ptr;
-
   unsigned int red = 0;
   unsigned int green = 0;
   unsigned int blue = 0;
@@ -42,14 +40,10 @@ class Color {
     syncSfColor();
   }
 
-  Color(unsigned int r, unsigned int g, unsigned int b) :
-      Color(r, g, b, 255)
+  Color(unsigned int red, unsigned int green, unsigned int blue, unsigned int alpha = 255) :
+      Color()
   {
-  }
-
-  Color(unsigned int r, unsigned int g, unsigned int b, unsigned int a)
-  {
-    set(r, g, b, a);
+    set(red, green, blue, alpha);
   }
 
   void set(unsigned int r, unsigned int g, unsigned int b)

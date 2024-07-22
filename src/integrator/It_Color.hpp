@@ -32,9 +32,32 @@ class Color {
     rb_define_method(colorClass, "set", RUBY_METHOD_FUNC(method_set), 3);
   }
 
+  // Utils
+
   static VALUE getRbClass()
   {
     return rb_const_get(rb_cObject, rb_intern("Color"));
+  }
+
+  static VALUE createRubyObject(Eng::Color *inst)
+  {
+    return Data_Wrap_Struct(getRbClass(), 0, free, inst);
+  }
+
+  static VALUE getRubyObject(Eng::Color *inst)
+  {
+    if (inst == nullptr) {
+      return Qnil;
+    }
+    if (inst->ptr == Qnil) {
+      inst->ptr = createRubyObject(inst);
+    }
+    return inst->ptr;
+  }
+
+  static Eng::Color *getObjectValue(VALUE rbObj)
+  {
+    return (Eng::Color *)DATA_PTR(rbObj);
   }
 
  private:
@@ -47,8 +70,8 @@ class Color {
 
     Eng::Color *color = Eng::Color::deserialize(data, len);
 
-    VALUE table_obj = Data_Wrap_Struct(self, NULL, free, color);
-    return table_obj;
+    VALUE rubyObj = Data_Wrap_Struct(self, NULL, free, color);
+    return rubyObj;
   }
 
   static VALUE alloc(VALUE self)

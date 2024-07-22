@@ -3,11 +3,11 @@
 #include <stdexcept>
 
 #include "MarshalUtils.hpp"
-#include "ruby.h"
+#include "engnine/EngineBase.hpp"
 
 namespace Eng {
 
-class Tone {
+class Tone : public EngineBase {
  public:
   static Tone *deserialize(const char *data, int len)
   {
@@ -24,8 +24,6 @@ class Tone {
 
     return tone;
   }
-
-  VALUE ptr;
 
   int red = 0;
   int green = 0;

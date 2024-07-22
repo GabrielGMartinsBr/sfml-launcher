@@ -37,30 +37,32 @@ class Viewport {
     rb_define_method(viewportClass, "oy=", RUBY_METHOD_FUNC(attrSet_oy), 1);
   }
 
-  inline static VALUE getRbClass()
+  // Utils
+
+  static VALUE getRbClass()
   {
     return rb_const_get(rb_cObject, rb_intern("Viewport"));
   }
 
-  static inline VALUE createRubyObject(Eng::Viewport *instPtr)
+  static VALUE createRubyObject(Eng::Viewport *inst)
   {
-    return Data_Wrap_Struct(getRbClass(), 0, free, instPtr);
+    return Data_Wrap_Struct(getRbClass(), 0, free, inst);
   }
 
-  static VALUE getRubyObject(Eng::Viewport *viewport)
+  static VALUE getRubyObject(Eng::Viewport *inst)
   {
-    if (viewport == nullptr) {
+    if (inst == nullptr) {
       return Qnil;
     }
-    if (viewport->ptr == Qnil) {
-      viewport->ptr = createRubyObject(viewport);
+    if (inst->ptr == Qnil) {
+      inst->ptr = createRubyObject(inst);
     }
-    return viewport->ptr;
+    return inst->ptr;
   }
 
-  static inline Eng::Viewport *getObjectValue(VALUE self)
+  static Eng::Viewport *getObjectValue(VALUE rbObj)
   {
-    return (Eng::Viewport *)DATA_PTR(self);
+    return (Eng::Viewport *)DATA_PTR(rbObj);
   }
 
   static inline bool isInstanceOf(VALUE inst)
@@ -109,6 +111,7 @@ class Viewport {
     Eng::Engine::getInstance().addViewport(inst);
 
     DATA_PTR(self) = inst.get();
+    inst->ptr = self;
 
     return self;
   }
@@ -126,6 +129,7 @@ class Viewport {
     Eng::Engine::getInstance().addViewport(inst);
 
     DATA_PTR(self) = inst.get();
+    inst->ptr = self;
 
     return self;
   }

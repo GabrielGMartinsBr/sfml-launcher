@@ -30,6 +30,34 @@ class Tone {
     rb_define_method(rbc_Tone, "set", RUBY_METHOD_FUNC(method_set), 3);
   }
 
+  // Utils
+
+  static VALUE getRbClass()
+  {
+    return rb_const_get(rb_cObject, rb_intern("Tone"));
+  }
+
+  static VALUE createRubyObject(Eng::Tone *inst)
+  {
+    return Data_Wrap_Struct(getRbClass(), 0, free, inst);
+  }
+
+  static VALUE getRubyObject(Eng::Tone *inst)
+  {
+    if (inst == nullptr) {
+      return Qnil;
+    }
+    if (inst->ptr == Qnil) {
+      inst->ptr = createRubyObject(inst);
+    }
+    return inst->ptr;
+  }
+
+  static Eng::Tone *getObjectValue(VALUE rbObj)
+  {
+    return (Eng::Tone *)DATA_PTR(rbObj);
+  }
+
  private:
   static VALUE method_load(VALUE self, VALUE marshaled_data)
   {
@@ -39,8 +67,8 @@ class Tone {
 
     Eng::Tone *tone = Eng::Tone::deserialize(data, len);
 
-    VALUE table_obj = Data_Wrap_Struct(self, NULL, free, tone);
-    return table_obj;
+    VALUE rubyObj = Data_Wrap_Struct(self, NULL, free, tone);
+    return rubyObj;
   }
 
   static VALUE method_initialize(int argc, VALUE *argv, VALUE self)

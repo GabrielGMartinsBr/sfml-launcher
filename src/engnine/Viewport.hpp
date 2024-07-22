@@ -2,15 +2,14 @@
 
 #include <SFML/Graphics/Rect.hpp>
 
+#include "engnine/EngineBase.hpp"
 #include "engnine/RGSSViewport.hpp"
 #include "engnine/Rect.hpp"
-#include "ruby.h"
 
 namespace Eng {
 
-class Viewport {
+class Viewport : public EngineBase {
  public:
-  VALUE ptr;
 
   Viewport(int x, int y, int width, int height) :
       rect(x, y, width, height),
