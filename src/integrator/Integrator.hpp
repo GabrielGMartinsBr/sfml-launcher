@@ -13,6 +13,7 @@
 #include "integrator/It_FileTest.hpp"
 #include "integrator/It_Graphics.hpp"
 #include "integrator/It_Input.hpp"
+#include "integrator/It_Plane.hpp"
 #include "integrator/It_Rect.hpp"
 #include "integrator/It_Sprite.hpp"
 #include "integrator/It_Table.hpp"
@@ -55,6 +56,7 @@ class Integrator {
     It::Window::integrate();
     It::Font::integrate();
     It::Table::integrate();
+    It::Plane::integrate();
 
     loadBuiltInScripts();
 

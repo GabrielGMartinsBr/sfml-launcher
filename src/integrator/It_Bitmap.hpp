@@ -48,9 +48,32 @@ class Bitmap {
     rb_define_method(bitmapClass, "stretch_blt", RUBY_METHOD_FUNC(method_stretch_blt), -1);
   }
 
+  // Utils
+
   static VALUE getRbClass()
   {
     return rb_const_get(rb_cObject, rb_intern("Bitmap"));
+  }
+
+  static VALUE createRubyObject(Eng::Bitmap *inst)
+  {
+    return Data_Wrap_Struct(getRbClass(), 0, free, inst);
+  }
+
+  static VALUE getRubyObject(Eng::Bitmap *inst)
+  {
+    if (inst == nullptr) {
+      return Qnil;
+    }
+    if (inst->ptr == Qnil) {
+      inst->ptr = createRubyObject(inst);
+    }
+    return inst->ptr;
+  }
+
+  static Eng::Bitmap *getObjectValue(VALUE rbObj)
+  {
+    return (Eng::Bitmap *)DATA_PTR(rbObj);
   }
 
  private:
