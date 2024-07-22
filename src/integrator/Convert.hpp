@@ -25,6 +25,12 @@ struct Convert {
     return FIX2INT(v);
   }
 
+  static unsigned int toCUnsignedInt(VALUE v)
+  {
+    Check_Type(v, T_FIXNUM);
+    return FIX2UINT(v);
+  }
+
   static double toCDouble(VALUE v)
   {
     Check_Type(v, T_FLOAT);
