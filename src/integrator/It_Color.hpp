@@ -60,6 +60,11 @@ class Color {
     return (Eng::Color *)DATA_PTR(rbObj);
   }
 
+  static inline bool isInstance(VALUE inst)
+  {
+    return rb_class_of(inst) == getRbClass();
+  }
+
  private:
 
   static VALUE method_load(VALUE self, VALUE marshaled_data)

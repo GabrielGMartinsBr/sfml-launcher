@@ -1,6 +1,7 @@
 #pragma once
 
 #include "RbUtils.hpp"
+#include "engnine/Color.hpp"
 #include "engnine/Sprite.hpp"
 #include "engnine/Viewport.hpp"
 #include "integrator/Convert.hpp"
@@ -79,9 +80,10 @@ class Sprite {
     // Methods
 
     rb_define_method(spriteClass, "viewport", RUBY_METHOD_FUNC(method_viewport), 0);
-
     rb_define_method(spriteClass, "dispose", RUBY_METHOD_FUNC(method_dispose), 0);
     rb_define_method(spriteClass, "disposed", RUBY_METHOD_FUNC(method_disposed), 0);
+    rb_define_method(spriteClass, "flash", RUBY_METHOD_FUNC(method_flash), 2);
+    rb_define_method(spriteClass, "update", RUBY_METHOD_FUNC(method_update), 0);
   }
 
   // Utils
@@ -547,7 +549,7 @@ class Sprite {
   static VALUE method_dispose(VALUE self)
   {
     Eng::Sprite *inst = (Eng::Sprite *)DATA_PTR(self);
-    inst->dispose();
+    inst->method_dispose();
     return Qnil;
   }
 
@@ -558,8 +560,49 @@ class Sprite {
   static VALUE method_disposed(VALUE self)
   {
     Eng::Sprite *inst = (Eng::Sprite *)DATA_PTR(self);
-    bool isDisposed = inst->disposed();
+    bool isDisposed = inst->method_disposed();
     return isDisposed ? Qtrue : Qfalse;
+  }
+
+  /*
+    Method flash
+  */
+
+  static VALUE method_flash(VALUE self, VALUE _color, VALUE _time)
+  {
+    if (_color == Qnil || !Color::isInstance(_color)) {
+      RbUtils::raiseCantConvertError(
+        rb_class_of(_color),
+        Color::getRbClass()
+      );
+      return Qnil;
+    }
+
+    int time = Convert::toCInt(_time);
+    Eng::Color *color = Color::getObjectValue(_color);
+
+    if (color == nullptr) {
+      RbUtils::raiseRuntimeException(
+        "Sprite flash method received a null pointer color arg."
+      );
+      return Qnil;
+    }
+
+    Eng::Sprite *inst = getInstance(self);
+    inst->method_flash(color, time);
+
+    return Qnil;
+  }
+
+  /*
+    Method update
+  */
+
+  static VALUE method_update(VALUE self)
+  {
+    Eng::Sprite *inst = getInstance(self);
+    inst->method_update();
+    return Qnil;
   }
 };
 

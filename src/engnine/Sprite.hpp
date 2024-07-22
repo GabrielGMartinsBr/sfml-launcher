@@ -272,10 +272,15 @@ class Sprite : Drawable, public EngineBase {
 
   /* --------------------------------------------------- */
 
-  /*
-    Attr opacity
-  */
-  unsigned int getter_opacity() { return opacity; }
+  // Getter opacity
+
+  unsigned int getter_opacity()
+  {
+    return opacity;
+  }
+
+  // Setter opacity
+
   void setter_opacity(unsigned int v)
   {
     Num::clamp(v, 0u, 255u);
@@ -340,14 +345,24 @@ class Sprite : Drawable, public EngineBase {
       RGSS Methods
   */
 
-  void dispose()
+  void method_dispose()
   {
     isDisposed = true;
   }
 
-  bool disposed()
+  bool method_disposed()
   {
     return isDisposed;
+  }
+
+  void method_flash(Color *color, int time)
+  {
+    Log::out() << "Sprite method flash was called but it's not implemented yet.";
+  }
+
+  void method_update()
+  {
+    Log::out() << "Sprite method update was called but it's not implemented yet.";
   }
 
   /* --------------------------------------------------- */
