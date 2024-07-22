@@ -12,7 +12,11 @@ class Rect {
   {
     VALUE rectClass = rb_define_class("Rect", rb_cObject);
 
+    // Initialize
+
     rb_define_method(rectClass, "initialize", RUBY_METHOD_FUNC(initialize), 4);
+
+    // Props
 
     rb_define_method(rectClass, "x", RUBY_METHOD_FUNC(getter_x), 0);
     rb_define_method(rectClass, "x=", RUBY_METHOD_FUNC(setter_x), 1);
@@ -26,9 +30,15 @@ class Rect {
     rb_define_method(rectClass, "height", RUBY_METHOD_FUNC(getter_height), 0);
     rb_define_method(rectClass, "height=", RUBY_METHOD_FUNC(setter_height), 1);
 
+    // Methods
+
     rb_define_method(rectClass, "set", RUBY_METHOD_FUNC(method_set), 4);
     rb_define_method(rectClass, "empty", RUBY_METHOD_FUNC(method_empty), 0);
+
+    rb_define_method(rectClass, "to_s", RUBY_METHOD_FUNC(method_to_s), 0);
   }
+
+  // Utils
 
   static VALUE getRbClass()
   {
@@ -56,7 +66,17 @@ class Rect {
     return (Eng::Rect *)DATA_PTR(self);
   }
 
+  static inline bool isInstance(VALUE inst)
+  {
+    return rb_class_of(inst) == getRbClass();
+  }
+
  private:
+
+  static Eng::Rect *getInstance(VALUE self)
+  {
+    return (Eng::Rect *)DATA_PTR(self);
+  }
 
   static VALUE initialize(VALUE self, VALUE _x, VALUE _y, VALUE _w, VALUE _h)
   {
@@ -158,11 +178,22 @@ class Rect {
   }
 
   // Method empty
+
   static VALUE method_empty(VALUE self)
   {
     auto inst = It::Rect::getObjectValue(self);
     inst->method_empty();
     return self;
+  }
+
+  // Method to_s
+
+  static VALUE method_to_s(VALUE self)
+  {
+    Eng::Rect *inst = getInstance(self);
+    char buffer[64];
+    sprintf(buffer, "(%i, %i, %i, %i)", inst->getter_x(), inst->getter_y(), inst->getter_width(), inst->getter_height());
+    return Convert::toRubyString(buffer);
   }
 };
 
