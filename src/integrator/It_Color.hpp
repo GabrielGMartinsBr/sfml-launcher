@@ -109,16 +109,16 @@ class Color {
 
     if (argc == 3) {
       rb_scan_args(argc, argv, "3", &rb_r, &rb_g, &rb_b);
-      int r = Convert::toCInt(rb_r);
-      int g = Convert::toCInt(rb_g);
-      int b = Convert::toCInt(rb_b);
+      double r = Convert::toCDouble2(rb_r);
+      double g = Convert::toCDouble2(rb_g);
+      double b = Convert::toCDouble2(rb_b);
       instance = new Eng::Color(r, g, b);
     } else if (argc == 4) {
       rb_scan_args(argc, argv, "4", &rb_r, &rb_g, &rb_b, &rb_a);
-      int r = Convert::toCInt(rb_r);
-      int g = Convert::toCInt(rb_g);
-      int b = Convert::toCInt(rb_b);
-      int a = Convert::toCInt(rb_a);
+      double r = Convert::toCDouble2(rb_r);
+      double g = Convert::toCDouble2(rb_g);
+      double b = Convert::toCDouble2(rb_b);
+      double a = Convert::toCDouble2(rb_a);
       instance = new Eng::Color(r, g, b, a);
     } else {
       RbUtils::raiseRuntimeException(
@@ -151,7 +151,7 @@ class Color {
   static VALUE setter_red(VALUE self, VALUE value)
   {
     Eng::Color *inst = getObjectValue(self);
-    inst->red = Convert::toCDouble(value);
+    inst->red = Convert::toCDouble2(value);
     return value;
   }
 
@@ -170,7 +170,7 @@ class Color {
   static VALUE setter_green(VALUE self, VALUE value)
   {
     Eng::Color *inst = getObjectValue(self);
-    inst->green = Convert::toCDouble(value);
+    inst->green = Convert::toCDouble2(value);
     return value;
   }
 
@@ -189,7 +189,7 @@ class Color {
   static VALUE setter_blue(VALUE self, VALUE value)
   {
     Eng::Color *inst = getObjectValue(self);
-    inst->blue = Convert::toCDouble(value);
+    inst->blue = Convert::toCDouble2(value);
     return value;
   }
 
@@ -208,7 +208,7 @@ class Color {
   static VALUE setter_alpha(VALUE self, VALUE value)
   {
     Eng::Color *inst = getObjectValue(self);
-    inst->alpha = Convert::toCDouble(value);
+    inst->alpha = Convert::toCDouble2(value);
     return value;
   }
 
@@ -225,19 +225,19 @@ class Color {
 
     if (argc == 3) {
       rb_scan_args(argc, argv, "3", &_r, &_g, &_b);
-      float r = Convert::toCDouble(_r);
-      float g = Convert::toCDouble(_g);
-      float b = Convert::toCDouble(_b);
+      float r = Convert::toCDouble2(_r);
+      float g = Convert::toCDouble2(_g);
+      float b = Convert::toCDouble2(_b);
       inst->set(r, g, b);
       return Qnil;
     }
 
     if (argc == 4) {
       rb_scan_args(argc, argv, "3", &_r, &_g, &_b, &_a);
-      float r = Convert::toCDouble(_r);
-      float g = Convert::toCDouble(_g);
-      float b = Convert::toCDouble(_b);
-      float a = Convert::toCDouble(_a);
+      float r = Convert::toCDouble2(_r);
+      float g = Convert::toCDouble2(_g);
+      float b = Convert::toCDouble2(_b);
+      float a = Convert::toCDouble2(_a);
       inst->set(r, g, b, a);
       return Qnil;
     }

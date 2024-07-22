@@ -37,6 +37,18 @@ struct Convert {
     return NUM2DBL(v);
   }
 
+  static double toCDouble2(VALUE v)
+  {
+    if (TYPE(v) == T_FLOAT) {
+      return NUM2DBL(v);
+    } else if (TYPE(v) == T_FIXNUM) {
+      return static_cast<double>(FIX2LONG(v));
+    } else {
+      rb_raise(rb_eTypeError, "Expected Float or Fixnum");
+      return 0.0;
+    }
+  }
+
   static VALUE toRubyNumber(int v)
   {
     return INT2FIX(v);

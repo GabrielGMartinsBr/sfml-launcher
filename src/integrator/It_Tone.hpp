@@ -109,16 +109,16 @@ class Tone {
 
     if (argc == 3) {
       rb_scan_args(argc, argv, "3", &rb_r, &rb_g, &rb_b);
-      int r = Convert::toCInt(rb_r);
-      int g = Convert::toCInt(rb_g);
-      int b = Convert::toCInt(rb_b);
+      double r = Convert::toCDouble2(rb_r);
+      double g = Convert::toCDouble2(rb_g);
+      double b = Convert::toCDouble2(rb_b);
       instance = new Eng::Tone(r, g, b);
     } else if (argc == 4) {
       rb_scan_args(argc, argv, "4", &rb_r, &rb_g, &rb_b, &rb_a);
-      int r = Convert::toCInt(rb_r);
-      int g = Convert::toCInt(rb_g);
-      int b = Convert::toCInt(rb_b);
-      int a = Convert::toCInt(rb_a);
+      double r = Convert::toCDouble2(rb_r);
+      double g = Convert::toCDouble2(rb_g);
+      double b = Convert::toCDouble2(rb_b);
+      double a = Convert::toCDouble2(rb_a);
       instance = new Eng::Tone(r, g, b, a);
     } else {
       RbUtils::raiseRuntimeException(

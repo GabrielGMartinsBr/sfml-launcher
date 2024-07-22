@@ -35,9 +35,9 @@ class Tone : public EngineBase {
     set(red, green, blue, gray);
   }
 
-  Tone()
+  Tone() :
+      Tone(0, 0, 0)
   {
-    Tone(0, 0, 0, 0);
   }
 
   void set(float red, float green, float blue, float gray = 0)
