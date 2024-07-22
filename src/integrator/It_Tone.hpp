@@ -1,8 +1,8 @@
 #pragma once
 
+#include "Convert.hpp"
 #include "RbUtils.hpp"
 #include "engnine/Tone.hpp"
-#include "integrator/Convert.hpp"
 #include "ruby.h"
 
 namespace It {
@@ -12,22 +12,35 @@ class Tone {
 
   static void integrate()
   {
-    VALUE rbc_Tone = rb_define_class("Tone", rb_cObject);
+    VALUE toneClass = rb_define_class("Tone", rb_cObject);
 
-    rb_define_module_function(rbc_Tone, "_load", RUBY_METHOD_FUNC(method_load), 1);
+    // Serialize
 
-    rb_define_method(rbc_Tone, "initialize", RUBY_METHOD_FUNC(method_initialize), -1);
+    rb_define_module_function(toneClass, "_load", RUBY_METHOD_FUNC(method_load), 1);
 
-    rb_define_method(rbc_Tone, "red", RUBY_METHOD_FUNC(attrGet_red), 0);
-    rb_define_method(rbc_Tone, "red=", RUBY_METHOD_FUNC(attrSet_red), 1);
+    // Initialize
 
-    rb_define_method(rbc_Tone, "green", RUBY_METHOD_FUNC(attrGet_green), 0);
-    rb_define_method(rbc_Tone, "green=", RUBY_METHOD_FUNC(attrSet_green), 1);
+    rb_define_method(toneClass, "initialize", RUBY_METHOD_FUNC(method_initialize), -1);
 
-    rb_define_method(rbc_Tone, "blue", RUBY_METHOD_FUNC(attrGet_blue), 0);
-    rb_define_method(rbc_Tone, "blue=", RUBY_METHOD_FUNC(attrSet_blue), 1);
+    // Props
 
-    rb_define_method(rbc_Tone, "set", RUBY_METHOD_FUNC(method_set), 3);
+    rb_define_method(toneClass, "red", RUBY_METHOD_FUNC(setter_red), 0);
+    rb_define_method(toneClass, "red=", RUBY_METHOD_FUNC(getter_red), 1);
+
+    rb_define_method(toneClass, "green", RUBY_METHOD_FUNC(setter_green), 0);
+    rb_define_method(toneClass, "green=", RUBY_METHOD_FUNC(getter_green), 1);
+
+    rb_define_method(toneClass, "blue", RUBY_METHOD_FUNC(setter_blue), 0);
+    rb_define_method(toneClass, "blue=", RUBY_METHOD_FUNC(getter_blue), 1);
+
+    rb_define_method(toneClass, "gray", RUBY_METHOD_FUNC(setter_gray), 0);
+    rb_define_method(toneClass, "gray=", RUBY_METHOD_FUNC(getter_gray), 1);
+
+    // Methods
+
+    rb_define_method(toneClass, "set", RUBY_METHOD_FUNC(method_set), -1);
+
+    rb_define_method(toneClass, "to_s", RUBY_METHOD_FUNC(method_to_s), 0);
   }
 
   // Utils
@@ -58,7 +71,18 @@ class Tone {
     return (Eng::Tone *)DATA_PTR(rbObj);
   }
 
+  static inline bool isInstance(VALUE inst)
+  {
+    return rb_class_of(inst) == getRbClass();
+  }
+
  private:
+
+  static Eng::Tone *getInstance(VALUE self)
+  {
+    return (Eng::Tone *)DATA_PTR(self);
+  }
+
   static VALUE method_load(VALUE self, VALUE marshaled_data)
   {
     Check_Type(marshaled_data, T_STRING);
@@ -71,95 +95,167 @@ class Tone {
     return rubyObj;
   }
 
+  static VALUE alloc(VALUE self)
+  {
+    return self;
+  }
+
+  // Initialize
+
   static VALUE method_initialize(int argc, VALUE *argv, VALUE self)
   {
-    VALUE _red, _green, _blue, _gray;
     Eng::Tone *instance;
+    VALUE rb_r, rb_g, rb_b, rb_a;
 
     if (argc == 3) {
-      rb_scan_args(argc, argv, "3", &_red, &_green, &_blue);
-      int red = Convert::toCInt(_red);
-      int green = Convert::toCInt(_green);
-      int blue = Convert::toCInt(_blue);
-      instance = new Eng::Tone(red, green, blue);
+      rb_scan_args(argc, argv, "3", &rb_r, &rb_g, &rb_b);
+      int r = Convert::toCInt(rb_r);
+      int g = Convert::toCInt(rb_g);
+      int b = Convert::toCInt(rb_b);
+      instance = new Eng::Tone(r, g, b);
     } else if (argc == 4) {
-      rb_scan_args(argc, argv, "4", &_red, &_green, &_blue, &_gray);
-      int red = Convert::toCInt(_red);
-      int green = Convert::toCInt(_green);
-      int blue = Convert::toCInt(_blue);
-      int gray = Convert::toCInt(_gray);
-      instance = new Eng::Tone(red, green, blue, gray);
+      rb_scan_args(argc, argv, "4", &rb_r, &rb_g, &rb_b, &rb_a);
+      int r = Convert::toCInt(rb_r);
+      int g = Convert::toCInt(rb_g);
+      int b = Convert::toCInt(rb_b);
+      int a = Convert::toCInt(rb_a);
+      instance = new Eng::Tone(r, g, b, a);
     } else {
       RbUtils::raiseRuntimeException(
-        "Tone initialize takes 3 or 4 argument, but " + std::to_string(argc) + " were received."
+        "Tone initialize takes 3 or 4 arguments, but " + std::to_string(argc) + " were received."
       );
       return Qnil;
     }
 
+    instance->ptr = self;
     DATA_PTR(self) = instance;
     return self;
   }
 
-  static VALUE method_set(VALUE self, VALUE p_r, VALUE p_g, VALUE p_b)
+  /*
+      Props
+  */
+
+  // Getter red
+
+  static VALUE getter_red(VALUE self)
   {
-    Eng::Tone *inst = (Eng::Tone *)DATA_PTR(self);
+    Eng::Tone *inst = getObjectValue(self);
+    return Convert::toRubyDouble(
+      inst->red
+    );
+  }
 
-    Check_Type(p_r, T_FIXNUM);
-    Check_Type(p_g, T_FIXNUM);
-    Check_Type(p_b, T_FIXNUM);
+  // Setter red
 
-    int r = FIX2INT(p_r);
-    int g = FIX2INT(p_g);
-    int b = FIX2INT(p_b);
+  static VALUE setter_red(VALUE self, VALUE value)
+  {
+    Eng::Tone *inst = getObjectValue(self);
+    inst->red = Convert::toCDouble(value);
+    return value;
+  }
 
-    inst->set(r, g, b);
+  // Getter green
 
+  static VALUE getter_green(VALUE self)
+  {
+    Eng::Tone *inst = getObjectValue(self);
+    return Convert::toRubyDouble(
+      inst->green
+    );
+  }
+
+  // Setter green
+
+  static VALUE setter_green(VALUE self, VALUE value)
+  {
+    Eng::Tone *inst = getObjectValue(self);
+    inst->green = Convert::toCDouble(value);
+    return value;
+  }
+
+  // Getter blue
+
+  static VALUE getter_blue(VALUE self)
+  {
+    Eng::Tone *inst = getObjectValue(self);
+    return Convert::toRubyDouble(
+      inst->blue
+    );
+  }
+
+  // Setter blue
+
+  static VALUE setter_blue(VALUE self, VALUE value)
+  {
+    Eng::Tone *inst = getObjectValue(self);
+    inst->blue = Convert::toCDouble(value);
+    return value;
+  }
+
+  // Getter gray
+
+  static VALUE getter_gray(VALUE self)
+  {
+    Eng::Tone *inst = getObjectValue(self);
+    return Convert::toRubyDouble(
+      inst->gray
+    );
+  }
+
+  // Setter gray
+
+  static VALUE setter_gray(VALUE self, VALUE value)
+  {
+    Eng::Tone *inst = getObjectValue(self);
+    inst->gray = Convert::toCDouble(value);
+    return value;
+  }
+
+  /*
+      Methods
+  */
+
+  // Method set
+
+  static VALUE method_set(int argc, VALUE *argv, VALUE self)
+  {
+    Eng::Tone *inst = getInstance(self);
+    VALUE _r, _g, _b, _a;
+
+    if (argc == 3) {
+      rb_scan_args(argc, argv, "3", &_r, &_g, &_b);
+      float r = Convert::toCDouble(_r);
+      float g = Convert::toCDouble(_g);
+      float b = Convert::toCDouble(_b);
+      inst->set(r, g, b);
+      return Qnil;
+    }
+
+    if (argc == 4) {
+      rb_scan_args(argc, argv, "3", &_r, &_g, &_b, &_a);
+      float r = Convert::toCDouble(_r);
+      float g = Convert::toCDouble(_g);
+      float b = Convert::toCDouble(_b);
+      float a = Convert::toCDouble(_a);
+      inst->set(r, g, b, a);
+      return Qnil;
+    }
+
+    RbUtils::raiseRuntimeException(
+      "Tone set method takes 3 or 4 arguments, but " + std::to_string(argc) + " were received."
+    );
     return Qnil;
   }
 
-  static VALUE attrGet_red(VALUE self)
-  {
-    Eng::Tone *inst = (Eng::Tone *)DATA_PTR(self);
-    return INT2NUM(inst->red);
-  }
+  // Method to_s
 
-  static VALUE attrSet_red(VALUE self, VALUE value)
+  static VALUE method_to_s(VALUE self)
   {
-    Check_Type(value, T_FIXNUM);
-    int r = NUM2INT(value);
-    Eng::Tone *inst = (Eng::Tone *)DATA_PTR(self);
-    inst->red = r;
-    return value;
-  }
-
-  static VALUE attrGet_green(VALUE self)
-  {
-    Eng::Tone *inst = (Eng::Tone *)DATA_PTR(self);
-    return INT2NUM(inst->green);
-  }
-
-  static VALUE attrSet_green(VALUE self, VALUE value)
-  {
-    Check_Type(value, T_FIXNUM);
-    int r = NUM2INT(value);
-    Eng::Tone *inst = (Eng::Tone *)DATA_PTR(self);
-    inst->green = r;
-    return value;
-  }
-
-  static VALUE attrGet_blue(VALUE self)
-  {
-    Eng::Tone *inst = (Eng::Tone *)DATA_PTR(self);
-    return INT2NUM(inst->blue);
-  }
-
-  static VALUE attrSet_blue(VALUE self, VALUE value)
-  {
-    Check_Type(value, T_FIXNUM);
-    int r = NUM2INT(value);
-    Eng::Tone *inst = (Eng::Tone *)DATA_PTR(self);
-    inst->blue = r;
-    return value;
+    Eng::Tone &i = *getInstance(self);
+    char buffer[64];
+    sprintf(buffer, "(%f, %f, %f, %f)", i.red, i.green, i.blue, i.gray);
+    return Convert::toRubyString(buffer);
   }
 };
 

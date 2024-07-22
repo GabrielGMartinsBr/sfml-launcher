@@ -30,28 +30,28 @@ class Color : public EngineBase {
     return color;
   }
 
-  unsigned int red = 0;
-  unsigned int green = 0;
-  unsigned int blue = 0;
-  unsigned int alpha = 255;
+  float red = 0;
+  float green = 0;
+  float blue = 0;
+  float alpha = 255;
 
   Color()
   {
     syncSfColor();
   }
 
-  Color(unsigned int red, unsigned int green, unsigned int blue, unsigned int alpha = 255) :
+  Color(float red, float green, float blue, float alpha = 255) :
       Color()
   {
     set(red, green, blue, alpha);
   }
 
-  void set(unsigned int r, unsigned int g, unsigned int b)
+  void set(float r, float g, float b)
   {
     set(r, g, b, 255);
   }
 
-  void set(unsigned int r, unsigned int g, unsigned int b, unsigned int a)
+  void set(float r, float g, float b, float a)
   {
     clamp(r);
     clamp(g);
@@ -77,7 +77,7 @@ class Color : public EngineBase {
  private:
   sf::Color sfColor;
 
-  void clamp(unsigned int &v)
+  void clamp(float &v)
   {
     if (v < 0) {
       v = 0;
