@@ -25,9 +25,20 @@ struct Convert {
     return FIX2INT(v);
   }
 
+  static double toCDouble(VALUE v)
+  {
+    Check_Type(v, T_FLOAT);
+    return NUM2DBL(v);
+  }
+
   static VALUE toRubyNumber(int v)
   {
     return INT2FIX(v);
+  }
+
+  static VALUE toRubyDouble(double v)
+  {
+    return rb_float_new(v);
   }
 
   inline static const bool toCBool(VALUE v)
