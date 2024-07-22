@@ -1,9 +1,11 @@
 #pragma once
 
-#include "app.h"
-#include "engnine/Bitmap.hpp"
+#include "RbUtils.hpp"
 #include "engnine/Sprite.hpp"
 #include "engnine/Viewport.hpp"
+#include "integrator/Convert.hpp"
+#include "integrator/It_Bitmap.hpp"
+#include "integrator/It_Rect.hpp"
 #include "integrator/It_Viewport.hpp"
 #include "ruby.h"
 
@@ -19,36 +21,71 @@ class Sprite {
 
     rb_define_method(spriteClass, "initialize", RUBY_METHOD_FUNC(initialize), -1);
 
-    rb_define_method(spriteClass, "x", RUBY_METHOD_FUNC(attrGet_x), 0);
-    rb_define_method(spriteClass, "x=", RUBY_METHOD_FUNC(attrSet_x), 1);
+    rb_define_method(spriteClass, "x", RUBY_METHOD_FUNC(getter_x), 0);
+    rb_define_method(spriteClass, "x=", RUBY_METHOD_FUNC(setter_x), 1);
 
-    rb_define_method(spriteClass, "y", RUBY_METHOD_FUNC(attrGet_y), 0);
-    rb_define_method(spriteClass, "y=", RUBY_METHOD_FUNC(attrSet_y), 1);
+    rb_define_method(spriteClass, "y", RUBY_METHOD_FUNC(getter_y), 0);
+    rb_define_method(spriteClass, "y=", RUBY_METHOD_FUNC(setter_y), 1);
 
-    rb_define_method(spriteClass, "z", RUBY_METHOD_FUNC(attrGet_z), 0);
-    rb_define_method(spriteClass, "z=", RUBY_METHOD_FUNC(attrSet_z), 1);
+    rb_define_method(spriteClass, "z", RUBY_METHOD_FUNC(getter_z), 0);
+    rb_define_method(spriteClass, "z=", RUBY_METHOD_FUNC(setter_z), 1);
 
-    rb_define_method(spriteClass, "ox", RUBY_METHOD_FUNC(attrGet_ox), 0);
-    rb_define_method(spriteClass, "ox=", RUBY_METHOD_FUNC(attrSet_ox), 1);
+    rb_define_method(spriteClass, "ox", RUBY_METHOD_FUNC(getter_ox), 0);
+    rb_define_method(spriteClass, "ox=", RUBY_METHOD_FUNC(setter_ox), 1);
 
-    rb_define_method(spriteClass, "oy", RUBY_METHOD_FUNC(attrGet_oy), 0);
-    rb_define_method(spriteClass, "oy=", RUBY_METHOD_FUNC(attrSet_oy), 1);
+    rb_define_method(spriteClass, "oy", RUBY_METHOD_FUNC(getter_oy), 0);
+    rb_define_method(spriteClass, "oy=", RUBY_METHOD_FUNC(setter_oy), 1);
 
-    rb_define_method(spriteClass, "opacity", RUBY_METHOD_FUNC(attrGet_opacity), 0);
-    rb_define_method(spriteClass, "opacity=", RUBY_METHOD_FUNC(attrSet_opacity), 1);
+    rb_define_method(spriteClass, "zoom_x", RUBY_METHOD_FUNC(getter_zoom_x), 0);
+    rb_define_method(spriteClass, "zoom_x=", RUBY_METHOD_FUNC(setter_zoom_x), 1);
 
-    rb_define_method(spriteClass, "blend_type", RUBY_METHOD_FUNC(attrGet_blend_type), 0);
-    rb_define_method(spriteClass, "blend_type=", RUBY_METHOD_FUNC(attrSet_blend_type), 1);
-    rb_define_method(spriteClass, "bitmap", RUBY_METHOD_FUNC(attrGet_bitmap), 0);
-    rb_define_method(spriteClass, "bitmap=", RUBY_METHOD_FUNC(attrSet_bitmap), 1);
+    rb_define_method(spriteClass, "zoom_y", RUBY_METHOD_FUNC(getter_zoom_y), 0);
+    rb_define_method(spriteClass, "zoom_y=", RUBY_METHOD_FUNC(setter_zoom_y), 1);
 
-    rb_define_method(spriteClass, "src_rect", RUBY_METHOD_FUNC(attrGet_src_rect), 0);
-    rb_define_method(spriteClass, "src_rect=", RUBY_METHOD_FUNC(attrSet_src_rect), 1);
+    rb_define_method(spriteClass, "opacity", RUBY_METHOD_FUNC(getter_opacity), 0);
+    rb_define_method(spriteClass, "opacity=", RUBY_METHOD_FUNC(setter_opacity), 1);
 
-    rb_define_method(spriteClass, "viewport", RUBY_METHOD_FUNC(attrGet_viewport), 0);
+    rb_define_method(spriteClass, "blend_type", RUBY_METHOD_FUNC(getter_blend_type), 0);
+    rb_define_method(spriteClass, "blend_type=", RUBY_METHOD_FUNC(setter_blend_type), 1);
+
+    rb_define_method(spriteClass, "bitmap", RUBY_METHOD_FUNC(getter_bitmap), 0);
+    rb_define_method(spriteClass, "bitmap=", RUBY_METHOD_FUNC(setter_bitmap), 1);
+
+    rb_define_method(spriteClass, "src_rect", RUBY_METHOD_FUNC(getter_src_rect), 0);
+    rb_define_method(spriteClass, "src_rect=", RUBY_METHOD_FUNC(setter_src_rect), 1);
+
+    rb_define_method(spriteClass, "viewport", RUBY_METHOD_FUNC(method_viewport), 0);
 
     rb_define_method(spriteClass, "dispose", RUBY_METHOD_FUNC(method_dispose), 0);
     rb_define_method(spriteClass, "disposed", RUBY_METHOD_FUNC(method_disposed), 0);
+  }
+
+  // Utils
+
+  static VALUE getRbClass()
+  {
+    return rb_const_get(rb_cObject, rb_intern("Sprite"));
+  }
+
+  static VALUE createRubyObject(Eng::Sprite *inst)
+  {
+    return Data_Wrap_Struct(getRbClass(), 0, free, inst);
+  }
+
+  static VALUE getRubyObject(Eng::Sprite *inst)
+  {
+    if (inst == nullptr) {
+      return Qnil;
+    }
+    if (inst->ptr == Qnil) {
+      inst->ptr = createRubyObject(inst);
+    }
+    return inst->ptr;
+  }
+
+  static Eng::Sprite *getObjectValue(VALUE rbObj)
+  {
+    return (Eng::Sprite *)DATA_PTR(rbObj);
   }
 
  private:
@@ -64,226 +101,278 @@ class Sprite {
 
   static VALUE initialize(int argc, VALUE *argv, VALUE self)
   {
+    Eng::Sprite *instance;
+
     if (argc == 0) {
-      return overload_initialize1(self);
+      instance = new Eng::Sprite();
     } else if (argc == 1) {
-      return overload_initialize2(argc, argv, self);
+      VALUE _viewport;
+      rb_scan_args(argc, argv, "1", &_viewport);
+      if (!Viewport::isInstanceFrom(_viewport)) {
+        RbUtils::raiseCantConvertError(
+          rb_class_of(_viewport),
+          Viewport::getRbClass()
+        );
+      }
+      Eng::Viewport *viewport = Viewport::getObjectValue(_viewport);
+      instance = new Eng::Sprite(viewport);
     } else {
       RbUtils::raiseRuntimeException(
         "Sprite initialize takes 0 or 1 argument, but " + std::to_string(argc) + " were received."
       );
       return Qnil;
     }
-  }
 
-  static VALUE overload_initialize1(VALUE self)
-  {
-    Eng::Sprite *instance = new Eng::Sprite();
     DATA_PTR(self) = instance;
+    instance->ptr = self;
     return self;
   }
 
-  static VALUE overload_initialize2(int argc, VALUE *argv, VALUE self)
+  // Getter x
+
+  static VALUE getter_x(VALUE self)
   {
-    VALUE _viewport;
-    rb_scan_args(argc, argv, "1", &_viewport);
-
-    if (!It::Viewport::isInstanceOf(_viewport)) {
-      VALUE from = rb_class_of(_viewport);
-      VALUE to = It::Viewport::getRbClass();
-      RbUtils::raiseCantConvertError(from, to);
-    }
-
-    Check_Type(_viewport, T_OBJECT);
-    Eng::Viewport *viewport = (Eng::Viewport *)DATA_PTR(_viewport);
-
-    Eng::Sprite *instance = new Eng::Sprite(viewport);
-    DATA_PTR(self) = instance;
-    return self;
+    Eng::Sprite *inst = getInstance(self);
+    return Convert::toRubyNumber(
+      inst->getter_x()
+    );
   }
 
-  /*
-    Attr x
-  */
+  // Setter x
 
-  static VALUE attrGet_x(VALUE self)
+  static VALUE setter_x(VALUE self, VALUE value)
   {
-    Eng::Sprite *inst = (Eng::Sprite *)DATA_PTR(self);
-    return INT2FIX(inst->getter_x());
-  }
-
-  static VALUE attrSet_x(VALUE self, VALUE value)
-  {
-    Check_Type(value, T_FIXNUM);
-    unsigned int x = FIX2INT(value);
-    Eng::Sprite *inst = (Eng::Sprite *)DATA_PTR(self);
-    inst->setter_x(x);
+    Eng::Sprite *inst = getInstance(self);
+    inst->setter_x(
+      Convert::toCInt(value)
+    );
     return value;
   }
 
-  /*
-    Attr y
-  */
+  // Getter y
 
-  static VALUE attrGet_y(VALUE self)
+  static VALUE getter_y(VALUE self)
   {
-    Eng::Sprite *inst = (Eng::Sprite *)DATA_PTR(self);
-    return INT2FIX(inst->getter_y());
+    Eng::Sprite *inst = getInstance(self);
+    return Convert::toRubyNumber(
+      inst->getter_y()
+    );
   }
 
-  static VALUE attrSet_y(VALUE self, VALUE value)
+  // Setter y
+
+  static VALUE setter_y(VALUE self, VALUE value)
   {
-    Check_Type(value, T_FIXNUM);
-    unsigned int y = FIX2INT(value);
-    Eng::Sprite *inst = (Eng::Sprite *)DATA_PTR(self);
-    inst->setter_y(y);
+    Eng::Sprite *inst = getInstance(self);
+    inst->setter_y(
+      Convert::toCInt(value)
+    );
     return value;
   }
 
-  /*
-   Attr z
-  */
+  // Getter z
 
-  static VALUE attrGet_z(VALUE self)
+  static VALUE getter_z(VALUE self)
   {
-    int z = getInstance(self)->getter_z();
-    return INT2FIX(z);
+    Eng::Sprite *inst = getInstance(self);
+    return Convert::toRubyNumber(
+      inst->getter_z()
+    );
   }
 
-  static VALUE attrSet_z(VALUE self, VALUE value)
+  // Setter z
+
+  static VALUE setter_z(VALUE self, VALUE value)
   {
-    Check_Type(value, T_FIXNUM);
-    int z = FIX2INT(value);
-    getInstance(self)->setter_z(z);
+    Eng::Sprite *inst = getInstance(self);
+    inst->setter_z(
+      Convert::toCInt(value)
+    );
     return value;
   }
 
-  /*
-   Attr ox
-  */
+  // Getter ox
 
-  static VALUE attrGet_ox(VALUE self)
+  static VALUE getter_ox(VALUE self)
   {
-    int ox = getInstance(self)->getter_ox();
-    return INT2FIX(ox);
+    Eng::Sprite *inst = getInstance(self);
+    return Convert::toRubyNumber(
+      inst->getter_ox()
+    );
   }
 
-  static VALUE attrSet_ox(VALUE self, VALUE value)
+  // Setter ox
+
+  static VALUE setter_ox(VALUE self, VALUE value)
   {
-    Check_Type(value, T_FIXNUM);
-    int ox = FIX2INT(value);
-    getInstance(self)->setter_ox(ox);
+    Eng::Sprite *inst = getInstance(self);
+    inst->setter_ox(
+      Convert::toCInt(value)
+    );
     return value;
   }
 
-  /*
-   Attr oy
-  */
+  // Getter oy
 
-  static VALUE attrGet_oy(VALUE self)
+  static VALUE getter_oy(VALUE self)
   {
-    int oy = getInstance(self)->getter_oy();
-    return INT2FIX(oy);
+    Eng::Sprite *inst = getInstance(self);
+    return Convert::toRubyNumber(
+      inst->getter_oy()
+    );
   }
 
-  static VALUE attrSet_oy(VALUE self, VALUE value)
+  // Setter oy
+
+  static VALUE setter_oy(VALUE self, VALUE value)
   {
-    Check_Type(value, T_FIXNUM);
-    int oy = FIX2INT(value);
-    getInstance(self)->setter_oy(oy);
+    Eng::Sprite *inst = getInstance(self);
+    inst->setter_oy(
+      Convert::toCInt(value)
+    );
     return value;
   }
 
-  /*
-   Attr opacity
-  */
+  // Getter zoom_x
 
-  static VALUE attrGet_opacity(VALUE self)
+  static VALUE getter_zoom_x(VALUE self)
   {
-    int opacity = getInstance(self)->getter_opacity();
-    return INT2FIX(opacity);
+    Eng::Sprite *inst = getObjectValue(self);
+    return Convert::toRubyDouble(
+      inst->getter_zoom_x()
+    );
   }
 
-  static VALUE attrSet_opacity(VALUE self, VALUE value)
+  // Setter zoom_x
+
+  static VALUE setter_zoom_x(VALUE self, VALUE value)
   {
-    Check_Type(value, T_FIXNUM);
-    int opacity = FIX2INT(value);
-    getInstance(self)->setter_opacity(opacity);
+    Eng::Sprite *inst = getObjectValue(self);
+    inst->setter_zoom_x(
+      Convert::toCDouble(value)
+    );
     return value;
   }
 
-  /*
-   Attr blend_type
-  */
+  // Getter zoom_y
 
-  static VALUE attrGet_blend_type(VALUE self)
+  static VALUE getter_zoom_y(VALUE self)
   {
-    int blend_type = getInstance(self)->getBlendType();
-    return INT2FIX(blend_type);
+    Eng::Sprite *inst = getObjectValue(self);
+    return Convert::toRubyDouble(
+      inst->getter_zoom_y()
+    );
   }
 
-  static VALUE attrSet_blend_type(VALUE self, VALUE value)
+  // Setter zoom_y
+
+  static VALUE setter_zoom_y(VALUE self, VALUE value)
   {
-    Check_Type(value, T_FIXNUM);
-    int blend_type = FIX2INT(value);
-    getInstance(self)->setBlendType(blend_type);
+    Eng::Sprite *inst = getObjectValue(self);
+    inst->setter_zoom_y(
+      Convert::toCDouble(value)
+    );
     return value;
   }
 
-  /*
-    Attr bitmap
-  */
+  // Getter opacity
 
-  static VALUE attrGet_bitmap(VALUE self)
+  static VALUE setter_opacity(VALUE self, VALUE value)
   {
-    Eng::Sprite *inst = (Eng::Sprite *)DATA_PTR(self);
-    Eng::Bitmap *bitmap = inst->getBitmap();
+    Eng::Sprite *inst = getInstance(self);
+    inst->setter_opacity(
+      Convert::toCBool(value)
+    );
+    return value;
+  }
 
-    if (bitmap == nullptr) {
+  // Setter opacity
+
+  static VALUE getter_opacity(VALUE self)
+  {
+    Eng::Sprite *inst = getInstance(self);
+    return Convert::toRubyBool(
+      inst->getter_opacity()
+    );
+  }
+
+  // Getter blend_type
+
+  static VALUE setter_blend_type(VALUE self, VALUE value)
+  {
+    Eng::Sprite *inst = getInstance(self);
+    inst->setter_blend_type(
+      Convert::toCInt(value)
+    );
+    return value;
+  }
+
+  // Setter blend_type
+
+  static VALUE getter_blend_type(VALUE self)
+  {
+    Eng::Sprite *inst = getInstance(self);
+    return Convert::toRubyNumber(
+      inst->getter_blend_type()
+    );
+  }
+
+  // Getter bitmap
+
+  static VALUE getter_bitmap(VALUE self)
+  {
+    Eng::Sprite *inst = getInstance(self);
+    return Bitmap::getRubyObject(
+      inst->getBitmap()
+    );
+  }
+
+  // Getter bitmap
+
+  static VALUE setter_bitmap(VALUE self, VALUE value)
+  {
+    if (value != Qnil && !Bitmap::isInstanceFrom(value)) {
+      RbUtils::raiseCantConvertError(
+        rb_class_of(value),
+        Bitmap::getRbClass()
+      );
       return Qnil;
     }
 
-    return inst->bitmap_ptr;
-  }
-
-  static VALUE attrSet_bitmap(VALUE self, VALUE value)
-  {
-    Check_Type(value, T_OBJECT);
-
-    Eng::Sprite *inst = (Eng::Sprite *)DATA_PTR(self);
-    Eng::Bitmap *bitmap = (Eng::Bitmap *)DATA_PTR(value);
-
-    inst->setBitmap(bitmap);
-    inst->bitmap_ptr = value;
+    Eng::Sprite *inst = getInstance(self);
+    inst->setBitmap(
+      Bitmap::getObjectValue(value)
+    );
 
     return value;
   }
 
-  /*
-    Attr src_rect
-  */
+  // Getter src_rect
 
-  static VALUE attrGet_src_rect(VALUE self)
+  static VALUE getter_src_rect(VALUE self)
   {
-    Eng::Sprite *inst = (Eng::Sprite *)DATA_PTR(self);
-    Eng::Rect *rect = inst->getSrcRect();
+    Eng::Sprite *inst = getInstance(self);
+    return Rect::getRubyObject(
+      inst->getSrcRect()
+    );
+  }
 
-    if (rect == nullptr) {
+  // Setter src_rect
+
+  static VALUE setter_src_rect(VALUE self, VALUE value)
+  {
+    if (value != Qnil && !Rect::isInstanceFrom(value)) {
+      RbUtils::raiseCantConvertError(
+        rb_class_of(value),
+        Rect::getRbClass()
+      );
       return Qnil;
     }
 
-    return inst->bitmap_ptr;
-  }
-
-  static VALUE attrSet_src_rect(VALUE self, VALUE value)
-  {
-    Check_Type(value, T_OBJECT);
-
-    Eng::Sprite *inst = (Eng::Sprite *)DATA_PTR(self);
-    Eng::Rect *rect = (Eng::Rect *)DATA_PTR(value);
-
-    inst->setSrcRect(rect);
-    inst->bitmap_ptr = value;
+    Eng::Sprite *inst = getInstance(self);
+    inst->setSrcRect(
+      Rect::getObjectValue(value)
+    );
 
     return value;
   }
@@ -292,17 +381,12 @@ class Sprite {
     Method viewport
   */
 
-  static VALUE attrGet_viewport(VALUE self)
+  static VALUE method_viewport(VALUE self)
   {
-    Eng::Sprite *inst = (Eng::Sprite *)DATA_PTR(self);
-    Eng::Viewport *viewport = inst->getViewport();
-
-    if (viewport == nullptr) {
-      return Qnil;
-    }
-
-    VALUE viewportClass = Viewport::getRbClass();
-    return Data_Wrap_Struct(viewportClass, 0, free, viewport);
+    Eng::Sprite *inst = getInstance(self);
+    return Viewport::getRubyObject(
+      inst->getViewport()
+    );
   }
 
   /*

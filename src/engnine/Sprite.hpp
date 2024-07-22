@@ -15,36 +15,39 @@
 #include "engnine/Color.hpp"
 #include "engnine/Drawable.hpp"
 #include "engnine/Engine.hpp"
+#include "engnine/EngineBase.hpp"
 #include "engnine/Rect.hpp"
 #include "engnine/Tone.hpp"
 #include "engnine/Viewport.hpp"
 #include "engnine/VpRects.hpp"
-#include "ruby.h"
 
 namespace Eng {
 
-class Sprite : Drawable {
+class Sprite : Drawable, public EngineBase {
  public:
 
-  VALUE bitmap_ptr;  // TODO: Remove
-
-  int zoom_x;
-  int zoom_y;
   int angle;
   int mirror;
   int bush_depth;
   int blend_type;
 
-  Sprite() :
+  Sprite(Viewport *_viewport = nullptr) :
       spriteColor(255, 255, 255, 255)
   {
-    Eng::Engine::getInstance().addDrawable(this);
-  }
-
-  Sprite(Viewport *_viewport) :
-      Sprite()
-  {
     viewport = _viewport;
+    bitmap = nullptr;
+    visible = true;
+    z = 0;
+    ox = 0;
+    oy = 0;
+    zoom_x = 1.0;
+    zoom_y = 1.0;
+    opacity = 255;
+    blend_type = 0;
+    color = new Color(0, 0, 0, 0);
+    tone = new Tone(0, 0, 0, 0);
+    isDisposed = false;
+    Eng::Engine::getInstance().addDrawable(this);
   }
 
   inline int getZPosition() const override
@@ -68,7 +71,7 @@ class Sprite : Drawable {
     sf::RenderStates state;
     // state.blendMode = sf::BlendNone;
 
-    if (getBlendType() == 2) {
+    if (getter_blend_type() == 2) {
       Engine::getInstance().blendShaders.sprInvertShader.setUniform("opacity", opacity);
       state.shader = &Engine::getInstance().blendShaders.sprInvertShader;
       state.blendMode = sf::BlendMultiply;
@@ -80,8 +83,7 @@ class Sprite : Drawable {
     // Engine::getInstance().blendShaders.sprInvertShader.setUniform("opacity", opacity);
     // state.shader = &Engine::getInstance().blendShaders.sprInvertShader;
     // state.blendMode = sf::BlendMultiply;
-      // state.blendMode = sf::BlendAlpha;
-
+    // state.blendMode = sf::BlendAlpha;
 
     renderTexture.draw(
       sfSprite,
@@ -145,6 +147,42 @@ class Sprite : Drawable {
     dirty = true;
   }
 
+  /* --------------------------------------------------- */
+
+  // Getter zoom_x
+
+  double getter_zoom_x()
+  {
+    return zoom_x;
+  }
+
+  // Setter zoom_x
+
+  void setter_zoom_x(double value)
+  {
+    zoom_x = value;
+    dirty = true;
+  }
+
+  /* --------------------------------------------------- */
+
+  // Getter zoom_y
+
+  double getter_zoom_y()
+  {
+    return zoom_y;
+  }
+
+  // Setter zoom_y
+
+  void setter_zoom_y(double value)
+  {
+    zoom_y = value;
+    dirty = true;
+  }
+
+  /* --------------------------------------------------- */
+
   /*
     Attr opacity
   */
@@ -159,9 +197,10 @@ class Sprite : Drawable {
 
   /*
    Attr blend_type
- */
-  unsigned int getBlendType() { return blend_type; }
-  void setBlendType(unsigned int v)
+  */
+  unsigned int getter_blend_type() { return blend_type; }
+
+  void setter_blend_type(unsigned int v)
   {
     Num::clamp(v, 0u, 2u);
     blend_type = v;
@@ -200,12 +239,12 @@ class Sprite : Drawable {
 
   void dispose()
   {
-    _disposed = true;
+    isDisposed = true;
   }
 
   bool disposed()
   {
-    return _disposed;
+    return isDisposed;
   }
 
   Viewport *getViewport()
@@ -215,7 +254,7 @@ class Sprite : Drawable {
 
   bool shouldRender()
   {
-    return !_disposed && bitmap != nullptr && !bitmap->disposed();
+    return !isDisposed && bitmap != nullptr && !bitmap->disposed();
   }
 
   void applyChanges()
@@ -314,23 +353,24 @@ class Sprite : Drawable {
    */
 
  private:
-  bool dirty = false;
-  bool _disposed = false;
-  bool loadedBitmap = false;
-
   Viewport *viewport = nullptr;
   Bitmap *bitmap = nullptr;
-  Color *color = nullptr;
-  Tone *tone = nullptr;
   Rect *src_rect = nullptr;
-
   float x = 0;
   float y = 0;
   int z = 0;
   bool visible = true;
   float ox = 0;
   float oy = 0;
+  double zoom_x;
+  double zoom_y;
   int opacity = 255;
+  Color *color = nullptr;
+  Tone *tone = nullptr;
+
+  bool dirty = false;
+  bool isDisposed = false;
+  bool loadedBitmap = false;
 
   sf::Color spriteColor;
   sf::Sprite sfSprite;

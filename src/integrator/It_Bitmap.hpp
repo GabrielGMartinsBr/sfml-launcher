@@ -76,6 +76,12 @@ class Bitmap {
     return (Eng::Bitmap *)DATA_PTR(rbObj);
   }
 
+  static inline bool isInstanceFrom(VALUE inst)
+  {
+    return rb_class_of(inst) == getRbClass();
+  }
+
+
  private:
 
   /*
