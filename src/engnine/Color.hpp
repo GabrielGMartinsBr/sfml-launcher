@@ -30,28 +30,23 @@ class Color : public EngineBase {
     return color;
   }
 
-  float red = 0;
-  float green = 0;
-  float blue = 0;
-  float alpha = 255;
+  double red;
+  double green;
+  double blue;
+  double alpha;
 
-  Color()
+  Color() :
+      Color(0, 0, 0)
   {
+  }
+
+  Color(double red, double green, double blue, double alpha = 255)
+  {
+    set(red, green, blue, alpha);
     syncSfColor();
   }
 
-  Color(float red, float green, float blue, float alpha = 255) :
-      Color()
-  {
-    set(red, green, blue, alpha);
-  }
-
-  void set(float r, float g, float b)
-  {
-    set(r, g, b, 255);
-  }
-
-  void set(float r, float g, float b, float a)
+  void set(double r, double g, double b, double a = 255)
   {
     clamp(r);
     clamp(g);
@@ -77,7 +72,7 @@ class Color : public EngineBase {
  private:
   sf::Color sfColor;
 
-  void clamp(float &v)
+  void clamp(double &v)
   {
     if (v < 0) {
       v = 0;

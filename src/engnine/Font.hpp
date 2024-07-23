@@ -3,13 +3,12 @@
 #include <string>
 #include <vector>
 
-#include "base/Log.hpp"
 #include "engnine/Color.hpp"
-#include "ruby.h"
+#include "engnine/EngineBase.hpp"
 
 namespace Eng {
 
-class Font {
+class Font : public EngineBase {
  public:
   static std::vector<std::string>* default_name;
   static int default_size;
@@ -23,16 +22,14 @@ class Font {
   }
 
  public:
-  VALUE ptr;
 
   Font(std::vector<std::string>* name, int size = 22) :
       name(name),
       size(size),
       bold(false),
-      italic(false),
-      color(nullptr),
-      ptr(Qnil)
+      italic(false)
   {
+    color = new Color(255, 255, 255, 255);
   }
 
   // Font(Font& other) :
@@ -49,11 +46,9 @@ class Font {
       name(new std::vector<std::string>({ "Arial" })),
       size(22),
       bold(false),
-      italic(false),
-      color(nullptr),
-      ptr(Qnil)
+      italic(false)
   {
-    Log::out() << "Default constructor";
+    color = new Color(255, 255, 255, 255);
   }
 
   std::vector<std::string>* getter_name()
