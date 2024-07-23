@@ -26,6 +26,36 @@ class Table {
     rb_define_method(tableClass, "zsize", RUBY_METHOD_FUNC(method_zsize), 0);
   }
 
+  // Utils
+
+  static VALUE getRbClass()
+  {
+    return rb_const_get(rb_cObject, rb_intern("Table"));
+  }
+
+  static VALUE createRubyObject(Eng::Table *inst)
+  {
+    return Data_Wrap_Struct(getRbClass(), 0, free, inst);
+  }
+
+  static VALUE getRubyObject(Eng::Table *inst)
+  {
+    if (inst == nullptr) {
+      return Qnil;
+    }
+    if (inst->ptr == Qnil) {
+      inst->ptr = createRubyObject(inst);
+    }
+    return inst->ptr;
+  }
+
+  static Eng::Table *getObjectValue(VALUE rbObj)
+  {
+    return (Eng::Table *)DATA_PTR(rbObj);
+  }
+
+  // Private
+
  private:
 
   static VALUE method_load(VALUE self, VALUE marshaled_data)
@@ -68,12 +98,13 @@ class Table {
     }
 
     DATA_PTR(self) = instance;
+    instance->ptr = self;
     return self;
   }
 
   static VALUE getValue(int argc, VALUE *argv, VALUE self)
   {
-    Eng::Table *inst = (Eng::Table *)DATA_PTR(self);
+    Eng::Table *inst = getObjectValue(self);
     VALUE rb_x, rb_y, rb_z;
 
     if (argc == 1) {
@@ -108,7 +139,7 @@ class Table {
 
   static VALUE setValue(int argc, VALUE *argv, VALUE self)
   {
-    Eng::Table *inst = (Eng::Table *)DATA_PTR(self);
+    Eng::Table *inst = getObjectValue(self);
     VALUE rb_v, rb_x, rb_y, rb_z;
 
     if (argc == 2) {
@@ -158,19 +189,19 @@ class Table {
 
   static VALUE method_xsize(VALUE self)
   {
-    Eng::Table *inst = (Eng::Table *)DATA_PTR(self);
+    Eng::Table *inst = getObjectValue(self);
     return Convert::toRubyNumber(inst->getXSize());
   }
 
   static VALUE method_ysize(VALUE self)
   {
-    Eng::Table *inst = (Eng::Table *)DATA_PTR(self);
+    Eng::Table *inst = getObjectValue(self);
     return Convert::toRubyNumber(inst->getYSize());
   }
 
   static VALUE method_zsize(VALUE self)
   {
-    Eng::Table *inst = (Eng::Table *)DATA_PTR(self);
+    Eng::Table *inst = getObjectValue(self);
     return Convert::toRubyNumber(inst->getZSize());
   }
 };

@@ -3,10 +3,11 @@
 #include "base/AppDefs.h"
 #include "base/Log.hpp"
 #include "base/MarshalUtils.hpp"
+#include "engnine/EngineBase.hpp"
 
 namespace Eng {
 
-class Table {
+class Table : public EngineBase {
  public:
 
   static Table *deserialize(const char *data, int len)
