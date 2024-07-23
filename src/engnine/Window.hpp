@@ -8,7 +8,6 @@
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
 #include <cmath>
-#include <cstdlib>
 
 #include "engnine/Bitmap.hpp"
 #include "engnine/Drawable.hpp"
@@ -22,23 +21,36 @@ class Window : Drawable {
  public:
 
   Window(Viewport *viewport = 0) :
-      width(0),
-      height(0),
       windowSkin(nullptr),
       contents(nullptr),
       cursor_rect(new Rect(0, 0, 0, 0))
   {
     Eng::Engine::getInstance().addDrawable(this);
-    // dirty = true;
     contentsDirty = true;
     skinDirty = true;
+
+    active = true;
+    visible = true;
+    pause = false;
+
+    x = 0;
+    y = 0;
+    width = 0;
+    height = 0;
+    z = 0;
+    ox = 0;
+    oy = 0;
+    opacity = 255;
+    back_opacity = 255;
+    contents_opacity = 255;
+    isDisposed = false;
   }
 
   ~Window()
   {
-    free(windowSkin);
-    free(contents);
-    free(cursor_rect);
+    // free(windowSkin);
+    // free(contents);
+    // free(cursor_rect);
   }
 
   int getZPosition() const override
@@ -52,6 +64,7 @@ class Window : Drawable {
       return;
     }
     if (skinDirty) {
+      Log::out() << "updateSkin";
       updateBackgroundSprite();
       updateBorder();
       updateCursorRect();
@@ -59,7 +72,7 @@ class Window : Drawable {
       cursor_rect->markAsClean();
     }
     if (cursor_rect->isDirty()) {
-      Log::out() << "updateCursorRect";
+      // Log::out() << "updateCursorRect";
       updateCursorRect();
       cursor_rect->markAsClean();
     }
@@ -74,7 +87,7 @@ class Window : Drawable {
     rd.draw(backgroundSprite, sf::BlendAlpha);
     rd.draw(borderSprite, sf::BlendAlpha);
     if (!cursor_rect->isEmpty()) {
-    rd.draw(cursorSprite, sf::BlendAlpha);
+      rd.draw(cursorSprite, sf::BlendAlpha);
     }
     rd.draw(contentsSprite, sf::BlendAlpha);
   }
@@ -180,6 +193,16 @@ class Window : Drawable {
   int getter_contents_opacity() { return contents_opacity; }
   void setter_contents_opacity(int v) { contents_opacity = v; }
 
+  void method_dispose()
+  {
+    isDisposed = true;
+  }
+
+  bool method_disposed()
+  {
+    return isDisposed;
+  }
+
  private:
   Bitmap *windowSkin;
   Bitmap *contents;
@@ -198,6 +221,7 @@ class Window : Drawable {
   int opacity;
   int back_opacity;
   int contents_opacity;
+  bool isDisposed;
 
   sf::Sprite backgroundSprite;
   sf::Sprite contentsSprite;

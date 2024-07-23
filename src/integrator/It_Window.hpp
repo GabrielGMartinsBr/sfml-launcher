@@ -74,6 +74,11 @@ class Window {
 
     rb_define_method(windowClass, "contents_opacity", RUBY_METHOD_FUNC(getter_contents_opacity), 0);
     rb_define_method(windowClass, "contents_opacity=", RUBY_METHOD_FUNC(setter_contents_opacity), 1);
+
+    // Methods
+
+    rb_define_method(windowClass, "dispose", RUBY_METHOD_FUNC(method_dispose), 0);
+    rb_define_method(windowClass, "disposed?", RUBY_METHOD_FUNC(method_dispose), 0);
   }
 
  private:
@@ -483,6 +488,34 @@ class Window {
     inst->setter_contents_opacity(z);
 
     return Qnil;
+  }
+
+  /*
+    Method dispose
+  */
+
+  static VALUE method_dispose(VALUE self)
+  {
+    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    if (inst == nullptr) {
+      return Qnil;
+    }
+
+    inst->method_dispose();
+
+    return Qnil;
+  }
+
+  static VALUE method_disposed(VALUE self)
+  {
+    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    if (inst == nullptr) {
+      return Qnil;
+    }
+
+    bool result = inst->method_disposed();
+
+    return result ? Qtrue : Qfalse;
   }
 };
 }  // namespace It
