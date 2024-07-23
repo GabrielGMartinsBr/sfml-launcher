@@ -81,7 +81,7 @@ class Sprite {
 
     rb_define_method(spriteClass, "viewport", RUBY_METHOD_FUNC(method_viewport), 0);
     rb_define_method(spriteClass, "dispose", RUBY_METHOD_FUNC(method_dispose), 0);
-    rb_define_method(spriteClass, "disposed", RUBY_METHOD_FUNC(method_disposed), 0);
+    rb_define_method(spriteClass, "disposed?", RUBY_METHOD_FUNC(method_disposed), 0);
     rb_define_method(spriteClass, "flash", RUBY_METHOD_FUNC(method_flash), 2);
     rb_define_method(spriteClass, "update", RUBY_METHOD_FUNC(method_update), 0);
   }
@@ -198,7 +198,7 @@ class Sprite {
 
   static VALUE setter_src_rect(VALUE self, VALUE value)
   {
-    if (value != Qnil && !Rect::isInstanceFrom(value)) {
+    if (value != Qnil && !Rect::isInstance(value)) {
       RbUtils::raiseCantConvertError(
         rb_class_of(value),
         Rect::getRbClass()
@@ -387,7 +387,7 @@ class Sprite {
   static VALUE getter_angle(VALUE self)
   {
     Eng::Sprite *inst = getObjectValue(self);
-    return Convert::toRubyNumber(
+    return Convert::toRubyDouble(
       inst->getter_angle()
     );
   }
@@ -398,7 +398,7 @@ class Sprite {
   {
     Eng::Sprite *inst = getObjectValue(self);
     inst->setter_angle(
-      Convert::toCInt(value)
+      Convert::toCDouble(value)
     );
     return value;
   }
@@ -447,23 +447,23 @@ class Sprite {
 
   // Getter opacity
 
-  static VALUE setter_opacity(VALUE self, VALUE value)
+  static VALUE getter_opacity(VALUE self)
   {
     Eng::Sprite *inst = getInstance(self);
-    inst->setter_opacity(
-      Convert::toCBool(value)
+    return Convert::toRubyNumber(
+      inst->getter_opacity()
     );
-    return value;
   }
 
   // Setter opacity
 
-  static VALUE getter_opacity(VALUE self)
+  static VALUE setter_opacity(VALUE self, VALUE value)
   {
     Eng::Sprite *inst = getInstance(self);
-    return Convert::toRubyBool(
-      inst->getter_opacity()
+    inst->setter_opacity(
+      Convert::toCUnsignedInt(value)
     );
+    return value;
   }
 
   // Getter blend_type
@@ -513,9 +513,6 @@ class Sprite {
   {
     Eng::Sprite *inst = getObjectValue(self);
     Eng::Tone *value = inst->getter_tone();
-    if (value == nullptr) {
-      return Qnil;
-    }
     return Tone::getRubyObject(value);
   }
 

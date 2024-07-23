@@ -10,6 +10,7 @@
 #include <SFML/Graphics/Texture.hpp>
 #include <algorithm>
 
+#include "Log.hpp"
 #include "base/NumberUtils.hpp"
 #include "engnine/Bitmap.hpp"
 #include "engnine/Color.hpp"
@@ -31,6 +32,7 @@ class Sprite : Drawable, public EngineBase {
   {
     viewport = _viewport;
     bitmap = nullptr;
+    src_rect = new Rect(0, 0, 0, 0);
     visible = true;
     x = 0;
     y = 0;
@@ -39,14 +41,18 @@ class Sprite : Drawable, public EngineBase {
     oy = 0;
     zoom_x = 1.0;
     zoom_y = 1.0;
-    angle = 0;
+    angle = 0.0;
     mirror = false;
     bush_depth = 0;
     opacity = 255;
     blend_type = 0;
     color = new Color(0, 0, 0, 0);
     tone = new Tone(0, 0, 0, 0);
+
+    dirty = false;
     isDisposed = false;
+    loadedBitmap = false;
+
     Eng::Engine::getInstance().addDrawable(this);
   }
 
@@ -64,6 +70,8 @@ class Sprite : Drawable, public EngineBase {
   void setter_bitmap(Bitmap *value)
   {
     bitmap = value;
+    src_rect->setter_width(bitmap->width);
+    src_rect->setter_height(bitmap->height);
     dirty = true;
   }
 
@@ -147,8 +155,10 @@ class Sprite : Drawable, public EngineBase {
 
   void setter_z(int value)
   {
-    z = value;
-    Eng::Engine::getInstance().markZOrderDirty();
+    if (z != value) {
+      z = value;
+      Eng::Engine::getInstance().markZOrderDirty();
+    }
   }
 
   /* --------------------------------------------------- */
@@ -223,14 +233,14 @@ class Sprite : Drawable, public EngineBase {
 
   // Getter angle
 
-  int getter_angle()
+  double getter_angle()
   {
     return angle;
   }
 
   // Setter angle
 
-  void setter_angle(int value)
+  void setter_angle(double value)
   {
     angle = value;
     dirty = true;
@@ -274,19 +284,20 @@ class Sprite : Drawable, public EngineBase {
 
   // Getter opacity
 
-  unsigned int getter_opacity()
+  unsigned short getter_opacity()
   {
     return opacity;
   }
 
   // Setter opacity
 
-  void setter_opacity(unsigned int v)
+  void setter_opacity(int v)
   {
-    Num::clamp(v, 0u, 255u);
-    opacity = v;
-    spriteColor.a = v;
-    dirty = true;
+    int value = Num::clamp(v, 0, 255);
+    if (opacity != value) {
+      opacity = value;
+      dirty = true;
+    }
   }
 
   /* --------------------------------------------------- */
@@ -362,7 +373,7 @@ class Sprite : Drawable, public EngineBase {
 
   void method_update()
   {
-    Log::out() << "Sprite method update was called but it's not implemented yet.";
+    // Log::out() << "Sprite method update was called but it's not implemented yet.";
   }
 
   /* --------------------------------------------------- */
@@ -524,9 +535,9 @@ class Sprite : Drawable, public EngineBase {
    */
 
  private:
-  Viewport *viewport = nullptr;
-  Bitmap *bitmap = nullptr;
-  Rect *src_rect = nullptr;
+  Viewport *viewport;
+  Bitmap *bitmap;
+  Rect *src_rect;
   bool visible;
   double x;
   double y;
@@ -535,17 +546,17 @@ class Sprite : Drawable, public EngineBase {
   double oy;
   double zoom_x;
   double zoom_y;
-  int angle;
+  double angle;
   bool mirror;
   int bush_depth;
-  int opacity;
+  unsigned short opacity;
   int blend_type;
-  Color *color = nullptr;
-  Tone *tone = nullptr;
+  Color *color;
+  Tone *tone;
 
-  bool dirty = false;
-  bool isDisposed = false;
-  bool loadedBitmap = false;
+  bool dirty;
+  bool isDisposed;
+  bool loadedBitmap;
 
   sf::Color spriteColor;
   sf::Sprite sfSprite;
