@@ -20,8 +20,8 @@ class Plane : public EngineBase {
     z = 0;
     ox = 0;
     oy = 0;
-    zoom_x = 1.23;
-    zoom_y = 1.23;
+    zoom_x = 1.0;
+    zoom_y = 1.0;
     opacity = 255;
     blend_type = 0;
     color = new Color(0, 0, 0, 0);

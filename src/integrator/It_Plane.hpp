@@ -111,7 +111,7 @@ class Plane {
     } else if (argc == 1) {
       VALUE _viewport;
       rb_scan_args(argc, argv, "1", &_viewport);
-      Eng::Viewport *viewport = It::Viewport::getObjectValue(_viewport);
+      Eng::Viewport *viewport = Viewport::getObjectValue(_viewport);
       inst = new Eng::Plane(viewport);
     } else {
       RbUtils::raiseRuntimeException(
@@ -210,7 +210,7 @@ class Plane {
   {
     Eng::Plane *inst = getObjectValue(self);
     inst->setter_ox(
-      Convert::toCInt(value)
+      Convert::toCInt2(value)
     );
     return value;
   }
@@ -231,7 +231,7 @@ class Plane {
   {
     Eng::Plane *inst = getObjectValue(self);
     inst->setter_oy(
-      Convert::toCInt(value)
+      Convert::toCInt2(value)
     );
     return value;
   }
