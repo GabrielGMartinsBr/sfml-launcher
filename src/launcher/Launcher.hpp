@@ -64,7 +64,7 @@ class Launcher {
     VALUE result;
 
     std::string code;
-    app::ULong lineNumber = 0;
+    app::ULong lineNumber = 1;
 
     for (PlayerScript& script : scripts) {
       code.append(script.code).append("\n");

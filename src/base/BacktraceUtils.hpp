@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstring>
 #include <regex>
 
 class BacktraceUtils {
@@ -7,6 +8,11 @@ class BacktraceUtils {
  public:
   static void pickLineNumber(const char* message, long& result)
   {
+    if (strcmp(message, "(eval)") == 0) {
+      result = 0;
+      return;
+    }
+
     std::regex pattern(R"(^[^:]+:(\d+))");
     std::cmatch match;
 
