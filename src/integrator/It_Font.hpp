@@ -7,6 +7,7 @@
 #include "Convert.hpp"
 #include "engnine/Color.hpp"
 #include "engnine/Font.hpp"
+#include "integrator/It_Color.hpp"
 #include "ruby.h"
 
 // TODO: Implement methods and attributes
@@ -134,11 +135,14 @@ class Font {
   static VALUE setter_name(VALUE self, VALUE value)
   {
     std::vector<std::string> *names = Convert::toCStringVector(value);
+    if (names == nullptr) {
+      return Qnil;
+    }
 
     Eng::Font *inst = (Eng::Font *)DATA_PTR(self);
     inst->setter_name(*names);
 
-    return Qnil;
+    return value;
   }
 
   /*
@@ -160,7 +164,7 @@ class Font {
     Eng::Font *inst = (Eng::Font *)DATA_PTR(self);
     inst->setter_size(x);
 
-    return Qnil;
+    return value;
   }
 
   /*
@@ -180,8 +184,7 @@ class Font {
     bool value = Convert::toCBool(_value);
     Eng::Font *inst = (Eng::Font *)DATA_PTR(self);
     inst->setter_bold(value);
-
-    return Qnil;
+    return _value;
   }
 
   /*
@@ -201,8 +204,7 @@ class Font {
     bool value = Convert::toCBool(_value);
     Eng::Font *inst = (Eng::Font *)DATA_PTR(self);
     inst->setter_italic(value);
-
-    return Qnil;
+    return value;
   }
 
   /*
@@ -212,7 +214,7 @@ class Font {
   {
     Eng::Font *inst = (Eng::Font *)DATA_PTR(self);
     Eng::Color *color = inst->getter_color();
-    return color->ptr;
+    return Color::getRubyObject(color);
   }
 
   /*
@@ -221,9 +223,10 @@ class Font {
   static VALUE setter_color(VALUE self, VALUE value)
   {
     Eng::Font *inst = (Eng::Font *)DATA_PTR(self);
-    Eng::Color *color = (Eng::Color *)DATA_PTR(value);
-    inst->setter_color(color);
-    return Qnil;
+    inst->setter_color(
+      Color::getObjectValue(value)
+    );
+    return value;
   }
 };
 }  // namespace It
