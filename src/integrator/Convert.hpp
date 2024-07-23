@@ -25,6 +25,18 @@ struct Convert {
     return FIX2INT(v);
   }
 
+  static int toCInt2(VALUE v)
+  {
+    if (TYPE(v) == T_FLOAT) {
+      return (int)NUM2DBL(v);
+    } else if (TYPE(v) == T_FIXNUM) {
+      return FIX2INT(v);
+    } else {
+      rb_raise(rb_eTypeError, "Expected Float or Fixnum");
+      return 0;
+    }
+  }
+
   static unsigned int toCUnsignedInt(VALUE v)
   {
     Check_Type(v, T_FIXNUM);
@@ -71,6 +83,17 @@ struct Convert {
 
   static app::Vector<app::String>* toCStringVector(VALUE arr)
   {
+    if (TYPE(arr) == T_STRING) {
+      std::vector<std::string>* vec = new std::vector<std::string>(1);
+      vec->at(0) = arr;
+      return vec;
+    }
+
+    if (TYPE(arr) != T_ARRAY) {
+      rb_raise(rb_eTypeError, "Expected String or Array");
+      return nullptr;
+    }
+
     int length = RARRAY_LEN(arr);
     std::vector<std::string>* vec = new std::vector<std::string>(length);
     const char* str;
