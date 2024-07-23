@@ -8,15 +8,16 @@
 #include "It_LoadSaveData.hpp"
 #include "It_Window.hpp"
 #include "integrator/It_Audio.hpp"
+#include "integrator/It_Autotiles.hpp"
 #include "integrator/It_Bitmap.hpp"
 #include "integrator/It_Color.hpp"
-#include "integrator/It_FileTest.hpp"
 #include "integrator/It_Graphics.hpp"
 #include "integrator/It_Input.hpp"
 #include "integrator/It_Plane.hpp"
 #include "integrator/It_Rect.hpp"
 #include "integrator/It_Sprite.hpp"
 #include "integrator/It_Table.hpp"
+#include "integrator/It_Tilemap.hpp"
 #include "integrator/It_Tone.hpp"
 #include "integrator/It_Viewport.hpp"
 #include "ruby.h"
@@ -56,6 +57,8 @@ class Integrator {
     It::Window::integrate();
     It::Font::integrate();
     It::Table::integrate();
+    It::Tilemap::integrate();
+    It::Autotiles::integrate();
     It::Plane::integrate();
 
     loadBuiltInScripts();
