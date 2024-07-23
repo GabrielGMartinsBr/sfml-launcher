@@ -151,7 +151,6 @@ class Bitmap {
     if (font == nullptr) {
       return Qnil;
     }
-    Log::out() << "getter " << font->ptr;
     return font->ptr;
   }
 
@@ -160,7 +159,6 @@ class Bitmap {
   */
   static VALUE setter_font(VALUE self, VALUE value)
   {
-    Log::out() << "setter ";
     Eng::Bitmap *inst = (Eng::Bitmap *)DATA_PTR(self);
     Eng::Font *font = (Eng::Font *)DATA_PTR(value);
     inst->setter_font(font);
@@ -207,8 +205,7 @@ class Bitmap {
   static VALUE method_disposed(VALUE self)
   {
     Eng::Bitmap *inst = (Eng::Bitmap *)DATA_PTR(self);
-    bool isDisposed = inst->disposed();
-    return isDisposed ? Qtrue : Qfalse;
+    return inst->disposed() ? Qtrue : Qfalse;
   }
 
   /*

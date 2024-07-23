@@ -2,6 +2,7 @@
 
 #include <SFML/Graphics/BlendMode.hpp>
 #include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/Image.hpp>
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
@@ -27,8 +28,6 @@ enum TextAlign {
   TEXT_CENTER,
   TEXT_RIGHT
 };
-
-typedef const char* Str;
 
 class Bitmap {
  public:
@@ -218,19 +217,30 @@ class Bitmap {
 
   void hue_change(int _hue);
 
-  void draw_text(int x, int y, int width, int height, Str str, TextAlign align = TextAlign::TEXT_LEFT)
+  void draw_text(int x, int y, int width, int height, app::CStr str, TextAlign align = TextAlign::TEXT_LEFT)
   {
     Texts::drawText(renderTexture, x, y, *font, str);
     renderTexture.display();
   }
 
-  void draw_text(Rect rect, Str str, TextAlign align = TextAlign::TEXT_LEFT)
+  void draw_text(Rect rect, app::CStr str, TextAlign align = TextAlign::TEXT_LEFT)
   {
     Texts::drawText(renderTexture, rect.getter_x(), rect.getter_y(), *font, str);
     renderTexture.display();
   }
 
-  int get_text_size(Str _str);
+  Eng::Rect* get_text_size(app::CStr str)
+  {
+    sf::Font sfFont;
+    Texts::loadFont(sfFont);
+    sf::Text text;
+    text.setFont(sfFont);
+    text.setString(str);
+    text.setCharacterSize(24);
+    sf::FloatRect textBounds = text.getLocalBounds();
+    Eng::Rect* rect = new Eng::Rect(textBounds.left, textBounds.top, textBounds.width, textBounds.height);
+    return rect;
+  }
 
 
  private:

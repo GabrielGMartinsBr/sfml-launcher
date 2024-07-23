@@ -134,7 +134,7 @@ class Sprite {
     } else if (argc == 1) {
       VALUE _viewport;
       rb_scan_args(argc, argv, "1", &_viewport);
-      if (!Viewport::isInstanceFrom(_viewport)) {
+      if (!Viewport::isInstance(_viewport)) {
         RbUtils::raiseCantConvertError(
           rb_class_of(_viewport),
           Viewport::getRbClass()
