@@ -387,6 +387,11 @@ class Sprite : Drawable, public EngineBase {
     return z;
   }
 
+  bool shouldRender() const override
+  {
+    return !isDisposed && visible;
+  }
+
   Viewport *getViewport()
   {
     return viewport;

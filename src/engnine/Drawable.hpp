@@ -1,10 +1,13 @@
 #pragma once
 
 #include <SFML/Graphics/Texture.hpp>
+
 namespace Eng {
 
 struct Drawable {
   virtual inline int getZPosition() const = 0;
+
+  virtual inline bool shouldRender() const = 0;
 
   virtual void update() = 0;
 

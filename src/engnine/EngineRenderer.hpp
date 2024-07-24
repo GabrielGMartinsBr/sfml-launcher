@@ -107,6 +107,9 @@ struct EngineRenderer {
       sortZ();
     }
     for (Eng::Drawable* drawable : drawables) {
+      if (!drawable->shouldRender()) {
+        continue;
+      }
       drawable->update();
       drawable->draw(renderTexture);
     }

@@ -58,6 +58,11 @@ class Window : Drawable {
     return z;
   }
 
+  bool shouldRender() const override
+  {
+    return !isDisposed && visible;
+  }
+
   void update() override
   {
     if (width < 1 || height < 1) {
