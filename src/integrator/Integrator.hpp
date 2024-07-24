@@ -11,6 +11,7 @@
 #include "integrator/It_Autotiles.hpp"
 #include "integrator/It_Bitmap.hpp"
 #include "integrator/It_Color.hpp"
+#include "integrator/It_EngineLog.hpp"
 #include "integrator/It_Graphics.hpp"
 #include "integrator/It_Input.hpp"
 #include "integrator/It_Plane.hpp"
@@ -43,7 +44,7 @@ class Integrator {
 
     loadScriptsPath();
 
-    // It::FileTest::integrate();
+    It::EngineLog::integrate();
     It::LoadSaveData::integrate();
     It::Graphics::integrate();
     It::Audio::integrate();
