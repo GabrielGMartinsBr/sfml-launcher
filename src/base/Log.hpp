@@ -6,6 +6,12 @@
 class Log {
   struct Out {
     std::ostringstream* stream = nullptr;
+    bool lb;
+
+    Out(bool lb)
+    {
+      this->lb = lb;
+    }
 
     template <typename T>
     Out& operator<<(const T& value)
@@ -19,13 +25,22 @@ class Log {
 
     ~Out()
     {
-      std::cout << (*stream).str() << std::endl;
+      std::cout << (*stream).str();
+      if (lb) {
+        std::cout << std::endl;
+      }
       delete stream;
     }
   };
 
   struct Err {
     std::ostringstream* stream = nullptr;
+    bool lb;
+
+    Err(bool lb)
+    {
+      this->lb = lb;
+    }
 
     template <typename T>
     Err& operator<<(const T& value)
@@ -39,12 +54,15 @@ class Log {
 
     ~Err()
     {
-      std::cerr << (*stream).str() << std::endl;
+      std::cerr << (*stream).str();
+      if (lb) {
+        std::cerr << std::endl;
+      }
       delete stream;
     }
   };
 
  public:
-  static Out out() { return Out(); }
-  static Err err() { return Err(); }
+  static Out out(bool lb = true) { return Out(lb); }
+  static Err err(bool lb = true) { return Err(lb); }
 };
