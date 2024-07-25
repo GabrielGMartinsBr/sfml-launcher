@@ -8,6 +8,7 @@
 #include <SFML/Graphics/Shader.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
+#include <SFML/System/Vector2.hpp>
 #include <algorithm>
 
 #include "Log.hpp"
@@ -28,7 +29,8 @@ class Sprite : Drawable, public EngineBase {
  public:
 
   Sprite(Viewport *_viewport = nullptr) :
-      spriteColor(255, 255, 255, 255)
+      spriteColor(255, 255, 255, 255),
+      position(0, 0)
   {
     viewport = _viewport;
     bitmap = nullptr;
@@ -70,8 +72,8 @@ class Sprite : Drawable, public EngineBase {
   void setter_bitmap(Bitmap *value)
   {
     bitmap = value;
-    src_rect->setter_width(bitmap->width);
-    src_rect->setter_height(bitmap->height);
+    src_rect->setter_width(bitmap->getter_width());
+    src_rect->setter_height(bitmap->getter_height());
     dirty = true;
   }
 
@@ -389,7 +391,7 @@ class Sprite : Drawable, public EngineBase {
 
   bool shouldRender() const override
   {
-    return !isDisposed && visible;
+    return !isDisposed && visible && bitmap != nullptr && !bitmap->disposed();
   }
 
   Viewport *getViewport()
@@ -399,26 +401,40 @@ class Sprite : Drawable, public EngineBase {
 
   sf::Sprite &getSfSprite()
   {
-    return sfSprite;
-  }
-
-  bool shouldRender()
-  {
-    return !isDisposed && bitmap != nullptr && !bitmap->disposed();
+    return spr;
   }
 
   void update() override
   {
-    applyChanges();
+    if (!dirty || !bitmap) {
+      return;
+    }
+
+    if (!loadedBitmap || bitmap->dirty) {
+      spr.setTexture(
+        bitmap->renderTexture.getTexture()
+      );
+      loadedBitmap = true;
+      bitmap->dirty = false;
+    }
+
+    position.x = x - ox;
+    position.y = y - oy;
+
+    sf::IntRect srcRect = src_rect->sfRect();
+
+    spr.setPosition(position);
+
+    spr.setTextureRect(srcRect);
   }
 
   void draw(sf::RenderTexture &renderTexture) override
   {
-    if (!shouldRender()) {
-      return;
-    }
-
     float opacity = getter_opacity() / 255.f;
+
+    renderTexture.draw(spr);
+
+    return;
 
     sf::RenderStates state;
     // state.blendMode = sf::BlendNone;
@@ -437,8 +453,10 @@ class Sprite : Drawable, public EngineBase {
     // state.blendMode = sf::BlendMultiply;
     // state.blendMode = sf::BlendAlpha;
 
+    // Log::out() << " ---> Position: " << sfSprite.getPosition();
+
     renderTexture.draw(
-      sfSprite,
+      spr,
       state
     );
     renderTexture.display();
@@ -451,14 +469,14 @@ class Sprite : Drawable, public EngineBase {
     }
 
     if (!loadedBitmap || bitmap->dirty) {
-      sfSprite.setTexture(
+      spr.setTexture(
         bitmap->renderTexture.getTexture()
       );
 
       loadedBitmap = true;
     }
 
-    sfSprite.setColor(spriteColor);
+    spr.setColor(spriteColor);
 
     vp::ViewportRect vp;
     vp::DestinyRect dst;
@@ -467,8 +485,8 @@ class Sprite : Drawable, public EngineBase {
     sf::IntRect dstRect(
       ox,
       oy,
-      bitmap->width,
-      bitmap->height
+      bitmap->getter_width(),
+      bitmap->getter_height()
     );
 
     if (src_rect) {
@@ -516,8 +534,8 @@ class Sprite : Drawable, public EngineBase {
       dst.width = std::min(dst.width, dstRect.width);
       dst.height = std::min(dst.height, dstRect.height);
 
-      position.x = dst.x;
-      position.y = dst.y;
+      position.x = dst.x + ox;
+      position.y = dst.y + oy;
 
       dstRect.width = dst.width;
       dstRect.height = dst.height;
@@ -529,8 +547,11 @@ class Sprite : Drawable, public EngineBase {
       dstRect.top += dst.top;
     }
 
-    sfSprite.setPosition(position);
-    sfSprite.setTextureRect(dstRect);
+    // dstRect.left += 16;
+    // dstRect.top += 16;
+
+    spr.setPosition(position);
+    spr.setTextureRect(dstRect);
 
     dirty = false;
   }
@@ -564,8 +585,9 @@ class Sprite : Drawable, public EngineBase {
   bool loadedBitmap;
 
   sf::Color spriteColor;
-  sf::Sprite sfSprite;
-  sf::Texture text;
+  sf::Sprite spr;
+  sf::Texture texture;
+  sf::Vector2f position;
 };
 
 }  // namespace Eng
