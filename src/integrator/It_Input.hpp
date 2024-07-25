@@ -1,6 +1,5 @@
 #pragma once
 
-#include "base/Log.hpp"
 #include "engnine/Input.hpp"
 #include "integrator/Convert.hpp"
 #include "ruby.h"
@@ -19,6 +18,8 @@ class Input {
     rb_define_module_function(inputClass, "press?", RUBY_METHOD_FUNC(method_press), 1);
     rb_define_module_function(inputClass, "trigger?", RUBY_METHOD_FUNC(method_trigger), 1);
     rb_define_module_function(inputClass, "repeat?", RUBY_METHOD_FUNC(method_repeat), 1);
+    rb_define_module_function(inputClass, "dir4", RUBY_METHOD_FUNC(method_dir4), 0);
+    rb_define_module_function(inputClass, "dir8", RUBY_METHOD_FUNC(method_dir8), 0);
 
     rb_define_const(inputClass, "DOWN", Convert::toRubyNumber(Eng::InputKey::DOWN));
     rb_define_const(inputClass, "LEFT", Convert::toRubyNumber(Eng::InputKey::LEFT));
@@ -77,6 +78,18 @@ class Input {
     }
     bool isPressed = Eng::Input::getInstance().isRepeated(key);
     return isPressed ? Qtrue : Qfalse;
+  }
+
+  static VALUE method_dir4(VALUE self, VALUE _num)
+  {
+    return Convert::toRubyNumber(
+      Eng::Input::getInstance().getDir4()
+    );
+  }
+
+  static VALUE method_dir8(VALUE self, VALUE _num)
+  {
+    return Convert::toRubyNumber(0);
   }
 
   static Eng::InputKey convertKeyCode(VALUE _num)

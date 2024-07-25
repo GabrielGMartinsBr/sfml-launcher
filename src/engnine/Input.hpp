@@ -6,6 +6,14 @@
 
 namespace Eng {
 
+enum DirectionalKey {
+  DIRECTIONAL_NONE = 0,
+  DIRECTIONAL_DOWN = 2,
+  DIRECTIONAL_UP = 8,
+  DIRECTIONAL_LEFT = 4,
+  DIRECTIONAL_RIGHT = 6
+};
+
 enum InputKey {
   UNKNOW,
   DOWN,
@@ -72,6 +80,8 @@ class Input {
         keyTimes[i] = 0;
       }
     }
+
+    updateDirectional();
   }
 
   bool isPressed(InputKey key)
@@ -94,6 +104,11 @@ class Input {
     return num > -1 && num < Eng::InputKey::NUM_KEYS;
   }
 
+  DirectionalKey getDir4()
+  {
+    return dir4;
+  }
+
   Eng::InputKey castKeyCode(int num)
   {
     return (Eng::InputKey)num;
@@ -104,12 +119,14 @@ class Input {
   bool previousKeyStates[InputKey::NUM_KEYS];
   bool pressStates[InputKey::NUM_KEYS];
   unsigned short keyTimes[InputKey::NUM_KEYS];
+  DirectionalKey dir4;
 
   Input()
   {
     for (int i = 1; i < InputKey::NUM_KEYS; i++) {
       keyTimes[i] = 0;
     }
+    dir4 = DirectionalKey::DIRECTIONAL_NONE;
   }
 
   Input(const Input&);
@@ -187,6 +204,27 @@ class Input {
         return InputKey::UNKNOW;
         break;
     }
+  }
+
+  void updateDirectional()
+  {
+    if (pressStates[InputKey::UP] && dir4 != DirectionalKey::DIRECTIONAL_DOWN) {
+      dir4 = DirectionalKey::DIRECTIONAL_UP;
+      return;
+    } else if (pressStates[InputKey::DOWN] && dir4 != DirectionalKey::DIRECTIONAL_UP) {
+      dir4 = DirectionalKey::DIRECTIONAL_DOWN;
+      return;
+    }
+
+    if (pressStates[InputKey::LEFT] && dir4 != DirectionalKey::DIRECTIONAL_RIGHT) {
+      dir4 = DirectionalKey::DIRECTIONAL_LEFT;
+      return;
+    } else if (pressStates[InputKey::RIGHT] && dir4 != DirectionalKey::DIRECTIONAL_LEFT) {
+      dir4 = DirectionalKey::DIRECTIONAL_RIGHT;
+      return;
+    }
+
+    dir4 = DirectionalKey::DIRECTIONAL_NONE;
   }
 };
 
