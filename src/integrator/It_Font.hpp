@@ -47,6 +47,34 @@ class Font {
     rb_define_method(fontClass, "color=", RUBY_METHOD_FUNC(setter_color), 1);
   }
 
+  // Utils
+
+  static VALUE getRbClass()
+  {
+    return rb_const_get(rb_cObject, rb_intern("Font"));
+  }
+
+  static VALUE createRubyObject(Eng::Font *inst)
+  {
+    return Data_Wrap_Struct(getRbClass(), 0, free, inst);
+  }
+
+  static VALUE getRubyObject(Eng::Font *inst)
+  {
+    if (inst == nullptr) {
+      return Qnil;
+    }
+    if (inst->ptr == Qnil) {
+      inst->ptr = createRubyObject(inst);
+    }
+    return inst->ptr;
+  }
+
+  static Eng::Font *getObjectValue(VALUE rbObj)
+  {
+    return (Eng::Font *)DATA_PTR(rbObj);
+  }
+
  private:
   static VALUE method_initialize(int argc, VALUE *argv, VALUE self)
   {

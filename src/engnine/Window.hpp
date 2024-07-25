@@ -9,6 +9,7 @@
 #include <SFML/Graphics/Texture.hpp>
 #include <cmath>
 
+#include "Log.hpp"
 #include "engnine/Bitmap.hpp"
 #include "engnine/Drawable.hpp"
 #include "engnine/Engine.hpp"
@@ -200,6 +201,7 @@ class Window : Drawable {
 
   void method_dispose()
   {
+    Log::out() << "Dispose";
     isDisposed = true;
   }
 
@@ -260,9 +262,9 @@ class Window : Drawable {
     backgroundSprite.setScale(scaleX, scaleY);
     backgroundSprite.setPosition(x + 1, y + 1);
 
-    Log::out() << "update()";
-    Log::out() << "Rect width: " << cursor_rect->getter_width();
-    Log::out() << "Rect height: " << cursor_rect->getter_height();
+    // Log::out() << "update()";
+    // Log::out() << "Rect width: " << cursor_rect->getter_width();
+    // Log::out() << "Rect height: " << cursor_rect->getter_height();
   }
 
   void updateContentsSprite()
@@ -340,7 +342,7 @@ class Window : Drawable {
     if (windowSkin == nullptr) {
       return;
     }
-    Log::out() << " - [[updateBorder]]";
+    Log::out() << " - updateBorder()";
     constexpr int BORDER_START_X = 128;
     constexpr int BORDER_START_Y = 0;
     constexpr int BORDER_END_X = 192;

@@ -2,10 +2,10 @@
 
 #include "Convert.hpp"
 #include "RbUtils.hpp"
-#include "base/Log.hpp"
 #include "engnine/Bitmap.hpp"
 #include "engnine/Rect.hpp"
 #include "integrator/It_Color.hpp"
+#include "integrator/It_Font.hpp"
 #include "integrator/It_Rect.hpp"
 #include "ruby.h"
 
@@ -145,13 +145,9 @@ class Bitmap {
   */
   static VALUE getter_font(VALUE self)
   {
-    Eng::Bitmap *inst = (Eng::Bitmap *)DATA_PTR(self);
+    Eng::Bitmap *inst = getObjectValue(self);
     Eng::Font *font = inst->getter_font();
-
-    if (font == nullptr) {
-      return Qnil;
-    }
-    return font->ptr;
+    return Font::getRubyObject(font);
   }
 
   /*
@@ -159,10 +155,10 @@ class Bitmap {
   */
   static VALUE setter_font(VALUE self, VALUE value)
   {
-    Eng::Bitmap *inst = (Eng::Bitmap *)DATA_PTR(self);
-    Eng::Font *font = (Eng::Font *)DATA_PTR(value);
+    Eng::Bitmap *inst = getObjectValue(self);
+    Eng::Font *font = Font::getObjectValue(value);
     inst->setter_font(font);
-    return Qnil;
+    return value;
   }
 
   /*
@@ -170,10 +166,9 @@ class Bitmap {
   */
   static VALUE getter_rect(VALUE self)
   {
-    Eng::Bitmap *inst = (Eng::Bitmap *)DATA_PTR(self);
+    Eng::Bitmap *inst = getObjectValue(self);
     Eng::Rect *rect = new Eng::Rect(inst->get_rect());
-    VALUE rectObj = It::Rect::getRubyObject(rect);
-    return rectObj;
+    return It::Rect::getRubyObject(rect);
   }
 
   /*
@@ -182,7 +177,7 @@ class Bitmap {
 
   static VALUE method_clear(VALUE self)
   {
-    Eng::Bitmap *inst = (Eng::Bitmap *)DATA_PTR(self);
+    Eng::Bitmap *inst = getObjectValue(self);
     inst->clear();
     return Qnil;
   }
@@ -193,7 +188,7 @@ class Bitmap {
 
   static VALUE method_dispose(VALUE self)
   {
-    Eng::Bitmap *inst = (Eng::Bitmap *)DATA_PTR(self);
+    Eng::Bitmap *inst = getObjectValue(self);
     inst->dispose();
     return Qnil;
   }
@@ -204,7 +199,7 @@ class Bitmap {
 
   static VALUE method_disposed(VALUE self)
   {
-    Eng::Bitmap *inst = (Eng::Bitmap *)DATA_PTR(self);
+    Eng::Bitmap *inst = getObjectValue(self);
     return inst->disposed() ? Qtrue : Qfalse;
   }
 
@@ -214,8 +209,10 @@ class Bitmap {
 
   static VALUE method_width(VALUE self)
   {
-    Eng::Bitmap *inst = (Eng::Bitmap *)DATA_PTR(self);
-    return INT2NUM(inst->width);
+    Eng::Bitmap *inst = getObjectValue(self);
+    return Convert::toRubyNumber(
+      inst->getter_width()
+    );
   }
 
   /*
@@ -224,8 +221,10 @@ class Bitmap {
 
   static VALUE method_height(VALUE self)
   {
-    Eng::Bitmap *inst = (Eng::Bitmap *)DATA_PTR(self);
-    return INT2NUM(inst->height);
+    Eng::Bitmap *inst = getObjectValue(self);
+    return Convert::toRubyNumber(
+      inst->getter_height()
+    );
   }
 
   /*
@@ -312,10 +311,10 @@ class Bitmap {
     Check_Type(_rect, T_OBJECT);
     Check_Type(_color, T_OBJECT);
 
-    Eng::Rect *rect = (Eng::Rect *)DATA_PTR(_rect);
-    Eng::Color *color = (Eng::Color *)DATA_PTR(_color);
+    Eng::Rect *rect = Rect::getObjectValue(_rect);
+    Eng::Color *color = Color::getObjectValue(_color);
 
-    Eng::Bitmap *inst = (Eng::Bitmap *)DATA_PTR(self);
+    Eng::Bitmap *inst = Bitmap::getObjectValue(self);
 
     inst->fill_rect(rect, color);
 
@@ -330,13 +329,16 @@ class Bitmap {
     switch (argc) {
       case 2: {
         rb_scan_args(argc, argv, "2", &_rect, &_str);
-        Eng::Rect *rect = (Eng::Rect *)DATA_PTR(_rect);
+        Eng::Rect *rect = Rect::getObjectValue(_rect);
         app::CStr str = Convert::toCStr(_str);
         inst->draw_text(rect, str);
         break;
       }
       case 3: {
         rb_scan_args(argc, argv, "3", &_rect, &_str, &_align);
+        Eng::Rect *rect = Rect::getObjectValue(_rect);
+        app::CStr str = Convert::toCStr(_str);
+        inst->draw_text(rect, str);
         break;
       }
       case 5: {
@@ -346,16 +348,20 @@ class Bitmap {
         int width = Convert::toCInt(_width);
         int height = Convert::toCInt(_height);
         app::CStr str = Convert::toCStr(_str);
-        Log::out() << str;
         inst->draw_text(x, y, width, height, str);
         break;
       }
       case 6: {
         rb_scan_args(argc, argv, "6", &_x, &_y, &_width, &_height, &_str, &_align);
+        int x = Convert::toCInt(_x);
+        int y = Convert::toCInt(_y);
+        int width = Convert::toCInt(_width);
+        int height = Convert::toCInt(_height);
+        app::CStr str = Convert::toCStr(_str);
+        inst->draw_text(x, y, width, height, str);
         break;
       }
       default: {
-        Log::out() << "argc: " << argc;
         RbUtils::raiseRuntimeException("Bad number of arguments was receive.");
         return Qnil;
       }

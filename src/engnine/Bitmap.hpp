@@ -10,16 +10,15 @@
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/System/Vector2.hpp>
-#include <cstdlib>
 #include <stdexcept>
 
 #include "base/Log.hpp"
 #include "engnine/Color.hpp"
+#include "engnine/EngineBase.hpp"
 #include "engnine/FileUtils.hpp"
 #include "engnine/Font.hpp"
 #include "engnine/Rect.hpp"
 #include "engnine/internal/Texts.hpp"
-#include "ruby.h"
 
 namespace Eng {
 
@@ -29,17 +28,9 @@ enum TextAlign {
   TEXT_RIGHT
 };
 
-class Bitmap {
+class Bitmap : public EngineBase {
  public:
-  VALUE ptr;
-
-  bool _disposed = false;
   sf::RenderTexture renderTexture;
-  // sf::Image image;
-
-  unsigned int width;
-  unsigned int height;
-
   bool dirty = false;
 
   Bitmap(const char* assetName) :
@@ -86,9 +77,26 @@ class Bitmap {
     renderTexture.clear(sf::Color::Transparent);
   }
 
+  // Properties
+
+  // width
+
+  int getter_width()
+  {
+    return width;
+  }
+
+  // height
+
+  int getter_height()
+  {
+    return height;
+  }
+
+  // font
+
   Font* getter_font()
   {
-    Log::out() << font;
     return font;
   }
 
@@ -100,12 +108,12 @@ class Bitmap {
 
   void dispose()
   {
-    _disposed = true;
+    isDisposed = true;
   }
 
   bool disposed()
   {
-    return _disposed;
+    return isDisposed;
   }
 
   Rect get_rect() const
@@ -166,7 +174,7 @@ class Bitmap {
 
   void set_pixel(unsigned int x, unsigned int y, Color* _color)
   {
-    if (_disposed) {
+    if (isDisposed) {
       throw std::runtime_error("disposed bitmap");
     }
     if (x < 0 || x >= width || y < 0 || y >= height) {
@@ -245,6 +253,11 @@ class Bitmap {
 
  private:
   Font* font;
+  Rect* rect;
+  unsigned int width;
+  unsigned int height;
+
+  bool isDisposed = false;
 
   static void parseColor(sf::Color& dest, Color* src)
   {
@@ -257,8 +270,6 @@ class Bitmap {
   void createFont()
   {
     font = new Font();
-    VALUE fontClass = rb_const_get(rb_cObject, rb_intern("Font"));
-    font->ptr = Data_Wrap_Struct(fontClass, NULL, free, font);
   }
 };
 
