@@ -18,6 +18,7 @@ class Bitmap {
   static void integrate()
   {
     VALUE bitmapClass = rb_define_class("Bitmap", rb_cObject);
+    rb_define_alloc_func(bitmapClass, instance_allocator);
 
     rb_define_method(bitmapClass, "initialize", RUBY_METHOD_FUNC(initialize), -1);
 
@@ -57,7 +58,7 @@ class Bitmap {
 
   static VALUE createRubyObject(Eng::Bitmap *inst)
   {
-    return Data_Wrap_Struct(getRbClass(), 0, free, inst);
+    return Data_Wrap_Struct(getRbClass(), instance_mark, instance_free, inst);
   }
 
   static VALUE getRubyObject(Eng::Bitmap *inst)
@@ -83,6 +84,29 @@ class Bitmap {
 
 
  private:
+
+  /*
+    Allocator
+  */
+
+  static VALUE instance_allocator(VALUE instanceClass)
+  {
+    return Data_Wrap_Struct(instanceClass, instance_mark, instance_free, nullptr);
+  }
+
+  /*
+    Deallocator
+  */
+
+  static void instance_free(void *ptr)
+  {
+    Log::out() << "[[bitmap_free]]";
+    delete static_cast<Eng::Bitmap *>(ptr);
+  }
+
+  static void instance_mark(void *ptr)
+  {
+  }
 
   /*
     Method initialize
@@ -119,8 +143,8 @@ class Bitmap {
     unsigned int height = FIX2INT(_height);
     Eng::Bitmap *inst = new Eng::Bitmap(width, height);
 
-    inst->ptr = self;
     DATA_PTR(self) = inst;
+    inst->ptr = self;
     return self;
   }
 
@@ -135,8 +159,8 @@ class Bitmap {
     const char *fileName = StringValuePtr(_fileName);
     Eng::Bitmap *inst = new Eng::Bitmap(fileName);
 
-    inst->ptr = self;
     DATA_PTR(self) = inst;
+    inst->ptr = self;
     return self;
   }
 
@@ -156,6 +180,7 @@ class Bitmap {
   static VALUE setter_font(VALUE self, VALUE value)
   {
     Eng::Bitmap *inst = getObjectValue(self);
+    Eng::Font *prev = inst->getter_font();
     Eng::Font *font = Font::getObjectValue(value);
     inst->setter_font(font);
     return value;
@@ -168,7 +193,8 @@ class Bitmap {
   {
     Eng::Bitmap *inst = getObjectValue(self);
     Eng::Rect *rect = new Eng::Rect(inst->get_rect());
-    return It::Rect::getRubyObject(rect);
+    VALUE value = It::Rect::getRubyObject(rect);
+    return value;
   }
 
   /*
@@ -239,11 +265,9 @@ class Bitmap {
     unsigned int x = NUM2UINT(_x);
     unsigned int y = NUM2UINT(_y);
 
-    Eng::Bitmap *inst = (Eng::Bitmap *)DATA_PTR(self);
+    Eng::Bitmap *inst = getObjectValue(self);
     Eng::Color *color = inst->get_pixel(x, y);
-
-    VALUE colorClass = Color::getRbClass();
-    return Data_Wrap_Struct(colorClass, 0, free, color);
+    return Color::getRubyObject(color);
   }
 
   /*
@@ -259,8 +283,8 @@ class Bitmap {
     unsigned int x = NUM2UINT(_x);
     unsigned int y = NUM2UINT(_y);
 
-    Eng::Bitmap *inst = (Eng::Bitmap *)DATA_PTR(self);
-    Eng::Color *color = (Eng::Color *)DATA_PTR(_color);
+    Eng::Bitmap *inst = getObjectValue(self);
+    Eng::Color *color = Color::getObjectValue(_color);
 
     inst->set_pixel(x, y, color);
 
@@ -295,8 +319,8 @@ class Bitmap {
     unsigned int width = Convert::toCInt(_width);
     unsigned int height = Convert::toCInt(_height);
 
-    Eng::Bitmap *inst = (Eng::Bitmap *)DATA_PTR(self);
-    Eng::Color *color = (Eng::Color *)DATA_PTR(_color);
+    Eng::Bitmap *inst = getObjectValue(self);
+    Eng::Color *color = Color::getObjectValue(_color);
 
     inst->fill_rect(x, y, width, height, color);
 
@@ -308,8 +332,21 @@ class Bitmap {
     VALUE _rect, _color;
     rb_scan_args(argc, argv, "2", &_rect, &_color);
 
-    Check_Type(_rect, T_OBJECT);
-    Check_Type(_color, T_OBJECT);
+    if (!Rect::isInstance(_rect)) {
+      RbUtils::raiseCantConvertError(
+        rb_class_of(_rect),
+        Rect::getRbClass()
+      );
+      return Qnil;
+    }
+
+    if (!Color::isInstance(_color)) {
+      RbUtils::raiseCantConvertError(
+        rb_class_of(_color),
+        Color::getRbClass()
+      );
+      return Qnil;
+    }
 
     Eng::Rect *rect = Rect::getObjectValue(_rect);
     Eng::Color *color = Color::getObjectValue(_color);
@@ -324,7 +361,7 @@ class Bitmap {
   static VALUE method_draw_text(int argc, VALUE *argv, VALUE self)
   {
     VALUE _x, _y, _width, _height, _rect, _str, _align;
-    Eng::Bitmap *inst = (Eng::Bitmap *)DATA_PTR(self);
+    Eng::Bitmap *inst = getObjectValue(self);
 
     switch (argc) {
       case 2: {
@@ -372,7 +409,7 @@ class Bitmap {
 
   static VALUE method_text_size(VALUE self, VALUE _str)
   {
-    Eng::Bitmap *inst = (Eng::Bitmap *)DATA_PTR(self);
+    Eng::Bitmap *inst = getObjectValue(self);
     app::CStr str = Convert::toCStr(_str);
     Eng::Rect *rect = inst->get_text_size(str);
     VALUE rectObj = It::Rect::getRubyObject(rect);
@@ -381,7 +418,7 @@ class Bitmap {
 
   static VALUE method_blt(int argc, VALUE *argv, VALUE self)
   {
-    Eng::Bitmap *inst = (Eng::Bitmap *)DATA_PTR(self);
+    Eng::Bitmap *inst = getObjectValue(self);
     VALUE _x, _y, _src_bitmap, _src_rect, _opacity;
 
     if (argc == 4) {
@@ -389,8 +426,8 @@ class Bitmap {
 
       int x = Convert::toCInt(_x);
       int y = Convert::toCInt(_y);
-      Eng::Bitmap *src_bitmap = (Eng::Bitmap *)DATA_PTR(_src_bitmap);
-      Eng::Rect *src_rect = (Eng::Rect *)DATA_PTR(_src_rect);
+      Eng::Bitmap *src_bitmap = Bitmap::getObjectValue(_src_bitmap);
+      Eng::Rect *src_rect = Rect::getObjectValue(_src_rect);
 
       inst->blt(x, y, src_bitmap, src_rect);
       return Qnil;
@@ -402,8 +439,8 @@ class Bitmap {
       int x = Convert::toCInt(_x);
       int y = Convert::toCInt(_y);
       int opacity = Convert::toCInt(_opacity);
-      Eng::Bitmap *src_bitmap = (Eng::Bitmap *)DATA_PTR(_src_bitmap);
-      Eng::Rect *src_rect = (Eng::Rect *)DATA_PTR(_src_rect);
+      Eng::Bitmap *src_bitmap = Bitmap::getObjectValue(_src_bitmap);
+      Eng::Rect *src_rect = Rect::getObjectValue(_src_rect);
 
       inst->blt(x, y, src_bitmap, src_rect, opacity);
 
@@ -417,15 +454,15 @@ class Bitmap {
 
   static VALUE method_stretch_blt(int argc, VALUE *argv, VALUE self)
   {
-    Eng::Bitmap *inst = (Eng::Bitmap *)DATA_PTR(self);
+    Eng::Bitmap *inst = getObjectValue(self);
     VALUE _dst_rect, _src_bitmap, _src_rect, _opacity;
 
     if (argc == 3) {
       rb_scan_args(argc, argv, "3", &_dst_rect, &_src_bitmap, &_src_rect);
 
-      Eng::Rect *dst_rect = (Eng::Rect *)DATA_PTR(_dst_rect);
-      Eng::Bitmap *src_bitmap = (Eng::Bitmap *)DATA_PTR(_src_bitmap);
-      Eng::Rect *src_rect = (Eng::Rect *)DATA_PTR(_src_rect);
+      Eng::Rect *dst_rect = Rect::getObjectValue(_dst_rect);
+      Eng::Bitmap *src_bitmap = Bitmap::getObjectValue(_src_bitmap);
+      Eng::Rect *src_rect = Rect::getObjectValue(_src_rect);
 
       inst->stretch_blt(dst_rect, src_bitmap, src_rect);
       return Qnil;
@@ -434,10 +471,10 @@ class Bitmap {
     if (argc == 4) {
       rb_scan_args(argc, argv, "4", &_dst_rect, &_src_bitmap, &_src_rect, &_opacity);
 
-      Eng::Rect *dst_rect = (Eng::Rect *)DATA_PTR(_dst_rect);
+      Eng::Rect *dst_rect = Rect::getObjectValue(_dst_rect);
       int opacity = Convert::toCInt(_opacity);
-      Eng::Bitmap *src_bitmap = (Eng::Bitmap *)DATA_PTR(_src_bitmap);
-      Eng::Rect *src_rect = (Eng::Rect *)DATA_PTR(_src_rect);
+      Eng::Bitmap *src_bitmap = Bitmap::getObjectValue(_src_bitmap);
+      Eng::Rect *src_rect = Rect::getObjectValue(_src_rect);
 
       inst->stretch_blt(dst_rect, src_bitmap, src_rect, opacity);
 

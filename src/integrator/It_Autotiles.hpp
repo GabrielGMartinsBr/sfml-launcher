@@ -16,8 +16,9 @@ class Autotiles {
   static void integrate()
   {
     VALUE autotilesRb = rb_define_class("TilemapAutotiles", rb_cObject);
+    rb_define_alloc_func(autotilesRb, instance_allocator);
 
-    rb_define_method(autotilesRb, "initialize", RUBY_METHOD_FUNC(initialize), 0);
+    // rb_define_method(autotilesRb, "initialize", RUBY_METHOD_FUNC(initialize), 0);
 
     rb_define_method(autotilesRb, "[]", RUBY_METHOD_FUNC(getter), 1);
     rb_define_method(autotilesRb, "[]=", RUBY_METHOD_FUNC(setter), 2);
@@ -32,7 +33,7 @@ class Autotiles {
 
   static VALUE createRubyObject(Eng::Autotiles *inst)
   {
-    return Data_Wrap_Struct(getRbClass(), 0, free, inst);
+    return Data_Wrap_Struct(getRbClass(), instance_mark, instance_free, inst);
   }
 
   static VALUE getRubyObject(Eng::Autotiles *inst)
@@ -54,15 +55,30 @@ class Autotiles {
  private:
 
   /*
-      Initialize
+    Allocator
   */
-  static VALUE initialize(int argc, VALUE *argv, VALUE self)
+
+  static VALUE instance_allocator(VALUE instanceClass)
   {
-    Eng::Autotiles *inst;
-    inst->ptr = self;
-    DATA_PTR(self) = inst;
-    return self;
+    return Data_Wrap_Struct(instanceClass, instance_mark, instance_free, nullptr);
   }
+
+  /*
+    Deallocator
+  */
+
+  static void instance_free(void *ptr)
+  {
+    delete static_cast<Eng::Autotiles *>(ptr);
+  }
+
+  static void instance_mark(void *ptr)
+  {
+  }
+
+  /*
+    Method initialize
+  */
 
   /*
       Getter
@@ -76,7 +92,7 @@ class Autotiles {
       );
       return Qnil;
     }
-    Eng::Autotiles *inst = It::Autotiles::getObjectValue(self);
+    Eng::Autotiles *inst = getObjectValue(self);
     Eng::Bitmap *value = inst->getter(index);
     return It::Bitmap::getRubyObject(value);
   }

@@ -3,16 +3,14 @@
 #include <SFML/Graphics/Rect.hpp>
 
 #include "Log.hpp"
-#include "ruby.h"
+#include "engnine/EngineBase.hpp"
 
 namespace Eng {
 
-class Rect {
+class Rect : public EngineBase {
  public:
-  VALUE ptr;
 
   Rect(float _x, float _y, unsigned int _width, unsigned int _height) :
-      ptr(Qnil),
       dirty(false)
   {
     x = _x;
@@ -22,7 +20,6 @@ class Rect {
   }
 
   Rect(Rect* _rect) :
-      ptr(Qnil),
       dirty(false)
   {
     x = _rect->x;
@@ -42,6 +39,11 @@ class Rect {
     dirty = true;
 
     return *this;
+  }
+
+  ~Rect()
+  {
+    Log::out() << "destructor rect";
   }
 
   void set(int _x, int _y, int _width, int _height)

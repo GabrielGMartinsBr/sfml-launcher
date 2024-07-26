@@ -2,6 +2,7 @@
 
 #include <stdexcept>
 
+#include "RbUtils.hpp"
 #include "base/Sugars.hpp"
 #include "engnine/Engine.hpp"
 #include "engnine/Rect.hpp"
@@ -20,6 +21,7 @@ class Viewport {
   static void integrate()
   {
     VALUE viewportClass = rb_define_class("Viewport", rb_cObject);
+    rb_define_alloc_func(viewportClass, instance_allocator);
 
     // Initialize
 
@@ -27,8 +29,8 @@ class Viewport {
 
     // Properties
 
-    rb_define_method(viewportClass, "rect", RUBY_METHOD_FUNC(attrGet_rect), 0);
-    rb_define_method(viewportClass, "rect=", RUBY_METHOD_FUNC(attrSet_rect), 1);
+    rb_define_method(viewportClass, "rect", RUBY_METHOD_FUNC(getter_rect), 0);
+    rb_define_method(viewportClass, "rect=", RUBY_METHOD_FUNC(setter_rect), 1);
 
     rb_define_method(viewportClass, "visible", RUBY_METHOD_FUNC(attrGet_visible), 0);
     rb_define_method(viewportClass, "visible=", RUBY_METHOD_FUNC(attrSet_visible), 1);
@@ -65,7 +67,7 @@ class Viewport {
 
   static VALUE createRubyObject(Eng::Viewport *inst)
   {
-    return Data_Wrap_Struct(getRbClass(), 0, free, inst);
+    return Data_Wrap_Struct(getRbClass(), instance_mark, instance_free, inst);
   }
 
   static VALUE getRubyObject(Eng::Viewport *inst)
@@ -91,9 +93,27 @@ class Viewport {
 
  private:
 
-  static Eng::Viewport *getInstance(VALUE self)
+  /*
+    Allocator
+  */
+
+  static VALUE instance_allocator(VALUE instanceClass)
   {
-    return (Eng::Viewport *)DATA_PTR(self);
+    return Data_Wrap_Struct(instanceClass, instance_mark, instance_free, nullptr);
+  }
+
+  /*
+    Deallocator
+  */
+
+  static void instance_free(void *ptr)
+  {
+    Log::out() << "[[Viewport_free]]";
+    delete static_cast<Eng::Viewport *>(ptr);
+  }
+
+  static void instance_mark(void *ptr)
+  {
   }
 
   /*
@@ -126,10 +146,12 @@ class Viewport {
     unsigned int width = FIX2INT(_width);
     unsigned int height = FIX2INT(_height);
 
-    SharedPtr<Eng::Viewport> inst = MakeSharedPtr<Eng::Viewport>(x, y, width, height);
-    Eng::Engine::getInstance().addViewport(inst);
+    // SharedPtr<Eng::Viewport> inst = MakeSharedPtr<Eng::Viewport>(x, y, width, height);
+    // Eng::Engine::getInstance().addViewport(inst);
+    // DATA_PTR(self) = inst.get();
 
-    DATA_PTR(self) = inst.get();
+    Eng::Viewport *inst = new Eng::Viewport(x, y, width, height);
+    DATA_PTR(self) = inst;
     inst->ptr = self;
 
     return self;
@@ -140,14 +162,14 @@ class Viewport {
     VALUE _rect;
     rb_scan_args(argc, argv, "1", &_rect);
 
-    Check_Type(_rect, T_OBJECT);
+    Eng::Rect *rect = Rect::getObjectValue(_rect);
 
-    Eng::Rect *rect = (Eng::Rect *)DATA_PTR(_rect);
+    // SharedPtr<Eng::Viewport> inst = MakeSharedPtr<Eng::Viewport>(rect);
+    // Eng::Engine::getInstance().addViewport(inst);
+    // DATA_PTR(self) = inst.get();
 
-    SharedPtr<Eng::Viewport> inst = MakeSharedPtr<Eng::Viewport>(rect);
-    Eng::Engine::getInstance().addViewport(inst);
-
-    DATA_PTR(self) = inst.get();
+    Eng::Viewport *inst = new Eng::Viewport(rect);
+    DATA_PTR(self) = inst;
     inst->ptr = self;
 
     return self;
@@ -157,30 +179,25 @@ class Viewport {
     Attr rect
   */
 
-  static VALUE attrGet_rect(VALUE self)
+  static VALUE getter_rect(VALUE self)
   {
-    Eng::Viewport *inst = (Eng::Viewport *)DATA_PTR(self);
+    Eng::Viewport *inst = getObjectValue(self);
     Eng::Rect *rect = inst->getRect();
+    return Rect::getRubyObject(rect);
+  }
 
+  static VALUE setter_rect(VALUE self, VALUE value)
+  {
+    Eng::Rect *rect = Rect::getObjectValue(value);
     if (rect == nullptr) {
+      RbUtils::raiseRuntimeException("Invalid rect argument received.");
       return Qnil;
     }
 
-    VALUE rectClass = Rect::getRbClass();
-    return Data_Wrap_Struct(rectClass, 0, free, rect);
-  }
-
-  static VALUE attrSet_rect(VALUE self, VALUE value)
-  {
-    Eng::Rect *rect = (Eng::Rect *)DATA_PTR(value);
-    if (rect == nullptr) {
-      throw std::runtime_error("invalid rect pointer");
-    }
-
-    Eng::Viewport *inst = (Eng::Viewport *)DATA_PTR(self);
+    Eng::Viewport *inst = getObjectValue(self);
     inst->setRect(rect);
 
-    return Qnil;
+    return value;
   }
 
   /*
@@ -189,16 +206,16 @@ class Viewport {
 
   static VALUE attrGet_visible(VALUE self)
   {
-    bool visible = getInstance(self)->getVisible();
+    bool visible = getObjectValue(self)->getVisible();
     return visible ? Qtrue : Qfalse;
   }
 
   static VALUE attrSet_visible(VALUE self, VALUE value)
   {
     if (value == Qtrue) {
-      getInstance(self)->setVisible(true);
+      getObjectValue(self)->setVisible(true);
     } else if (value == Qfalse) {
-      getInstance(self)->setVisible(false);
+      getObjectValue(self)->setVisible(false);
     } else {
       throw std::runtime_error("Expected a boolean value.");
     }
@@ -211,7 +228,7 @@ class Viewport {
 
   static VALUE attrGet_z(VALUE self)
   {
-    int z = getInstance(self)->getZ();
+    int z = getObjectValue(self)->getZ();
     return INT2FIX(z);
   }
 
@@ -219,7 +236,7 @@ class Viewport {
   {
     Check_Type(value, T_FIXNUM);
     int z = FIX2INT(value);
-    getInstance(self)->setZ(z);
+    getObjectValue(self)->setZ(z);
     return value;
   }
 
@@ -229,7 +246,7 @@ class Viewport {
 
   static VALUE attrGet_ox(VALUE self)
   {
-    int ox = getInstance(self)->getOx();
+    int ox = getObjectValue(self)->getOx();
     return INT2FIX(ox);
   }
 
@@ -237,7 +254,7 @@ class Viewport {
   {
     Check_Type(value, T_FIXNUM);
     int ox = FIX2INT(value);
-    getInstance(self)->setOx(ox);
+    getObjectValue(self)->setOx(ox);
     return value;
   }
 
@@ -247,7 +264,7 @@ class Viewport {
 
   static VALUE attrGet_oy(VALUE self)
   {
-    int oy = getInstance(self)->getOy();
+    int oy = getObjectValue(self)->getOy();
     return INT2FIX(oy);
   }
 
@@ -255,7 +272,7 @@ class Viewport {
   {
     Check_Type(value, T_FIXNUM);
     int oy = FIX2INT(value);
-    getInstance(self)->setOy(oy);
+    getObjectValue(self)->setOy(oy);
     return value;
   }
 
@@ -263,7 +280,7 @@ class Viewport {
 
   static VALUE getter_color(VALUE self)
   {
-    Eng::Viewport *inst = getInstance(self);
+    Eng::Viewport *inst = getObjectValue(self);
     Eng::Color *value = inst->getter_color();
     return Color::getRubyObject(value);
   }
@@ -272,7 +289,7 @@ class Viewport {
 
   static VALUE setter_color(VALUE self, VALUE value)
   {
-    Eng::Viewport *inst = getInstance(self);
+    Eng::Viewport *inst = getObjectValue(self);
     inst->setter_color(
       Color::getObjectValue(value)
     );
@@ -283,7 +300,7 @@ class Viewport {
 
   static VALUE getter_tone(VALUE self)
   {
-    Eng::Viewport *inst = getInstance(self);
+    Eng::Viewport *inst = getObjectValue(self);
     Eng::Tone *value = inst->getter_tone();
     return Tone::getRubyObject(value);
   }
@@ -292,7 +309,7 @@ class Viewport {
 
   static VALUE setter_tone(VALUE self, VALUE value)
   {
-    Eng::Viewport *inst = getInstance(self);
+    Eng::Viewport *inst = getObjectValue(self);
     inst->setter_tone(
       Tone::getObjectValue(value)
     );
@@ -305,7 +322,7 @@ class Viewport {
 
   static VALUE method_dispose(VALUE self)
   {
-    Eng::Viewport *inst = getInstance(self);
+    Eng::Viewport *inst = getObjectValue(self);
     inst->method_dispose();
     return Qnil;
   }
@@ -316,7 +333,7 @@ class Viewport {
 
   static VALUE method_disposed(VALUE self)
   {
-    Eng::Viewport *inst = getInstance(self);
+    Eng::Viewport *inst = getObjectValue(self);
     bool isDisposed = inst->method_disposed();
     return isDisposed ? Qtrue : Qfalse;
   }
@@ -345,7 +362,7 @@ class Viewport {
       return Qnil;
     }
 
-    Eng::Viewport *inst = getInstance(self);
+    Eng::Viewport *inst = getObjectValue(self);
     inst->method_flash(color, time);
 
     return Qnil;
@@ -357,7 +374,7 @@ class Viewport {
 
   static VALUE method_update(VALUE self)
   {
-    Eng::Viewport *inst = getInstance(self);
+    Eng::Viewport *inst = getObjectValue(self);
     inst->method_update();
     return Qnil;
   }

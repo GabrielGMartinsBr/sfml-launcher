@@ -13,12 +13,13 @@
 #include "engnine/Bitmap.hpp"
 #include "engnine/Drawable.hpp"
 #include "engnine/Engine.hpp"
+#include "engnine/EngineBase.hpp"
 #include "engnine/Rect.hpp"
 #include "engnine/Viewport.hpp"
 
 namespace Eng {
 
-class Window : Drawable {
+class Window : public EngineBase, Drawable {
  public:
 
   Window(Viewport *viewport = 0) :

@@ -21,6 +21,7 @@ class Tilemap {
   static void integrate()
   {
     VALUE tilemaptRb = rb_define_class("Tilemap", rb_cObject);
+    rb_define_alloc_func(tilemaptRb, instance_allocator);
 
     // Initialize
 
@@ -69,7 +70,7 @@ class Tilemap {
 
   static VALUE createRubyObject(Eng::Tilemap *inst)
   {
-    return Data_Wrap_Struct(getRbClass(), 0, free, inst);
+    return Data_Wrap_Struct(getRbClass(), instance_mark, instance_free, inst);
   }
 
   static VALUE getRubyObject(Eng::Tilemap *inst)
@@ -91,6 +92,33 @@ class Tilemap {
   // Private
 
  private:
+
+  /*
+    Allocator
+  */
+
+  static VALUE instance_allocator(VALUE instanceClass)
+  {
+    return Data_Wrap_Struct(instanceClass, instance_mark, instance_free, nullptr);
+  }
+
+  /*
+    Deallocator
+  */
+
+  static void instance_free(void *ptr)
+  {
+    Log::out() << "[[Tilemap_free]]";
+    delete static_cast<Eng::Tilemap *>(ptr);
+  }
+
+  static void instance_mark(void *ptr)
+  {
+  }
+
+  /*
+    Method initialize
+  */
 
   static Eng::Tilemap *getInstance(VALUE self)
   {
@@ -119,8 +147,8 @@ class Tilemap {
       return Qnil;
     }
 
-    inst->ptr = self;
     DATA_PTR(self) = inst;
+    inst->ptr = self;
     return self;
   }
 

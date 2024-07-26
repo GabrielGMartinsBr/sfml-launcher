@@ -4,14 +4,11 @@
 #include "engnine/EngineBase.hpp"
 #include "engnine/Tone.hpp"
 #include "engnine/Viewport.hpp"
-#include "ruby.h"
 
 namespace Eng {
 
 class Plane : public EngineBase {
  public:
-  VALUE ptr;
-
   Plane(Viewport* vp = nullptr)
   {
     viewport = vp;

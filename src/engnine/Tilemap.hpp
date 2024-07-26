@@ -1,15 +1,14 @@
 #pragma once
 
 #include "engnine/Autotiles.hpp"
+#include "engnine/EngineBase.hpp"
 #include "engnine/Table.hpp"
 #include "engnine/Viewport.hpp"
-#include "ruby.h"
 
 namespace Eng {
 
-class Tilemap {
+class Tilemap : public EngineBase {
  public:
-  VALUE ptr;
 
   Tilemap(Viewport* _viewport = nullptr)
   {

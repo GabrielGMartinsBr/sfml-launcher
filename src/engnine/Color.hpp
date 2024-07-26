@@ -46,6 +46,11 @@ class Color : public EngineBase {
     syncSfColor();
   }
 
+  ~Color()
+  {
+    
+  }
+
   void set(double r, double g, double b, double a = 255)
   {
     clamp(r);

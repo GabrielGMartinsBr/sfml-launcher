@@ -10,11 +10,11 @@ namespace Eng {
 
 class Font : public EngineBase {
  public:
-  static std::vector<std::string>* default_name;
+  // static std::vector<std::string>* default_name;
   static int default_size;
   static bool default_bold;
   static bool default_italic;
-  static Color* default_color;
+  // static Color* default_color;
 
   static bool exist(const char* name)
   {
@@ -30,6 +30,10 @@ class Font : public EngineBase {
       italic(false)
   {
     color = new Color(255, 255, 255, 255);
+  }
+
+  ~Font()
+  {
   }
 
   // Font(Font& other) :

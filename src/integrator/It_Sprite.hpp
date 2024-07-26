@@ -19,6 +19,7 @@ class Sprite {
   static void integrate()
   {
     VALUE spriteClass = rb_define_class("Sprite", rb_cObject);
+    rb_define_alloc_func(spriteClass, instance_allocator);
 
     // Initialize
 
@@ -95,7 +96,7 @@ class Sprite {
 
   static VALUE createRubyObject(Eng::Sprite *inst)
   {
-    return Data_Wrap_Struct(getRbClass(), 0, free, inst);
+    return Data_Wrap_Struct(getRbClass(), instance_mark, instance_free, inst);
   }
 
   static VALUE getRubyObject(Eng::Sprite *inst)
@@ -116,13 +117,31 @@ class Sprite {
 
  private:
 
-  static Eng::Sprite *getInstance(VALUE self)
+  /*
+    Allocator
+  */
+
+  static VALUE instance_allocator(VALUE instanceClass)
   {
-    return (Eng::Sprite *)DATA_PTR(self);
+    return Data_Wrap_Struct(instanceClass, instance_mark, instance_free, nullptr);
   }
 
   /*
-    Initialize
+    Deallocator
+  */
+
+  static void instance_free(void *ptr)
+  {
+    Log::out() << "[[Sprite_free]]";
+    delete static_cast<Eng::Sprite *>(ptr);
+  }
+
+  static void instance_mark(void *ptr)
+  {
+  }
+
+  /*
+    Method initialize
   */
 
   static VALUE initialize(int argc, VALUE *argv, VALUE self)
@@ -158,7 +177,7 @@ class Sprite {
 
   static VALUE getter_bitmap(VALUE self)
   {
-    Eng::Sprite *inst = getInstance(self);
+    Eng::Sprite *inst = getObjectValue(self);
     return Bitmap::getRubyObject(
       inst->getter_bitmap()
     );
@@ -176,7 +195,7 @@ class Sprite {
       return Qnil;
     }
 
-    Eng::Sprite *inst = getInstance(self);
+    Eng::Sprite *inst = getObjectValue(self);
     inst->setter_bitmap(
       Bitmap::getObjectValue(value)
     );
@@ -188,7 +207,7 @@ class Sprite {
 
   static VALUE getter_src_rect(VALUE self)
   {
-    Eng::Sprite *inst = getInstance(self);
+    Eng::Sprite *inst = getObjectValue(self);
     return Rect::getRubyObject(
       inst->getter_src_rect()
     );
@@ -206,7 +225,7 @@ class Sprite {
       return Qnil;
     }
 
-    Eng::Sprite *inst = getInstance(self);
+    Eng::Sprite *inst = getObjectValue(self);
     inst->setter_src_rect(
       Rect::getObjectValue(value)
     );
@@ -239,7 +258,7 @@ class Sprite {
 
   static VALUE getter_x(VALUE self)
   {
-    Eng::Sprite *inst = getInstance(self);
+    Eng::Sprite *inst = getObjectValue(self);
     return Convert::toRubyNumber(
       inst->getter_x()
     );
@@ -249,7 +268,7 @@ class Sprite {
 
   static VALUE setter_x(VALUE self, VALUE value)
   {
-    Eng::Sprite *inst = getInstance(self);
+    Eng::Sprite *inst = getObjectValue(self);
     inst->setter_x(
       Convert::toCInt(value)
     );
@@ -260,7 +279,7 @@ class Sprite {
 
   static VALUE getter_y(VALUE self)
   {
-    Eng::Sprite *inst = getInstance(self);
+    Eng::Sprite *inst = getObjectValue(self);
     return Convert::toRubyNumber(
       inst->getter_y()
     );
@@ -270,7 +289,7 @@ class Sprite {
 
   static VALUE setter_y(VALUE self, VALUE value)
   {
-    Eng::Sprite *inst = getInstance(self);
+    Eng::Sprite *inst = getObjectValue(self);
     inst->setter_y(
       Convert::toCInt(value)
     );
@@ -281,7 +300,7 @@ class Sprite {
 
   static VALUE getter_z(VALUE self)
   {
-    Eng::Sprite *inst = getInstance(self);
+    Eng::Sprite *inst = getObjectValue(self);
     return Convert::toRubyNumber(
       inst->getter_z()
     );
@@ -291,7 +310,7 @@ class Sprite {
 
   static VALUE setter_z(VALUE self, VALUE value)
   {
-    Eng::Sprite *inst = getInstance(self);
+    Eng::Sprite *inst = getObjectValue(self);
     inst->setter_z(
       Convert::toCInt(value)
     );
@@ -302,7 +321,7 @@ class Sprite {
 
   static VALUE getter_ox(VALUE self)
   {
-    Eng::Sprite *inst = getInstance(self);
+    Eng::Sprite *inst = getObjectValue(self);
     return Convert::toRubyNumber(
       inst->getter_ox()
     );
@@ -312,7 +331,7 @@ class Sprite {
 
   static VALUE setter_ox(VALUE self, VALUE value)
   {
-    Eng::Sprite *inst = getInstance(self);
+    Eng::Sprite *inst = getObjectValue(self);
     inst->setter_ox(
       Convert::toCInt(value)
     );
@@ -323,7 +342,7 @@ class Sprite {
 
   static VALUE getter_oy(VALUE self)
   {
-    Eng::Sprite *inst = getInstance(self);
+    Eng::Sprite *inst = getObjectValue(self);
     return Convert::toRubyNumber(
       inst->getter_oy()
     );
@@ -333,7 +352,7 @@ class Sprite {
 
   static VALUE setter_oy(VALUE self, VALUE value)
   {
-    Eng::Sprite *inst = getInstance(self);
+    Eng::Sprite *inst = getObjectValue(self);
     inst->setter_oy(
       Convert::toCInt(value)
     );
@@ -449,7 +468,7 @@ class Sprite {
 
   static VALUE getter_opacity(VALUE self)
   {
-    Eng::Sprite *inst = getInstance(self);
+    Eng::Sprite *inst = getObjectValue(self);
     return Convert::toRubyNumber(
       inst->getter_opacity()
     );
@@ -459,7 +478,7 @@ class Sprite {
 
   static VALUE setter_opacity(VALUE self, VALUE value)
   {
-    Eng::Sprite *inst = getInstance(self);
+    Eng::Sprite *inst = getObjectValue(self);
     inst->setter_opacity(
       Convert::toCUnsignedInt(value)
     );
@@ -470,7 +489,7 @@ class Sprite {
 
   static VALUE setter_blend_type(VALUE self, VALUE value)
   {
-    Eng::Sprite *inst = getInstance(self);
+    Eng::Sprite *inst = getObjectValue(self);
     inst->setter_blend_type(
       Convert::toCInt(value)
     );
@@ -481,7 +500,7 @@ class Sprite {
 
   static VALUE getter_blend_type(VALUE self)
   {
-    Eng::Sprite *inst = getInstance(self);
+    Eng::Sprite *inst = getObjectValue(self);
     return Convert::toRubyNumber(
       inst->getter_blend_type()
     );
@@ -533,7 +552,7 @@ class Sprite {
 
   static VALUE method_viewport(VALUE self)
   {
-    Eng::Sprite *inst = getInstance(self);
+    Eng::Sprite *inst = getObjectValue(self);
     return Viewport::getRubyObject(
       inst->getViewport()
     );
@@ -585,7 +604,7 @@ class Sprite {
       return Qnil;
     }
 
-    Eng::Sprite *inst = getInstance(self);
+    Eng::Sprite *inst = getObjectValue(self);
     inst->method_flash(color, time);
 
     return Qnil;
@@ -597,7 +616,7 @@ class Sprite {
 
   static VALUE method_update(VALUE self)
   {
-    Eng::Sprite *inst = getInstance(self);
+    Eng::Sprite *inst = getObjectValue(self);
     inst->method_update();
     return Qnil;
   }

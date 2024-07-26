@@ -13,6 +13,7 @@ class Tone {
   static void integrate()
   {
     VALUE toneClass = rb_define_class("Tone", rb_cObject);
+    rb_define_alloc_func(toneClass, instance_allocator);
 
     // Serialize
 
@@ -52,7 +53,7 @@ class Tone {
 
   static VALUE createRubyObject(Eng::Tone *inst)
   {
-    return Data_Wrap_Struct(getRbClass(), 0, free, inst);
+    return Data_Wrap_Struct(getRbClass(), instance_mark, instance_free, inst);
   }
 
   static VALUE getRubyObject(Eng::Tone *inst)
@@ -78,9 +79,27 @@ class Tone {
 
  private:
 
-  static Eng::Tone *getInstance(VALUE self)
+  /*
+    Allocator
+  */
+
+  static VALUE instance_allocator(VALUE instanceClass)
   {
-    return (Eng::Tone *)DATA_PTR(self);
+    return Data_Wrap_Struct(instanceClass, instance_mark, instance_free, nullptr);
+  }
+
+  /*
+    Deallocator
+  */
+
+  static void instance_free(void *ptr)
+  {
+    Log::out() << "[[Tone_free]]";
+    delete static_cast<Eng::Tone *>(ptr);
+  }
+
+  static void instance_mark(void *ptr)
+  {
   }
 
   static VALUE method_load(VALUE self, VALUE marshaled_data)
@@ -91,16 +110,12 @@ class Tone {
 
     Eng::Tone *tone = Eng::Tone::deserialize(data, len);
 
-    VALUE rubyObj = Data_Wrap_Struct(self, NULL, free, tone);
-    return rubyObj;
+    return getRubyObject(tone);
   }
 
-  static VALUE alloc(VALUE self)
-  {
-    return self;
-  }
-
-  // Initialize
+  /*
+    Method initialize
+  */
 
   static VALUE method_initialize(int argc, VALUE *argv, VALUE self)
   {
@@ -127,8 +142,8 @@ class Tone {
       return Qnil;
     }
 
-    instance->ptr = self;
     DATA_PTR(self) = instance;
+    instance->ptr = self;
     return self;
   }
 
@@ -220,7 +235,7 @@ class Tone {
 
   static VALUE method_set(int argc, VALUE *argv, VALUE self)
   {
-    Eng::Tone *inst = getInstance(self);
+    Eng::Tone *inst = getObjectValue(self);
     VALUE _r, _g, _b, _a;
 
     if (argc == 3) {
@@ -252,7 +267,7 @@ class Tone {
 
   static VALUE method_to_s(VALUE self)
   {
-    Eng::Tone &i = *getInstance(self);
+    Eng::Tone &i = *getObjectValue(self);
     char buffer[64];
     sprintf(buffer, "(%f, %f, %f, %f)", i.red, i.green, i.blue, i.gray);
     return Convert::toRubyString(buffer);

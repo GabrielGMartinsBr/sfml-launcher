@@ -14,6 +14,7 @@ class Table {
   static void integrate()
   {
     VALUE tableClass = rb_define_class("Table", rb_cObject);
+    rb_define_alloc_func(tableClass, instance_allocator);
 
     rb_define_module_function(tableClass, "_load", RUBY_METHOD_FUNC(method_load), 1);
 
@@ -35,7 +36,7 @@ class Table {
 
   static VALUE createRubyObject(Eng::Table *inst)
   {
-    return Data_Wrap_Struct(getRbClass(), 0, free, inst);
+    return Data_Wrap_Struct(getRbClass(), instance_mark, instance_free, inst);
   }
 
   static VALUE getRubyObject(Eng::Table *inst)
@@ -58,6 +59,30 @@ class Table {
 
  private:
 
+  /*
+    Allocator
+  */
+
+  static VALUE instance_allocator(VALUE instanceClass)
+  {
+    return Data_Wrap_Struct(instanceClass, instance_mark, instance_free, nullptr);
+  }
+
+  /*
+    Deallocator
+  */
+
+  static void instance_free(void *ptr)
+  {
+    if (ptr == nullptr) return;
+    // Log::out() << "[[Table_free]]";
+    delete static_cast<Eng::Table *>(ptr);
+  }
+
+  static void instance_mark(void *ptr)
+  {
+  }
+
   static VALUE method_load(VALUE self, VALUE marshaled_data)
   {
     Check_Type(marshaled_data, T_STRING);
@@ -65,10 +90,12 @@ class Table {
     int len = RSTRING_LEN(marshaled_data);
 
     Eng::Table *table = Eng::Table::deserialize(data, len);
-
-    VALUE table_obj = Data_Wrap_Struct(self, NULL, free, table);
-    return table_obj;
+    return getRubyObject(table);
   }
+
+  /*
+    Method initialize
+  */
 
   static VALUE method_initialize(int argc, VALUE *argv, VALUE self)
   {

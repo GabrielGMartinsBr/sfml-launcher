@@ -13,6 +13,7 @@ class Color {
   static void integrate()
   {
     VALUE colorClass = rb_define_class("Color", rb_cObject);
+    rb_define_alloc_func(colorClass, instance_allocator);
 
     // Serialize
 
@@ -52,7 +53,7 @@ class Color {
 
   static VALUE createRubyObject(Eng::Color *inst)
   {
-    return Data_Wrap_Struct(getRbClass(), 0, free, inst);
+    return Data_Wrap_Struct(getRbClass(), instance_mark, instance_free, inst);
   }
 
   static VALUE getRubyObject(Eng::Color *inst)
@@ -78,9 +79,28 @@ class Color {
 
  private:
 
-  static Eng::Color *getInstance(VALUE self)
+  /*
+    Allocator
+  */
+
+  static VALUE instance_allocator(VALUE instanceClass)
   {
-    return (Eng::Color *)DATA_PTR(self);
+    return Data_Wrap_Struct(instanceClass, instance_mark, instance_free, nullptr);
+  }
+
+  /*
+    Deallocator
+  */
+
+  static void instance_free(void *ptr)
+  {
+    if (ptr == nullptr) return;
+    // Log::out() << "[[Color_free]]";
+    delete static_cast<Eng::Color *>(ptr);
+  }
+
+  static void instance_mark(void *ptr)
+  {
   }
 
   static VALUE method_load(VALUE self, VALUE marshaled_data)
@@ -90,14 +110,8 @@ class Color {
     int len = RSTRING_LEN(marshaled_data);
 
     Eng::Color *color = Eng::Color::deserialize(data, len);
-
-    VALUE rubyObj = Data_Wrap_Struct(self, NULL, free, color);
-    return rubyObj;
-  }
-
-  static VALUE alloc(VALUE self)
-  {
-    return self;
+    VALUE value = getRubyObject(color);
+    return value;
   }
 
   // Initialize
@@ -127,8 +141,8 @@ class Color {
       return Qnil;
     }
 
-    instance->ptr = self;
     DATA_PTR(self) = instance;
+    instance->ptr = self;
     return self;
   }
 
@@ -220,7 +234,7 @@ class Color {
 
   static VALUE method_set(int argc, VALUE *argv, VALUE self)
   {
-    Eng::Color *inst = getInstance(self);
+    Eng::Color *inst = getObjectValue(self);
     VALUE _r, _g, _b, _a;
 
     if (argc == 3) {
@@ -252,7 +266,7 @@ class Color {
 
   static VALUE method_to_s(VALUE self)
   {
-    Eng::Color &i = *getInstance(self);
+    Eng::Color &i = *getObjectValue(self);
     char buffer[64];
     sprintf(buffer, "(%f, %f, %f, %f)", i.red, i.green, i.blue, i.alpha);
     return Convert::toRubyString(buffer);

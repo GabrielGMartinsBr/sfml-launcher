@@ -21,6 +21,7 @@ class Plane {
   static void integrate()
   {
     VALUE planeClass = rb_define_class("Plane", rb_cObject);
+    rb_define_alloc_func(planeClass, instance_allocator);
 
     // Initialize
 
@@ -77,7 +78,7 @@ class Plane {
 
   static VALUE createRubyObject(Eng::Plane *inst)
   {
-    return Data_Wrap_Struct(getRbClass(), 0, free, inst);
+    return Data_Wrap_Struct(getRbClass(), instance_mark, instance_free, inst);
   }
 
   static VALUE getRubyObject(Eng::Plane *inst)
@@ -99,7 +100,30 @@ class Plane {
  private:
 
   /*
-    Initialize
+    Allocator
+  */
+
+  static VALUE instance_allocator(VALUE instanceClass)
+  {
+    return Data_Wrap_Struct(instanceClass, instance_mark, instance_free, nullptr);
+  }
+
+  /*
+    Deallocator
+  */
+
+  static void instance_free(void *ptr)
+  {
+    Log::out() << "[[Plane_free]]";
+    delete static_cast<Eng::Plane *>(ptr);
+  }
+
+  static void instance_mark(void *ptr)
+  {
+  }
+
+  /*
+    Method initialize
   */
 
   static VALUE initialize(int argc, VALUE *argv, VALUE self)
@@ -120,8 +144,8 @@ class Plane {
       return Qnil;
     }
 
-    inst->ptr = self;
     DATA_PTR(self) = inst;
+    inst->ptr = self;
     return self;
   }
 

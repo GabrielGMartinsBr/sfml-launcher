@@ -4,6 +4,7 @@
 #include "It_Rect.hpp"
 #include "engnine/Rect.hpp"
 #include "engnine/Window.hpp"
+#include "integrator/It_Bitmap.hpp"
 #include "ruby.h"
 
 // TODO: Implement methods and attributes
@@ -16,8 +17,9 @@ class Window {
   static void integrate()
   {
     VALUE windowClass = rb_define_class("Window", rb_cObject);
+    rb_define_alloc_func(windowClass, instance_allocator);
 
-    rb_define_method(windowClass, "initialize", RUBY_METHOD_FUNC(method_initialize), -1);
+    rb_define_method(windowClass, "initialize", RUBY_METHOD_FUNC(initialize), -1);
     rb_define_method(windowClass, "update", RUBY_METHOD_FUNC(method_update), 0);
 
     rb_define_method(windowClass, "update", RUBY_METHOD_FUNC(method_update), 0);
@@ -81,13 +83,69 @@ class Window {
     rb_define_method(windowClass, "disposed?", RUBY_METHOD_FUNC(method_dispose), 0);
   }
 
- private:
-  static VALUE method_initialize(int argc, VALUE *argv, VALUE self)
+  // Utils
+
+  static VALUE getRbClass()
   {
-    Eng::Window *window = new Eng::Window();
+    return rb_const_get(rb_cObject, rb_intern("Window"));
+  }
 
-    DATA_PTR(self) = window;
+  static VALUE createRubyObject(Eng::Window *inst)
+  {
+    return Data_Wrap_Struct(getRbClass(), instance_mark, instance_free, inst);
+  }
 
+  static VALUE getRubyObject(Eng::Window *inst)
+  {
+    if (inst == nullptr) {
+      return Qnil;
+    }
+    if (inst->ptr == Qnil) {
+      inst->ptr = createRubyObject(inst);
+    }
+    return inst->ptr;
+  }
+
+  static Eng::Window *getObjectValue(VALUE rbObj)
+  {
+    return (Eng::Window *)DATA_PTR(rbObj);
+  }
+
+
+ private:
+
+  /*
+    Allocator
+  */
+
+  static VALUE instance_allocator(VALUE instanceClass)
+  {
+    return Data_Wrap_Struct(instanceClass, instance_mark, instance_free, nullptr);
+  }
+
+  /*
+    Deallocator
+  */
+
+  static void instance_free(void *ptr)
+  {
+    Log::out() << "[[window_free]]";
+    delete static_cast<Eng::Window *>(ptr);
+  }
+
+  static void instance_mark(void *ptr)
+  {
+  }
+
+  /*
+    Method initialize
+  */
+
+  static VALUE initialize(int argc, VALUE *argv, VALUE self)
+  {
+    Eng::Window *inst = new Eng::Window();
+    DATA_PTR(self) = inst;
+    inst->ptr = self;
     return self;
   }
 
@@ -97,37 +155,27 @@ class Window {
   }
 
   /*
-      Get windowSkin
+    Get windowSkin
   */
 
   static VALUE getter_windowSkin(VALUE self)
   {
-    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
-    auto v = inst->getWindowSkin();
-
-    Check_Type(v, T_OBJECT);
-
-    if (v == nullptr) {
-      return Qnil;
-    }
-
-    return v->ptr;
+    Eng::Window *inst = getObjectValue(self);
+    return It::Bitmap::getRubyObject(
+      inst->getWindowSkin()
+    );
   }
 
   /*
-      Set windowSkin
+    Set windowSkin
   */
 
   static VALUE setter_windowSkin(VALUE self, VALUE value)
   {
-    Check_Type(value, T_OBJECT);
-
-    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
-    Eng::Bitmap *bp = (Eng::Bitmap *)DATA_PTR(value);
-
+    Eng::Window *inst = getObjectValue(self);
+    Eng::Bitmap *bp = It::Bitmap::getObjectValue(value);
     inst->setWindowSkin(bp);
-
-    return Qnil;
+    return value;
   }
 
   /*
@@ -135,14 +183,10 @@ class Window {
   */
   static VALUE getter_contents(VALUE self)
   {
-    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
-    Eng::Bitmap *bp = inst->getContents();
-
-    if (bp == nullptr) {
-      return Qnil;
-    }
-
-    return bp->ptr;
+    Eng::Window *inst = getObjectValue(self);
+    return It::Bitmap::getRubyObject(
+      inst->getContents()
+    );
   }
 
   /*
@@ -150,13 +194,10 @@ class Window {
   */
   static VALUE setter_contents(VALUE self, VALUE value)
   {
-    Check_Type(value, T_OBJECT);
-    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
-    Eng::Bitmap *bp = (Eng::Bitmap *)DATA_PTR(value);
-
+    Eng::Window *inst = getObjectValue(self);
+    Eng::Bitmap *bp = It::Bitmap::getObjectValue(value);
     inst->setContents(bp);
-
-    return Qnil;
+    return value;
   }
 
   /*
@@ -164,7 +205,7 @@ class Window {
   */
   static VALUE getter_stretch(VALUE self)
   {
-    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    Eng::Window *inst = getObjectValue(self);
     return Convert::toRubyBool(inst->getter_stretch());
   }
 
@@ -175,7 +216,7 @@ class Window {
   {
     int v = Convert::toCBool(value);
 
-    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    Eng::Window *inst = getObjectValue(self);
     inst->setter_stretch(v);
 
     return Qnil;
@@ -186,7 +227,7 @@ class Window {
   */
   static VALUE getter_cursor_rect(VALUE self)
   {
-    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    Eng::Window *inst = getObjectValue(self);
     Eng::Rect *rect = inst->getter_cursor_rect();
     return It::Rect::getRubyObject(rect);
   }
@@ -196,9 +237,9 @@ class Window {
   */
   static VALUE setter_cursor_rect(VALUE self, VALUE value)
   {
-    Eng::Rect *rect = (Eng::Rect *)DATA_PTR(value);
+    Eng::Rect *rect = Rect::getObjectValue(value);
 
-    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    Eng::Window *inst = getObjectValue(self);
     inst->setter_cursor_rect(rect);
 
     return Qnil;
@@ -209,7 +250,7 @@ class Window {
   */
   static VALUE getter_active(VALUE self)
   {
-    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    Eng::Window *inst = getObjectValue(self);
     return Convert::toRubyBool(inst->getter_active());
   }
 
@@ -220,7 +261,7 @@ class Window {
   {
     int v = Convert::toCBool(value);
 
-    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    Eng::Window *inst = getObjectValue(self);
     inst->setter_active(v);
 
     return Qnil;
@@ -231,7 +272,7 @@ class Window {
   */
   static VALUE getter_visible(VALUE self)
   {
-    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    Eng::Window *inst = getObjectValue(self);
     return Convert::toRubyBool(inst->getter_visible());
   }
 
@@ -242,7 +283,7 @@ class Window {
   {
     int v = Convert::toCBool(value);
 
-    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    Eng::Window *inst = getObjectValue(self);
     inst->setter_visible(v);
 
     return Qnil;
@@ -253,7 +294,7 @@ class Window {
   */
   static VALUE getter_pause(VALUE self)
   {
-    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    Eng::Window *inst = getObjectValue(self);
     return Convert::toRubyBool(inst->getter_pause());
   }
 
@@ -264,7 +305,7 @@ class Window {
   {
     int v = Convert::toCBool(value);
 
-    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    Eng::Window *inst = getObjectValue(self);
     inst->setter_pause(v);
 
     return Qnil;
@@ -275,7 +316,7 @@ class Window {
   */
   static VALUE getter_x(VALUE self)
   {
-    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    Eng::Window *inst = getObjectValue(self);
     return Convert::toRubyNumber(inst->getX());
   }
 
@@ -286,7 +327,7 @@ class Window {
   {
     int x = Convert::toCInt(value);
 
-    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    Eng::Window *inst = getObjectValue(self);
     inst->setX(x);
 
     return Qnil;
@@ -297,7 +338,7 @@ class Window {
   */
   static VALUE getter_y(VALUE self)
   {
-    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    Eng::Window *inst = getObjectValue(self);
     return Convert::toRubyNumber(inst->getY());
   }
 
@@ -308,7 +349,7 @@ class Window {
   {
     int y = Convert::toCInt(value);
 
-    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    Eng::Window *inst = getObjectValue(self);
     inst->setY(y);
 
     return Qnil;
@@ -319,7 +360,7 @@ class Window {
   */
   static VALUE getter_width(VALUE self)
   {
-    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    Eng::Window *inst = getObjectValue(self);
     return Convert::toRubyNumber(inst->getWidth());
   }
 
@@ -330,7 +371,7 @@ class Window {
   {
     int width = Convert::toCInt(value);
 
-    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    Eng::Window *inst = getObjectValue(self);
     inst->setWidth(width);
 
     return Qnil;
@@ -341,7 +382,7 @@ class Window {
   */
   static VALUE getter_height(VALUE self)
   {
-    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    Eng::Window *inst = getObjectValue(self);
     return Convert::toRubyNumber(inst->getHeight());
   }
 
@@ -352,7 +393,7 @@ class Window {
   {
     int height = Convert::toCInt(value);
 
-    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    Eng::Window *inst = getObjectValue(self);
     inst->setHeight(height);
 
     return Qnil;
@@ -363,7 +404,7 @@ class Window {
   */
   static VALUE getter_z(VALUE self)
   {
-    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    Eng::Window *inst = getObjectValue(self);
     return Convert::toRubyNumber(inst->getZ());
   }
 
@@ -374,7 +415,7 @@ class Window {
   {
     int z = Convert::toCInt(value);
 
-    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    Eng::Window *inst = getObjectValue(self);
     inst->setZ(z);
 
     return Qnil;
@@ -385,7 +426,7 @@ class Window {
   */
   static VALUE getter_ox(VALUE self)
   {
-    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    Eng::Window *inst = getObjectValue(self);
     return Convert::toRubyNumber(inst->getter_ox());
   }
 
@@ -396,7 +437,7 @@ class Window {
   {
     int z = Convert::toCInt(value);
 
-    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    Eng::Window *inst = getObjectValue(self);
     inst->setter_ox(z);
 
     return Qnil;
@@ -407,7 +448,7 @@ class Window {
   */
   static VALUE getter_oy(VALUE self)
   {
-    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    Eng::Window *inst = getObjectValue(self);
     return Convert::toRubyNumber(inst->getter_oy());
   }
 
@@ -418,7 +459,7 @@ class Window {
   {
     int z = Convert::toCInt(value);
 
-    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    Eng::Window *inst = getObjectValue(self);
     inst->setter_oy(z);
 
     return Qnil;
@@ -429,7 +470,7 @@ class Window {
   */
   static VALUE getter_opacity(VALUE self)
   {
-    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    Eng::Window *inst = getObjectValue(self);
     return Convert::toRubyNumber(inst->getter_opacity());
   }
 
@@ -440,7 +481,7 @@ class Window {
   {
     int z = Convert::toCInt(value);
 
-    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    Eng::Window *inst = getObjectValue(self);
     inst->setter_opacity(z);
 
     return Qnil;
@@ -451,7 +492,7 @@ class Window {
   */
   static VALUE getter_back_opacity(VALUE self)
   {
-    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    Eng::Window *inst = getObjectValue(self);
     return Convert::toRubyNumber(inst->getter_back_opacity());
   }
 
@@ -462,7 +503,7 @@ class Window {
   {
     int z = Convert::toCInt(value);
 
-    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    Eng::Window *inst = getObjectValue(self);
     inst->setter_back_opacity(z);
 
     return Qnil;
@@ -473,7 +514,7 @@ class Window {
   */
   static VALUE getter_contents_opacity(VALUE self)
   {
-    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    Eng::Window *inst = getObjectValue(self);
     return Convert::toRubyNumber(inst->getter_contents_opacity());
   }
 
@@ -484,7 +525,7 @@ class Window {
   {
     int z = Convert::toCInt(value);
 
-    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    Eng::Window *inst = getObjectValue(self);
     inst->setter_contents_opacity(z);
 
     return Qnil;
@@ -496,7 +537,7 @@ class Window {
 
   static VALUE method_dispose(VALUE self)
   {
-    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    Eng::Window *inst = getObjectValue(self);
     if (inst == nullptr) {
       return Qnil;
     }
@@ -508,7 +549,7 @@ class Window {
 
   static VALUE method_disposed(VALUE self)
   {
-    Eng::Window *inst = (Eng::Window *)DATA_PTR(self);
+    Eng::Window *inst = getObjectValue(self);
     if (inst == nullptr) {
       return Qnil;
     }

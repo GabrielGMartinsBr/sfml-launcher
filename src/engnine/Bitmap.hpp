@@ -59,6 +59,8 @@ class Bitmap : public EngineBase {
     spr.setTexture(texture);
     renderTexture.draw(spr, sf::BlendAlpha);
     renderTexture.display();
+
+    isDisposed = false;
   }
 
   Bitmap(unsigned int _width, unsigned int _height) :
@@ -75,6 +77,14 @@ class Bitmap : public EngineBase {
     renderTexture.create(width, height, settings);
     renderTexture.setSmooth(false);
     renderTexture.clear(sf::Color::Transparent);
+
+    isDisposed = false;
+  }
+
+  ~Bitmap()
+  {
+    Log::out() << " - Bitmap (destructor)";
+    dispose();
   }
 
   // Properties
@@ -102,7 +112,11 @@ class Bitmap : public EngineBase {
 
   void setter_font(Font* v)
   {
-    Log::out() << v;
+    if (font != nullptr) {
+      delete font;
+      // font = nullptr;
+    }
+    // Log::out() << v;
     font = v;
   }
 
@@ -253,11 +267,11 @@ class Bitmap : public EngineBase {
 
  private:
   Font* font;
-  Rect* rect;
+  // Rect* rect;
   unsigned int width;
   unsigned int height;
 
-  bool isDisposed = false;
+  bool isDisposed;
 
   static void parseColor(sf::Color& dest, Color* src)
   {

@@ -20,6 +20,7 @@ class Font {
   static void integrate()
   {
     VALUE fontClass = rb_define_class("Font", rb_cObject);
+    rb_define_alloc_func(fontClass, instance_allocator);
 
     rb_define_module_function(fontClass, "exist?", RUBY_METHOD_FUNC(method_exist), 1);
 
@@ -56,7 +57,7 @@ class Font {
 
   static VALUE createRubyObject(Eng::Font *inst)
   {
-    return Data_Wrap_Struct(getRbClass(), 0, free, inst);
+    return Data_Wrap_Struct(getRbClass(), instance_mark, instance_free, inst);
   }
 
   static VALUE getRubyObject(Eng::Font *inst)
@@ -76,6 +77,34 @@ class Font {
   }
 
  private:
+
+  /*
+    Allocator
+  */
+
+  static VALUE instance_allocator(VALUE instanceClass)
+  {
+    return Data_Wrap_Struct(instanceClass, instance_mark, instance_free, nullptr);
+  }
+
+  /*
+    Deallocator
+  */
+
+  static void instance_free(void *ptr)
+  {
+    Log::out() << "[[Font_free]]";
+    delete static_cast<Eng::Font *>(ptr);
+  }
+
+  static void instance_mark(void *ptr)
+  {
+  }
+
+  /*
+    Method initialize
+  */
+
   static VALUE method_initialize(int argc, VALUE *argv, VALUE self)
   {
     Eng::Font *font;
