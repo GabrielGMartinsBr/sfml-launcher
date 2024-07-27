@@ -1,6 +1,6 @@
 #pragma once
 
-#include "engnine/Bitmap.hpp"
+#include "engnine/Bitmap.h"
 #include "engnine/EngineBase.hpp"
 #include "engnine/Tone.hpp"
 #include "engnine/Viewport.hpp"

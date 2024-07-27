@@ -10,10 +10,11 @@
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <algorithm>
+#include <stdexcept>
 
 #include "Log.hpp"
 #include "base/NumberUtils.hpp"
-#include "engnine/Bitmap.hpp"
+#include "engnine/Bitmap.h"
 #include "engnine/Color.hpp"
 #include "engnine/Drawable.hpp"
 #include "engnine/Engine.hpp"
@@ -22,13 +23,17 @@
 #include "engnine/Tone.hpp"
 #include "engnine/Viewport.hpp"
 #include "engnine/VpRects.hpp"
+#include "integrator/It_Rect.hpp"
 
 namespace Eng {
 
 class Sprite : Drawable, public EngineBase {
  public:
 
-  Sprite(Viewport *_viewport = nullptr) :
+  // Constructor
+
+  Sprite(VALUE rbObj, Viewport *_viewport = nullptr) :
+      EngineBase(rbObj),
       spriteColor(255, 255, 255, 255),
       position(0, 0)
   {
@@ -55,7 +60,33 @@ class Sprite : Drawable, public EngineBase {
     isDisposed = false;
     loadedBitmap = false;
 
+    if (rbObj != Qnil) {
+      bindRubyProps();
+    }
+
     Eng::Engine::getInstance().addDrawable(this);
+  }
+
+  Sprite(Viewport *_viewport = nullptr) :
+      Sprite(Qnil, _viewport) { }
+
+  /* --------------------------------------------------- */
+
+  /*
+    Bind ruby props
+  */
+
+  void bindRubyProps()
+  {
+    if (rbObj == Qnil) {
+      std::runtime_error("Sprite doesn't have rbObj defined.");
+    }
+
+    if (src_rect->rbObj == Qnil) {
+      src_rect->rbObj = It::Rect::createRubyObject(src_rect);
+    }
+
+    rb_iv_set(rbObj, "src_rect", src_rect->rbObj);
   }
 
   /* --------------------------------------------------- */
@@ -90,6 +121,7 @@ class Sprite : Drawable, public EngineBase {
 
   void setter_src_rect(Rect *_src_rect)
   {
+    // Log::out() << "(((settings src rect)))";
     src_rect = _src_rect;
     dirty = true;
   }

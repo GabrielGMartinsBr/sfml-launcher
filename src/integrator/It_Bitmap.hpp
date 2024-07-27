@@ -2,7 +2,7 @@
 
 #include "Convert.hpp"
 #include "RbUtils.hpp"
-#include "engnine/Bitmap.hpp"
+#include "engnine/Bitmap.h"
 #include "engnine/Rect.hpp"
 #include "integrator/It_Color.hpp"
 #include "integrator/It_Font.hpp"
@@ -106,6 +106,10 @@ class Bitmap {
 
   static void instance_mark(void *ptr)
   {
+    Eng::Font *font = static_cast<Eng::Bitmap *>(ptr)->getter_font();
+    if (font != nullptr && font->rbObj != Qnil) {
+      rb_gc_mark(font->rbObj);
+    }
   }
 
   /*

@@ -4,13 +4,18 @@
 #include "engnine/EngineBase.hpp"
 #include "engnine/Table.hpp"
 #include "engnine/Viewport.hpp"
+#include "integrator/It_Autotiles.hpp"
 
 namespace Eng {
 
 class Tilemap : public EngineBase {
  public:
 
-  Tilemap(Viewport* _viewport = nullptr)
+  Tilemap(Viewport* _viewport = nullptr) :
+      Tilemap(Qnil, _viewport) { }
+
+  Tilemap(VALUE rbObj, Viewport* _viewport = nullptr) :
+      EngineBase(rbObj)
   {
     viewport = _viewport;
     tileset = nullptr;
@@ -23,6 +28,27 @@ class Tilemap : public EngineBase {
     ox = 0;
     oy = 0;
     isDisposed = false;
+
+    if (rbObj != Qnil) {
+      bindRubyProps();
+    }
+  }
+
+  /*
+    Bind ruby props
+  */
+
+  void bindRubyProps()
+  {
+    if (rbObj == Qnil) {
+      std::runtime_error("Tilemap doesn't have rbObj defined.");
+    }
+
+    if (autotiles->rbObj == Qnil) {
+      autotiles->rbObj = It::Autotiles::createRubyObject(autotiles);
+    }
+
+    rb_iv_set(rbObj, "autotiles", autotiles->rbObj);
   }
 
   /*

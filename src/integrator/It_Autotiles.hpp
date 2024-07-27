@@ -1,8 +1,7 @@
 #pragma once
 
-#include "Log.hpp"
-#include "engnine/Autotiles.hpp"
-#include "engnine/Bitmap.hpp"
+#include "engnine/Autotiles.h"
+#include "engnine/Bitmap.h"
 #include "integrator/Convert.hpp"
 #include "integrator/It_Bitmap.hpp"
 #include "ruby.h"
@@ -74,11 +73,28 @@ class Autotiles {
 
   static void instance_mark(void *ptr)
   {
+    Eng::Autotiles *inst = static_cast<Eng::Autotiles *>(ptr);
+    Eng::Bitmap *bp;
+    for (int i = 0; i < 6; i++) {
+      bp = inst->getter(i);
+      if (bp == nullptr || bp->rbObj == Qnil) {
+        continue;
+      }
+      rb_gc_mark(bp->rbObj);
+    }
   }
 
   /*
     Method initialize
   */
+
+  // static VALUE initialize(int argc, VALUE *argv, VALUE self)
+  // {
+  //   Eng::Autotiles *inst;
+  //   DATA_PTR(self) = inst;
+  //   inst->ptr = self;
+  //   return self;
+  // }
 
   /*
       Getter
@@ -93,6 +109,7 @@ class Autotiles {
       return Qnil;
     }
     Eng::Autotiles *inst = getObjectValue(self);
+
     Eng::Bitmap *value = inst->getter(index);
     return It::Bitmap::getRubyObject(value);
   }
@@ -111,6 +128,9 @@ class Autotiles {
     }
     Eng::Autotiles *inst = It::Autotiles::getObjectValue(self);
     Eng::Bitmap *value = It::Bitmap::getObjectValue(_value);
+
+    // Log::out() << " -> value index: " << index << " ptr: " << value->rbObj;
+
     inst->setter(index, value);
     return _value;
   }

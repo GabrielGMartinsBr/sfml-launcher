@@ -1,7 +1,7 @@
 #pragma once
 
 #include "RbUtils.hpp"
-#include "engnine/Bitmap.hpp"
+#include "engnine/Bitmap.h"
 #include "engnine/Color.hpp"
 #include "engnine/Plane.hpp"
 #include "engnine/Tone.hpp"

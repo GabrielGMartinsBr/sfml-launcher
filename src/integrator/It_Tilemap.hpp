@@ -134,22 +134,24 @@ class Tilemap {
     Eng::Tilemap *inst;
 
     if (argc == 0) {
-      inst = new Eng::Tilemap();
-    } else if (argc == 1) {
+      inst = new Eng::Tilemap(self);
+      DATA_PTR(self) = inst;
+      return self;
+    }
+
+    if (argc == 1) {
       VALUE _viewport;
       rb_scan_args(argc, argv, "1", &_viewport);
       Eng::Viewport *viewport = Viewport::getObjectValue(_viewport);
-      inst = new Eng::Tilemap(viewport);
-    } else {
-      RbUtils::raiseRuntimeException(
-        "Tilemap initializer takes 1 or 0 argument, but " + std::to_string(argc) + " were received."
-      );
-      return Qnil;
+      inst = new Eng::Tilemap(self, viewport);
+      DATA_PTR(self) = inst;
+      return self;
     }
 
-    DATA_PTR(self) = inst;
-    inst->rbObj = self;
-    return self;
+    RbUtils::raiseRuntimeException(
+      "Tilemap initializer takes 1 or 0 argument, but " + std::to_string(argc) + " were received."
+    );
+    return Qnil;
   }
 
   /*

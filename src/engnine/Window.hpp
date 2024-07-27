@@ -10,7 +10,7 @@
 #include <cmath>
 
 #include "Log.hpp"
-#include "engnine/Bitmap.hpp"
+#include "engnine/Bitmap.h"
 #include "engnine/Drawable.hpp"
 #include "engnine/Engine.hpp"
 #include "engnine/EngineBase.hpp"

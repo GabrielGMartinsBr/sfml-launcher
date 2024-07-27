@@ -30,9 +30,11 @@ class Bitmap : public EngineBase {
   sf::RenderTexture renderTexture;
   bool dirty = false;
 
-  Bitmap(const char* assetName);
-  Bitmap(unsigned int _width, unsigned int _height);
+  Bitmap(const char* assetName, VALUE rbObj = Qnil);
+  Bitmap(unsigned int _width, unsigned int _height, VALUE rbObj = Qnil);
   ~Bitmap();
+
+  void bindRubyProps();
 
   // Properties
 
@@ -74,7 +76,6 @@ class Bitmap : public EngineBase {
   bool isDisposed;
 
   static void parseColor(sf::Color& dest, Color* src);
-  void createFont();
 };
 
 }  // namespace Eng

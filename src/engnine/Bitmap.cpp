@@ -14,25 +14,29 @@
 #include <SFML/System/Vector2.hpp>
 #include <stdexcept>
 
+#include "AppDefs.h"
 #include "engnine/Color.hpp"
 #include "engnine/FileUtils.hpp"
 #include "engnine/Font.hpp"
 #include "engnine/Rect.hpp"
 #include "engnine/internal/Texts.hpp"
+#include "integrator/It_Font.hpp"
 
 namespace Eng {
 
-Bitmap::Bitmap(const char* assetName) :
-    font(nullptr),
+// Constructor
+
+Bitmap::Bitmap(const char* assetName, VALUE rbObj) :
+    EngineBase(rbObj),
+    font(new Font()),
     renderTexture()
 {
-  std::string filename = FileUtils::parseRtpPath(assetName);
   sf::Image image;
+  app::String filename = FileUtils::parseRtpPath(assetName);
   bool loaded = image.loadFromFile(filename);
   if (!loaded) {
     throw std::runtime_error("Could not load image.");
   }
-  createFont();
 
   sf::Vector2u size = image.getSize();
   width = size.x;
@@ -51,17 +55,22 @@ Bitmap::Bitmap(const char* assetName) :
 
   isDisposed = false;
   dirty = false;
+
+  if (rbObj != Qnil) {
+    bindRubyProps();
+  }
 }
 
-Bitmap::Bitmap(unsigned int _width, unsigned int _height) :
-    font(nullptr),
+// Constructor overload
+
+Bitmap::Bitmap(unsigned int _width, unsigned int _height, VALUE rbObj) :
+    EngineBase(rbObj),
+    font(new Font()),
     renderTexture()
 {
   width = _width;
   height = _height;
 
-  createFont();
-  // image.create(width, height, sf::Color::Transparent);
   sf::ContextSettings settings;
   settings.antialiasingLevel = 0;
   renderTexture.create(width, height, settings);
@@ -70,12 +79,33 @@ Bitmap::Bitmap(unsigned int _width, unsigned int _height) :
 
   isDisposed = false;
   dirty = false;
+
+  if (rbObj != Qnil) {
+    bindRubyProps();
+  }
 }
+
+// Destructor
 
 Bitmap::~Bitmap()
 {
   // Log::out() << " - Bitmap (destructor)";
   dispose();
+}
+
+// Bind props ruby object to instance object
+
+void Bitmap::bindRubyProps()
+{
+  if (rbObj == Qnil) {
+    std::runtime_error("Bitmap doesn't have rbObj defined.");
+  }
+
+  if (font->rbObj == Qnil) {
+    font->rbObj = It::Font::createRubyObject(font);
+  }
+
+  rb_iv_set(rbObj, "font", font->rbObj);
 }
 
 /*
@@ -93,11 +123,16 @@ Font* Bitmap::getter_font()
 
 void Bitmap::setter_font(Font* v)
 {
-  if (font != nullptr) {
-    delete font;
-    // font = nullptr;
+  Log::out() << "Setting font: " << (v == font);
+
+  if (font == v) {
+    return;
   }
-  // Log::out() << v;
+
+  // if (font != nullptr && font->rbObj != Qnil) {
+  //   rb_gc_mark(font->rbObj);
+  // }
+
   font = v;
 }
 
@@ -297,13 +332,6 @@ void Bitmap::parseColor(sf::Color& dest, Color* src)
   dest.g = src->green;
   dest.b = src->blue;
   dest.a = src->alpha;
-}
-
-// Method createFont
-
-void Bitmap::createFont()
-{
-  font = new Font();
 }
 
 }  // namespace Eng
