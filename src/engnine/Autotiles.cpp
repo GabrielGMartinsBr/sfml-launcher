@@ -13,7 +13,7 @@ namespace Eng {
 Autotiles::Autotiles() :
     EngineBase(Qnil)
 {
-  for (int i = 0; i < 6; ++i) {
+  for (int i = 0; i < 7; ++i) {
     bitmaps[i] = nullptr;
   }
   bindRubyProps();
@@ -29,7 +29,7 @@ void Autotiles::bindRubyProps()
     rbObj = It::Autotiles::createRubyObject(this);
   }
   app::String name;
-  for (int i = 0; i < 6; ++i) {
+  for (int i = 0; i < 7; ++i) {
     if (bitmaps[i] == nullptr) {
       continue;
     }
@@ -43,12 +43,23 @@ void Autotiles::bindRubyProps()
 
 bool Autotiles::setter(int index, Bitmap* value)
 {
-  if (index < 0 && index > 6) {
+  if (index < 0 || index > 6) {
     return false;
   }
 
-  // delete bitmaps[index];
-  // bitmaps[index] = nullptr;
+  if (bitmaps[index] == value) {
+    return false;
+  }
+
+  // if (bitmaps[index] != nullptr && bitmaps[index]->rbObj != Qnil) {
+  //   rb_gc_mark(bitmaps[index]->rbObj);
+  // }
+
+  if (value != nullptr && value->rbObj == Qnil) {
+    value->rbObj = It::Bitmap::createRubyObject(value);
+    app::String name = "bitmap_" + std::to_string(index);
+    rb_iv_set(rbObj, name.c_str(), value->rbObj);
+  }
 
   bitmaps[index] = value;
 
@@ -57,7 +68,7 @@ bool Autotiles::setter(int index, Bitmap* value)
 
 Bitmap* Autotiles::getter(int index)
 {
-  if (index < 0 && index > 6) {
+  if (index < 0 || index > 6) {
     return nullptr;
   }
   return bitmaps[index];

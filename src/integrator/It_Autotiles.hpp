@@ -75,7 +75,7 @@ class Autotiles {
   {
     Eng::Autotiles *inst = static_cast<Eng::Autotiles *>(ptr);
     Eng::Bitmap *bp;
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < 7; i++) {
       bp = inst->getter(i);
       if (bp == nullptr || bp->rbObj == Qnil) {
         continue;
