@@ -1,8 +1,8 @@
 #pragma once
 
 #include "RbUtils.hpp"
-#include "engnine/Autotiles.hpp"
-#include "engnine/Bitmap.hpp"
+#include "engnine/Autotiles.h"
+#include "engnine/Bitmap.h"
 #include "engnine/Table.hpp"
 #include "engnine/Tilemap.hpp"
 #include "engnine/Viewport.hpp"
