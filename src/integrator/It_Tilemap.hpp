@@ -4,7 +4,7 @@
 #include "engnine/Autotiles.h"
 #include "engnine/Bitmap.h"
 #include "engnine/Table.hpp"
-#include "engnine/Tilemap.hpp"
+#include "engnine/Tilemap.h"
 #include "engnine/Viewport.hpp"
 #include "integrator/Convert.hpp"
 #include "integrator/It_Autotiles.hpp"
