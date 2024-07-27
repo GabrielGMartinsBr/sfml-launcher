@@ -86,10 +86,10 @@ class Plane {
     if (inst == nullptr) {
       return Qnil;
     }
-    if (inst->ptr == Qnil) {
-      inst->ptr = createRubyObject(inst);
+    if (inst->rbObj == Qnil) {
+      inst->rbObj = createRubyObject(inst);
     }
-    return inst->ptr;
+    return inst->rbObj;
   }
 
   static Eng::Plane *getObjectValue(VALUE rbObj)
@@ -145,7 +145,7 @@ class Plane {
     }
 
     DATA_PTR(self) = inst;
-    inst->ptr = self;
+    inst->rbObj = self;
     return self;
   }
 

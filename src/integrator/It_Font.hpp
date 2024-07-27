@@ -65,10 +65,10 @@ class Font {
     if (inst == nullptr) {
       return Qnil;
     }
-    if (inst->ptr == Qnil) {
-      inst->ptr = createRubyObject(inst);
+    if (inst->rbObj == Qnil) {
+      inst->rbObj = createRubyObject(inst);
     }
-    return inst->ptr;
+    return inst->rbObj;
   }
 
   static Eng::Font *getObjectValue(VALUE rbObj)
@@ -126,7 +126,7 @@ class Font {
     }
 
     DATA_PTR(self) = font;
-    font->ptr = self;
+    font->rbObj = self;
     return self;
   }
 

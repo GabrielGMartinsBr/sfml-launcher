@@ -6,10 +6,10 @@ namespace Eng {
 
 class EngineBase {
  public:
-  VALUE ptr;
+  VALUE rbObj;
 
-  EngineBase() :
-      ptr(Qnil) { }
+  EngineBase(VALUE rbObj = Qnil) :
+      rbObj(rbObj) { }
 };
 
 }  // namespace Eng

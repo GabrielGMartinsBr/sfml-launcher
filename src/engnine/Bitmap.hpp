@@ -12,7 +12,6 @@
 #include <SFML/System/Vector2.hpp>
 #include <stdexcept>
 
-#include "base/Log.hpp"
 #include "engnine/Color.hpp"
 #include "engnine/EngineBase.hpp"
 #include "engnine/FileUtils.hpp"
@@ -83,7 +82,7 @@ class Bitmap : public EngineBase {
 
   ~Bitmap()
   {
-    Log::out() << " - Bitmap (destructor)";
+    // Log::out() << " - Bitmap (destructor)";
     dispose();
   }
 

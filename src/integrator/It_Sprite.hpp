@@ -104,10 +104,10 @@ class Sprite {
     if (inst == nullptr) {
       return Qnil;
     }
-    if (inst->ptr == Qnil) {
-      inst->ptr = createRubyObject(inst);
+    if (inst->rbObj == Qnil) {
+      inst->rbObj = createRubyObject(inst);
     }
-    return inst->ptr;
+    return inst->rbObj;
   }
 
   static Eng::Sprite *getObjectValue(VALUE rbObj)
@@ -132,12 +132,13 @@ class Sprite {
 
   static void instance_free(void *ptr)
   {
-    Log::out() << "[[Sprite_free]]";
+    // Log::out() << "[[Sprite_free]]: " << static_cast<Eng::Sprite *>(ptr)->rbObj;
     delete static_cast<Eng::Sprite *>(ptr);
   }
 
   static void instance_mark(void *ptr)
   {
+    rb_gc_mark(static_cast<Eng::Sprite *>(ptr)->getter_src_rect()->rbObj);
   }
 
   /*
@@ -149,8 +150,12 @@ class Sprite {
     Eng::Sprite *instance;
 
     if (argc == 0) {
-      instance = new Eng::Sprite();
-    } else if (argc == 1) {
+      instance = new Eng::Sprite(self);
+      DATA_PTR(self) = instance;
+      return self;
+    }
+
+    if (argc == 1) {
       VALUE _viewport;
       rb_scan_args(argc, argv, "1", &_viewport);
       if (!Viewport::isInstance(_viewport)) {
@@ -160,17 +165,15 @@ class Sprite {
         );
       }
       Eng::Viewport *viewport = Viewport::getObjectValue(_viewport);
-      instance = new Eng::Sprite(viewport);
-    } else {
+      instance = new Eng::Sprite(self, viewport);
+      DATA_PTR(self) = instance;
+      return self;
+    }
+
       RbUtils::raiseRuntimeException(
         "Sprite initialize takes 0 or 1 argument, but " + std::to_string(argc) + " were received."
       );
       return Qnil;
-    }
-
-    DATA_PTR(self) = instance;
-    instance->ptr = self;
-    return self;
   }
 
   // Getter bitmap

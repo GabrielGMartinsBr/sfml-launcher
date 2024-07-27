@@ -78,10 +78,10 @@ class Tilemap {
     if (inst == nullptr) {
       return Qnil;
     }
-    if (inst->ptr == Qnil) {
-      inst->ptr = createRubyObject(inst);
+    if (inst->rbObj == Qnil) {
+      inst->rbObj = createRubyObject(inst);
     }
-    return inst->ptr;
+    return inst->rbObj;
   }
 
   static Eng::Tilemap *getObjectValue(VALUE rbObj)
@@ -148,7 +148,7 @@ class Tilemap {
     }
 
     DATA_PTR(self) = inst;
-    inst->ptr = self;
+    inst->rbObj = self;
     return self;
   }
 

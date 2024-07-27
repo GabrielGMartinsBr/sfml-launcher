@@ -61,10 +61,10 @@ class Tone {
     if (inst == nullptr) {
       return Qnil;
     }
-    if (inst->ptr == Qnil) {
-      inst->ptr = createRubyObject(inst);
+    if (inst->rbObj == Qnil) {
+      inst->rbObj = createRubyObject(inst);
     }
-    return inst->ptr;
+    return inst->rbObj;
   }
 
   static Eng::Tone *getObjectValue(VALUE rbObj)
@@ -94,7 +94,7 @@ class Tone {
 
   static void instance_free(void *ptr)
   {
-    Log::out() << "[[Tone_free]]";
+    // Log::out() << "[[Tone_free]]";
     delete static_cast<Eng::Tone *>(ptr);
   }
 
@@ -143,7 +143,7 @@ class Tone {
     }
 
     DATA_PTR(self) = instance;
-    instance->ptr = self;
+    instance->rbObj = self;
     return self;
   }
 

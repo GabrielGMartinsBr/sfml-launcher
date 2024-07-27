@@ -75,10 +75,10 @@ class Viewport {
     if (inst == nullptr) {
       return Qnil;
     }
-    if (inst->ptr == Qnil) {
-      inst->ptr = createRubyObject(inst);
+    if (inst->rbObj == Qnil) {
+      inst->rbObj = createRubyObject(inst);
     }
-    return inst->ptr;
+    return inst->rbObj;
   }
 
   static Eng::Viewport *getObjectValue(VALUE rbObj)
@@ -152,7 +152,7 @@ class Viewport {
 
     Eng::Viewport *inst = new Eng::Viewport(x, y, width, height);
     DATA_PTR(self) = inst;
-    inst->ptr = self;
+    inst->rbObj = self;
 
     return self;
   }
@@ -170,7 +170,7 @@ class Viewport {
 
     Eng::Viewport *inst = new Eng::Viewport(rect);
     DATA_PTR(self) = inst;
-    inst->ptr = self;
+    inst->rbObj = self;
 
     return self;
   }

@@ -55,10 +55,11 @@ class Rect {
     if (rect == nullptr) {
       return Qnil;
     }
-    if (rect->ptr == Qnil) {
-      rect->ptr = createRubyObject(rect);
+    if (rect->rbObj == Qnil) {
+      rect->rbObj = createRubyObject(rect);
+      // rb_global_variable(&rect->rbObj);
     }
-    return rect->ptr;
+    return rect->rbObj;
   }
 
   static Eng::Rect *getObjectValue(VALUE self)
@@ -88,7 +89,7 @@ class Rect {
 
   static void instance_free(void *ptr)
   {
-    Log::out() << "[[Rect_free]]";
+    // Log::out() << "[[Rect_free]]: " << static_cast<Eng::Rect *>(ptr)->rbObj;
     delete static_cast<Eng::Rect *>(ptr);
   }
 
@@ -109,7 +110,7 @@ class Rect {
 
     Eng::Rect *inst = new Eng::Rect(x, y, width, height);
     DATA_PTR(self) = inst;
-    inst->ptr = self;
+    inst->rbObj = self;
 
     return self;
   }

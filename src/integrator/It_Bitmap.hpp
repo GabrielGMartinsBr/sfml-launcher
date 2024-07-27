@@ -66,10 +66,10 @@ class Bitmap {
     if (inst == nullptr) {
       return Qnil;
     }
-    if (inst->ptr == Qnil) {
-      inst->ptr = createRubyObject(inst);
+    if (inst->rbObj == Qnil) {
+      inst->rbObj = createRubyObject(inst);
     }
-    return inst->ptr;
+    return inst->rbObj;
   }
 
   static Eng::Bitmap *getObjectValue(VALUE rbObj)
@@ -100,7 +100,7 @@ class Bitmap {
 
   static void instance_free(void *ptr)
   {
-    Log::out() << "[[bitmap_free]]";
+    // Log::out() << "[[bitmap_free]]";
     delete static_cast<Eng::Bitmap *>(ptr);
   }
 
@@ -144,7 +144,7 @@ class Bitmap {
     Eng::Bitmap *inst = new Eng::Bitmap(width, height);
 
     DATA_PTR(self) = inst;
-    inst->ptr = self;
+    inst->rbObj = self;
     return self;
   }
 
@@ -160,7 +160,7 @@ class Bitmap {
     Eng::Bitmap *inst = new Eng::Bitmap(fileName);
 
     DATA_PTR(self) = inst;
-    inst->ptr = self;
+    inst->rbObj = self;
     return self;
   }
 

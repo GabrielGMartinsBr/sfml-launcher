@@ -100,10 +100,10 @@ class Window {
     if (inst == nullptr) {
       return Qnil;
     }
-    if (inst->ptr == Qnil) {
-      inst->ptr = createRubyObject(inst);
+    if (inst->rbObj == Qnil) {
+      inst->rbObj = createRubyObject(inst);
     }
-    return inst->ptr;
+    return inst->rbObj;
   }
 
   static Eng::Window *getObjectValue(VALUE rbObj)
@@ -145,7 +145,7 @@ class Window {
   {
     Eng::Window *inst = new Eng::Window();
     DATA_PTR(self) = inst;
-    inst->ptr = self;
+    inst->rbObj = self;
     return self;
   }
 

@@ -61,10 +61,10 @@ class Color {
     if (inst == nullptr) {
       return Qnil;
     }
-    if (inst->ptr == Qnil) {
-      inst->ptr = createRubyObject(inst);
+    if (inst->rbObj == Qnil) {
+      inst->rbObj = createRubyObject(inst);
     }
-    return inst->ptr;
+    return inst->rbObj;
   }
 
   static Eng::Color *getObjectValue(VALUE rbObj)
@@ -142,7 +142,7 @@ class Color {
     }
 
     DATA_PTR(self) = instance;
-    instance->ptr = self;
+    instance->rbObj = self;
     return self;
   }
 
