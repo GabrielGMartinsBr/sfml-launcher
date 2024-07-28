@@ -67,37 +67,32 @@ void Tilemap::update()
     return;
   }
 
-  const sf::Texture& tileTexture = tileset->renderTexture.getTexture();
+  const sf::Texture& tileTexture = tileset->getTexture();
+  tileSprite.setTexture(tileTexture);
 
-  cols = map_data->getXSize();
-  rows = map_data->getYSize();
-
-  w = cols * 32;
-  h = rows * 32;
-
-  rTexture.create(w, h);
-
-  // sf::Image img;
-  // img.create(w, h, sf::Color::Transparent);
-
-  sf::Sprite tile;
-  tile.setTexture(tileTexture);
-
-  Bitmap* autoTileBitmap;
+  Bitmap* bp;
   for (int i = 0; i < 7; i++) {
-    autoTileBitmap = autotiles->getter(i);
-    if (autoTileBitmap == nullptr) {
-      autoTileTextures[i] = nullptr;
+    bp = autotiles->getter(i);
+    if (bp == nullptr) {
+      continue;
     } else {
-      autoTileTextures[i] = &autoTileBitmap->renderTexture.getTexture();
+      autotileSpr[i].setTexture(bp->getTexture());
     }
   }
 
+  int cols = map_data->getXSize();
+  int rows = map_data->getYSize();
+
+  int w = cols * 32;
+  int h = rows * 32;
+
+  rTexture.create(w, h);
+
   for (int y = 0; y < rows; y++) {
     for (int x = 0; x < cols; x++) {
-      handleTile(x, y, 0, tile);
-      handleTile(x, y, 1, tile);
-      handleTile(x, y, 2, tile);
+      handleTile(x, y, 0);
+      handleTile(x, y, 1);
+      handleTile(x, y, 2);
     }
   }
 
@@ -266,7 +261,7 @@ void Tilemap::updateIsEligible()
   }
 }
 
-void Tilemap::handleTile(int x, int y, int z, sf::Sprite& tile)
+void Tilemap::handleTile(int x, int y, int z)
 {
   int id = map_data->getValue(x, y, z);
   if (id < 48) {
@@ -283,9 +278,9 @@ void Tilemap::handleTile(int x, int y, int z, sf::Sprite& tile)
   int tile_x = id % T_COLS * T_SIZE;
   int tile_y = id / T_COLS * T_SIZE;
 
-  tile.setTextureRect(sf::IntRect(tile_x, tile_y, T_SIZE, T_SIZE));
-  tile.setPosition(x * T_SIZE, y * T_SIZE);
-  rTexture.draw(tile);
+  tileSprite.setTextureRect(sf::IntRect(tile_x, tile_y, T_SIZE, T_SIZE));
+  tileSprite.setPosition(x * T_SIZE, y * T_SIZE);
+  rTexture.draw(tileSprite);
 }
 
 void Tilemap::handleAutoTile(int id, int x, int y)
@@ -293,14 +288,7 @@ void Tilemap::handleAutoTile(int id, int x, int y)
   int autoTileId = id / 48 - 1;
   int autoTilePatter = id % 48;
 
-  const sf::Texture* aTexture = autoTileTextures[autoTileId];
-
-  if (aTexture == nullptr) {
-    return;
-  }
-
-  sf::Sprite aTile;
-  aTile.setTexture(*aTexture);
+  sf::Sprite& tile = autotileSpr[autoTileId];
 
   id %= 48;
   const int* tiles = autotilesPositions[id >> 3][id & 7];
@@ -313,14 +301,14 @@ void Tilemap::handleAutoTile(int id, int x, int y)
     tile_position = tiles[i] - 1;
     tx = (tile_position % 6) * 16;
     ty = (tile_position / 6) * 16;
-    aTile.setTextureRect(
+    tile.setTextureRect(
       sf::IntRect(tx, ty, 16, 16)
     );
-    aTile.setPosition(
+    tile.setPosition(
       _x + i % 2 * 16,
       std::floor(_y + i / 2 * 16)
     );
-    rTexture.draw(aTile);
+    rTexture.draw(tile);
   }
 }
 

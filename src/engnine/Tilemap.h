@@ -87,16 +87,12 @@ class Tilemap : public EngineBase, Drawable {
   sf::Sprite spr;
   sf::RenderTexture rTexture;
 
-  int cols;
-  int rows;
-  int w;
-  int h;
-
-  const sf::Texture* autoTileTextures[7];
+  sf::Sprite tileSprite;
+  sf::Sprite autotileSpr[7];
 
   void updateIsEligible();
 
-  void handleTile(int x, int y, int z, sf::Sprite& tile);
+  void handleTile(int x, int y, int z);
 
   void handleAutoTile(int x, int y, int z);
 };
