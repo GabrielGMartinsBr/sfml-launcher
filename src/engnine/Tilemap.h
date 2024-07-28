@@ -1,5 +1,8 @@
 #pragma once
 
+#include <SFML/Graphics/RenderTexture.hpp>
+#include <SFML/Graphics/Sprite.hpp>
+
 #include "engnine/Autotiles.h"
 #include "engnine/Drawable.hpp"
 #include "engnine/EngineBase.hpp"
@@ -78,6 +81,25 @@ class Tilemap : public EngineBase, Drawable {
   int oy;
 
   bool isDisposed;
+  bool isEligible;
+  bool ready;
+  bool dirty;
+  sf::Sprite spr;
+  sf::RenderTexture rTexture;
+
+  int cols;
+  int rows;
+  int w;
+  int h;
+
+  const sf::Texture* autoTileTextures[7];
+  static int _autotiles[6][8][4];
+
+  void updateIsEligible();
+
+  void handleTile(int x, int y, int z, sf::Sprite& tile);
+
+  void handleAutoTile(int x, int y, int z);
 };
 
 }  // namespace Eng

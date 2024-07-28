@@ -1,15 +1,26 @@
-#pragma once
-
 #include "engnine/Tilemap.h"
 
+#include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/Image.hpp>
+#include <SFML/Graphics/RenderTexture.hpp>
+#include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/Texture.hpp>
+#include <cmath>
+#include <vector>
+
 #include "engnine/Autotiles.h"
+#include "engnine/Bitmap.h"
 #include "engnine/Engine.hpp"
 #include "engnine/EngineBase.hpp"
+#include "engnine/Input.hpp"
 #include "engnine/Table.hpp"
 #include "engnine/Viewport.hpp"
 #include "integrator/It_Autotiles.hpp"
 
 namespace Eng {
+
+constexpr int T_SIZE = 32;
+constexpr int T_COLS = 8;
 
 Tilemap::Tilemap(Viewport* _viewport) :
     Tilemap(Qnil, _viewport) { }
@@ -21,7 +32,6 @@ Tilemap::Tilemap(VALUE rbObj, Viewport* _viewport) :
   tileset = nullptr;
   autotiles = new Autotiles();
   map_data = nullptr;
-  map_data = nullptr;
   flash_data = nullptr;
   priorities = nullptr;
   visible = true;
@@ -29,11 +39,81 @@ Tilemap::Tilemap(VALUE rbObj, Viewport* _viewport) :
   oy = 0;
   isDisposed = false;
 
+  isEligible = false;
+  ready = false;
+  dirty = false;
+
   if (rbObj != Qnil) {
     bindRubyProps();
   }
 
   Eng::Engine::getInstance().addDrawable(this);
+}
+
+// Engine Drawable
+
+inline int Tilemap::getZPosition() const
+{
+  return 0;
+}
+
+inline bool Tilemap::shouldRender() const
+{
+  return isEligible;
+}
+
+void Tilemap::update()
+{
+  if (!dirty || tileset == nullptr || map_data == nullptr) {
+    return;
+  }
+
+  const sf::Texture& tileTexture = tileset->renderTexture.getTexture();
+
+  cols = map_data->getXSize();
+  rows = map_data->getYSize();
+
+  w = cols * 32;
+  h = rows * 32;
+
+  rTexture.create(w, h);
+
+  // sf::Image img;
+  // img.create(w, h, sf::Color::Transparent);
+
+  sf::Sprite tile;
+  tile.setTexture(tileTexture);
+
+  Bitmap* autoTileBitmap;
+  for (int i = 0; i < 7; i++) {
+    autoTileBitmap = autotiles->getter(i);
+    if (autoTileBitmap == nullptr) {
+      autoTileTextures[i] = nullptr;
+    } else {
+      autoTileTextures[i] = &autoTileBitmap->renderTexture.getTexture();
+    }
+  }
+
+  for (int y = 0; y < rows; y++) {
+    for (int x = 0; x < cols; x++) {
+      handleTile(x, y, 0, tile);
+      handleTile(x, y, 1, tile);
+      handleTile(x, y, 2, tile);
+    }
+  }
+
+  rTexture.display();
+  spr.setTexture(rTexture.getTexture());
+
+  dirty = false;
+  ready = true;
+}
+
+void Tilemap::draw(sf::RenderTexture& rd)
+{
+  if (!ready) return;
+  rd.draw(spr);
+  rd.display();
 }
 
 /*
@@ -53,26 +133,6 @@ void Tilemap::bindRubyProps()
   rb_iv_set(rbObj, "autotiles", autotiles->rbObj);
 }
 
-// Drawable
-
-inline int Tilemap::getZPosition() const
-{
-  return 0;
-}
-
-inline bool Tilemap::shouldRender() const
-{
-  return false;
-}
-
-void Tilemap::update()
-{
-}
-
-void Tilemap::draw(sf::RenderTexture& renderTexture)
-{
-}
-
 /*
   Properties
 */
@@ -87,6 +147,7 @@ Bitmap* Tilemap::getter_tileset()
 void Tilemap::setter_tileset(Bitmap* value)
 {
   tileset = value;
+  updateIsEligible();
 }
 
 // autotiles
@@ -106,6 +167,7 @@ Table* Tilemap::getter_map_data()
 void Tilemap::setter_map_data(Table* value)
 {
   map_data = value;
+  updateIsEligible();
 }
 
 // flash_data
@@ -196,5 +258,122 @@ Viewport* Tilemap::method_viewport()
 // update
 
 void Tilemap::method_update() { }
+
+void Tilemap::updateIsEligible()
+{
+  isEligible = map_data != nullptr && tileset != nullptr;
+  if (isEligible) {
+    dirty = true;
+  }
+}
+
+void Tilemap::handleTile(int x, int y, int z, sf::Sprite& tile)
+{
+  int id = map_data->getValue(x, y, z);
+  if (id < 48) {
+    return;
+  }
+
+  if (id < 48 * 8) {
+    handleAutoTile(id, x, y);
+    return;
+  }
+
+  id -= 48 * 8;
+
+  int tile_x = id % T_COLS * T_SIZE;
+  int tile_y = id / T_COLS * T_SIZE;
+
+  tile.setTextureRect(sf::IntRect(tile_x, tile_y, T_SIZE, T_SIZE));
+  tile.setPosition(x * T_SIZE, y * T_SIZE);
+  rTexture.draw(tile);
+}
+
+void Tilemap::handleAutoTile(int id, int x, int y)
+{
+  int autoTileId = id / 48 - 1;
+  int autoTilePatter = id % 48;
+
+  const sf::Texture* aTexture = autoTileTextures[autoTileId];
+
+  if (aTexture == nullptr) {
+    return;
+  }
+
+  sf::Sprite aTile;
+  aTile.setTexture(*aTexture);
+
+  id %= 48;
+  int* tiles = _autotiles[id >> 3][id & 7];
+
+  int _x = x * T_SIZE;
+  int _y = y * T_SIZE;
+
+  int tile_position, tx, ty;
+  for (int i = 0; i <= 4; i++) {
+    tile_position = tiles[i] - 1;
+    tx = (tile_position % 6) * 16;
+    ty = (tile_position / 6) * 16;
+    aTile.setTextureRect(
+      sf::IntRect(tx, ty, 16, 16)
+    );
+    aTile.setPosition(
+      _x + i % 2 * 16,
+      std::floor(_y + i / 2 * 16)
+    );
+    rTexture.draw(aTile);
+  }
+}
+
+int Tilemap::_autotiles[6][8][4] = {
+  { { 27, 28, 33, 34 },
+    { 5, 28, 33, 34 },
+    { 27, 6, 33, 34 },
+    { 5, 6, 33, 34 },
+    { 27, 28, 33, 12 },
+    { 5, 28, 33, 12 },
+    { 27, 6, 33, 12 },
+    { 5, 6, 33, 12 } },
+  { { 27, 28, 11, 34 },
+    { 5, 28, 11, 34 },
+    { 27, 6, 11, 34 },
+    { 5, 6, 11, 34 },
+    { 27, 28, 11, 12 },
+    { 5, 28, 11, 12 },
+    { 27, 6, 11, 12 },
+    { 5, 6, 11, 12 } },
+  { { 25, 26, 31, 32 },
+    { 25, 6, 31, 32 },
+    { 25, 26, 31, 12 },
+    { 25, 6, 31, 12 },
+    { 15, 16, 21, 22 },
+    { 15, 16, 21, 12 },
+    { 15, 16, 11, 22 },
+    { 15, 16, 11, 12 } },
+  { { 29, 30, 35, 36 },
+    { 29, 30, 11, 36 },
+    { 5, 30, 35, 36 },
+    { 5, 30, 11, 36 },
+    { 39, 40, 45, 46 },
+    { 5, 40, 45, 46 },
+    { 39, 6, 45, 46 },
+    { 5, 6, 45, 46 } },
+  { { 25, 30, 31, 36 },
+    { 15, 16, 45, 46 },
+    { 13, 14, 19, 20 },
+    { 13, 14, 19, 12 },
+    { 17, 18, 23, 24 },
+    { 17, 18, 11, 24 },
+    { 41, 42, 47, 48 },
+    { 5, 42, 47, 48 } },
+  { { 37, 38, 43, 44 },
+    { 37, 6, 43, 44 },
+    { 13, 18, 19, 24 },
+    { 13, 14, 43, 44 },
+    { 37, 42, 43, 48 },
+    { 17, 18, 47, 48 },
+    { 13, 18, 43, 48 },
+    { 1, 2, 7, 8 } }
+};
 
 }  // namespace Eng

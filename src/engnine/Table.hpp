@@ -29,7 +29,7 @@ class Table : public EngineBase {
     }
 
     Table *table = new Table(x, y, z);
-    memcpy(table->values.data(), data, sizeof(int16_t) * size);
+    memcpy(&table->values[0], data, sizeof(int16_t) * size);
 
     return table;
   }
@@ -47,12 +47,12 @@ class Table : public EngineBase {
       zSize(source.zSize),
       values(source.values) { }
 
-  inline const short getValue(int x, int y = 0, int z = 0) const
+  inline const int16_t getValue(int x, int y = 0, int z = 0) const
   {
     return values[calcIndex(x, y, z)];
   }
 
-  inline const void setValue(short value, int x, int y = 0, int z = 0)
+  inline const void setValue(int16_t value, int x, int y = 0, int z = 0)
   {
     if (x < 0 || x >= xSize) {
       Log::err() << "x index is out of range.";
@@ -90,7 +90,7 @@ class Table : public EngineBase {
       return;
     }
 
-    app::Vector<short> newValues(xSize * ySize * zSize);
+    app::Vector<int16_t> newValues(xSize * ySize * zSize);
 
     int xLimit = std::min(x, xSize);
     int yLimit = std::min(y, ySize);
@@ -128,7 +128,7 @@ class Table : public EngineBase {
   int xSize;
   int ySize;
   int zSize;
-  app::Vector<short> values;
+  app::Vector<int16_t> values;
 
   inline const int calcIndex(int x, int y = 0, int z = 0) const
   {

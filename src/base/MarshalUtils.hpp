@@ -1,11 +1,12 @@
 #pragma once
 
+#include <cstdint>
 #include <cstring>
 
 struct MarshalUtils {
   static inline int readInt32(const char **data)
   {
-    int result;
+    int32_t result;
 
     std::memcpy(&result, *data, 4);
     *data += 4;
