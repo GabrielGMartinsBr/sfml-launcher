@@ -93,7 +93,6 @@ class Tilemap : public EngineBase, Drawable {
   int h;
 
   const sf::Texture* autoTileTextures[7];
-  static int _autotiles[6][8][4];
 
   void updateIsEligible();
 
