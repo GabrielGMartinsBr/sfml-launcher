@@ -18,7 +18,7 @@ class Autotiles : public EngineBase {
 
  private:
 
-  Bitmap* bitmaps[6];
+  Bitmap* bitmaps[7];
 };
 
 }  // namespace Eng
