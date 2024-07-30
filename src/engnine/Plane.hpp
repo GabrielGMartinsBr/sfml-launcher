@@ -4,12 +4,19 @@
 #include "engnine/EngineBase.hpp"
 #include "engnine/Tone.hpp"
 #include "engnine/Viewport.hpp"
+#include "integrator/It_Bitmap.hpp"
+#include "integrator/It_Color.hpp"
+#include "integrator/It_Tone.hpp"
+#include "integrator/It_Viewport.hpp"
 
 namespace Eng {
 
 class Plane : public EngineBase {
  public:
-  Plane(Viewport* vp = nullptr)
+  Plane(Viewport* vp = nullptr) :
+      Plane(Qnil, vp) { }
+  Plane(VALUE rbObj, Viewport* vp = nullptr) :
+      EngineBase(rbObj)
   {
     viewport = vp;
     bitmap = nullptr;
@@ -24,6 +31,38 @@ class Plane : public EngineBase {
     color = new Color(0, 0, 0, 0);
     tone = new Tone(0, 0, 0, 0);
     isDisposed = false;
+
+    if (rbObj != Qnil) {
+      bindRubyProps();
+    }
+  }
+
+  /* --------------------------------------------------- */
+
+  /*
+    Bind ruby props
+  */
+
+  void bindRubyProps()
+  {
+    if (rbObj == Qnil) {
+      std::runtime_error("Plane doesn't have rbObj defined.");
+    }
+
+    if (viewport != nullptr && viewport->rbObj == Qnil) {
+      viewport->rbObj = It::Viewport::createRubyObject(viewport);
+      rb_iv_set(rbObj, "@viewport", viewport->rbObj);
+    }
+
+    if (color->rbObj == Qnil) {
+      color->rbObj = It::Color::createRubyObject(color);
+    }
+    if (tone->rbObj == Qnil) {
+      tone->rbObj = It::Tone::createRubyObject(tone);
+    }
+
+    rb_iv_set(rbObj, "@color", color->rbObj);
+    rb_iv_set(rbObj, "@tone", tone->rbObj);
   }
 
   /* --------------------------------------------------- */
@@ -39,7 +78,16 @@ class Plane : public EngineBase {
 
   void setter_bitmap(Bitmap* value)
   {
+    if (bitmap == value) {
+      return;
+    }
+
+    if (value->rbObj == Qnil) {
+      value->rbObj = It::Bitmap::createRubyObject(value);
+    }
+
     bitmap = value;
+    rb_iv_set(rbObj, "@bitmap", bitmap->rbObj);
   }
 
   /* --------------------------------------------------- */

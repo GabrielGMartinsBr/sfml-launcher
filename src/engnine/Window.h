@@ -35,11 +35,11 @@ class Window : public EngineBase, Drawable {
 
   void draw(sf::RenderTexture &rd) override;
 
-  Bitmap *getWindowSkin();
-  void setWindowSkin(Bitmap *value);
+  Bitmap *getter_windowskin();
+  void setter_windowskin(Bitmap *value);
 
-  Bitmap *getContents();
-  void setContents(Bitmap *v);
+  Bitmap *getter_contents();
+  void setter_contents(Bitmap *v);
 
   bool getter_stretch();
   void setter_stretch(bool v);
@@ -86,11 +86,14 @@ class Window : public EngineBase, Drawable {
   int getter_contents_opacity();
   void setter_contents_opacity(int v);
 
+  Viewport *method_viewport();
+
   void method_dispose();
 
   bool method_disposed();
 
  private:
+  Viewport *viewport;
   Bitmap *windowSkin;
   Bitmap *contents;
   bool stretch;

@@ -16,8 +16,8 @@
 #include "engnine/Rect.hpp"
 #include "engnine/Viewport.hpp"
 #include "integrator/It_Bitmap.hpp"
-#include "integrator/It_Font.hpp"
 #include "integrator/It_Rect.hpp"
+#include "integrator/It_Viewport.hpp"
 
 namespace Eng {
 
@@ -28,11 +28,11 @@ Window::Window(Viewport *viewport) :
 
 Window::Window(VALUE rbObj, Viewport *viewport) :
     EngineBase(rbObj),
+    viewport(viewport),
     windowSkin(nullptr),
     contents(nullptr),
     cursor_rect(new Rect(0, 0, 0, 0))
 {
-  Eng::Engine::getInstance().addDrawable(this);
   contentsDirty = true;
   skinDirty = true;
 
@@ -55,6 +55,8 @@ Window::Window(VALUE rbObj, Viewport *viewport) :
   if (rbObj != Qnil) {
     bindRubyProps();
   }
+
+  Eng::Engine::getInstance().addDrawable(this);
 }
 
 Window::~Window()
@@ -72,11 +74,16 @@ void Window::bindRubyProps()
     std::runtime_error("Window doesn't have rbObj defined.");
   }
 
+  if (viewport != nullptr && viewport->rbObj == Qnil) {
+    viewport->rbObj = It::Viewport::createRubyObject(viewport);
+    rb_iv_set(rbObj, "@viewport", viewport->rbObj);
+  }
+
   if (cursor_rect->rbObj == Qnil) {
     cursor_rect->rbObj = It::Rect::createRubyObject(cursor_rect);
   }
 
-  rb_iv_set(rbObj, "cursor_rect", cursor_rect->rbObj);
+  rb_iv_set(rbObj, "@cursor_rect", cursor_rect->rbObj);
 }
 
 // Engine
@@ -125,11 +132,15 @@ void Window::draw(sf::RenderTexture &rd)
   rd.draw(contentsSprite, sf::BlendAlpha);
 }
 
-Bitmap *Window::getWindowSkin()
+/*
+  Properties
+*/
+
+Bitmap *Window::getter_windowskin()
 {
   return windowSkin;
 }
-void Window::setWindowSkin(Bitmap *value)
+void Window::setter_windowskin(Bitmap *value)
 {
   if (windowSkin == value) {
     return;
@@ -140,14 +151,14 @@ void Window::setWindowSkin(Bitmap *value)
   }
 
   windowSkin = value;
-  rb_iv_set(rbObj, "@windowSkin", windowSkin->rbObj);
+  rb_iv_set(rbObj, "@windowskin", windowSkin->rbObj);
 }
 
-Bitmap *Window::getContents()
+Bitmap *Window::getter_contents()
 {
   return contents;
 }
-void Window::setContents(Bitmap *value)
+void Window::setter_contents(Bitmap *value)
 {
   if (contents == value) {
     return;
@@ -236,16 +247,35 @@ void Window::setter_back_opacity(int v) { back_opacity = v; }
 int Window::getter_contents_opacity() { return contents_opacity; }
 void Window::setter_contents_opacity(int v) { contents_opacity = v; }
 
+/*
+  Methods
+*/
+
+// Method viewport
+
+Viewport *Window::method_viewport()
+{
+  return viewport;
+}
+
+// Method dispose
+
 void Window::method_dispose()
 {
   Log::out() << "Dispose";
   isDisposed = true;
 }
 
+// Method disposed?
+
 bool Window::method_disposed()
 {
   return isDisposed;
 }
+
+/*
+  Internals
+*/
 
 void Window::updateBackgroundSprite()
 {

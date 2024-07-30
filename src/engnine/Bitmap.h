@@ -36,6 +36,10 @@ class Bitmap : public EngineBase {
 
   void bindRubyProps();
 
+  // Engine
+
+  const sf::Texture& getTexture();
+
   // Properties
 
   Font* getter_font();

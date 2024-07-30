@@ -24,7 +24,10 @@
 #include "engnine/Viewport.hpp"
 #include "engnine/VpRects.hpp"
 #include "integrator/It_Bitmap.hpp"
+#include "integrator/It_Color.hpp"
 #include "integrator/It_Rect.hpp"
+#include "integrator/It_Tone.hpp"
+#include "integrator/It_Viewport.hpp"
 
 namespace Eng {
 
@@ -83,11 +86,24 @@ class Sprite : Drawable, public EngineBase {
       std::runtime_error("Sprite doesn't have rbObj defined.");
     }
 
+    if (viewport != nullptr && viewport->rbObj == Qnil) {
+      viewport->rbObj = It::Viewport::createRubyObject(viewport);
+      rb_iv_set(rbObj, "@viewport", viewport->rbObj);
+    }
+
     if (src_rect->rbObj == Qnil) {
       src_rect->rbObj = It::Rect::createRubyObject(src_rect);
     }
+    if (color->rbObj == Qnil) {
+      color->rbObj = It::Color::createRubyObject(color);
+    }
+    if (tone->rbObj == Qnil) {
+      tone->rbObj = It::Tone::createRubyObject(tone);
+    }
 
-    rb_iv_set(rbObj, "src_rect", src_rect->rbObj);
+    rb_iv_set(rbObj, "@src_rect", src_rect->rbObj);
+    rb_iv_set(rbObj, "@color", color->rbObj);
+    rb_iv_set(rbObj, "@tone", tone->rbObj);
   }
 
   /* --------------------------------------------------- */
@@ -377,7 +393,16 @@ class Sprite : Drawable, public EngineBase {
 
   void setter_color(Color *value)
   {
+    if (color == value) {
+      return;
+    }
+
+    if (value->rbObj == Qnil) {
+      value->rbObj = It::Color::createRubyObject(value);
+    }
+
     color = value;
+    rb_iv_set(rbObj, "@color", color->rbObj);
   }
 
   /* --------------------------------------------------- */
@@ -393,7 +418,16 @@ class Sprite : Drawable, public EngineBase {
 
   void setter_tone(Tone *value)
   {
+    if (tone == value) {
+      return;
+    }
+
+    if (value->rbObj == Qnil) {
+      value->rbObj = It::Tone::createRubyObject(value);
+    }
+
     tone = value;
+    rb_iv_set(rbObj, "@tone", tone->rbObj);
   }
 
   /* --------------------------------------------------- */

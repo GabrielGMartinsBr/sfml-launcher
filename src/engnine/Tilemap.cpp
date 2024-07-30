@@ -62,7 +62,7 @@ inline int Tilemap::getZPosition() const
 
 inline bool Tilemap::shouldRender() const
 {
-  return isEligible;
+  return !isDisposed && isEligible;
 }
 
 void Tilemap::update()
@@ -258,6 +258,7 @@ void Tilemap::setter_oy(int value)
 
 void Tilemap::method_dispose()
 {
+  Log::out() << "Dispose Tilemap";
   isDisposed = true;
 }
 

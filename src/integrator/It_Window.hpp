@@ -80,8 +80,9 @@ class Window {
 
     // Methods
 
+    rb_define_method(windowClass, "viewport", RUBY_METHOD_FUNC(method_viewport), 0);
     rb_define_method(windowClass, "dispose", RUBY_METHOD_FUNC(method_dispose), 0);
-    rb_define_method(windowClass, "disposed?", RUBY_METHOD_FUNC(method_dispose), 0);
+    rb_define_method(windowClass, "disposed?", RUBY_METHOD_FUNC(method_disposed), 0);
   }
 
   // Utils
@@ -184,7 +185,7 @@ class Window {
   {
     Eng::Window *inst = getObjectValue(self);
     return It::Bitmap::getRubyObject(
-      inst->getWindowSkin()
+      inst->getter_windowskin()
     );
   }
 
@@ -196,7 +197,7 @@ class Window {
   {
     Eng::Window *inst = getObjectValue(self);
     Eng::Bitmap *bp = It::Bitmap::getObjectValue(value);
-    inst->setWindowSkin(bp);
+    inst->setter_windowskin(bp);
     return value;
   }
 
@@ -207,7 +208,7 @@ class Window {
   {
     Eng::Window *inst = getObjectValue(self);
     return It::Bitmap::getRubyObject(
-      inst->getContents()
+      inst->getter_contents()
     );
   }
 
@@ -218,7 +219,7 @@ class Window {
   {
     Eng::Window *inst = getObjectValue(self);
     Eng::Bitmap *bp = It::Bitmap::getObjectValue(value);
-    inst->setContents(bp);
+    inst->setter_contents(bp);
     return value;
   }
 
@@ -552,6 +553,23 @@ class Window {
 
     return Qnil;
   }
+
+  /*
+    Method viewport
+  */
+
+  static VALUE method_viewport(VALUE self)
+  {
+    Eng::Window *inst = getObjectValue(self);
+    if (inst == nullptr) {
+      return Qnil;
+    }
+
+    return It::Viewport::getRubyObject(
+      inst->method_viewport()
+    );
+  }
+
 
   /*
     Method dispose

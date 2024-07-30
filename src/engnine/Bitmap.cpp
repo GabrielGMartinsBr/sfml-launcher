@@ -1,5 +1,3 @@
-#pragma once
-
 #include "engnine/Bitmap.h"
 
 #include <SFML/Graphics/BlendMode.hpp>
@@ -108,6 +106,13 @@ void Bitmap::bindRubyProps()
   rb_iv_set(rbObj, "font", font->rbObj);
 }
 
+// Engine
+
+const sf::Texture& Bitmap::getTexture()
+{
+  return renderTexture.getTexture();
+}
+
 /*
   Properties
 */
@@ -123,8 +128,6 @@ Font* Bitmap::getter_font()
 
 void Bitmap::setter_font(Font* v)
 {
-  Log::out() << "Setting font: " << (v == font);
-
   if (font == v) {
     return;
   }

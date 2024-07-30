@@ -128,25 +128,25 @@ class Plane {
 
   static VALUE initialize(int argc, VALUE *argv, VALUE self)
   {
-    Eng::Plane *inst;
-
     if (argc == 0) {
-      inst = new Eng::Plane();
-    } else if (argc == 1) {
+      Eng::Plane *inst = new Eng::Plane(self);
+      DATA_PTR(self) = inst;
+      return self;
+    }
+
+    if (argc == 1) {
       VALUE _viewport;
       rb_scan_args(argc, argv, "1", &_viewport);
       Eng::Viewport *viewport = Viewport::getObjectValue(_viewport);
-      inst = new Eng::Plane(viewport);
-    } else {
-      RbUtils::raiseRuntimeException(
-        "Plane initializer takes 1 or 0 argument, but " + std::to_string(argc) + " were received."
-      );
-      return Qnil;
+      Eng::Plane *inst = new Eng::Plane(self, viewport);
+      DATA_PTR(self) = inst;
+      return self;
     }
 
-    DATA_PTR(self) = inst;
-    inst->rbObj = self;
-    return self;
+    RbUtils::raiseRuntimeException(
+      "Plane initializer takes 1 or 0 argument, but " + std::to_string(argc) + " were received."
+    );
+    return Qnil;
   }
 
   /*

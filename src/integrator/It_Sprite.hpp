@@ -170,10 +170,10 @@ class Sprite {
       return self;
     }
 
-      RbUtils::raiseRuntimeException(
-        "Sprite initialize takes 0 or 1 argument, but " + std::to_string(argc) + " were received."
-      );
-      return Qnil;
+    RbUtils::raiseRuntimeException(
+      "Sprite initialize takes 0 or 1 argument, but " + std::to_string(argc) + " were received."
+    );
+    return Qnil;
   }
 
   // Getter bitmap
@@ -210,7 +210,11 @@ class Sprite {
 
   static VALUE getter_src_rect(VALUE self)
   {
+    // return rb_iv_get(self, "src_rect");
     Eng::Sprite *inst = getObjectValue(self);
+    // Log::out() << "sprite: " << inst->ptr;
+    // Log::out() << "src_rect: " << inst->getter_src_rect()->ptr;
+    // return inst->getter_src_rect()->ptr;
     return Rect::getRubyObject(
       inst->getter_src_rect()
     );
