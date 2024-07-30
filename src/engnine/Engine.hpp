@@ -72,6 +72,11 @@ class Engine {
     renderer->addDrawable(drawable);
   }
 
+  void removeDrawable(Eng::Drawable* drawable)
+  {
+    renderer->removeDrawable(drawable);
+  }
+
   void markZOrderDirty()
   {
     renderer->markZOrderDirty();

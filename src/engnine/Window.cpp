@@ -57,13 +57,12 @@ Window::Window(VALUE rbObj, Viewport *viewport) :
   }
 
   Eng::Engine::getInstance().addDrawable(this);
+  removedFromEngineLoop = false;
 }
 
 Window::~Window()
 {
-  // free(windowSkin);
-  // free(contents);
-  // free(cursor_rect);
+  removeDrawable();
 }
 
 // Bind props ruby object to instance object
@@ -262,8 +261,9 @@ Viewport *Window::method_viewport()
 
 void Window::method_dispose()
 {
-  Log::out() << "Dispose";
+  // Log::out() << "Dispose";
   isDisposed = true;
+  removeDrawable();
 }
 
 // Method disposed?
@@ -523,6 +523,15 @@ void Window::updateBorder()
   borderTexture = rd.getTexture();
   borderSprite.setTexture(borderTexture);
   borderSprite.setPosition(x, y);
+}
+
+void Window::removeDrawable()
+{
+  if (removedFromEngineLoop) {
+    return;
+  }
+  Eng::Engine::getInstance().removeDrawable(this);
+  removedFromEngineLoop = true;
 }
 
 }  // namespace Eng

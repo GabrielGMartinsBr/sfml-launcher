@@ -124,6 +124,9 @@ class Window : public EngineBase, Drawable {
 
   bool skinDirty;
   bool contentsDirty;
+  bool removedFromEngineLoop;
+
+  void removeDrawable();
 
   void updateBackgroundSprite();
 

@@ -39,6 +39,16 @@ struct EngineRenderer {
   {
     drawables.push_back(drawable);
     zDirty = true;
+    Log::out() << "(add) Drawables size: " << drawables.size();
+  }
+
+  void removeDrawable(Eng::Drawable* drawable)
+  {
+    auto it = std::find(drawables.begin(), drawables.end(), drawable);
+    if (it != drawables.end()) {
+      drawables.erase(it);
+    }
+    Log::out() << "(remove) Drawables size: " << drawables.size();
   }
 
   void markZOrderDirty()

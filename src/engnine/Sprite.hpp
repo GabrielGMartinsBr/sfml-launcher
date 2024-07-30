@@ -69,10 +69,17 @@ class Sprite : Drawable, public EngineBase {
     }
 
     Eng::Engine::getInstance().addDrawable(this);
+    removedFromEngineLoop = false;
   }
 
   Sprite(Viewport *_viewport = nullptr) :
       Sprite(Qnil, _viewport) { }
+
+  ~Sprite()
+  {
+    Log::out() << "Destructor sprite";
+    removeDrawable();
+  }
 
   /* --------------------------------------------------- */
 
@@ -439,6 +446,7 @@ class Sprite : Drawable, public EngineBase {
   void method_dispose()
   {
     isDisposed = true;
+    removeDrawable();
   }
 
   bool method_disposed()
@@ -661,11 +669,21 @@ class Sprite : Drawable, public EngineBase {
   bool dirty;
   bool isDisposed;
   bool loadedBitmap;
+  bool removedFromEngineLoop;
 
   sf::Color spriteColor;
   sf::Sprite spr;
   sf::Texture texture;
   sf::Vector2f position;
+
+  void removeDrawable()
+  {
+    if (removedFromEngineLoop) {
+      return;
+    }
+    Eng::Engine::getInstance().removeDrawable(this);
+    removedFromEngineLoop = true;
+  }
 };
 
 }  // namespace Eng

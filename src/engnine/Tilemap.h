@@ -17,6 +17,8 @@ class Tilemap : public EngineBase, Drawable {
   Tilemap(Viewport* _viewport = nullptr);
   Tilemap(VALUE rbObj, Viewport* _viewport = nullptr);
 
+  ~Tilemap();
+
   void bindRubyProps();
 
   /*
@@ -87,6 +89,7 @@ class Tilemap : public EngineBase, Drawable {
   bool dirty;
   bool shouldBuildSprites;
   bool shouldUpdateSprRect;
+  bool removedFromEngineLoop;
 
   sf::Sprite spr;
   sf::IntRect sprRect;
@@ -94,6 +97,8 @@ class Tilemap : public EngineBase, Drawable {
 
   sf::Sprite tileSprite;
   sf::Sprite autotileSpr[7];
+
+  void removeDrawable();
 
   void updateIsEligible();
 

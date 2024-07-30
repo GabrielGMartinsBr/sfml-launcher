@@ -51,6 +51,12 @@ Tilemap::Tilemap(VALUE rbObj, Viewport* _viewport) :
   }
 
   Eng::Engine::getInstance().addDrawable(this);
+  removedFromEngineLoop = false;
+}
+
+Tilemap::~Tilemap()
+{
+  removeDrawable();
 }
 
 // Engine Drawable
@@ -258,8 +264,8 @@ void Tilemap::setter_oy(int value)
 
 void Tilemap::method_dispose()
 {
-  Log::out() << "Dispose Tilemap";
   isDisposed = true;
+  removeDrawable();
 }
 
 // disposed?
@@ -337,6 +343,15 @@ void Tilemap::handleAutoTile(int id, int x, int y)
     );
     rTexture.draw(tile);
   }
+}
+
+void Tilemap::removeDrawable()
+{
+  if (removedFromEngineLoop) {
+    return;
+  }
+  Eng::Engine::getInstance().removeDrawable(this);
+  removedFromEngineLoop = true;
 }
 
 }  // namespace Eng
