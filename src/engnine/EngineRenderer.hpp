@@ -6,11 +6,14 @@
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/Text.hpp>
 #include <SFML/System/Vector2.hpp>
+#include <stdexcept>
+#include <string>
 
-#include "base/Log.hpp"
 #include "base/Sugars.hpp"
 #include "engnine/Drawable.hpp"
+#include "engnine/Timer.hpp"
 #include "engnine/Viewport.hpp"
 
 namespace Eng {
@@ -77,12 +80,33 @@ struct EngineRenderer {
   sf::Sprite bufferSprite;
   sf::RenderTexture renderTexture;
 
+  sf::Sprite fpsSprite;
+  sf::Font font;
+  sf::Text fpsText;
+
   void createBuffer()
   {
     sf::ContextSettings settings;
     // settings.antialiasingLevel = 0;
     renderTexture.create(width, height, settings);
     renderTexture.clear(sf::Color::Transparent);
+    createFpsText();
+  }
+
+  void createFpsText()
+  {
+    bool result = font.loadFromFile(
+      "/run/media/home/common/gabrielmartins.dev/dev/cpp/orm-xp/sfml-launcher/assets/arial.ttf"
+    );
+    if (!result) {
+      std::runtime_error("Could not load font.");
+    }
+    fpsText.setFont(font);
+    fpsText.setFillColor(sf::Color::White);
+    fpsText.setOutlineColor(sf::Color::Black);
+    fpsText.setOutlineThickness(1.5);
+    fpsText.setCharacterSize(16);
+    fpsText.setPosition(8, 8);
   }
 
   void createDefaultViewport()
@@ -113,6 +137,7 @@ struct EngineRenderer {
       drawable->update();
       drawable->draw(renderTexture);
     }
+    renderFps();
   }
 
   void renderViewports()
@@ -140,6 +165,12 @@ struct EngineRenderer {
     target->draw(bufferSprite);
   }
 
+  void renderFps()
+  {
+    fpsText.setString(std::to_string(Timer::getInstance().getFps()));
+    renderTexture.draw(fpsText);
+  }
+
   static bool compareZ(const Drawable* a, const Drawable* b)
   {
     return a->getZPosition() < b->getZPosition();
@@ -147,7 +178,7 @@ struct EngineRenderer {
 
   void sortZ()
   {
-    Log::out() << "sort";
+    // Log::out() << "sort";
     std::sort(drawables.begin(), drawables.end(), compareZ);
     zDirty = false;
   }

@@ -15,6 +15,9 @@ class Timer {
   T_TimePoint lastFrameTs;
   float frameTime = 1.0f / 40.0f * 1e3;
   float fps = 0;
+  float fps_0 = 0;
+  float fps_1 = 0;
+  float fps_2 = 0;
 
   Timer() = default;
   Timer(const Timer&) = delete;
@@ -49,6 +52,11 @@ class Timer {
     Log::out() << "FPS: " << std::round(fps);
   }
 
+  int getFps()
+  {
+    return std::round(fps);
+  }
+
   void controlFrameRate()
   {
     float elapsed = getElapsed();
@@ -59,7 +67,11 @@ class Timer {
       );
       elapsed += d;
     }
+    fps_2 = fps_1;
+    fps_1 = fps_0;
+    fps_0 = fps;
     fps = 1.0e3f / elapsed;
+    fps = (fps + fps_0 + fps_1 + fps_2) / 4;
     updateLastFrame();
   }
 
