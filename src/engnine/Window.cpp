@@ -11,6 +11,7 @@
 #include <cmath>
 
 #include "Log.hpp"
+#include "NumberUtils.hpp"
 #include "engnine/Bitmap.h"
 #include "engnine/Engine.hpp"
 #include "engnine/Rect.hpp"
@@ -238,13 +239,33 @@ void Window::setter_oy(int v)
 }
 
 int Window::getter_opacity() { return opacity; }
-void Window::setter_opacity(int v) { opacity = v; }
+void Window::setter_opacity(int v)
+{
+  int value = Num::clamp(v, 0, 255);
+  if (opacity != value) {
+    opacity = value;
+    skinDirty = true;
+  }
+}
 
 int Window::getter_back_opacity() { return back_opacity; }
-void Window::setter_back_opacity(int v) { back_opacity = v; }
+void Window::setter_back_opacity(int v)
+{
+  int value = Num::clamp(v, 0, 255);
+  if (back_opacity != value) {
+    back_opacity = value;
+  }
+}
 
 int Window::getter_contents_opacity() { return contents_opacity; }
-void Window::setter_contents_opacity(int v) { contents_opacity = v; }
+void Window::setter_contents_opacity(int v)
+{
+  int value = Num::clamp(v, 0, 255);
+  if (contents_opacity != value) {
+    contents_opacity = value;
+    contentsDirty = true;
+  }
+}
 
 /*
   Methods
