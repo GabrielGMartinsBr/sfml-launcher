@@ -3,7 +3,7 @@
 #include "Convert.hpp"
 #include "It_Rect.hpp"
 #include "engnine/Rect.hpp"
-#include "engnine/Window.hpp"
+#include "engnine/Window.h"
 #include "integrator/It_Bitmap.hpp"
 #include "ruby.h"
 
