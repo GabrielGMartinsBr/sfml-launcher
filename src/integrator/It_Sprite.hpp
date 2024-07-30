@@ -277,7 +277,7 @@ class Sprite {
   {
     Eng::Sprite *inst = getObjectValue(self);
     inst->setter_x(
-      Convert::toCInt(value)
+      Convert::toCInt2(value)
     );
     return value;
   }
@@ -298,7 +298,7 @@ class Sprite {
   {
     Eng::Sprite *inst = getObjectValue(self);
     inst->setter_y(
-      Convert::toCInt(value)
+      Convert::toCInt2(value)
     );
     return value;
   }

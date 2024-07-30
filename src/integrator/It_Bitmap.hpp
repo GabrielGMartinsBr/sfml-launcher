@@ -256,11 +256,8 @@ class Bitmap {
 
   static VALUE method_get_pixel(VALUE self, VALUE _x, VALUE _y)
   {
-    Check_Type(_x, T_FIXNUM);
-    Check_Type(_y, T_FIXNUM);
-
-    unsigned int x = NUM2UINT(_x);
-    unsigned int y = NUM2UINT(_y);
+    unsigned int x = Convert::toCInt2(_x);
+    unsigned int y = Convert::toCInt2(_y);
 
     Eng::Bitmap *inst = getObjectValue(self);
     Eng::Color *color = inst->get_pixel(x, y);
@@ -273,12 +270,16 @@ class Bitmap {
 
   static VALUE method_set_pixel(VALUE self, VALUE _x, VALUE _y, VALUE _color)
   {
-    Check_Type(_x, T_FIXNUM);
-    Check_Type(_y, T_FIXNUM);
-    Check_Type(_color, T_OBJECT);
+    if (!Color::isInstance(_color)) {
+      RbUtils::raiseCantConvertError(
+        rb_class_of(_color),
+        Color::getRbClass()
+      );
+      return Qnil;
+    }
 
-    unsigned int x = NUM2UINT(_x);
-    unsigned int y = NUM2UINT(_y);
+    unsigned int x = Convert::toCInt2(_x);
+    unsigned int y = Convert::toCInt2(_y);
 
     Eng::Bitmap *inst = getObjectValue(self);
     Eng::Color *color = Color::getObjectValue(_color);
