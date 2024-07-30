@@ -100,7 +100,7 @@ class Bitmap {
 
   static void instance_free(void *ptr)
   {
-    // Log::out() << "[[bitmap_free]]";
+    Log::out() << "[[bitmap_free]]";
     delete static_cast<Eng::Bitmap *>(ptr);
   }
 
@@ -122,16 +122,18 @@ class Bitmap {
       VALUE _width, _height;
       rb_scan_args(argc, argv, "2", &_width, &_height);
       return initializeSize(self, _width, _height);
-    } else if (argc == 1) {
+    }
+
+    if (argc == 1) {
       VALUE _fileName;
       rb_scan_args(argc, argv, "1", &_fileName);
       return initializeImage(self, _fileName);
-    } else {
-      RbUtils::raiseRuntimeException(
-        "Bitmap initializer takes 1 or 2 arguments, but " + std::to_string(argc) + " were received."
-      );
-      return Qnil;
     }
+
+    RbUtils::raiseRuntimeException(
+      "Bitmap initializer takes 1 or 2 arguments, but " + std::to_string(argc) + " were received."
+    );
+    return Qnil;
   }
 
   /*
@@ -140,15 +142,10 @@ class Bitmap {
 
   static VALUE initializeSize(VALUE self, VALUE _width, VALUE _height)
   {
-    Check_Type(_width, T_FIXNUM);
-    Check_Type(_height, T_FIXNUM);
-
-    unsigned int width = FIX2INT(_width);
-    unsigned int height = FIX2INT(_height);
-    Eng::Bitmap *inst = new Eng::Bitmap(width, height);
-
+    unsigned int width = Convert::toCInt2(_width);
+    unsigned int height = Convert::toCInt2(_height);
+    Eng::Bitmap *inst = new Eng::Bitmap(width, height, self);
     DATA_PTR(self) = inst;
-    inst->rbObj = self;
     return self;
   }
 
@@ -158,13 +155,9 @@ class Bitmap {
 
   static VALUE initializeImage(VALUE self, VALUE _fileName)
   {
-    Check_Type(_fileName, T_STRING);
-
-    const char *fileName = StringValuePtr(_fileName);
-    Eng::Bitmap *inst = new Eng::Bitmap(fileName);
-
+    const char *fileName = Convert::toCStr(_fileName);
+    Eng::Bitmap *inst = new Eng::Bitmap(fileName, self);
     DATA_PTR(self) = inst;
-    inst->rbObj = self;
     return self;
   }
 

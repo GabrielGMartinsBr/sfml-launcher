@@ -19,9 +19,13 @@ namespace Eng {
 class Window : public EngineBase, Drawable {
  public:
 
-  Window(Viewport *viewport = 0);
+  Window(Viewport *viewport = nullptr);
+
+  Window(VALUE rbObj, Viewport *viewport = nullptr);
 
   ~Window();
+
+  void bindRubyProps();
 
   int getZPosition() const override;
 

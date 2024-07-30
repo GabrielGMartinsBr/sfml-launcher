@@ -23,6 +23,7 @@
 #include "engnine/Tone.hpp"
 #include "engnine/Viewport.hpp"
 #include "engnine/VpRects.hpp"
+#include "integrator/It_Bitmap.hpp"
 #include "integrator/It_Rect.hpp"
 
 namespace Eng {
@@ -102,9 +103,20 @@ class Sprite : Drawable, public EngineBase {
 
   void setter_bitmap(Bitmap *value)
   {
+    if (bitmap == value) {
+      return;
+    }
+
+    if (value->rbObj == Qnil) {
+      value->rbObj = It::Bitmap::createRubyObject(value);
+    }
+
     bitmap = value;
+    rb_iv_set(rbObj, "@bitmap", bitmap->rbObj);
+
     src_rect->setter_width(bitmap->getter_width());
     src_rect->setter_height(bitmap->getter_height());
+
     dirty = true;
   }
 

@@ -5,6 +5,7 @@
 #include "engnine/Rect.hpp"
 #include "engnine/Window.h"
 #include "integrator/It_Bitmap.hpp"
+#include "integrator/It_Viewport.hpp"
 #include "ruby.h"
 
 // TODO: Implement methods and attributes
@@ -143,10 +144,31 @@ class Window {
 
   static VALUE initialize(int argc, VALUE *argv, VALUE self)
   {
-    Eng::Window *inst = new Eng::Window();
-    DATA_PTR(self) = inst;
-    inst->rbObj = self;
-    return self;
+    if (argc == 0) {
+      Eng::Window *inst = new Eng::Window(self);
+      DATA_PTR(self) = inst;
+      return self;
+    }
+
+    if (argc == 1) {
+      VALUE _viewport;
+      rb_scan_args(argc, argv, "1", &_viewport);
+      if (!Viewport::isInstance(_viewport)) {
+        RbUtils::raiseCantConvertError(
+          rb_class_of(_viewport),
+          Viewport::getRbClass()
+        );
+      }
+      Eng::Viewport *viewport = Viewport::getObjectValue(_viewport);
+      Eng::Window *inst = new Eng::Window(self, viewport);
+      DATA_PTR(self) = inst;
+      return self;
+    }
+
+    RbUtils::raiseRuntimeException(
+      "Window initialize takes 0 or 1 argument, but " + std::to_string(argc) + " were received."
+    );
+    return Qnil;
   }
 
   static VALUE method_update(VALUE self)

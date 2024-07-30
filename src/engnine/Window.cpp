@@ -15,10 +15,19 @@
 #include "engnine/Engine.hpp"
 #include "engnine/Rect.hpp"
 #include "engnine/Viewport.hpp"
+#include "integrator/It_Bitmap.hpp"
+#include "integrator/It_Font.hpp"
+#include "integrator/It_Rect.hpp"
 
 namespace Eng {
 
 Window::Window(Viewport *viewport) :
+    Window(Qnil, viewport)
+{
+}
+
+Window::Window(VALUE rbObj, Viewport *viewport) :
+    EngineBase(rbObj),
     windowSkin(nullptr),
     contents(nullptr),
     cursor_rect(new Rect(0, 0, 0, 0))
@@ -42,6 +51,10 @@ Window::Window(Viewport *viewport) :
   back_opacity = 255;
   contents_opacity = 255;
   isDisposed = false;
+
+  if (rbObj != Qnil) {
+    bindRubyProps();
+  }
 }
 
 Window::~Window()
@@ -50,6 +63,23 @@ Window::~Window()
   // free(contents);
   // free(cursor_rect);
 }
+
+// Bind props ruby object to instance object
+
+void Window::bindRubyProps()
+{
+  if (rbObj == Qnil) {
+    std::runtime_error("Window doesn't have rbObj defined.");
+  }
+
+  if (cursor_rect->rbObj == Qnil) {
+    cursor_rect->rbObj = It::Rect::createRubyObject(cursor_rect);
+  }
+
+  rb_iv_set(rbObj, "cursor_rect", cursor_rect->rbObj);
+}
+
+// Engine
 
 int Window::getZPosition() const
 {
@@ -105,20 +135,30 @@ void Window::setWindowSkin(Bitmap *value)
     return;
   }
 
+  if (value->rbObj == Qnil) {
+    value->rbObj = It::Bitmap::createRubyObject(value);
+  }
+
   windowSkin = value;
+  rb_iv_set(rbObj, "@windowSkin", windowSkin->rbObj);
 }
 
 Bitmap *Window::getContents()
 {
   return contents;
 }
-void Window::setContents(Bitmap *v)
+void Window::setContents(Bitmap *value)
 {
-  if (contents == v) {
+  if (contents == value) {
     return;
   }
 
-  contents = v;
+  if (value->rbObj == Qnil) {
+    value->rbObj = It::Bitmap::createRubyObject(value);
+  }
+
+  contents = value;
+  rb_iv_set(rbObj, "@contents", contents->rbObj);
 }
 
 bool Window::getter_stretch() { return stretch; }
