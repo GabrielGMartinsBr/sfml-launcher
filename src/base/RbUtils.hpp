@@ -3,7 +3,7 @@
 #include <stdexcept>
 
 #include "AppDefs.h"
-#include "app.h"
+#include "integrator/Convert.hpp"
 #include "ruby.h"
 
 struct RbUtils {
