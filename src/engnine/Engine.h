@@ -7,10 +7,9 @@
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/VideoMode.hpp>
 
-#include "base/Sugars.hpp"
 #include "engnine/BlenShaders.hpp"
 #include "engnine/Drawable.hpp"
-#include "engnine/EngineRenderer.hpp"
+#include "engnine/EngineRenderer.h"
 #include "engnine/Input.hpp"
 
 namespace Eng {
@@ -46,8 +45,8 @@ class Engine {
   bool running = false;
   Input& input;
 
-  sf::RenderWindow* window = nullptr;
-  EngineRenderer* renderer = nullptr;
+  sf::RenderWindow* window;
+  EngineRenderer* renderer;
 
   Engine();
 

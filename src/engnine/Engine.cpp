@@ -13,7 +13,7 @@
 #include "base/Sugars.hpp"
 #include "engnine/BlenShaders.hpp"
 #include "engnine/Drawable.hpp"
-#include "engnine/EngineRenderer.hpp"
+#include "engnine/EngineRenderer.h"
 #include "engnine/Input.hpp"
 #include "engnine/internal/Texts.hpp"
 #include "ruby.h"
@@ -95,7 +95,6 @@ void Engine::updateGraphics()
 
   window->display();
 }
-
 
 Engine::Engine() :
     input(Input::getInstance())

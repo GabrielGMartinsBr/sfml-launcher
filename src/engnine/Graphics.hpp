@@ -1,6 +1,6 @@
 #pragma once
 
-#include "engnine/Engine.hpp"
+#include "engnine/Engine.h"
 #include "engnine/Timer.hpp"
 
 namespace Eng {

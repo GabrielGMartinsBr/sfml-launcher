@@ -13,7 +13,7 @@
 #include "Log.hpp"
 #include "NumberUtils.hpp"
 #include "engnine/Bitmap.h"
-#include "engnine/Engine.hpp"
+#include "engnine/Engine.h"
 #include "engnine/Rect.hpp"
 #include "engnine/Viewport.hpp"
 #include "integrator/It_Bitmap.hpp"

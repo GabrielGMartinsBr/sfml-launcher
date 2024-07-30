@@ -8,7 +8,7 @@
 
 #include "base/AppDefs.h"
 #include "base/BacktraceUtils.hpp"
-#include "engnine/Engine.hpp"
+#include "engnine/Engine.h"
 #include "integrator/Integrator.hpp"
 #include "loaders/PlayerScript.hpp"
 #include "loaders/ScriptsLoader.hpp"
