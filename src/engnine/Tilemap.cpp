@@ -25,7 +25,8 @@ Tilemap::Tilemap(Viewport* _viewport) :
     Tilemap(Qnil, _viewport) { }
 
 Tilemap::Tilemap(VALUE rbObj, Viewport* _viewport) :
-    EngineBase(rbObj)
+    EngineBase(rbObj),
+    sprRect(0, 0, 640, 480)
 {
   viewport = _viewport;
   tileset = nullptr;
@@ -40,6 +41,9 @@ Tilemap::Tilemap(VALUE rbObj, Viewport* _viewport) :
 
   isEligible = false;
   ready = false;
+  created = false;
+  shouldBuildSprites = true;
+  shouldUpdateSprRect = true;
   dirty = false;
 
   if (rbObj != Qnil) {
@@ -67,6 +71,24 @@ void Tilemap::update()
     return;
   }
 
+  if (shouldBuildSprites) {
+    buildSprites();
+    shouldBuildSprites = false;
+  }
+
+  if (shouldUpdateSprRect) {
+    sprRect.left = ox;
+    sprRect.top = oy;
+    spr.setTextureRect(sprRect);
+    shouldUpdateSprRect = false;
+  }
+
+  dirty = false;
+  ready = true;
+}
+
+void Tilemap::buildSprites()
+{
   const sf::Texture& tileTexture = tileset->getTexture();
   tileSprite.setTexture(tileTexture);
 
@@ -86,7 +108,10 @@ void Tilemap::update()
   int w = cols * 32;
   int h = rows * 32;
 
-  rTexture.create(w, h);
+  if (!created) {
+    rTexture.create(w, h);
+    created = true;
+  }
 
   for (int y = 0; y < rows; y++) {
     for (int x = 0; x < cols; x++) {
@@ -98,9 +123,6 @@ void Tilemap::update()
 
   rTexture.display();
   spr.setTexture(rTexture.getTexture());
-
-  dirty = false;
-  ready = true;
 }
 
 void Tilemap::draw(sf::RenderTexture& rd)
@@ -210,6 +232,8 @@ int Tilemap::getter_ox()
 void Tilemap::setter_ox(int value)
 {
   ox = value;
+  dirty = true;
+  shouldUpdateSprRect = true;
 }
 
 // oy
@@ -222,6 +246,8 @@ int Tilemap::getter_oy()
 void Tilemap::setter_oy(int value)
 {
   oy = value;
+  dirty = true;
+  shouldUpdateSprRect = true;
 }
 
 /*

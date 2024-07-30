@@ -82,15 +82,22 @@ class Tilemap : public EngineBase, Drawable {
 
   bool isDisposed;
   bool isEligible;
+  bool created;
   bool ready;
   bool dirty;
+  bool shouldBuildSprites;
+  bool shouldUpdateSprRect;
+
   sf::Sprite spr;
+  sf::IntRect sprRect;
   sf::RenderTexture rTexture;
 
   sf::Sprite tileSprite;
   sf::Sprite autotileSpr[7];
 
   void updateIsEligible();
+
+  void buildSprites();
 
   void handleTile(int x, int y, int z);
 
