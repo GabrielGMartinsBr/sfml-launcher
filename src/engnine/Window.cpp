@@ -22,6 +22,16 @@
 
 namespace Eng {
 
+static const uint8_t cursorAniAlpha[] = {
+  /* Fade out */
+  0xFF, 0xF7, 0xEF, 0xE7, 0xDF, 0xD7, 0xCF, 0xC7,
+  0xBF, 0xB7, 0xAF, 0xA7, 0x9F, 0x97, 0x8F, 0x87,
+  /* Fade in */
+  0x7F, 0x87, 0x8F, 0x97, 0x9F, 0xA7, 0xAF, 0xB7,
+  0xBF, 0xC7, 0xCF, 0xD7, 0xDF, 0xE7, 0xEF, 0xF7
+};
+static const int cursorAniAlphaN = sizeof(cursorAniAlpha);
+
 Window::Window(Viewport *viewport) :
     Window(Qnil, viewport)
 {
@@ -52,6 +62,8 @@ Window::Window(VALUE rbObj, Viewport *viewport) :
   back_opacity = 255;
   contents_opacity = 255;
   isDisposed = false;
+
+  cursorAniAlphaId = 0;
 
   if (rbObj != Qnil) {
     bindRubyProps();
@@ -292,6 +304,12 @@ void Window::method_dispose()
 bool Window::method_disposed()
 {
   return isDisposed;
+}
+
+void Window::method_update()
+{
+  cursorAniAlphaId = (cursorAniAlphaId + 1) % cursorAniAlphaN;
+  cursorSprite.setColor(sf::Color(255, 255, 255, cursorAniAlpha[cursorAniAlphaId]));
 }
 
 /*

@@ -21,9 +21,6 @@ class Window {
     rb_define_alloc_func(windowClass, instance_allocator);
 
     rb_define_method(windowClass, "initialize", RUBY_METHOD_FUNC(initialize), -1);
-    rb_define_method(windowClass, "update", RUBY_METHOD_FUNC(method_update), 0);
-
-    rb_define_method(windowClass, "update", RUBY_METHOD_FUNC(method_update), 0);
 
     // Attrs
 
@@ -83,6 +80,7 @@ class Window {
     rb_define_method(windowClass, "viewport", RUBY_METHOD_FUNC(method_viewport), 0);
     rb_define_method(windowClass, "dispose", RUBY_METHOD_FUNC(method_dispose), 0);
     rb_define_method(windowClass, "disposed?", RUBY_METHOD_FUNC(method_disposed), 0);
+    rb_define_method(windowClass, "update", RUBY_METHOD_FUNC(method_update), 0);
   }
 
   // Utils
@@ -169,11 +167,6 @@ class Window {
     RbUtils::raiseRuntimeException(
       "Window initialize takes 0 or 1 argument, but " + std::to_string(argc) + " were received."
     );
-    return Qnil;
-  }
-
-  static VALUE method_update(VALUE self)
-  {
     return Qnil;
   }
 
@@ -570,7 +563,6 @@ class Window {
     );
   }
 
-
   /*
     Method dispose
   */
@@ -597,6 +589,22 @@ class Window {
     bool result = inst->method_disposed();
 
     return result ? Qtrue : Qfalse;
+  }
+
+  /*
+    Method update
+  */
+
+  static VALUE method_update(VALUE self)
+  {
+    Eng::Window *inst = getObjectValue(self);
+    if (inst == nullptr) {
+      return Qnil;
+    }
+
+    inst->method_update();
+
+    return Qnil;
   }
 };
 }  // namespace It

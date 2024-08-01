@@ -92,6 +92,8 @@ class Window : public EngineBase, Drawable {
 
   bool method_disposed();
 
+  void method_update();
+
  private:
   Viewport *viewport;
   Bitmap *windowSkin;
@@ -125,6 +127,8 @@ class Window : public EngineBase, Drawable {
   bool skinDirty;
   bool contentsDirty;
   bool removedFromEngineLoop;
+
+  int cursorAniAlphaId;
 
   void removeDrawable();
 
