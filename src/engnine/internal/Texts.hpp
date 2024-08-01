@@ -9,7 +9,6 @@
 #include <SFML/System/Utf.hpp>
 #include <stdexcept>
 
-#include "Log.hpp"
 #include "base/AppDefs.h"
 #include "engnine/Font.hpp"
 
@@ -24,14 +23,14 @@ class Texts {
   static void loadFonts()
   {
     static sf::Font font;
-    if (!font.loadFromFile("/run/media/home/common/gabrielmartins.dev/dev/cpp/orm-xp/sfml-launcher/assets/arial.ttf")) {
+    if (!font.loadFromFile("/run/media/home/common/gabrielmartins.dev/dev/cpp/orm-xp/sfml-launcher/assets/Roboto-Medium.ttf")) {
       throw std::runtime_error("Load fonts failed");
     }
   }
 
   static void loadFont(sf::Font &font)
   {
-    if (!font.loadFromFile("/run/media/home/common/gabrielmartins.dev/dev/cpp/orm-xp/sfml-launcher/assets/arial.ttf")) {
+    if (!font.loadFromFile("/run/media/home/common/gabrielmartins.dev/dev/cpp/orm-xp/sfml-launcher/assets/Roboto-Medium.ttf")) {
       throw std::runtime_error("Load fonts failed");
     }
   }
@@ -41,17 +40,13 @@ class Texts {
     sf::String s = fromUtf8(str);
     sf::Font sfFont;
     loadFont(sfFont);
-    sfFont.setSmooth(false);
+    // sfFont.setSmooth(true);
     sf::Text text;
     text.setFont(sfFont);
-    // text.setString(str);
     text.setString(s);
-    text.setCharacterSize(font.getter_size());
+    text.setCharacterSize(font.getter_size() - 1);
     text.setFillColor(font.getter_color()->getSfColor());
     text.setPosition(x, y);
-    text.setOutlineColor(sf::Color::White);
-    // text.setOutlineThickness(.5);
-    // texture.setSmooth(true);
     texture.draw(text, sf::BlendNone);
   }
 

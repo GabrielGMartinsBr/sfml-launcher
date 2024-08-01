@@ -373,7 +373,8 @@ class Bitmap {
         rb_scan_args(argc, argv, "3", &_rect, &_str, &_align);
         Eng::Rect *rect = Rect::getObjectValue(_rect);
         app::CStr str = Convert::toCStr(_str);
-        inst->draw_text(rect, str);
+        Eng::TextAlign align = (Eng::TextAlign)Convert::toCInt(_align);
+        inst->draw_text(rect, str, align);
         break;
       }
       case 5: {
@@ -388,12 +389,13 @@ class Bitmap {
       }
       case 6: {
         rb_scan_args(argc, argv, "6", &_x, &_y, &_width, &_height, &_str, &_align);
-        int x = Convert::toCInt(_x);
-        int y = Convert::toCInt(_y);
-        int width = Convert::toCInt(_width);
-        int height = Convert::toCInt(_height);
+        double x = Convert::toCDouble2(_x);
+        double y = Convert::toCDouble2(_y);
+        double width = Convert::toCDouble2(_width);
+        double height = Convert::toCDouble2(_height);
         app::CStr str = Convert::toCStr(_str);
-        inst->draw_text(x, y, width, height, str);
+        Eng::TextAlign align = (Eng::TextAlign)Convert::toCInt(_align);
+        inst->draw_text(x, y, width, height, str, align);
         break;
       }
       default: {

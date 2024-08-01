@@ -68,9 +68,13 @@ class Bitmap : public EngineBase {
 
   void hue_change(int _hue);
 
-  void draw_text(int x, int y, int width, int height, app::CStr str, TextAlign align = TextAlign::TEXT_LEFT);
+  void draw_text(double x, double y, double width, double height, app::CStr str, TextAlign align = TextAlign::TEXT_LEFT);
   void draw_text(Rect rect, app::CStr str, TextAlign align = TextAlign::TEXT_LEFT);
   Eng::Rect* get_text_size(app::CStr str);
+
+  // Engine
+
+  sf::FloatRect getTextBounds(app::CStr str, int fontSize);
 
  private:
 

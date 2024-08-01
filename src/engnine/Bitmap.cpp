@@ -222,9 +222,7 @@ void Bitmap::fill_rect(int x, int y, int width, int height, Color* color)
   sf::Sprite sprite;
   sf::Image img;
   sf::Texture text;
-  sf::Color sfColor;
-
-  parseColor(sfColor, color);
+  sf::Color& sfColor = color->getSfColor();
 
   img.create(this->width, this->height, sf::Color::Transparent);
 
@@ -283,12 +281,16 @@ void Bitmap::set_pixel(unsigned int x, unsigned int y, Color* _color)
     return;
   }
   sf::Texture texture = renderTexture.getTexture();
-  sf::Image image = texture.copyToImage();
-  sf::Color color(_color->red, _color->green, _color->blue);
-  image.setPixel(x, y, color);
+  sf::Image image = renderTexture.getTexture().copyToImage();
+  image.setPixel(x, y, _color->getSfColor());
+  texture.loadFromImage(image);
+
   sf::Sprite sprite;
   sprite.setTexture(texture);
+
   renderTexture.draw(sprite);
+  renderTexture.display();
+
   dirty = true;
 }
 
@@ -298,9 +300,19 @@ void Bitmap::hue_change(int _hue) { }
 
 // Method draw_text
 
-void Bitmap::draw_text(int x, int y, int width, int height, app::CStr str, TextAlign align)
+void Bitmap::draw_text(double x, double y, double width, double height, app::CStr str, TextAlign align)
 {
-  Texts::drawText(renderTexture, x, y, *font, str);
+  if (align == TextAlign::TEXT_LEFT) {
+    Texts::drawText(renderTexture, x, y, *font, str);
+  } else if (align == TextAlign::TEXT_RIGHT) {
+    sf::FloatRect size = getTextBounds(str, font->getter_size());
+    double _x = x + width - size.width;
+    Texts::drawText(renderTexture, _x, y, *font, str);
+  } else if (align == TextAlign::TEXT_CENTER) {
+    sf::FloatRect size = getTextBounds(str, font->getter_size());
+    double _x = x + (width - size.width) / 2;
+    Texts::drawText(renderTexture, _x, y, *font, str);
+  }
   renderTexture.display();
 }
 
@@ -325,6 +337,17 @@ Eng::Rect* Bitmap::get_text_size(app::CStr str)
   sf::FloatRect textBounds = text.getLocalBounds();
   Eng::Rect* rect = new Eng::Rect(textBounds.left, textBounds.top, textBounds.width, textBounds.height);
   return rect;
+}
+
+sf::FloatRect Bitmap::getTextBounds(app::CStr str, int fontSize)
+{
+  sf::Font sfFont;
+  Texts::loadFont(sfFont);
+  sf::Text text;
+  text.setFont(sfFont);
+  text.setString(str);
+  text.setCharacterSize(fontSize);
+  return text.getLocalBounds();
 }
 
 // Static method parseColor
