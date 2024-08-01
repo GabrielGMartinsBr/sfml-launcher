@@ -407,137 +407,165 @@ void Window::updateBorder()
   constexpr int BORDER_SIZE = 64;
   constexpr int BORDER_LINE = BORDER_SIZE - CORNER_SIZE * 2;
 
-  sf::Image src = windowSkin->renderTexture.getTexture().copyToImage();
-  sf::Texture srcTexture;
-  srcTexture.loadFromImage(src);
+  sf::Texture srcTexture(windowSkin->getTexture());
 
   sf::RenderTexture rd;
   rd.create(width, height);
   rd.clear(sf::Color::Transparent);
 
-  sf::IntRect dstRect(BORDER_START_X, BORDER_START_Y, CORNER_SIZE, CORNER_SIZE);
-
-  sf::Sprite leftTop;
-  leftTop.setTexture(srcTexture);
-  leftTop.setTextureRect(dstRect);
-  leftTop.setPosition(0, 0);
-  rd.draw(leftTop);
-  rd.display();
-
-  sf::Sprite rightTop;
-  rightTop.setTexture(srcTexture);
-  dstRect.left = BORDER_END_X - CORNER_SIZE;
-  rightTop.setTextureRect(dstRect);
-  rightTop.setPosition(width - CORNER_SIZE, 0);
-  rd.draw(rightTop);
-  rd.display();
-
-  sf::Sprite rightBottom;
-  rightBottom.setTexture(srcTexture);
-  dstRect.left = BORDER_END_X - CORNER_SIZE;
-  dstRect.top = BORDER_END_Y - CORNER_SIZE;
-  rightBottom.setTextureRect(dstRect);
-  rightBottom.setPosition(width - CORNER_SIZE, height - CORNER_SIZE);
-  rd.draw(rightBottom);
-  rd.display();
-
-  sf::Sprite leftBottom;
-  leftBottom.setTexture(srcTexture);
-  dstRect.left = BORDER_START_X;
-  dstRect.top = BORDER_END_Y - CORNER_SIZE;
-  leftBottom.setTextureRect(dstRect);
-  leftBottom.setPosition(0, height - CORNER_SIZE);
-  rd.draw(leftBottom);
-  rd.display();
-
-  sf::Sprite top;
-  top.setTexture(srcTexture);
-  dstRect = sf::IntRect(
+  sf::IntRect topLeft(
+    BORDER_START_X,
+    BORDER_START_Y,
+    CORNER_SIZE,
+    CORNER_SIZE
+  );
+  sf::IntRect topRight(
+    BORDER_END_X - CORNER_SIZE,
+    BORDER_START_Y,
+    CORNER_SIZE,
+    CORNER_SIZE
+  );
+  sf::IntRect bottomRight(
+    BORDER_END_X - CORNER_SIZE,
+    BORDER_END_Y - CORNER_SIZE,
+    CORNER_SIZE,
+    CORNER_SIZE
+  );
+  sf::IntRect bottomLeft(
+    BORDER_START_X,
+    BORDER_END_Y - CORNER_SIZE,
+    CORNER_SIZE,
+    CORNER_SIZE
+  );
+  sf::IntRect top(
     BORDER_START_X + CORNER_SIZE,
     BORDER_START_Y,
     BORDER_LINE,
     BORDER_THICK
   );
-  top.setTextureRect(dstRect);
-  int limitX = std::floor((width - CORNER_SIZE * 2) / BORDER_LINE);
-  for (int i = 0; i < limitX; i++) {
-    top.setPosition(CORNER_SIZE + BORDER_LINE * i, 0);
-    rd.draw(top);
-    rd.display();
-  }
-  int stopX = CORNER_SIZE + BORDER_LINE * limitX;
-  int missingX = width - CORNER_SIZE - stopX;
-  if (missingX > 0) {
-    dstRect.width = missingX;
-    top.setTextureRect(dstRect);
-    top.setPosition(stopX, 0);
-    rd.draw(top);
-    rd.display();
-  }
-
-  sf::Sprite bottom;
-  bottom.setTexture(srcTexture);
-  dstRect = sf::IntRect(
+  sf::IntRect bottom(
     BORDER_START_X + CORNER_SIZE,
     BORDER_END_Y - CORNER_SIZE,
     BORDER_LINE,
     BORDER_THICK
   );
-  bottom.setTextureRect(dstRect);
-  limitX = std::floor((width - CORNER_SIZE * 2) / BORDER_LINE);
-  int _y = height - CORNER_SIZE;
+  sf::IntRect left(
+    BORDER_START_X,
+    BORDER_START_Y + CORNER_SIZE,
+    BORDER_THICK,
+    BORDER_LINE
+  );
+  sf::IntRect right(
+    BORDER_END_X - BORDER_THICK,
+    BORDER_START_Y + CORNER_SIZE,
+    BORDER_THICK,
+    BORDER_LINE
+  );
+
+  sf::Sprite borderSpr;
+  borderSpr.setTexture(srcTexture);
+
+  // Top Left
+
+  borderSpr.setTextureRect(topLeft);
+  borderSpr.setPosition(0, 0);
+  rd.draw(borderSpr);
+  rd.display();
+
+  // Top Right
+
+  borderSpr.setTextureRect(topRight);
+  borderSpr.setPosition(width - CORNER_SIZE, 0);
+  rd.draw(borderSpr);
+  rd.display();
+
+  // Bottom Right
+
+  borderSpr.setTextureRect(bottomRight);
+  borderSpr.setPosition(width - CORNER_SIZE, height - CORNER_SIZE);
+  rd.draw(borderSpr);
+  rd.display();
+
+  // Bottom Left
+
+  borderSpr.setTextureRect(bottomLeft);
+  borderSpr.setPosition(0, height - CORNER_SIZE);
+  rd.draw(borderSpr);
+  rd.display();
+
+  // Top
+
+  borderSpr.setTextureRect(top);
+  int limitX = std::floor((width - CORNER_SIZE * 2) / BORDER_LINE);
   for (int i = 0; i < limitX; i++) {
-    bottom.setPosition(CORNER_SIZE + BORDER_LINE * i, _y);
-    rd.draw(bottom);
-    rd.display();
-  }
-  stopX = CORNER_SIZE + BORDER_LINE * limitX;
-  missingX = width - CORNER_SIZE - stopX;
-  if (missingX > 0) {
-    dstRect.width = missingX;
-    bottom.setTextureRect(dstRect);
-    bottom.setPosition(stopX, _y);
-    rd.draw(bottom);
+    borderSpr.setPosition(CORNER_SIZE + BORDER_LINE * i, 0);
+    rd.draw(borderSpr);
     rd.display();
   }
 
-  sf::Sprite left;
-  dstRect = sf::IntRect(BORDER_START_X, BORDER_START_Y + CORNER_SIZE, BORDER_THICK, BORDER_LINE);
-  left.setTexture(srcTexture);
-  left.setTextureRect(dstRect);
-  int limitY = std::floor((height - CORNER_SIZE * 2) / BORDER_LINE);
-  for (int i = 0; i < limitY; i++) {
-    left.setPosition(0, CORNER_SIZE + BORDER_LINE * i);
-    rd.draw(left);
+  int stopX = CORNER_SIZE + BORDER_LINE * limitX;
+  int missingX = width - CORNER_SIZE - stopX;
+  if (missingX > 0) {
+    top.width = missingX;
+    borderSpr.setTextureRect(top);
+    borderSpr.setPosition(stopX, 0);
+    rd.draw(borderSpr);
     rd.display();
   }
+
+  // Bottom
+
+  borderSpr.setTextureRect(bottom);
+  int _y = height - CORNER_SIZE;
+  for (int i = 0; i < limitX; i++) {
+    borderSpr.setPosition(CORNER_SIZE + BORDER_LINE * i, _y);
+    rd.draw(borderSpr);
+    rd.display();
+  }
+
+  if (missingX > 0) {
+    bottom.width = missingX;
+    borderSpr.setTextureRect(bottom);
+    borderSpr.setPosition(stopX, _y);
+    rd.draw(borderSpr);
+    rd.display();
+  }
+
+  // Left
+
+  borderSpr.setTextureRect(left);
+  int limitY = std::floor((height - CORNER_SIZE * 2) / BORDER_LINE);
+  for (int i = 0; i < limitY; i++) {
+    borderSpr.setPosition(0, CORNER_SIZE + BORDER_LINE * i);
+    rd.draw(borderSpr);
+    rd.display();
+  }
+
   int stopY = CORNER_SIZE + BORDER_LINE * limitY;
   int missingY = height - CORNER_SIZE - stopY;
   if (missingY > 0) {
-    dstRect.height = missingY;
-    left.setTextureRect(dstRect);
-    left.setPosition(0, stopY);
-    rd.draw(left);
+    left.height = missingY;
+    borderSpr.setTextureRect(left);
+    borderSpr.setPosition(0, stopY);
+    rd.draw(borderSpr);
     rd.display();
   }
 
-  sf::Sprite right;
-  dstRect = sf::IntRect(BORDER_END_X - BORDER_THICK, BORDER_START_Y + CORNER_SIZE, BORDER_THICK, BORDER_LINE);
-  right.setTexture(srcTexture);
-  right.setTextureRect(dstRect);
+  // Right
+
+  borderSpr.setTextureRect(right);
   int _x = width - BORDER_THICK;
   for (int i = 0; i < limitY; i++) {
-    right.setPosition(_x, CORNER_SIZE + BORDER_LINE * i);
-    rd.draw(right);
+    borderSpr.setPosition(_x, CORNER_SIZE + BORDER_LINE * i);
+    rd.draw(borderSpr);
     rd.display();
   }
-  stopY = CORNER_SIZE + BORDER_LINE * limitY;
-  missingY = height - CORNER_SIZE - stopY;
+
   if (missingY > 0) {
-    dstRect.height = missingY;
-    right.setTextureRect(dstRect);
-    right.setPosition(_x, stopY);
-    rd.draw(right);
+    right.height = missingY;
+    borderSpr.setTextureRect(right);
+    borderSpr.setPosition(_x, stopY);
+    rd.draw(borderSpr);
     rd.display();
   }
 
