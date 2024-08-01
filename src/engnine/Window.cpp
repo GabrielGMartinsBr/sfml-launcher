@@ -310,6 +310,7 @@ void Window::method_update()
 {
   cursorAniAlphaId = (cursorAniAlphaId + 1) % cursorAniAlphaN;
   cursorSprite.setColor(sf::Color(255, 255, 255, cursorAniAlpha[cursorAniAlphaId]));
+  contentsDirty = contents->dirty;
 }
 
 /*
