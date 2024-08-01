@@ -317,9 +317,7 @@ void Window::updateBackgroundSprite()
   backgroundSprite.setScale(scaleX, scaleY);
   backgroundSprite.setPosition(x + 1, y + 1);
 
-  // Log::out() << "update()";
-  // Log::out() << "Rect width: " << cursor_rect->getter_width();
-  // Log::out() << "Rect height: " << cursor_rect->getter_height();
+  backgroundSprite.setColor(sf::Color(255, 255, 255, back_opacity));
 }
 
 void Window::updateContentsSprite()
@@ -342,9 +340,10 @@ void Window::updateContentsSprite()
   rd->draw(*spr);
   rd->display();
   const sf::Texture *tex = &rd->getTexture();
-  contentsSprite.setTexture(*tex);
 
+  contentsSprite.setTexture(*tex);
   contentsSprite.setPosition(x + 16, y + 16);
+  contentsSprite.setColor(sf::Color(255, 255, 255, contents_opacity));
 }
 
 void Window::updateCursorRect()
@@ -572,6 +571,8 @@ void Window::updateBorder()
   borderTexture = rd.getTexture();
   borderSprite.setTexture(borderTexture);
   borderSprite.setPosition(x, y);
+
+  borderSprite.setColor(sf::Color(255, 255, 255, opacity));
 }
 
 void Window::removeDrawable()
