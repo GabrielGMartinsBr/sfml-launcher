@@ -10,7 +10,8 @@
 #include <SFML/System/Vector2.hpp>
 
 #include "base/Sugars.hpp"
-#include "engnine/Drawable.hpp"
+#include "engnine/OnRender.h"
+#include "engnine/OnUpdate.h"
 #include "engnine/Viewport.hpp"
 
 namespace Eng {
@@ -20,9 +21,17 @@ struct EngineRenderer {
 
   void addViewport(SharedPtr<Eng::Viewport> vp);
 
-  void addDrawable(Eng::Drawable* drawable);
+  // Update
 
-  void removeDrawable(Eng::Drawable* drawable);
+  void addToUpdateList(Eng::OnUpdate* instance);
+
+  void removeFromUpdateList(Eng::OnUpdate* instance);
+
+  // Render
+
+  void addToRenderList(Eng::OnRender* instance);
+
+  void removeFromRenderList(Eng::OnRender* instance);
 
   void markZOrderDirty();
 
@@ -37,14 +46,18 @@ struct EngineRenderer {
    */
 
  private:
+  static bool compareZ(const OnRender* a, const OnRender* b);
+
   unsigned int width;
   unsigned int height;
   bool zDirty;
 
   sf::RenderWindow* window;
   Vector<SharedPtr<Eng::Viewport>> viewports;
-  Vector<Eng::Drawable*> drawables;
   SharedPtr<Eng::Viewport> defaultVp;
+
+  Vector<Eng::OnUpdate*> updateList;
+  Vector<Eng::OnRender*> renderList;
 
   sf::Sprite bufferSprite;
   sf::RenderTexture renderTexture;
@@ -61,7 +74,9 @@ struct EngineRenderer {
 
   void clearViewports();
 
-  void renderDrawables();
+  void update();
+
+  void render();
 
   void renderViewports();
 
@@ -70,8 +85,6 @@ struct EngineRenderer {
   void renderBuffer(sf::RenderTarget* target);
 
   void renderFps();
-
-  static bool compareZ(const Drawable* a, const Drawable* b);
 
   void sortZ();
 };

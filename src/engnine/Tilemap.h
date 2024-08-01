@@ -4,14 +4,15 @@
 #include <SFML/Graphics/Sprite.hpp>
 
 #include "engnine/Autotiles.h"
-#include "engnine/Drawable.hpp"
 #include "engnine/EngineBase.hpp"
+#include "engnine/OnRender.h"
+#include "engnine/OnUpdate.h"
 #include "engnine/Table.hpp"
 #include "engnine/Viewport.hpp"
 
 namespace Eng {
 
-class Tilemap : public EngineBase, Drawable {
+class Tilemap : public EngineBase, OnUpdate, OnRender {
  public:
 
   Tilemap(Viewport* _viewport = nullptr);
@@ -19,19 +20,23 @@ class Tilemap : public EngineBase, Drawable {
 
   ~Tilemap();
 
-  void bindRubyProps();
-
   /*
-    Drawable
+    Engine Cycles
   */
 
-  inline int getZPosition() const override;
+  int getZIndex() const override;
 
-  inline bool shouldRender() const override;
+  bool shouldRender() const override;
 
-  void update() override;
+  void onUpdate() override;
 
-  void draw(sf::RenderTexture& renderTexture) override;
+  void onRender(sf::RenderTexture& rd) override;
+
+  /*
+    Rgss
+  */
+
+  void bindRubyProps();
 
   /*
     Properties
@@ -89,7 +94,7 @@ class Tilemap : public EngineBase, Drawable {
   bool dirty;
   bool shouldBuildSprites;
   bool shouldUpdateSprRect;
-  bool removedFromEngineLoop;
+  bool addedToEngineCycles;
 
   sf::Sprite spr;
   sf::IntRect sprRect;
@@ -98,7 +103,8 @@ class Tilemap : public EngineBase, Drawable {
   sf::Sprite tileSprite;
   sf::Sprite autotileSpr[7];
 
-  void removeDrawable();
+  void addToEngineCycles();
+  void removeFromEngineCycles();
 
   void updateIsEligible();
 

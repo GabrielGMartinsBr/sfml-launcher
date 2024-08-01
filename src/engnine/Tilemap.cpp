@@ -1,4 +1,4 @@
-#include "engnine/Tilemap.h"
+#include "Tilemap.h"
 
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Image.hpp>
@@ -10,7 +10,7 @@
 #include "engnine/AutotilePositions.h"
 #include "engnine/Autotiles.h"
 #include "engnine/Bitmap.h"
-#include "engnine/Engine.hpp"
+#include "engnine/Engine.h"
 #include "engnine/EngineBase.hpp"
 #include "engnine/Table.hpp"
 #include "engnine/Viewport.hpp"
@@ -45,23 +45,23 @@ Tilemap::Tilemap(VALUE rbObj, Viewport* _viewport) :
   shouldBuildSprites = true;
   shouldUpdateSprRect = true;
   dirty = false;
+  addedToEngineCycles = false;
 
   if (rbObj != Qnil) {
     bindRubyProps();
   }
 
-  Eng::Engine::getInstance().addDrawable(this);
-  removedFromEngineLoop = false;
+  addToEngineCycles();
 }
 
 Tilemap::~Tilemap()
 {
-  removeDrawable();
+  removeFromEngineCycles();
 }
 
 // Engine Drawable
 
-inline int Tilemap::getZPosition() const
+inline int Tilemap::getZIndex() const
 {
   return 0;
 }
@@ -71,7 +71,7 @@ inline bool Tilemap::shouldRender() const
   return !isDisposed && isEligible;
 }
 
-void Tilemap::update()
+void Tilemap::onUpdate()
 {
   if (!dirty || tileset == nullptr || map_data == nullptr) {
     return;
@@ -93,45 +93,7 @@ void Tilemap::update()
   ready = true;
 }
 
-void Tilemap::buildSprites()
-{
-  const sf::Texture& tileTexture = tileset->getTexture();
-  tileSprite.setTexture(tileTexture);
-
-  Bitmap* bp;
-  for (int i = 0; i < 7; i++) {
-    bp = autotiles->getter(i);
-    if (bp == nullptr) {
-      continue;
-    } else {
-      autotileSpr[i].setTexture(bp->getTexture());
-    }
-  }
-
-  int cols = map_data->getXSize();
-  int rows = map_data->getYSize();
-
-  int w = cols * 32;
-  int h = rows * 32;
-
-  if (!created) {
-    rTexture.create(w, h);
-    created = true;
-  }
-
-  for (int y = 0; y < rows; y++) {
-    for (int x = 0; x < cols; x++) {
-      handleTile(x, y, 0);
-      handleTile(x, y, 1);
-      handleTile(x, y, 2);
-    }
-  }
-
-  rTexture.display();
-  spr.setTexture(rTexture.getTexture());
-}
-
-void Tilemap::draw(sf::RenderTexture& rd)
+void Tilemap::onRender(sf::RenderTexture& rd)
 {
   if (!ready) return;
   rd.draw(spr);
@@ -265,7 +227,7 @@ void Tilemap::setter_oy(int value)
 void Tilemap::method_dispose()
 {
   isDisposed = true;
-  removeDrawable();
+  removeFromEngineCycles();
 }
 
 // disposed?
@@ -286,12 +248,74 @@ Viewport* Tilemap::method_viewport()
 
 void Tilemap::method_update() { }
 
+/*
+  Private
+*/
+
+void Tilemap::addToEngineCycles()
+{
+  if (addedToEngineCycles) {
+    return;
+  }
+  Engine::getInstance().addToUpdateList(this);
+  Engine::getInstance().addToRenderList(this);
+  addedToEngineCycles = true;
+}
+
+void Tilemap::removeFromEngineCycles()
+{
+  if (!addedToEngineCycles) {
+    return;
+  }
+  Engine::getInstance().removeFromUpdateList(this);
+  Engine::getInstance().removeFromRenderList(this);
+  addedToEngineCycles = false;
+}
+
 void Tilemap::updateIsEligible()
 {
   isEligible = map_data != nullptr && tileset != nullptr;
   if (isEligible) {
     dirty = true;
   }
+}
+
+void Tilemap::buildSprites()
+{
+  const sf::Texture& tileTexture = tileset->getTexture();
+  tileSprite.setTexture(tileTexture);
+
+  Bitmap* bp;
+  for (int i = 0; i < 7; i++) {
+    bp = autotiles->getter(i);
+    if (bp == nullptr) {
+      continue;
+    } else {
+      autotileSpr[i].setTexture(bp->getTexture());
+    }
+  }
+
+  int cols = map_data->getXSize();
+  int rows = map_data->getYSize();
+
+  int w = cols * 32;
+  int h = rows * 32;
+
+  if (!created) {
+    rTexture.create(w, h);
+    created = true;
+  }
+
+  for (int y = 0; y < rows; y++) {
+    for (int x = 0; x < cols; x++) {
+      handleTile(x, y, 0);
+      handleTile(x, y, 1);
+      handleTile(x, y, 2);
+    }
+  }
+
+  rTexture.display();
+  spr.setTexture(rTexture.getTexture());
 }
 
 void Tilemap::handleTile(int x, int y, int z)
@@ -343,15 +367,6 @@ void Tilemap::handleAutoTile(int id, int x, int y)
     );
     rTexture.draw(tile);
   }
-}
-
-void Tilemap::removeDrawable()
-{
-  if (removedFromEngineLoop) {
-    return;
-  }
-  Eng::Engine::getInstance().removeDrawable(this);
-  removedFromEngineLoop = true;
 }
 
 }  // namespace Eng

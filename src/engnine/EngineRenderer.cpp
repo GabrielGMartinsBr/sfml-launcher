@@ -1,6 +1,4 @@
-#pragma once
-
-#include "engnine/EngineRenderer.h"
+#include "EngineRenderer.h"
 
 #include <SFML/Graphics/BlendMode.hpp>
 #include <SFML/Graphics/Color.hpp>
@@ -13,8 +11,8 @@
 #include <stdexcept>
 #include <string>
 
-#include "base/Sugars.hpp"
-#include "engnine/Drawable.hpp"
+#include "engnine/OnRender.h"
+#include "engnine/OnUpdate.h"
 #include "engnine/Timer.hpp"
 #include "engnine/Viewport.hpp"
 
@@ -36,20 +34,34 @@ void EngineRenderer::addViewport(SharedPtr<Eng::Viewport> vp)
   viewports.push_back(vp);
 }
 
-void EngineRenderer::addDrawable(Eng::Drawable* drawable)
+// OnUpdate List
+
+void EngineRenderer::addToUpdateList(Eng::OnUpdate* instance)
 {
-  drawables.push_back(drawable);
-  zDirty = true;
-  // Log::out() << "(add) Drawables size: " << drawables.size();
+  updateList.push_back(instance);
 }
 
-void EngineRenderer::removeDrawable(Eng::Drawable* drawable)
+void EngineRenderer::removeFromUpdateList(Eng::OnUpdate* instance)
 {
-  auto it = std::find(drawables.begin(), drawables.end(), drawable);
-  if (it != drawables.end()) {
-    drawables.erase(it);
+  auto it = std::find(updateList.begin(), updateList.end(), instance);
+  if (it != updateList.end()) {
+    updateList.erase(it);
   }
-  Log::out() << "(remove) Drawables size: " << drawables.size();
+}
+
+// OnRender List
+
+void EngineRenderer::addToRenderList(Eng::OnRender* instance)
+{
+  renderList.push_back(instance);
+}
+
+void EngineRenderer::removeFromRenderList(Eng::OnRender* instance)
+{
+  auto it = std::find(renderList.begin(), renderList.end(), instance);
+  if (it != renderList.end()) {
+    renderList.erase(it);
+  }
 }
 
 void EngineRenderer::markZOrderDirty()
@@ -59,10 +71,10 @@ void EngineRenderer::markZOrderDirty()
 
 void EngineRenderer::render(sf::RenderTarget* target)
 {
-  // renderTexture.clear(sf::Color::Transparent);
+  update();
   renderTexture.clear();
   // clearViewports();
-  renderDrawables();
+  render();
   // renderViewports();
   renderBuffer(target);
 }
@@ -99,8 +111,8 @@ void EngineRenderer::createFpsText()
   fpsText.setFillColor(sf::Color::White);
   fpsText.setOutlineColor(sf::Color::Black);
   fpsText.setOutlineThickness(1.5);
-  fpsText.setCharacterSize(16);
-  fpsText.setPosition(8, 8);
+  fpsText.setCharacterSize(14);
+  fpsText.setPosition(4, 458);
 }
 
 void EngineRenderer::createDefaultViewport()
@@ -119,17 +131,23 @@ void EngineRenderer::clearViewports()
   }
 }
 
-void EngineRenderer::renderDrawables()
+void EngineRenderer::update()
+{
+  for (Eng::OnUpdate* updateInst : updateList) {
+    updateInst->onUpdate();
+  }
+}
+
+void EngineRenderer::render()
 {
   if (zDirty) {
     sortZ();
   }
-  for (Eng::Drawable* drawable : drawables) {
-    if (!drawable->shouldRender()) {
+  for (Eng::OnRender* renderInst : renderList) {
+    if (!renderInst->shouldRender()) {
       continue;
     }
-    drawable->update();
-    drawable->draw(renderTexture);
+    renderInst->onRender(renderTexture);
   }
   renderFps();
 }
@@ -165,15 +183,14 @@ void EngineRenderer::renderFps()
   renderTexture.draw(fpsText);
 }
 
-bool EngineRenderer::compareZ(const Drawable* a, const Drawable* b)
+bool EngineRenderer::compareZ(const OnRender* a, const OnRender* b)
 {
-  return a->getZPosition() < b->getZPosition();
+  return a->getZIndex() < b->getZIndex();
 }
 
 void EngineRenderer::sortZ()
 {
-  // Log::out() << "sort";
-  std::sort(drawables.begin(), drawables.end(), compareZ);
+  std::sort(renderList.begin(), renderList.end(), compareZ);
   zDirty = false;
 }
 

@@ -9,14 +9,15 @@
 #include <SFML/Graphics/Texture.hpp>
 
 #include "engnine/Bitmap.h"
-#include "engnine/Drawable.hpp"
 #include "engnine/EngineBase.hpp"
+#include "engnine/OnRender.h"
+#include "engnine/OnUpdate.h"
 #include "engnine/Rect.hpp"
 #include "engnine/Viewport.hpp"
 
 namespace Eng {
 
-class Window : public EngineBase, Drawable {
+class Window : public EngineBase, OnUpdate, OnRender {
  public:
 
   Window(Viewport *viewport = nullptr);
@@ -25,15 +26,19 @@ class Window : public EngineBase, Drawable {
 
   ~Window();
 
-  void bindRubyProps();
+  // Engine
 
-  int getZPosition() const override;
+  int getZIndex() const override;
 
   bool shouldRender() const override;
 
-  void update() override;
+  void onUpdate() override;
 
-  void draw(sf::RenderTexture &rd) override;
+  void onRender(sf::RenderTexture &rd) override;
+
+  // Rgss
+
+  void bindRubyProps();
 
   Bitmap *getter_windowskin();
   void setter_windowskin(Bitmap *value);
@@ -126,11 +131,12 @@ class Window : public EngineBase, Drawable {
 
   bool skinDirty;
   bool contentsDirty;
-  bool removedFromEngineLoop;
+  bool addedToEngineCycles;
 
   int cursorAniAlphaId;
 
-  void removeDrawable();
+  void addToEngineCycles();
+  void removeFromEngineCycles();
 
   void updateBackgroundSprite();
 

@@ -16,9 +16,10 @@
 #include "base/NumberUtils.hpp"
 #include "engnine/Bitmap.h"
 #include "engnine/Color.hpp"
-#include "engnine/Drawable.hpp"
-#include "engnine/Engine.hpp"
+#include "engnine/Engine.h"
 #include "engnine/EngineBase.hpp"
+#include "engnine/OnRender.h"
+#include "engnine/OnUpdate.h"
 #include "engnine/Rect.hpp"
 #include "engnine/Tone.hpp"
 #include "engnine/Viewport.hpp"
@@ -31,7 +32,7 @@
 
 namespace Eng {
 
-class Sprite : Drawable, public EngineBase {
+class Sprite : OnUpdate, OnRender, public EngineBase {
  public:
 
   // Constructor
@@ -63,13 +64,13 @@ class Sprite : Drawable, public EngineBase {
     dirty = false;
     isDisposed = false;
     loadedBitmap = false;
+    addedToEngineCycles = false;
 
     if (rbObj != Qnil) {
       bindRubyProps();
     }
 
-    Eng::Engine::getInstance().addDrawable(this);
-    removedFromEngineLoop = false;
+    addToEngineCycles();
   }
 
   Sprite(Viewport *_viewport = nullptr) :
@@ -78,7 +79,178 @@ class Sprite : Drawable, public EngineBase {
   ~Sprite()
   {
     Log::out() << "Destructor sprite";
-    removeDrawable();
+    removeFromEngineCycles();
+  }
+
+  /*
+      Engine Methods
+  */
+
+  inline int getZIndex() const override
+  {
+    return z;
+  }
+
+  bool shouldRender() const override
+  {
+    return !isDisposed && visible && bitmap != nullptr && !bitmap->disposed();
+  }
+
+  sf::Sprite &getSfSprite()
+  {
+    return spr;
+  }
+
+  void onUpdate() override
+  {
+    if (!dirty || !bitmap) {
+      return;
+    }
+
+    if (!loadedBitmap || bitmap->dirty) {
+      spr.setTexture(
+        bitmap->renderTexture.getTexture()
+      );
+      loadedBitmap = true;
+      bitmap->dirty = false;
+    }
+
+    position.x = x - ox;
+    position.y = y - oy;
+
+    sf::IntRect srcRect = src_rect->sfRect();
+
+    spr.setPosition(position);
+
+    spr.setTextureRect(srcRect);
+  }
+
+  void onRender(sf::RenderTexture &renderTexture) override
+  {
+    float opacity = getter_opacity() / 255.f;
+
+    renderTexture.draw(spr);
+
+    return;
+
+    sf::RenderStates state;
+    // state.blendMode = sf::BlendNone;
+
+    if (getter_blend_type() == 2) {
+      Engine::getInstance().blendShaders.sprInvertShader.setUniform("opacity", opacity);
+      state.shader = &Engine::getInstance().blendShaders.sprInvertShader;
+      state.blendMode = sf::BlendMultiply;
+    } else {
+      Engine::getInstance().blendShaders.sprNormalShader.setUniform("opacity", opacity);
+      state.shader = &Engine::getInstance().blendShaders.sprNormalShader;
+      state.blendMode = sf::BlendAlpha;
+    }
+    // Engine::getInstance().blendShaders.sprInvertShader.setUniform("opacity", opacity);
+    // state.shader = &Engine::getInstance().blendShaders.sprInvertShader;
+    // state.blendMode = sf::BlendMultiply;
+    // state.blendMode = sf::BlendAlpha;
+
+    // Log::out() << " ---> Position: " << sfSprite.getPosition();
+
+    renderTexture.draw(
+      spr,
+      state
+    );
+    renderTexture.display();
+  }
+
+  void applyChanges()
+  {
+    if (!dirty || !bitmap) {
+      return;
+    }
+
+    if (!loadedBitmap || bitmap->dirty) {
+      spr.setTexture(
+        bitmap->renderTexture.getTexture()
+      );
+
+      loadedBitmap = true;
+    }
+
+    spr.setColor(spriteColor);
+
+    vp::ViewportRect vp;
+    vp::DestinyRect dst;
+
+    sf::Vector2f position(x, y);
+    sf::IntRect dstRect(
+      ox,
+      oy,
+      bitmap->getter_width(),
+      bitmap->getter_height()
+    );
+
+    if (src_rect) {
+      dstRect.left = src_rect->getter_x() + ox;
+      dstRect.top = src_rect->getter_y() + oy;
+      dstRect.width = src_rect->getter_width();
+      dstRect.height = src_rect->getter_height();
+    }
+
+    if (viewport) {
+      auto &vpRect = *viewport->getRect();
+
+      // ---
+      vp.x = vpRect.getter_x();
+      vp.y = vpRect.getter_y();
+      vp.width = vpRect.getter_width();
+      vp.height = vpRect.getter_height();
+      dst.x = vp.x;
+      dst.y = vp.y;
+
+      int dstX = vpRect.getter_x() + x;
+      int dstY = vpRect.getter_y() + y;
+
+      if (dstX > vp.endX() || dstY > vp.endY()) {
+        return;
+      }
+
+      dst.width = vp.width;
+      dst.height = vp.height;
+
+      if (x > 0) {
+        dst.x += x;
+        dst.width -= x;
+      } else if (x < 0) {
+        dst.left -= x;
+      }
+      if (y > 0) {
+        dst.y += y;
+        dst.height -= y;
+      }
+      if (y < 0) {
+        dst.top -= y;
+      }
+
+      dst.width = std::min(dst.width, dstRect.width);
+      dst.height = std::min(dst.height, dstRect.height);
+
+      position.x = dst.x + ox;
+      position.y = dst.y + oy;
+
+      dstRect.width = dst.width;
+      dstRect.height = dst.height;
+
+      dstRect.left += viewport->getOx();
+      dstRect.top += viewport->getOy();
+
+      dstRect.left += dst.left;
+      dstRect.top += dst.top;
+    }
+
+    // dstRect.left += 16;
+    // dstRect.top += 16;
+
+    spr.setPosition(position);
+    spr.setTextureRect(dstRect);
+
+    dirty = false;
   }
 
   /* --------------------------------------------------- */
@@ -443,10 +615,15 @@ class Sprite : Drawable, public EngineBase {
       RGSS Methods
   */
 
+  Viewport *method_viewport()
+  {
+    return viewport;
+  }
+
   void method_dispose()
   {
     isDisposed = true;
-    removeDrawable();
+    removeFromEngineCycles();
   }
 
   bool method_disposed()
@@ -465,182 +642,6 @@ class Sprite : Drawable, public EngineBase {
   }
 
   /* --------------------------------------------------- */
-
-  /*
-      Engine Methods
-  */
-
-  inline int getZPosition() const override
-  {
-    return z;
-  }
-
-  bool shouldRender() const override
-  {
-    return !isDisposed && visible && bitmap != nullptr && !bitmap->disposed();
-  }
-
-  Viewport *getViewport()
-  {
-    return viewport;
-  }
-
-  sf::Sprite &getSfSprite()
-  {
-    return spr;
-  }
-
-  void update() override
-  {
-    if (!dirty || !bitmap) {
-      return;
-    }
-
-    if (!loadedBitmap || bitmap->dirty) {
-      spr.setTexture(
-        bitmap->renderTexture.getTexture()
-      );
-      loadedBitmap = true;
-      bitmap->dirty = false;
-    }
-
-    position.x = x - ox;
-    position.y = y - oy;
-
-    sf::IntRect srcRect = src_rect->sfRect();
-
-    spr.setPosition(position);
-
-    spr.setTextureRect(srcRect);
-  }
-
-  void draw(sf::RenderTexture &renderTexture) override
-  {
-    float opacity = getter_opacity() / 255.f;
-
-    renderTexture.draw(spr);
-
-    return;
-
-    sf::RenderStates state;
-    // state.blendMode = sf::BlendNone;
-
-    if (getter_blend_type() == 2) {
-      Engine::getInstance().blendShaders.sprInvertShader.setUniform("opacity", opacity);
-      state.shader = &Engine::getInstance().blendShaders.sprInvertShader;
-      state.blendMode = sf::BlendMultiply;
-    } else {
-      Engine::getInstance().blendShaders.sprNormalShader.setUniform("opacity", opacity);
-      state.shader = &Engine::getInstance().blendShaders.sprNormalShader;
-      state.blendMode = sf::BlendAlpha;
-    }
-    // Engine::getInstance().blendShaders.sprInvertShader.setUniform("opacity", opacity);
-    // state.shader = &Engine::getInstance().blendShaders.sprInvertShader;
-    // state.blendMode = sf::BlendMultiply;
-    // state.blendMode = sf::BlendAlpha;
-
-    // Log::out() << " ---> Position: " << sfSprite.getPosition();
-
-    renderTexture.draw(
-      spr,
-      state
-    );
-    renderTexture.display();
-  }
-
-  void applyChanges()
-  {
-    if (!dirty || !bitmap) {
-      return;
-    }
-
-    if (!loadedBitmap || bitmap->dirty) {
-      spr.setTexture(
-        bitmap->renderTexture.getTexture()
-      );
-
-      loadedBitmap = true;
-    }
-
-    spr.setColor(spriteColor);
-
-    vp::ViewportRect vp;
-    vp::DestinyRect dst;
-
-    sf::Vector2f position(x, y);
-    sf::IntRect dstRect(
-      ox,
-      oy,
-      bitmap->getter_width(),
-      bitmap->getter_height()
-    );
-
-    if (src_rect) {
-      dstRect.left = src_rect->getter_x() + ox;
-      dstRect.top = src_rect->getter_y() + oy;
-      dstRect.width = src_rect->getter_width();
-      dstRect.height = src_rect->getter_height();
-    }
-
-    if (viewport) {
-      auto &vpRect = *viewport->getRect();
-
-      // ---
-      vp.x = vpRect.getter_x();
-      vp.y = vpRect.getter_y();
-      vp.width = vpRect.getter_width();
-      vp.height = vpRect.getter_height();
-      dst.x = vp.x;
-      dst.y = vp.y;
-
-      int dstX = vpRect.getter_x() + x;
-      int dstY = vpRect.getter_y() + y;
-
-      if (dstX > vp.endX() || dstY > vp.endY()) {
-        return;
-      }
-
-      dst.width = vp.width;
-      dst.height = vp.height;
-
-      if (x > 0) {
-        dst.x += x;
-        dst.width -= x;
-      } else if (x < 0) {
-        dst.left -= x;
-      }
-      if (y > 0) {
-        dst.y += y;
-        dst.height -= y;
-      }
-      if (y < 0) {
-        dst.top -= y;
-      }
-
-      dst.width = std::min(dst.width, dstRect.width);
-      dst.height = std::min(dst.height, dstRect.height);
-
-      position.x = dst.x + ox;
-      position.y = dst.y + oy;
-
-      dstRect.width = dst.width;
-      dstRect.height = dst.height;
-
-      dstRect.left += viewport->getOx();
-      dstRect.top += viewport->getOy();
-
-      dstRect.left += dst.left;
-      dstRect.top += dst.top;
-    }
-
-    // dstRect.left += 16;
-    // dstRect.top += 16;
-
-    spr.setPosition(position);
-    spr.setTextureRect(dstRect);
-
-    dirty = false;
-  }
 
   /*
    *   Private
@@ -669,20 +670,31 @@ class Sprite : Drawable, public EngineBase {
   bool dirty;
   bool isDisposed;
   bool loadedBitmap;
-  bool removedFromEngineLoop;
+  bool addedToEngineCycles;
 
   sf::Color spriteColor;
   sf::Sprite spr;
   sf::Texture texture;
   sf::Vector2f position;
 
-  void removeDrawable()
+  void addToEngineCycles()
   {
-    if (removedFromEngineLoop) {
+    if (addedToEngineCycles) {
       return;
     }
-    Eng::Engine::getInstance().removeDrawable(this);
-    removedFromEngineLoop = true;
+    Eng::Engine::getInstance().addToUpdateList(this);
+    Eng::Engine::getInstance().addToRenderList(this);
+    addedToEngineCycles = true;
+  }
+
+  void removeFromEngineCycles()
+  {
+    if (!addedToEngineCycles) {
+      return;
+    }
+    Eng::Engine::getInstance().removeFromUpdateList(this);
+    Eng::Engine::getInstance().removeFromRenderList(this);
+    addedToEngineCycles = false;
   }
 };
 

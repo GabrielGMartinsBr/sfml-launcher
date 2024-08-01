@@ -8,9 +8,10 @@
 #include <SFML/Window/VideoMode.hpp>
 
 #include "engnine/BlenShaders.hpp"
-#include "engnine/Drawable.hpp"
 #include "engnine/EngineRenderer.h"
 #include "engnine/Input.hpp"
+#include "engnine/OnRender.h"
+#include "engnine/OnUpdate.h"
 
 namespace Eng {
 
@@ -30,11 +31,21 @@ class Engine {
 
   void addViewport(SharedPtr<Eng::Viewport> vp);
 
-  void addDrawable(Eng::Drawable* drawable);
+  // Update List
 
-  void removeDrawable(Eng::Drawable* drawable);
+  void addToUpdateList(Eng::OnUpdate* instance);
+
+  void removeFromUpdateList(Eng::OnUpdate* instance);
+
+  // Render List
+
+  void addToRenderList(Eng::OnRender* instance);
+
+  void removeFromRenderList(Eng::OnRender* instance);
 
   void markZOrderDirty();
+
+  // Engine update methods
 
   void updateInput();
 

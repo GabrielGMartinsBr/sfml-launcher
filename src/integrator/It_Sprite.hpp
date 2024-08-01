@@ -561,7 +561,7 @@ class Sprite {
   {
     Eng::Sprite *inst = getObjectValue(self);
     return Viewport::getRubyObject(
-      inst->getViewport()
+      inst->method_viewport()
     );
   }
 

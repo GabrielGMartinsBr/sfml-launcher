@@ -1,6 +1,4 @@
-#pragma once
-
-#include "engnine/Engine.h"
+#include "Engine.h"
 
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Rect.hpp>
@@ -12,7 +10,6 @@
 
 #include "base/Sugars.hpp"
 #include "engnine/BlenShaders.hpp"
-#include "engnine/Drawable.hpp"
 #include "engnine/EngineRenderer.h"
 #include "engnine/Input.hpp"
 #include "engnine/internal/Texts.hpp"
@@ -67,15 +64,31 @@ void Engine::addViewport(SharedPtr<Eng::Viewport> vp)
   renderer->addViewport(vp);
 }
 
-void Engine::addDrawable(Eng::Drawable* drawable)
+// OnUpdate List
+
+void Engine::addToUpdateList(Eng::OnUpdate* instance)
 {
-  renderer->addDrawable(drawable);
+  renderer->addToUpdateList(instance);
 }
 
-void Engine::removeDrawable(Eng::Drawable* drawable)
+void Engine::removeFromUpdateList(Eng::OnUpdate* instance)
 {
-  renderer->removeDrawable(drawable);
+  renderer->removeFromUpdateList(instance);
 }
+
+// OnRender List
+
+void Engine::addToRenderList(Eng::OnRender* instance)
+{
+  renderer->addToRenderList(instance);
+}
+
+void Engine::removeFromRenderList(Eng::OnRender* instance)
+{
+  renderer->removeFromRenderList(instance);
+}
+
+// ZOrder flag
 
 void Engine::markZOrderDirty()
 {
@@ -95,6 +108,10 @@ void Engine::updateGraphics()
 
   window->display();
 }
+
+/*
+  Private
+*/
 
 Engine::Engine() :
     input(Input::getInstance())

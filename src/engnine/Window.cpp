@@ -62,6 +62,7 @@ Window::Window(VALUE rbObj, Viewport *viewport) :
   back_opacity = 255;
   contents_opacity = 255;
   isDisposed = false;
+  addedToEngineCycles = false;
 
   cursorAniAlphaId = 0;
 
@@ -69,38 +70,17 @@ Window::Window(VALUE rbObj, Viewport *viewport) :
     bindRubyProps();
   }
 
-  Eng::Engine::getInstance().addDrawable(this);
-  removedFromEngineLoop = false;
+  addToEngineCycles();
 }
 
 Window::~Window()
 {
-  removeDrawable();
-}
-
-// Bind props ruby object to instance object
-
-void Window::bindRubyProps()
-{
-  if (rbObj == Qnil) {
-    std::runtime_error("Window doesn't have rbObj defined.");
-  }
-
-  if (viewport != nullptr && viewport->rbObj == Qnil) {
-    viewport->rbObj = It::Viewport::createRubyObject(viewport);
-    rb_iv_set(rbObj, "@viewport", viewport->rbObj);
-  }
-
-  if (cursor_rect->rbObj == Qnil) {
-    cursor_rect->rbObj = It::Rect::createRubyObject(cursor_rect);
-  }
-
-  rb_iv_set(rbObj, "@cursor_rect", cursor_rect->rbObj);
+  removeFromEngineCycles();
 }
 
 // Engine
 
-int Window::getZPosition() const
+int Window::getZIndex() const
 {
   return z;
 }
@@ -110,7 +90,7 @@ bool Window::shouldRender() const
   return !isDisposed && visible;
 }
 
-void Window::update()
+void Window::onUpdate()
 {
   if (width < 1 || height < 1) {
     return;
@@ -134,7 +114,7 @@ void Window::update()
   }
 }
 
-void Window::draw(sf::RenderTexture &rd)
+void Window::onRender(sf::RenderTexture &rd)
 {
   rd.draw(backgroundSprite, sf::BlendAlpha);
   rd.draw(borderSprite, sf::BlendAlpha);
@@ -142,6 +122,30 @@ void Window::draw(sf::RenderTexture &rd)
     rd.draw(cursorSprite, sf::BlendAlpha);
   }
   rd.draw(contentsSprite, sf::BlendAlpha);
+}
+
+/*
+  Rgss
+*/
+
+// Bind props ruby object to instance object
+
+void Window::bindRubyProps()
+{
+  if (rbObj == Qnil) {
+    std::runtime_error("Window doesn't have rbObj defined.");
+  }
+
+  if (viewport != nullptr && viewport->rbObj == Qnil) {
+    viewport->rbObj = It::Viewport::createRubyObject(viewport);
+    rb_iv_set(rbObj, "@viewport", viewport->rbObj);
+  }
+
+  if (cursor_rect->rbObj == Qnil) {
+    cursor_rect->rbObj = It::Rect::createRubyObject(cursor_rect);
+  }
+
+  rb_iv_set(rbObj, "@cursor_rect", cursor_rect->rbObj);
 }
 
 /*
@@ -294,9 +298,8 @@ Viewport *Window::method_viewport()
 
 void Window::method_dispose()
 {
-  // Log::out() << "Dispose";
   isDisposed = true;
-  removeDrawable();
+  removeFromEngineCycles();
 }
 
 // Method disposed?
@@ -314,8 +317,28 @@ void Window::method_update()
 }
 
 /*
-  Internals
+  Private
 */
+
+void Window::addToEngineCycles()
+{
+  if (addedToEngineCycles) {
+    return;
+  }
+  Eng::Engine::getInstance().addToUpdateList(this);
+  Eng::Engine::getInstance().addToRenderList(this);
+  addedToEngineCycles = true;
+}
+
+void Window::removeFromEngineCycles()
+{
+  if (!addedToEngineCycles) {
+    return;
+  }
+  Eng::Engine::getInstance().removeFromUpdateList(this);
+  Eng::Engine::getInstance().removeFromRenderList(this);
+  addedToEngineCycles = false;
+}
 
 void Window::updateBackgroundSprite()
 {
@@ -592,15 +615,6 @@ void Window::updateBorder()
   borderSprite.setPosition(x, y);
 
   borderSprite.setColor(sf::Color(255, 255, 255, opacity));
-}
-
-void Window::removeDrawable()
-{
-  if (removedFromEngineLoop) {
-    return;
-  }
-  Eng::Engine::getInstance().removeDrawable(this);
-  removedFromEngineLoop = true;
 }
 
 }  // namespace Eng
