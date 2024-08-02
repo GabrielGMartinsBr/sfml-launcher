@@ -3,16 +3,17 @@
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 
+#include "Sugars.hpp"
 #include "engnine/Autotiles.h"
 #include "engnine/EngineBase.hpp"
-#include "engnine/OnRender.h"
 #include "engnine/OnUpdate.h"
 #include "engnine/Table.hpp"
+#include "engnine/TilemapLayer.h"
 #include "engnine/Viewport.hpp"
 
 namespace Eng {
 
-class Tilemap : public EngineBase, OnUpdate, OnRender {
+class Tilemap : public EngineBase, OnUpdate {
  public:
 
   Tilemap(Viewport* _viewport = nullptr);
@@ -24,13 +25,13 @@ class Tilemap : public EngineBase, OnUpdate, OnRender {
     Engine Cycles
   */
 
-  int getZIndex() const override;
+  // int getZIndex() const override;
 
-  bool shouldRender() const override;
+  // bool shouldRender() const override;
 
   void onUpdate() override;
 
-  void onRender(sf::RenderTexture& rd) override;
+  // void onRender(sf::RenderTexture& rd) override;
 
   /*
     Rgss
@@ -96,9 +97,13 @@ class Tilemap : public EngineBase, OnUpdate, OnRender {
   bool shouldUpdateSprRect;
   bool addedToEngineCycles;
 
+  const sf::Vector2i& dimensions;
+  Vector<TilemapLayer*> layers;
+  int layersN;
+
   sf::Sprite spr;
-  sf::IntRect sprRect;
-  sf::RenderTexture rTexture;
+  sf::IntRect srcRect;
+  // sf::RenderTexture rTexture;
 
   sf::Sprite tileSprite;
   sf::Sprite autotileSpr[7];
@@ -106,13 +111,17 @@ class Tilemap : public EngineBase, OnUpdate, OnRender {
   void addToEngineCycles();
   void removeFromEngineCycles();
 
+  void setupLayers();
+
+  void checkLayer(int id, int y, int priority, int oy);
+
   void updateIsEligible();
 
   void buildSprites();
 
   void handleTile(int x, int y, int z);
 
-  void handleAutoTile(int x, int y, int z);
+  void handleAutoTile(int id, int x, int y, int z);
 };
 
 }  // namespace Eng
