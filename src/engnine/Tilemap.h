@@ -96,14 +96,13 @@ class Tilemap : public EngineBase, OnUpdate {
   bool shouldBuildSprites;
   bool shouldUpdateSprRect;
   bool addedToEngineCycles;
+  bool layersIsSetup;
 
   const sf::Vector2i& dimensions;
-  Vector<TilemapLayer*> layers;
+  Vector<SharedPtr<TilemapLayer>> layers;
   int layersN;
 
-  sf::Sprite spr;
   sf::IntRect srcRect;
-  // sf::RenderTexture rTexture;
 
   sf::Sprite tileSprite;
   sf::Sprite autotileSpr[7];
@@ -122,6 +121,8 @@ class Tilemap : public EngineBase, OnUpdate {
   void handleTile(int x, int y, int z);
 
   void handleAutoTile(int id, int x, int y, int z);
+
+  void disposeLayers();
 };
 
 }  // namespace Eng

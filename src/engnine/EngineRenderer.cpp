@@ -54,6 +54,7 @@ void EngineRenderer::removeFromUpdateList(Eng::OnUpdate* instance)
 void EngineRenderer::addToRenderList(Eng::OnRender* instance)
 {
   renderList.push_back(instance);
+  zDirty = true;
 }
 
 void EngineRenderer::removeFromRenderList(Eng::OnRender* instance)

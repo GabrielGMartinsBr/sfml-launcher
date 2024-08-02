@@ -4,6 +4,7 @@
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/System/Vector2.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/VideoMode.hpp>
 
@@ -21,13 +22,19 @@ class Engine {
 
   BlenShaders blendShaders;
 
-  void init(sf::RenderWindow& _window);
+  // Getters
 
   EngineRenderer* getRenderer();
 
-  void cleanup();
-
   bool isRunning();
+
+  const sf::Vector2i& getDimensions() const;
+
+  // Methods
+
+  void init(sf::RenderWindow& _window);
+
+  void cleanup();
 
   void addViewport(SharedPtr<Eng::Viewport> vp);
 
@@ -52,8 +59,9 @@ class Engine {
   void updateGraphics();
 
  private:
-  bool initialized = false;
-  bool running = false;
+  bool initialized;
+  bool running;
+  sf::Vector2i dimensions;
   Input& input;
 
   sf::RenderWindow* window;

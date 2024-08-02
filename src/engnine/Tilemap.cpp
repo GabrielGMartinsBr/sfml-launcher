@@ -7,8 +7,9 @@
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <cmath>
+#include <memory>
+#include <stdexcept>
 
-#include "Log.hpp"
 #include "engnine/AutotilePositions.h"
 #include "engnine/Autotiles.h"
 #include "engnine/Bitmap.h"
@@ -18,6 +19,7 @@
 #include "engnine/TilemapLayer.h"
 #include "engnine/Viewport.hpp"
 #include "integrator/It_Autotiles.hpp"
+#include "integrator/It_Table.hpp"
 
 namespace Eng {
 
@@ -51,12 +53,11 @@ Tilemap::Tilemap(VALUE rbObj, Viewport* viewport) :
   dirty = false;
   addedToEngineCycles = false;
   layersN = 0;
+  layersIsSetup = false;
 
   if (rbObj != Qnil) {
     bindRubyProps();
   }
-
-  setupLayers();
 
   addToEngineCycles();
 }
@@ -64,18 +65,20 @@ Tilemap::Tilemap(VALUE rbObj, Viewport* viewport) :
 Tilemap::~Tilemap()
 {
   removeFromEngineCycles();
-  for (int i = 0; i < layersN; i++) {
-    if (layers[i] == nullptr) {
-      continue;
-    }
-    delete layers[i];
-  }
+  disposeLayers();
 }
 
 void Tilemap::onUpdate()
 {
   if (!dirty || tileset == nullptr || map_data == nullptr) {
     return;
+  }
+
+  if (!layersIsSetup) {
+    setupLayers();
+    if (!layersIsSetup) {
+      std::runtime_error("Layers setup failed.");
+    }
   }
 
   if (shouldBuildSprites) {
@@ -87,12 +90,10 @@ void Tilemap::onUpdate()
     srcRect.left = ox;
     srcRect.top = oy;
     int _oy = oy / 32;
-    // spr.setTextureRect(sprRect);
     for (int i = 0; i < layersN; i++) {
       if (layers[i] == nullptr) continue;
       layers[i]->update(_oy);
       layers[i]->sprite.setTextureRect(srcRect);
-      // Log::out() << layers[i]->getZIndex();
     }
     shouldUpdateSprRect = false;
   }
@@ -115,7 +116,7 @@ void Tilemap::bindRubyProps()
     autotiles->rbObj = It::Autotiles::createRubyObject(autotiles);
   }
 
-  rb_iv_set(rbObj, "autotiles", autotiles->rbObj);
+  rb_iv_set(rbObj, "@autotiles", autotiles->rbObj);
 }
 
 /*
@@ -131,7 +132,17 @@ Bitmap* Tilemap::getter_tileset()
 
 void Tilemap::setter_tileset(Bitmap* value)
 {
+  if (tileset == value) {
+    return;
+  }
+
+  if (value->rbObj == Qnil) {
+    value->rbObj = It::Bitmap::createRubyObject(value);
+  }
+
   tileset = value;
+  rb_iv_set(rbObj, "@tileset", tileset->rbObj);
+
   updateIsEligible();
 }
 
@@ -151,7 +162,17 @@ Table* Tilemap::getter_map_data()
 
 void Tilemap::setter_map_data(Table* value)
 {
+  if (map_data == value) {
+    return;
+  }
+
+  if (value->rbObj == Qnil) {
+    value->rbObj = It::Table::createRubyObject(value);
+  }
+
   map_data = value;
+  rb_iv_set(rbObj, "@map_data", map_data->rbObj);
+
   updateIsEligible();
 }
 
@@ -164,7 +185,16 @@ Table* Tilemap::getter_flash_data()
 
 void Tilemap::setter_flash_data(Table* value)
 {
+  if (flash_data == value) {
+    return;
+  }
+
+  if (value->rbObj == Qnil) {
+    value->rbObj = It::Table::createRubyObject(value);
+  }
+
   flash_data = value;
+  rb_iv_set(rbObj, "@flash_data", flash_data->rbObj);
 }
 
 // priorities
@@ -176,7 +206,16 @@ Table* Tilemap::getter_priorities()
 
 void Tilemap::setter_priorities(Table* value)
 {
+  if (priorities == value) {
+    return;
+  }
+
+  if (value->rbObj == Qnil) {
+    value->rbObj = It::Table::createRubyObject(value);
+  }
+
   priorities = value;
+  rb_iv_set(rbObj, "@priorities", priorities->rbObj);
 }
 
 // visible
@@ -229,6 +268,13 @@ void Tilemap::method_dispose()
 {
   isDisposed = true;
   removeFromEngineCycles();
+  // for (int i = 0; i < layersN; i++) {
+  //   if (layers[i] == nullptr) {
+  //     continue;
+  //   }
+  //   layers[i]->dispose();
+  // }
+  disposeLayers();
 }
 
 // disposed?
@@ -273,11 +319,16 @@ void Tilemap::removeFromEngineCycles()
 
 void Tilemap::setupLayers()
 {
-  layersN = std::ceil(dimensions.y / 32.0f) + 6;
+  if (map_data == nullptr) {
+    return;
+  }
+  int rows = map_data->getYSize();
+  layersN = rows + 5;
   layers.resize(layersN);
   for (int i = 0; i < layersN; i++) {
     layers[i] = nullptr;
   }
+  layersIsSetup = true;
 }
 
 void Tilemap::checkLayer(int id, int y, int priority, int oy)
@@ -287,8 +338,7 @@ void Tilemap::checkLayer(int id, int y, int priority, int oy)
     int rows = map_data->getYSize();
     int w = cols * 32;
     int h = rows * 32;
-    int _oy = oy / 32;
-    layers[id] = new TilemapLayer(w, h, y, priority, layersN, _oy);
+    layers[id] = std::make_shared<TilemapLayer>(w, h, y, priority, oy / 32);
   }
 }
 
@@ -333,7 +383,6 @@ void Tilemap::buildSprites()
     if (layers[i] == nullptr) {
       continue;
     }
-    // Log::out() << i;
     layers[i]->rendTex.display();
     layers[i]->sprite.setTexture(layers[i]->rendTex.getTexture());
   }
@@ -347,7 +396,7 @@ void Tilemap::handleTile(int x, int y, int z)
   }
 
   if (id < 48 * 8) {
-    // handleAutoTile(id, x, y, z);
+    handleAutoTile(id, x, y, z);
     return;
   }
 
@@ -356,10 +405,10 @@ void Tilemap::handleTile(int x, int y, int z)
   if (priorities != nullptr) {
     priority = priorities->getValue(id);
     if (priority > 0) {
-      layerId = (y % 15) + priority;
-      // layerId = 0;
+      layerId = y + priority;
     }
   }
+  checkLayer(layerId, y, priority, oy);
 
   id -= 48 * 8;
 
@@ -369,7 +418,6 @@ void Tilemap::handleTile(int x, int y, int z)
   tileSprite.setTextureRect(sf::IntRect(tile_x, tile_y, T_SIZE, T_SIZE));
   tileSprite.setPosition(x * T_SIZE, y * T_SIZE);
 
-  checkLayer(layerId, y, priority, oy);
   layers[layerId]->rendTex.draw(tileSprite);
 }
 
@@ -383,10 +431,10 @@ void Tilemap::handleAutoTile(int id, int x, int y, int z)
   if (priorities != nullptr) {
     priority = priorities->getValue(id);
     if (priority > 0) {
-      layerId = (y + priority) % layersN;
-      // layerId = 0;
+      layerId = y + priority;
     }
   }
+  checkLayer(layerId, y, priority, oy);
 
   sf::Sprite& tile = autotileSpr[autoTileId];
 
@@ -397,7 +445,7 @@ void Tilemap::handleAutoTile(int id, int x, int y, int z)
   int _y = y * T_SIZE;
 
   int tile_position, tx, ty;
-  for (int i = 0; i <= 4; i++) {
+  for (int i = 0; i < 4; i++) {
     tile_position = tiles[i] - 1;
     tx = (tile_position % 6) * 16;
     ty = (tile_position / 6) * 16;
@@ -408,8 +456,17 @@ void Tilemap::handleAutoTile(int id, int x, int y, int z)
       _x + i % 2 * 16,
       std::floor(_y + i / 2 * 16)
     );
-    checkLayer(layerId, y, priority, oy);
     layers[layerId]->rendTex.draw(tile);
+  }
+}
+void Tilemap::disposeLayers()
+{
+  for (int i = 0; i < layersN; i++) {
+    if (layers[i] == nullptr) {
+      continue;
+    }
+    layers[i]->dispose();
+    layers[i].reset();
   }
 }
 

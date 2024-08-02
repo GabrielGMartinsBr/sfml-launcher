@@ -23,7 +23,28 @@ Engine& Engine::getInstance()
   return instance;
 }
 
-BlenShaders blendShaders;
+/*
+  Getters
+*/
+
+EngineRenderer* Engine::getRenderer()
+{
+  return renderer;
+}
+
+bool Engine::isRunning()
+{
+  return running;
+}
+
+const sf::Vector2i& Engine::getDimensions() const
+{
+  return dimensions;
+}
+
+/*
+  Methods
+*/
 
 void Engine::init(sf::RenderWindow& _window)
 {
@@ -44,19 +65,9 @@ void Engine::init(sf::RenderWindow& _window)
   initialized = true;
 }
 
-EngineRenderer* Engine::getRenderer()
-{
-  return renderer;
-}
-
 void Engine::cleanup()
 {
   delete renderer;
-}
-
-bool Engine::isRunning()
-{
-  return running;
 }
 
 void Engine::addViewport(SharedPtr<Eng::Viewport> vp)
@@ -114,8 +125,11 @@ void Engine::updateGraphics()
 */
 
 Engine::Engine() :
-    input(Input::getInstance())
+    input(Input::getInstance()),
+    dimensions(640, 480)
 {
+  initialized = false;
+  running = false;
 }
 
 void Engine::pollEvents()

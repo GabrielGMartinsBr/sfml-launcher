@@ -1,24 +1,24 @@
 #include "TilemapLayer.h"
 
+#include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/Sprite.hpp>
-#include <algorithm>
 
-#include "Log.hpp"
 #include "engnine/Engine.h"
 
 namespace Eng {
 
-TilemapLayer::TilemapLayer(int width, int height, int y, int priority, int layersN, int oy) :
+TilemapLayer::TilemapLayer(int width, int height, int y, int priority, int oy) :
     y(y),
-    priority(priority),
-    layersN(layersN)
+    oy(oy),
+    priority(priority)
 {
   isDisposed = false;
   addedToEngineCycles = false;
 
   create(width, height);
   calcZ();
+  update(oy);
 
   addToEngineCycles();
 }
@@ -26,36 +26,32 @@ TilemapLayer::TilemapLayer(int width, int height, int y, int priority, int layer
 TilemapLayer::~TilemapLayer()
 {
   removeFromEngineCycles();
+  dispose();
 }
 
 void TilemapLayer::create(int width, int height)
 {
   rendTex.create(width, height);
+  rendTex.clear(sf::Color::Transparent);
 }
 
 void TilemapLayer::calcZ()
 {
   if (priority == 0) {
     z = 0;
-  } else if (y < 15) {
-    z = (y + priority + 1) * 32;
   } else {
-    z = (15 + priority) * 32;
+    z = (y + priority + 1) * 32;
   }
   Engine::getInstance().markZOrderDirty();
 }
 
 void TilemapLayer::update(int oy)
 {
-  if (y < oy) {
-    return;
-  }
-  // nextZ = ((y - oy) + priority + 1) * 32;
-  nextZ = ((y - oy + priority) % layersN + 1) * 32;
+  this->oy = oy;
+  nextZ = (y - oy + priority + 1) * 32;
   if (nextZ != z) {
     z = nextZ;
     Engine::getInstance().markZOrderDirty();
-    Log::out() << "z: " << z << " y: " << y << " oy: " << oy << " priority: " << priority;
   }
 }
 
@@ -72,6 +68,12 @@ inline bool TilemapLayer::shouldRender() const
 void TilemapLayer::onRender(sf::RenderTexture& renderTexture)
 {
   renderTexture.draw(sprite);
+}
+
+void TilemapLayer::dispose()
+{
+  isDisposed = true;
+  removeFromEngineCycles();
 }
 
 /*

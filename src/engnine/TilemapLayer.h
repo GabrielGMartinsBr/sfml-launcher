@@ -13,7 +13,7 @@ class TilemapLayer : OnRender {
   sf::Sprite sprite;
   sf::RenderTexture rendTex;
 
-  TilemapLayer(int width, int height, int y, int priority, int layersN, int oy);
+  TilemapLayer(int width, int height, int y, int priority, int oy);
 
   ~TilemapLayer();
 
@@ -33,8 +33,8 @@ class TilemapLayer : OnRender {
 
  private:
   int y;
+  int oy;
   int priority;
-  int layersN;
   int z;
   int nextZ;
   bool isDisposed;
