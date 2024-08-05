@@ -13,7 +13,7 @@ class Audio {
  public:
   static void integrate()
   {
-    VALUE audioModule = rb_define_class("Audio", rb_cObject);
+    VALUE audioModule = rb_define_module("Audio");
 
     rb_define_module_function(audioModule, "bgm_play", RUBY_METHOD_FUNC(bgm_play), -1);
     rb_define_module_function(audioModule, "bgm_stop", RUBY_METHOD_FUNC(bgm_stop), 0);

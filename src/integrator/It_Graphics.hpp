@@ -10,17 +10,17 @@ class Graphics {
 
   static void integrate()
   {
-    VALUE graphicsClass = rb_define_class("Graphics", rb_cObject);
+    VALUE graphicsModule = rb_define_module("Graphics");
 
-    rb_define_module_function(graphicsClass, "frame_rate", RUBY_METHOD_FUNC(attrGet_frame_rate), 0);
-    rb_define_module_function(graphicsClass, "frame_rate=", RUBY_METHOD_FUNC(attrSet_frame_rate), 1);
+    rb_define_module_function(graphicsModule, "frame_rate", RUBY_METHOD_FUNC(attrGet_frame_rate), 0);
+    rb_define_module_function(graphicsModule, "frame_rate=", RUBY_METHOD_FUNC(attrSet_frame_rate), 1);
 
-    rb_define_module_function(graphicsClass, "frame_count", RUBY_METHOD_FUNC(attrGet_frame_count), 0);
-    rb_define_module_function(graphicsClass, "frame_count=", RUBY_METHOD_FUNC(attrSet_frame_count), 1);
+    rb_define_module_function(graphicsModule, "frame_count", RUBY_METHOD_FUNC(attrGet_frame_count), 0);
+    rb_define_module_function(graphicsModule, "frame_count=", RUBY_METHOD_FUNC(attrSet_frame_count), 1);
 
-    rb_define_module_function(graphicsClass, "update", RUBY_METHOD_FUNC(method_update), 0);
-    rb_define_module_function(graphicsClass, "transition", RUBY_METHOD_FUNC(method_transition), -1);
-    rb_define_module_function(graphicsClass, "frame_reset", RUBY_METHOD_FUNC(method_frame_reset), 0);
+    rb_define_module_function(graphicsModule, "update", RUBY_METHOD_FUNC(method_update), 0);
+    rb_define_module_function(graphicsModule, "transition", RUBY_METHOD_FUNC(method_transition), -1);
+    rb_define_module_function(graphicsModule, "frame_reset", RUBY_METHOD_FUNC(method_frame_reset), 0);
   }
 
   static VALUE getRbClass()
