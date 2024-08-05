@@ -6,6 +6,7 @@
 #include <sstream>
 #include <string>
 
+#include "Log.hpp"
 #include "base/AppDefs.h"
 #include "base/BacktraceUtils.hpp"
 #include "engnine/Engine.h"
@@ -64,7 +65,7 @@ class Launcher {
     VALUE result;
 
     std::string code;
-    app::ULong lineNumber = 1;
+    app::ULong lineNumber = 0;
 
     for (PlayerScript& script : scripts) {
       code.append(script.code).append("\n");
@@ -72,11 +73,23 @@ class Launcher {
       lineNumber = script.getEndLine();
     }
 
+    // findErrorLine(scripts, 13021);
+
     rb_eval_string_protect(code.c_str(), &errorState);
 
     if (errorState) {
       logError(scripts);
       // throwErrorOnScript(script);
+    }
+  }
+
+  void findErrorLine(const app::Vector<PlayerScript>& scripts, int lineNumber)
+  {
+    const PlayerScript* script = getScriptLine(scripts, lineNumber);
+    if (script != nullptr) {
+      lineNumber -= script->getStartLine();
+      Log::out() << "Name: " << script->name;
+      Log::out() << "line: " << lineNumber;
     }
   }
 

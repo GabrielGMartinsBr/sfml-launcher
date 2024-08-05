@@ -9,7 +9,7 @@ class BacktraceUtils {
   static void pickLineNumber(const char* message, long& result)
   {
     if (strcmp(message, "(eval)") == 0) {
-      result = 0;
+      result = 1;
       return;
     }
 
