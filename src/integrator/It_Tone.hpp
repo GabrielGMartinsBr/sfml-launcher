@@ -18,6 +18,7 @@ class Tone {
     // Serialize
 
     rb_define_module_function(toneClass, "_load", RUBY_METHOD_FUNC(method_load), 1);
+    rb_define_module_function(toneClass, "_dump", RUBY_METHOD_FUNC(method_dump), 1);
 
     // Initialize
 
@@ -101,6 +102,10 @@ class Tone {
   {
   }
 
+  /*
+    Deserialize / Marshal load
+  */
+
   static VALUE method_load(VALUE self, VALUE marshaled_data)
   {
     Check_Type(marshaled_data, T_STRING);
@@ -110,6 +115,23 @@ class Tone {
     Eng::Tone *tone = Eng::Tone::deserialize(data, len);
 
     return getRubyObject(tone);
+  }
+
+  /*
+    Serialize / Marshal dump
+  */
+
+  static VALUE method_dump(VALUE self, VALUE arg)
+  {
+    char *data = new char[Eng::Tone::SERIAL_SIZE];
+
+    Eng::Tone *inst = getObjectValue(self);
+    inst->serialize(data);
+
+    VALUE str = rb_str_new(data, Eng::Tone::SERIAL_SIZE);
+    delete[] data;
+
+    return str;
   }
 
   /*

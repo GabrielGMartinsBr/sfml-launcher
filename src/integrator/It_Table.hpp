@@ -16,7 +16,12 @@ class Table {
     VALUE tableClass = rb_define_class("Table", rb_cObject);
     rb_define_alloc_func(tableClass, instance_allocator);
 
+    // Serialize
+    
     rb_define_module_function(tableClass, "_load", RUBY_METHOD_FUNC(method_load), 1);
+    rb_define_module_function(tableClass, "_dump", RUBY_METHOD_FUNC(method_dump), 1);
+
+    // Class methods and properties
 
     rb_define_method(tableClass, "initialize", RUBY_METHOD_FUNC(method_initialize), -1);
     rb_define_method(tableClass, "[]", RUBY_METHOD_FUNC(getValue), -1);
@@ -82,6 +87,10 @@ class Table {
   {
   }
 
+  /*
+    Deserialize / Marshal load
+  */
+
   static VALUE method_load(VALUE self, VALUE marshaled_data)
   {
     Check_Type(marshaled_data, T_STRING);
@@ -90,6 +99,24 @@ class Table {
 
     Eng::Table *table = Eng::Table::deserialize(data, len);
     return getRubyObject(table);
+  }
+
+  /*
+    Serialize / Marshal dump
+  */
+
+  static VALUE method_dump(VALUE self, VALUE arg)
+  {
+    Eng::Table *inst = getObjectValue(self);
+    int size = inst->serialSize();
+    char *data = new char[size];
+
+    inst->serialize(data);
+
+    VALUE str = rb_str_new(data, size);
+    delete[] data;
+
+    return str;
   }
 
   /*

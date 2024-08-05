@@ -13,6 +13,11 @@ class Rect {
     VALUE rectClass = rb_define_class("Rect", rb_cObject);
     rb_define_alloc_func(rectClass, instance_allocator);
 
+    // Serialize
+
+    rb_define_module_function(rectClass, "_load", RUBY_METHOD_FUNC(method_load), 1);
+    rb_define_module_function(rectClass, "_dump", RUBY_METHOD_FUNC(method_dump), 1);
+
     // Initialize
     rb_define_method(rectClass, "initialize", RUBY_METHOD_FUNC(initialize), 4);
 
@@ -57,7 +62,6 @@ class Rect {
     }
     if (rect->rbObj == Qnil) {
       rect->rbObj = createRubyObject(rect);
-      // rb_global_variable(&rect->rbObj);
     }
     return rect->rbObj;
   }
@@ -94,6 +98,38 @@ class Rect {
 
   static void instance_mark(void *ptr)
   {
+  }
+
+  /*
+    Deserialize / Marshal load
+  */
+
+  static VALUE method_load(VALUE self, VALUE marshaled_data)
+  {
+    Check_Type(marshaled_data, T_STRING);
+    const char *data = RSTRING_PTR(marshaled_data);
+    int len = RSTRING_LEN(marshaled_data);
+
+    Eng::Rect *rect = Eng::Rect::deserialize(data, len);
+    VALUE value = getRubyObject(rect);
+    return value;
+  }
+
+  /*
+    Serialize / Marshal dump
+  */
+
+  static VALUE method_dump(VALUE self, VALUE arg)
+  {
+    char *data = new char[Eng::Rect::SERIAL_SIZE];
+
+    Eng::Rect *inst = getObjectValue(self);
+    inst->serialize(data);
+
+    VALUE str = rb_str_new(data, Eng::Rect::SERIAL_SIZE);
+    delete[] data;
+
+    return str;
   }
 
   /*

@@ -1,14 +1,39 @@
 #pragma once
 
 #include <SFML/Graphics/Rect.hpp>
+#include <stdexcept>
 
-#include "Log.hpp"
+#include "MarshalUtils.hpp"
 #include "engnine/EngineBase.hpp"
 
 namespace Eng {
 
 class Rect : public EngineBase {
  public:
+  static constexpr int SERIAL_SIZE = 16;
+
+  static Rect *deserialize(const char *data, int len)
+  {
+    if (len != SERIAL_SIZE) {
+      throw std::runtime_error("Marshal error: Rect has a bad file format");
+    }
+
+    int x = MarshalUtils::readInt32(&data);
+    int y = MarshalUtils::readInt32(&data);
+    int width = MarshalUtils::readInt32(&data);
+    int height = MarshalUtils::readInt32(&data);
+
+    Rect *rect = new Rect(x, y, width, height);
+    return rect;
+  }
+
+  void serialize(char *buffer) const
+  {
+    MarshalUtils::writeInt32(&buffer, x);
+    MarshalUtils::writeInt32(&buffer, y);
+    MarshalUtils::writeInt32(&buffer, width);
+    MarshalUtils::writeInt32(&buffer, height);
+  }
 
   Rect(float _x, float _y, unsigned int _width, unsigned int _height) :
       dirty(false)
@@ -19,7 +44,7 @@ class Rect : public EngineBase {
     height = _height;
   }
 
-  Rect(Rect* _rect) :
+  Rect(Rect *_rect) :
       dirty(false)
   {
     x = _rect->x;
@@ -28,7 +53,7 @@ class Rect : public EngineBase {
     height = _rect->height;
   }
 
-  Rect& operator=(const Rect& other)
+  Rect &operator=(const Rect &other)
   {
     if (this == &other) {
       return *this;

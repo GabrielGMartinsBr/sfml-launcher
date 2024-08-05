@@ -12,6 +12,8 @@ namespace Eng {
 
 class Color : public EngineBase {
  public:
+  static constexpr int SERIAL_SIZE = 32;
+  
   static Color *deserialize(const char *data, int len)
   {
     if (len < 32) {
@@ -28,6 +30,14 @@ class Color : public EngineBase {
     color->syncSfColor();
 
     return color;
+  }
+
+  void serialize(char *buffer) const
+  {
+    MarshalUtils::writeDouble(&buffer, red);
+    MarshalUtils::writeDouble(&buffer, green);
+    MarshalUtils::writeDouble(&buffer, blue);
+    MarshalUtils::writeDouble(&buffer, alpha);
   }
 
   double red;
@@ -48,7 +58,6 @@ class Color : public EngineBase {
 
   ~Color()
   {
-    
   }
 
   void set(double r, double g, double b, double a = 255)

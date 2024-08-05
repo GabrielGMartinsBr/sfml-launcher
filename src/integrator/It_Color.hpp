@@ -18,6 +18,7 @@ class Color {
     // Serialize
 
     rb_define_module_function(colorClass, "_load", RUBY_METHOD_FUNC(method_load), 1);
+    rb_define_module_function(colorClass, "_dump", RUBY_METHOD_FUNC(method_dump), 1);
 
     // Initialize
 
@@ -102,6 +103,10 @@ class Color {
   {
   }
 
+  /*
+    Deserialize / Marshal load
+  */
+
   static VALUE method_load(VALUE self, VALUE marshaled_data)
   {
     Check_Type(marshaled_data, T_STRING);
@@ -111,6 +116,23 @@ class Color {
     Eng::Color *color = Eng::Color::deserialize(data, len);
     VALUE value = getRubyObject(color);
     return value;
+  }
+
+  /*
+    Serialize / Marshal dump
+  */
+
+  static VALUE method_dump(VALUE self, VALUE arg)
+  {
+    char *data = new char[Eng::Color::SERIAL_SIZE];
+
+    Eng::Color *inst = getObjectValue(self);
+    inst->serialize(data);
+
+    VALUE str = rb_str_new(data, Eng::Color::SERIAL_SIZE);
+    delete[] data;
+
+    return str;
   }
 
   // Initialize

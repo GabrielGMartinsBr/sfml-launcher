@@ -9,9 +9,11 @@ namespace Eng {
 
 class Tone : public EngineBase {
  public:
+  static constexpr int SERIAL_SIZE = 32;
+
   static Tone *deserialize(const char *data, float len)
   {
-    if (len < 32) {
+    if (len < SERIAL_SIZE) {
       throw std::runtime_error("Marshal error: Tone has a bad file format");
     }
 
@@ -23,6 +25,14 @@ class Tone : public EngineBase {
     tone->gray = MarshalUtils::readDouble(&data);
 
     return tone;
+  }
+
+  void serialize(char *buffer) const
+  {
+    MarshalUtils::writeDouble(&buffer, red);
+    MarshalUtils::writeDouble(&buffer, green);
+    MarshalUtils::writeDouble(&buffer, blue);
+    MarshalUtils::writeDouble(&buffer, gray);
   }
 
   float red = 0;

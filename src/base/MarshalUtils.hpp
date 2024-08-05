@@ -23,4 +23,16 @@ struct MarshalUtils {
 
     return result;
   }
+
+  static inline void writeInt32(char **data, int32_t value)
+  {
+    memcpy(*data, &value, 4);
+    *data += 4;
+  }
+
+  static inline void writeDouble(char **data, double value)
+  {
+    memcpy(*data, &value, 8);
+    *data += 8;
+  }
 };

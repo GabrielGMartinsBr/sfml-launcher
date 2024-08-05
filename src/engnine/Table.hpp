@@ -34,6 +34,37 @@ class Table : public EngineBase {
     return table;
   }
 
+  int serialSize() const
+  {
+    return 20 + (xSize * ySize * zSize) * sizeof(int16_t);
+  }
+
+  void serialize(char *buffer) const
+  {
+    int size = xSize * ySize * zSize;
+    int dim;
+    if (zSize > 1) {
+      dim = 3;
+    } else if (ySize > 1) {
+      dim = 2;
+    } else {
+      dim = 1;
+    }
+
+    MarshalUtils::writeInt32(&buffer, dim);
+    MarshalUtils::writeInt32(&buffer, xSize);
+    MarshalUtils::writeInt32(&buffer, ySize);
+    MarshalUtils::writeInt32(&buffer, zSize);
+    MarshalUtils::writeInt32(&buffer, size);
+
+    writeSerializeValues(buffer, size);
+  }
+
+  void writeSerializeValues(char *buffer, int size) const
+  {
+    memcpy(buffer, &this->values[0], sizeof(int16_t) * size);
+  }
+
   Table(int x, int y = 1, int z = 1) :
       xSize(x),
       ySize(y),
