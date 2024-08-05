@@ -1,6 +1,6 @@
 #pragma once
 
-#include "base/AppDefs.h"
+#include "AppDefs.h"
 #include "base/Log.hpp"
 #include "base/MarshalUtils.hpp"
 #include "engnine/EngineBase.hpp"
@@ -71,7 +71,6 @@ class Table : public EngineBase {
       zSize(z),
       values(x * y * z)
   {
-    fill();
   }
 
   // Clone another instance

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Convert.hpp"
+#include "RbUtils.hpp"
 #include "engnine/Table.hpp"
 #include "ruby.h"
 
@@ -17,7 +18,7 @@ class Table {
     rb_define_alloc_func(tableClass, instance_allocator);
 
     // Serialize
-    
+
     rb_define_module_function(tableClass, "_load", RUBY_METHOD_FUNC(method_load), 1);
     rb_define_module_function(tableClass, "_dump", RUBY_METHOD_FUNC(method_dump), 1);
 
@@ -160,34 +161,35 @@ class Table {
     Eng::Table *inst = getObjectValue(self);
     VALUE rb_x, rb_y, rb_z;
 
-    if (argc == 1) {
-      rb_scan_args(argc, argv, "1", &rb_x);
-      int x = Convert::toCInt(rb_x);
-      short value = inst->getValue(x);
-      return Convert::toRubyNumber(value);
+    int x, y, z;
+    x = y = z = 0;
+
+    x = Convert::toCInt(argv[0]);
+    if (argc > 1) {
+      y = Convert::toCInt(argv[1]);
+    }
+    if (argc > 2) {
+      z = Convert::toCInt(argv[2]);
+    }
+    if (argc > 3) {
+      RbUtils::raiseRuntimeException(
+        "Method get value takes exactly 1, 2, or 3 arguments, but received "
+        + std::to_string(argc) + " arguments."
+      );
+      return Qnil;
     }
 
-    if (argc == 2) {
-      rb_scan_args(argc, argv, "2", &rb_x, &rb_y);
-      int x = Convert::toCInt(rb_x);
-      int y = Convert::toCInt(rb_y);
-      short value = inst->getValue(x, y);
-      return Convert::toRubyNumber(value);
+    if (
+      x < 0 || x >= inst->getXSize()
+      || y < 0 || y >= inst->getYSize()
+      || z < 0 || z >= inst->getZSize()
+    ) {
+      return Qnil;
     }
 
-    if (argc == 3) {
-      rb_scan_args(argc, argv, "3", &rb_x, &rb_y, &rb_z);
-      int x = Convert::toCInt(rb_x);
-      int y = Convert::toCInt(rb_y);
-      int z = Convert::toCInt(rb_z);
-      short value = inst->getValue(x, y, z);
-      return Convert::toRubyNumber(value);
-    }
+    short value = inst->getValue(x, y, z);
 
-    throw std::runtime_error(
-      "Method get value takes exactly 1, 2, or 3 arguments, but received "
-      + std::to_string(argc) + " arguments."
-    );
+    return Convert::toRubyNumber(value);
   }
 
   static VALUE setValue(int argc, VALUE *argv, VALUE self)
