@@ -25,17 +25,17 @@ class Tone {
 
     // Props
 
-    rb_define_method(toneClass, "red", RUBY_METHOD_FUNC(setter_red), 0);
-    rb_define_method(toneClass, "red=", RUBY_METHOD_FUNC(getter_red), 1);
+    rb_define_method(toneClass, "red", RUBY_METHOD_FUNC(getter_red), 0);
+    rb_define_method(toneClass, "red=", RUBY_METHOD_FUNC(setter_red), 1);
 
-    rb_define_method(toneClass, "green", RUBY_METHOD_FUNC(setter_green), 0);
-    rb_define_method(toneClass, "green=", RUBY_METHOD_FUNC(getter_green), 1);
+    rb_define_method(toneClass, "green", RUBY_METHOD_FUNC(getter_green), 0);
+    rb_define_method(toneClass, "green=", RUBY_METHOD_FUNC(setter_green), 1);
 
-    rb_define_method(toneClass, "blue", RUBY_METHOD_FUNC(setter_blue), 0);
-    rb_define_method(toneClass, "blue=", RUBY_METHOD_FUNC(getter_blue), 1);
+    rb_define_method(toneClass, "blue", RUBY_METHOD_FUNC(getter_blue), 0);
+    rb_define_method(toneClass, "blue=", RUBY_METHOD_FUNC(setter_blue), 1);
 
-    rb_define_method(toneClass, "gray", RUBY_METHOD_FUNC(setter_gray), 0);
-    rb_define_method(toneClass, "gray=", RUBY_METHOD_FUNC(getter_gray), 1);
+    rb_define_method(toneClass, "gray", RUBY_METHOD_FUNC(getter_gray), 0);
+    rb_define_method(toneClass, "gray=", RUBY_METHOD_FUNC(setter_gray), 1);
 
     // Methods
 

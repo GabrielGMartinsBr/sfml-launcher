@@ -25,17 +25,17 @@ class Color {
 
     // Props
 
-    rb_define_method(colorClass, "red", RUBY_METHOD_FUNC(setter_red), 0);
-    rb_define_method(colorClass, "red=", RUBY_METHOD_FUNC(getter_red), 1);
+    rb_define_method(colorClass, "red", RUBY_METHOD_FUNC(getter_red), 0);
+    rb_define_method(colorClass, "red=", RUBY_METHOD_FUNC(setter_red), 1);
 
-    rb_define_method(colorClass, "green", RUBY_METHOD_FUNC(setter_green), 0);
-    rb_define_method(colorClass, "green=", RUBY_METHOD_FUNC(getter_green), 1);
+    rb_define_method(colorClass, "green", RUBY_METHOD_FUNC(getter_green), 0);
+    rb_define_method(colorClass, "green=", RUBY_METHOD_FUNC(setter_green), 1);
 
-    rb_define_method(colorClass, "blue", RUBY_METHOD_FUNC(setter_blue), 0);
-    rb_define_method(colorClass, "blue=", RUBY_METHOD_FUNC(getter_blue), 1);
+    rb_define_method(colorClass, "blue", RUBY_METHOD_FUNC(getter_blue), 0);
+    rb_define_method(colorClass, "blue=", RUBY_METHOD_FUNC(setter_blue), 1);
 
-    rb_define_method(colorClass, "alpha", RUBY_METHOD_FUNC(setter_alpha), 0);
-    rb_define_method(colorClass, "alpha=", RUBY_METHOD_FUNC(getter_alpha), 1);
+    rb_define_method(colorClass, "alpha", RUBY_METHOD_FUNC(getter_alpha), 0);
+    rb_define_method(colorClass, "alpha=", RUBY_METHOD_FUNC(setter_alpha), 1);
 
     // Methods
 
