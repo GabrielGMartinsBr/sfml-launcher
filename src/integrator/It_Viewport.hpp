@@ -3,8 +3,6 @@
 #include <stdexcept>
 
 #include "RbUtils.hpp"
-#include "base/Sugars.hpp"
-#include "engnine/Engine.hpp"
 #include "engnine/Rect.hpp"
 #include "engnine/Viewport.hpp"
 #include "integrator/It_Color.hpp"
@@ -108,7 +106,6 @@ class Viewport {
 
   static void instance_free(void *ptr)
   {
-    Log::out() << "[[Viewport_free]]";
     delete static_cast<Eng::Viewport *>(ptr);
   }
 

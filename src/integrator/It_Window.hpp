@@ -129,7 +129,6 @@ class Window {
 
   static void instance_free(void *ptr)
   {
-    Log::out() << "[[window_free]]";
     delete static_cast<Eng::Window *>(ptr);
   }
 

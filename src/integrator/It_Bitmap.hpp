@@ -100,7 +100,6 @@ class Bitmap {
 
   static void instance_free(void *ptr)
   {
-    Log::out() << "[[bitmap_free]]";
     delete static_cast<Eng::Bitmap *>(ptr);
   }
 

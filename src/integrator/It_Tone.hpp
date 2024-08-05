@@ -94,7 +94,6 @@ class Tone {
 
   static void instance_free(void *ptr)
   {
-    // Log::out() << "[[Tone_free]]";
     delete static_cast<Eng::Tone *>(ptr);
   }
 

@@ -114,7 +114,6 @@ class Plane {
 
   static void instance_free(void *ptr)
   {
-    Log::out() << "[[Plane_free]]";
     delete static_cast<Eng::Plane *>(ptr);
   }
 

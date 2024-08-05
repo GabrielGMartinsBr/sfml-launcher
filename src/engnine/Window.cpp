@@ -10,7 +10,6 @@
 #include <SFML/Graphics/Texture.hpp>
 #include <cmath>
 
-#include "Log.hpp"
 #include "NumberUtils.hpp"
 #include "engnine/Bitmap.h"
 #include "engnine/Engine.h"
@@ -96,7 +95,6 @@ void Window::onUpdate()
     return;
   }
   if (skinDirty) {
-    Log::out() << "updateSkin";
     updateBackgroundSprite();
     updateBorder();
     updateCursorRect();
@@ -104,7 +102,6 @@ void Window::onUpdate()
     cursor_rect->markAsClean();
   }
   if (cursor_rect->isDirty()) {
-    // Log::out() << "updateCursorRect";
     updateCursorRect();
     cursor_rect->markAsClean();
   }
@@ -235,7 +232,7 @@ int Window::getZ() { return z; }
 void Window::setZ(int v)
 {
   z = v;
-  Eng::Engine::getInstance().markZOrderDirty();
+  Engine::getInstance().markZOrderDirty();
 }
 
 int Window::getter_ox() { return ox; }
@@ -243,7 +240,6 @@ void Window::setter_ox(int v)
 {
   ox = v;
   contentsDirty = true;
-  Log::out() << "(setter_ox)";
 }
 
 int Window::getter_oy() { return oy; }
@@ -251,7 +247,6 @@ void Window::setter_oy(int v)
 {
   oy = v;
   contentsDirty = true;
-  Log::out() << "(setter_oy)";
 }
 
 int Window::getter_opacity() { return opacity; }
@@ -325,8 +320,8 @@ void Window::addToEngineCycles()
   if (addedToEngineCycles) {
     return;
   }
-  Eng::Engine::getInstance().addToUpdateList(this);
-  Eng::Engine::getInstance().addToRenderList(this);
+  Engine::getInstance().addToUpdateList(this);
+  Engine::getInstance().addToRenderList(this);
   addedToEngineCycles = true;
 }
 
@@ -335,8 +330,8 @@ void Window::removeFromEngineCycles()
   if (!addedToEngineCycles) {
     return;
   }
-  Eng::Engine::getInstance().removeFromUpdateList(this);
-  Eng::Engine::getInstance().removeFromRenderList(this);
+  Engine::getInstance().removeFromUpdateList(this);
+  Engine::getInstance().removeFromRenderList(this);
   addedToEngineCycles = false;
 }
 
@@ -438,7 +433,6 @@ void Window::updateBorder()
   if (windowSkin == nullptr) {
     return;
   }
-  Log::out() << " - updateBorder()";
   constexpr int BORDER_START_X = 128;
   constexpr int BORDER_START_Y = 0;
   constexpr int BORDER_END_X = 192;

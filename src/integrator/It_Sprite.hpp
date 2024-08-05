@@ -132,7 +132,6 @@ class Sprite {
 
   static void instance_free(void *ptr)
   {
-    // Log::out() << "[[Sprite_free]]: " << static_cast<Eng::Sprite *>(ptr)->rbObj;
     delete static_cast<Eng::Sprite *>(ptr);
   }
 
@@ -210,11 +209,7 @@ class Sprite {
 
   static VALUE getter_src_rect(VALUE self)
   {
-    // return rb_iv_get(self, "src_rect");
     Eng::Sprite *inst = getObjectValue(self);
-    // Log::out() << "sprite: " << inst->ptr;
-    // Log::out() << "src_rect: " << inst->getter_src_rect()->ptr;
-    // return inst->getter_src_rect()->ptr;
     return Rect::getRubyObject(
       inst->getter_src_rect()
     );

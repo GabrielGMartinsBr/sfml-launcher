@@ -75,7 +75,6 @@ class Table {
   static void instance_free(void *ptr)
   {
     if (ptr == nullptr) return;
-    // Log::out() << "[[Table_free]]";
     delete static_cast<Eng::Table *>(ptr);
   }
 

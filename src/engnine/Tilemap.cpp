@@ -268,12 +268,6 @@ void Tilemap::method_dispose()
 {
   isDisposed = true;
   removeFromEngineCycles();
-  // for (int i = 0; i < layersN; i++) {
-  //   if (layers[i] == nullptr) {
-  //     continue;
-  //   }
-  //   layers[i]->dispose();
-  // }
   disposeLayers();
 }
 

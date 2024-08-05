@@ -43,16 +43,13 @@ class Rect : public EngineBase {
 
   ~Rect()
   {
-    Log::out() << "destructor rect";
   }
 
   void set(int _x, int _y, int _width, int _height)
   {
-    // Log::out() << "Rect.set y: " << _y;
     if (_x == x && y == _y && _width == width && _height == height) {
       return;
     }
-    Log::out() << "Rect.set";
     x = _x;
     y = _y;
     width = _width;

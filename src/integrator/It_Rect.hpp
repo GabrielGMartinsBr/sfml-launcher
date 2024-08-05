@@ -89,7 +89,6 @@ class Rect {
 
   static void instance_free(void *ptr)
   {
-    // Log::out() << "[[Rect_free]]: " << static_cast<Eng::Rect *>(ptr)->rbObj;
     delete static_cast<Eng::Rect *>(ptr);
   }
 

@@ -78,7 +78,6 @@ class Sprite : OnUpdate, OnRender, public EngineBase {
 
   ~Sprite()
   {
-    Log::out() << "Destructor sprite";
     removeFromEngineCycles();
   }
 
@@ -149,8 +148,6 @@ class Sprite : OnUpdate, OnRender, public EngineBase {
     // state.shader = &Engine::getInstance().blendShaders.sprInvertShader;
     // state.blendMode = sf::BlendMultiply;
     // state.blendMode = sf::BlendAlpha;
-
-    // Log::out() << " ---> Position: " << sfSprite.getPosition();
 
     renderTexture.draw(
       spr,
@@ -398,7 +395,7 @@ class Sprite : OnUpdate, OnRender, public EngineBase {
   {
     if (z != value) {
       z = value;
-      Eng::Engine::getInstance().markZOrderDirty();
+      Engine::getInstance().markZOrderDirty();
     }
   }
 
@@ -682,8 +679,8 @@ class Sprite : OnUpdate, OnRender, public EngineBase {
     if (addedToEngineCycles) {
       return;
     }
-    Eng::Engine::getInstance().addToUpdateList(this);
-    Eng::Engine::getInstance().addToRenderList(this);
+    Engine::getInstance().addToUpdateList(this);
+    Engine::getInstance().addToRenderList(this);
     addedToEngineCycles = true;
   }
 
@@ -692,8 +689,8 @@ class Sprite : OnUpdate, OnRender, public EngineBase {
     if (!addedToEngineCycles) {
       return;
     }
-    Eng::Engine::getInstance().removeFromUpdateList(this);
-    Eng::Engine::getInstance().removeFromRenderList(this);
+    Engine::getInstance().removeFromUpdateList(this);
+    Engine::getInstance().removeFromRenderList(this);
     addedToEngineCycles = false;
   }
 };

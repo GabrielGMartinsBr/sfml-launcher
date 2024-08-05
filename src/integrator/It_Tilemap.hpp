@@ -108,7 +108,6 @@ class Tilemap {
 
   static void instance_free(void *ptr)
   {
-    Log::out() << "[[Tilemap_free]]";
     delete static_cast<Eng::Tilemap *>(ptr);
   }
 

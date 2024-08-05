@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Convert.hpp"
-#include "Log.hpp"
 #include "RbUtils.hpp"
 #include "engnine/Color.hpp"
 #include "ruby.h"
@@ -96,7 +95,6 @@ class Color {
   static void instance_free(void *ptr)
   {
     if (ptr == nullptr) return;
-    Log::out() << "[[Color_free]]";
     delete static_cast<Eng::Color *>(ptr);
   }
 

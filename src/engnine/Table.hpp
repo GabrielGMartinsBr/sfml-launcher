@@ -38,7 +38,10 @@ class Table : public EngineBase {
       xSize(x),
       ySize(y),
       zSize(z),
-      values(x * y * z) { }
+      values(x * y * z)
+  {
+    fill();
+  }
 
   // Clone another instance
   Table(const Table &source) :
@@ -134,6 +137,19 @@ class Table : public EngineBase {
   {
     return xSize * ySize * z + xSize * y + x;
   };
+
+  void fill()
+  {
+    int index;
+    for (int z = 0; z < zSize; ++z) {
+      for (int y = 0; y < ySize; ++y) {
+        for (int x = 0; x < xSize; ++x) {
+          index = calcIndex(x, y, z);
+          values[index] = 0;
+        }
+      }
+    }
+  }
 };
 
 }  // namespace Eng
