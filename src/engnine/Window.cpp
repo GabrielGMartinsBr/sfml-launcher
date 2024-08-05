@@ -105,20 +105,23 @@ void Window::onUpdate()
     updateCursorRect();
     cursor_rect->markAsClean();
   }
-  if (contentsDirty) {
+  if (contentsDirty || (contents && contents->dirty)) {
     updateContentsSprite();
     contentsDirty = false;
+    if (contents) {
+      contents->dirty = false;
+    }
   }
 }
 
 void Window::onRender(sf::RenderTexture &rd)
 {
-  rd.draw(backgroundSprite, sf::BlendAlpha);
-  rd.draw(borderSprite, sf::BlendAlpha);
+  rd.draw(backgroundSprite);
+  rd.draw(borderSprite);
   if (!cursor_rect->isEmpty()) {
-    rd.draw(cursorSprite, sf::BlendAlpha);
+    rd.draw(cursorSprite);
   }
-  rd.draw(contentsSprite, sf::BlendAlpha);
+  rd.draw(contentsSprite);
 }
 
 /*
@@ -174,6 +177,12 @@ Bitmap *Window::getter_contents()
 void Window::setter_contents(Bitmap *value)
 {
   if (contents == value) {
+    return;
+  }
+
+  if (value == nullptr) {
+    contents = nullptr;
+    rb_iv_set(rbObj, "@contents", Qnil);
     return;
   }
 
@@ -306,6 +315,9 @@ bool Window::method_disposed()
 
 void Window::method_update()
 {
+  if (isDisposed || contents == nullptr || contents->disposed()) {
+    return;
+  }
   cursorAniAlphaId = (cursorAniAlphaId + 1) % cursorAniAlphaN;
   cursorSprite.setColor(sf::Color(255, 255, 255, cursorAniAlpha[cursorAniAlphaId]));
   contentsDirty = contents->dirty;

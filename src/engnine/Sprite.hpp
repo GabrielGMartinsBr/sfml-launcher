@@ -102,7 +102,7 @@ class Sprite : OnUpdate, OnRender, public EngineBase {
 
   void onUpdate() override
   {
-    if (!dirty || !bitmap) {
+    if (!bitmap || (!dirty && bitmap && !bitmap->dirty)) {
       return;
     }
 
@@ -126,8 +126,9 @@ class Sprite : OnUpdate, OnRender, public EngineBase {
 
   void onRender(sf::RenderTexture &renderTexture) override
   {
-    float opacity = getter_opacity() / 255.f;
-
+    // float opacity = getter_opacity() / 255.f;
+    // spriteColor.a = opacity;
+    // spr.setColor(spriteColor);
     renderTexture.draw(spr);
 
     return;

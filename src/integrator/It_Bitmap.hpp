@@ -74,6 +74,9 @@ class Bitmap {
 
   static Eng::Bitmap *getObjectValue(VALUE rbObj)
   {
+    if (rbObj == Qnil) {
+      return nullptr;
+    }
     return (Eng::Bitmap *)DATA_PTR(rbObj);
   }
 

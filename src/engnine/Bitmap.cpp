@@ -13,6 +13,7 @@
 #include <stdexcept>
 
 #include "AppDefs.h"
+#include "Log.hpp"
 #include "engnine/Color.hpp"
 #include "engnine/FileUtils.hpp"
 #include "engnine/Font.hpp"
@@ -147,6 +148,7 @@ void Bitmap::setter_font(Font* v)
 
 void Bitmap::dispose()
 {
+  // Log::out() << "dispose bitmap";
   isDisposed = true;
 }
 
