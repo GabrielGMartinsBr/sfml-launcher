@@ -24,6 +24,11 @@ class Tone {
 
     rb_define_method(toneClass, "initialize", RUBY_METHOD_FUNC(method_initialize), -1);
 
+    // Operators
+
+    rb_define_method(toneClass, "=", RUBY_METHOD_FUNC(operator_bind), 1);
+    rb_define_method(toneClass, "==", RUBY_METHOD_FUNC(operator_equal), 1);
+
     // Props
 
     rb_define_method(toneClass, "red", RUBY_METHOD_FUNC(getter_red), 0);
@@ -166,6 +171,36 @@ class Tone {
     DATA_PTR(self) = instance;
     instance->rbObj = self;
     return self;
+  }
+
+  static VALUE operator_bind(VALUE self, VALUE value)
+  {
+    if (rb_class_of(self) != rb_class_of(value)) {
+      RbUtils::raiseCantConvertError(
+        rb_class_of(self),
+        rb_class_of(value)
+      );
+      return Qnil;
+    }
+
+    Eng::Tone *inst = getObjectValue(self);
+    Eng::Tone *other = getObjectValue(value);
+
+    *inst = *other;
+    return self;
+  }
+
+  static VALUE operator_equal(VALUE self, VALUE value)
+  {
+    if (rb_class_of(self) != rb_class_of(value)) {
+      return Qfalse;
+    }
+
+    Eng::Tone *inst = getObjectValue(self);
+    Eng::Tone *other = getObjectValue(value);
+
+    bool isEqual = *inst == *other;
+    return Convert::toRubyBool(isEqual);
   }
 
   /*

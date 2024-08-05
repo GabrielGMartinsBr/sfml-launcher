@@ -13,7 +13,7 @@ namespace Eng {
 class Color : public EngineBase {
  public:
   static constexpr int SERIAL_SIZE = 32;
-  
+
   static Color *deserialize(const char *data, int len)
   {
     if (len < 32) {
@@ -58,6 +58,21 @@ class Color : public EngineBase {
 
   ~Color()
   {
+  }
+
+  bool operator==(const Color &other) const
+  {
+    return red == other.red && blue == other.blue && green == other.green && alpha == other.alpha;
+  }
+
+  Color &operator=(const Color &other)
+  {
+    red = other.red;
+    green = other.green;
+    blue = other.blue;
+    alpha = other.alpha;
+    syncSfColor();
+    return *this;
   }
 
   void set(double r, double g, double b, double a = 255)

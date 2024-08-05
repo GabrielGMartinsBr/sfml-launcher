@@ -50,6 +50,20 @@ class Tone : public EngineBase {
   {
   }
 
+  bool operator==(const Tone &other) const
+  {
+    return red == other.red && blue == other.blue && green == other.green && gray == other.gray;
+  }
+
+  Tone &operator=(const Tone &other)
+  {
+    red = other.red;
+    green = other.green;
+    blue = other.blue;
+    gray = other.gray;
+    return *this;
+  }
+
   void set(float red, float green, float blue, float gray = 0)
   {
     clamp(red);
