@@ -8,6 +8,7 @@
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/VideoMode.hpp>
 
+#include "AppDefs.h"
 #include "engnine/BlenShaders.hpp"
 #include "engnine/EngineRenderer.h"
 #include "engnine/Input.hpp"
@@ -30,9 +31,13 @@ class Engine {
 
   const sf::Vector2i& getDimensions() const;
 
+  const app::String& getProjectPath() const;
+
+  const app::String& getScriptsPath() const;
+
   // Methods
 
-  void init(sf::RenderWindow& _window);
+  void init(sf::RenderWindow& _window, app::CStr projectPath);
 
   void cleanup();
 
@@ -62,6 +67,9 @@ class Engine {
   bool initialized;
   bool running;
   sf::Vector2i dimensions;
+  app::String projectPath;
+  app::String scriptsPath;
+
   Input& input;
 
   sf::RenderWindow* window;
@@ -75,6 +83,8 @@ class Engine {
   void pollEvents();
 
   void handleCloseEvent();
+
+  void resolvePaths();
 };
 
 }  // namespace Eng

@@ -23,7 +23,7 @@ int main(int argc, char** argv)
     // app::CStr devScriptPath = "../GameData/projects/project-01/Scripts.rxdata";
     // app::CStr devScriptPath = "../GameData/projects/project-02/Scripts.rxdata";
     // app::CStr devScriptPath = "../../projects/FullScripts.rxdata";
-    app::CStr devScriptPath = "../../projects/Project1/Data/Scripts.rxdata";
+    app::CStr devScriptPath = "../../projects/Project1";
     launcher.run(devScriptPath);
   }
 }

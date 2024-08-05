@@ -8,9 +8,11 @@
 #include <SFML/Window/VideoMode.hpp>
 #include <stdexcept>
 
+#include "AppDefs.h"
 #include "base/Sugars.hpp"
 #include "engnine/BlenShaders.hpp"
 #include "engnine/EngineRenderer.h"
+#include "engnine/FileUtils.hpp"
 #include "engnine/Input.hpp"
 #include "engnine/internal/Texts.hpp"
 #include "ruby.h"
@@ -42,17 +44,32 @@ const sf::Vector2i& Engine::getDimensions() const
   return dimensions;
 }
 
+const app::String& Engine::getProjectPath() const
+{
+  return projectPath;
+}
+
+const app::String& Engine::getScriptsPath() const
+{
+  return scriptsPath;
+}
+
 /*
   Methods
 */
 
-void Engine::init(sf::RenderWindow& _window)
+void Engine::init(sf::RenderWindow& _window, app::CStr _projectPath)
 {
   if (initialized) {
     throw std::runtime_error("Engine can be initialized only once.");
   }
   running = true;
   window = &_window;
+  projectPath = _projectPath;
+
+  resolvePaths();
+
+  Log::out() << scriptsPath;
 
   blendShaders.loadShaders();
 
@@ -156,6 +173,12 @@ void Engine::handleCloseEvent()
 {
   ruby_stop(0);
   running = false;
+}
+
+void Engine::resolvePaths()
+{
+  app::FilePath _scriptsPath = FileUtils::combine(projectPath, "/Data/Scripts.rxdata");
+  scriptsPath = _scriptsPath.c_str();
 }
 
 }  // namespace Eng

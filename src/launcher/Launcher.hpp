@@ -32,7 +32,7 @@ class Launcher {
       mode(width, height),
       window(mode, title) { }
 
-  void run(app::CStr scriptsPath)
+  void run(app::CStr projectPath)
   {
     sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
     sf::Vector2i winPos(
@@ -43,10 +43,11 @@ class Launcher {
 
     ScriptsLoader& scriptsLoader = ScriptsLoader::getInstance();
 
-    engine.init(window);
+    engine.init(window, projectPath);
     integrator.init();
 
-    loadScripts(scriptsPath);
+    app::String scriptsPath = engine.getScriptsPath();
+    loadScripts(scriptsPath.c_str());
 
     integrator.cleanup();
     window.close();

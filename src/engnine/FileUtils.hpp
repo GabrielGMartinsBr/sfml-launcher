@@ -4,7 +4,6 @@
 #include <boost/filesystem/file_status.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
-#include <string>
 
 #include "base/AppDefs.h"
 
@@ -13,15 +12,6 @@ typedef boost::filesystem::path FPath;
 namespace Eng {
 
 struct FileUtils {
-  static app::String parseAssetPath(app::CStr assetName)
-  {
-    FPath p("/run/media/home/common/gabrielmartins.dev/dev/cpp/orm-xp/sfml-launcher/assets");
-    p.append(assetName);
-    p.replace_extension(".png");
-    FPath absolutePath = boost::filesystem::canonical(p);
-    return absolutePath.string();
-  }
-
   static app::String parseRtpPath(app::CStr assetName)
   {
     FPath p("/run/media/home/common/gabrielmartins.dev/dev/cpp/orm-xp/sfml-launcher/GameData/RGSS-RTP");

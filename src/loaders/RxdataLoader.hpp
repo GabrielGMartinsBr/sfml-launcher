@@ -8,6 +8,7 @@
 
 #include "base/AppDefs.h"
 #include "base/RbUtils.hpp"
+#include "engnine/Engine.h"
 #include "ruby.h"
 
 class RxdataLoader {
@@ -44,7 +45,7 @@ class RxdataLoader {
 
   static app::FilePath resolvePath(app::CStr filename)
   {
-    std::string dir = "/home/gabriel/gabrielmartins.dev/dev/cpp/orm-xp/projects/Project1";
+    const std::string& dir = Eng::Engine::getInstance().getProjectPath();
     boost::filesystem::path combined_path = boost::filesystem::path(dir) / filename;
     return boost::filesystem::canonical(combined_path);
   }
