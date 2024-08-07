@@ -5,6 +5,7 @@
 
 #include "Log.hpp"
 #include "TcpServer.hpp"
+#include "debugger/Breakpoints.h"
 
 namespace dbg {
 
@@ -16,7 +17,8 @@ Debugger& Debugger::getInstance()
   return instance;
 }
 
-Debugger::Debugger()
+Debugger::Debugger() :
+    breakpoints(Breakpoints::getInstance())
 {
   isRunning = false;
   Log::out() << "Debugger constructor()";
@@ -43,4 +45,4 @@ void Debugger::startServerThread()
   }
 }
 
-}  // namespace Debugger
+}  // namespace dbg

@@ -4,6 +4,8 @@
 #include <memory>
 #include <thread>
 
+#include "debugger/Breakpoints.h"
+
 namespace dbg {
 
 struct Debugger {
@@ -17,6 +19,7 @@ struct Debugger {
   void stop();
 
  private:
+  Breakpoints& breakpoints;
   boost::asio::io_context io_context;
 
   Debugger();
