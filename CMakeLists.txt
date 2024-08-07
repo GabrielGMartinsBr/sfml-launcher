@@ -3,7 +3,7 @@ project(ORM-SLauncher VERSION 0.1.0)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 
 
 # Debug
@@ -37,7 +37,7 @@ target_link_libraries(${PROJECT_NAME} ${RubyStatic_LIBRARIES} -lcrypt)
 
 
 # Boost Filesystem
-find_package(Boost COMPONENTS system filesystem REQUIRED)
+find_package(Boost COMPONENTS system filesystem thread REQUIRED)
 target_link_libraries(${PROJECT_NAME} 
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
