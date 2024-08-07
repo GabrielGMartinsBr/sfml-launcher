@@ -13,9 +13,11 @@ struct Breakpoints {
 
   void remove(UInt line);
 
-  bool has(UInt line);
+  bool contains(UInt line);
 
   int getSize();
+
+  bool isEmpty();
 
  private:
   static constexpr int MAX_SIZE = 512;

@@ -37,7 +37,7 @@ void Breakpoints::remove(UInt line)
   size--;
 }
 
-bool Breakpoints::has(UInt line)
+bool Breakpoints::contains(UInt line)
 {
   return findIndex(line) > -1;
 }
@@ -45,6 +45,11 @@ bool Breakpoints::has(UInt line)
 int Breakpoints::getSize()
 {
   return size;
+}
+
+bool Breakpoints::isEmpty()
+{
+  return size == 0;
 }
 
 /*
