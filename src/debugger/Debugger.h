@@ -17,16 +17,24 @@ using app::UInt;
 struct Debugger {
   static Debugger& getInstance();
 
-  bool isRunning;
   std::unique_ptr<std::thread> serverThread;
 
   void start();
 
   void stop();
 
+  bool isRunning();
+
+  bool isAttached();
+
+  void attach();
+
  private:
+
   Breakpoints& breakpoints;
   boost::asio::io_context io_context;
+  bool running;
+  bool attached;
 
   Debugger();
 

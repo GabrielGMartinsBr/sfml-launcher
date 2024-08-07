@@ -82,6 +82,11 @@ void Engine::init(sf::RenderWindow& _window, app::CStr _projectPath)
   initialized = true;
 }
 
+void Engine::update()
+{
+  pollEvents();
+}
+
 void Engine::cleanup()
 {
   delete renderer;

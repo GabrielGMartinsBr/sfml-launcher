@@ -39,6 +39,8 @@ class Engine {
 
   void init(sf::RenderWindow& _window, app::CStr projectPath);
 
+  void update();
+
   void cleanup();
 
   void addViewport(SharedPtr<Eng::Viewport> vp);

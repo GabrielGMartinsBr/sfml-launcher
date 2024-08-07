@@ -6,6 +6,7 @@
 #include <memory>
 
 #include "Log.hpp"
+#include "debugger/Debugger.h"
 
 namespace dbg {
 
@@ -54,6 +55,7 @@ struct TcpServer {
     void start()
     {
       Log::out() << "connected";
+      Debugger::getInstance().attach();
       doRead();
     }
 

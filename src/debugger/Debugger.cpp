@@ -1,12 +1,16 @@
 #include "Debugger.h"
 
 #include <boost/asio/io_context.hpp>
+#include <chrono>
 
 #include "Log.hpp"
 #include "TcpServer.hpp"
 #include "debugger/Breakpoints.h"
+#include "engnine/Engine.h"
 
 namespace dbg {
+
+using Eng::Engine;
 
 constexpr int PORT = 3333;
 
@@ -22,7 +26,9 @@ Debugger& Debugger::getInstance()
 Debugger::Debugger() :
     breakpoints(Breakpoints::getInstance())
 {
-  isRunning = false;
+  running = false;
+  attached = false;
+  Log::out() << "(((Debugger constructor)))";
 }
 
 void Debugger::start()
@@ -30,16 +36,39 @@ void Debugger::start()
   serverThread = std::make_unique<std::thread>(&Debugger::startServerThread, this);
   rb_add_event_hook(trace_function, RUBY_EVENT_LINE);
 
-  breakpoints.add(1);
-  breakpoints.add(19);
+  // breakpoints.add(1);
+  // breakpoints.add(19);
 
-  isRunning = true;
+  running = true;
 }
 
 void Debugger::stop()
 {
   io_context.stop();
 }
+
+bool Debugger::isRunning()
+{
+  return running;
+}
+
+bool Debugger::isAttached()
+{
+  return attached;
+}
+
+void Debugger::attach()
+{
+  attached = true;
+}
+
+/*
+  ------------------------------------------------------
+
+    ⇩⇩⇩⇩⇩⇩⇩⇩⇩ Private ⇩⇩⇩⇩⇩⇩⇩⇩⇩
+
+  ------------------------------------------------------
+*/
 
 void Debugger::startServerThread()
 {
@@ -53,6 +82,14 @@ void Debugger::startServerThread()
 
 void Debugger::trace_function(rb_event_t event, NODE* node, VALUE self, ID mid, VALUE classObj)
 {
+  Debugger& instance = getInstance();
+  Engine& engine = Engine::getInstance();
+
+  while (!instance.attached) {
+    engine.update();
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+  }
+
   static Breakpoints& breakpoints = Breakpoints::getInstance();
 
   if (breakpoints.isEmpty()) {
