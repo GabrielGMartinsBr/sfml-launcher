@@ -4,7 +4,7 @@
 #include <memory>
 #include <thread>
 
-namespace Debugger {
+namespace dbg {
 
 struct Debugger {
   static Debugger& getInstance();
@@ -18,7 +18,7 @@ struct Debugger {
 
  private:
   boost::asio::io_context io_context;
-  
+
   Debugger();
 
   Debugger(const Debugger&);
@@ -27,4 +27,4 @@ struct Debugger {
   void startServerThread();
 };
 
-}  // namespace Debugger
+}  // namespace dbg

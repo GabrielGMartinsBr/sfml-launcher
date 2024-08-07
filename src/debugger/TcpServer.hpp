@@ -7,7 +7,8 @@
 
 #include "Log.hpp"
 
-namespace Debugger {
+namespace dbg {
+
 using namespace boost::asio::ip;
 
 struct TcpServer {
@@ -20,7 +21,6 @@ struct TcpServer {
         tcp::endpoint(tcp::v4(), port)
       )
   {
-    // socket_ = new tcp::socket(io_context);
     socket_ = std::make_shared<tcp::socket>(io_context);
 
     Log::out() << "socket_->is_open(): " << socket_->is_open();
@@ -96,10 +96,8 @@ struct TcpServer {
     }
 
     std::shared_ptr<tcp::socket> socket_;
-    // enum { max_length = 1024 };
-    // char data_[max_length];
     std::string data_;
   };
 };
 
-}  // namespace Debugger
+}  // namespace dbg

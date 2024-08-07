@@ -6,7 +6,7 @@
 #include "Log.hpp"
 #include "TcpServer.hpp"
 
-namespace Debugger {
+namespace dbg {
 
 constexpr int PORT = 3333;
 

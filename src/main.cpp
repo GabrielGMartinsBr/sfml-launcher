@@ -12,10 +12,12 @@
 #include "debugger/Debugger.h"
 #include "launcher/Launcher.hpp"
 
+using dbg::Debugger;
+
 int main(int argc, char** argv)
 {
   Launcher launcher;
-  Debugger::Debugger& debugger = Debugger::Debugger::getInstance();
+  Debugger& debugger = Debugger::getInstance();
 
   debugger.start();
 
