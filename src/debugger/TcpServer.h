@@ -40,6 +40,10 @@ struct TcpConnection : public std::enable_shared_from_this<TcpConnection> {
 
   void handleBreakpointsMsg(const std::string& msg);
 
+  void handleAddBreakpointMsg(const std::string& msg);
+
+  void handleRemoveBreakpointMsg(const std::string& msg);
+
   void handleContinue();
 
   void handlePause();

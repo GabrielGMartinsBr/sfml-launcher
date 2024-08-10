@@ -71,7 +71,6 @@ TcpConnection::TcpConnection(std::shared_ptr<tcp::socket> socket) :
 void TcpConnection::start()
 {
   connected = true;
-  // Log::out() << "connected";
   doRead();
 }
 
@@ -170,12 +169,38 @@ void TcpConnection::handleReceivedMsg()
     handleBreakpointsMsg(msg.second);
     return;
   }
+
+  if (msg.first.compare("addBreakpoint") == 0) {
+    handleAddBreakpointMsg(msg.second);
+    return;
+  }
+
+  if (msg.first.compare("removeBreakpoint") == 0) {
+    handleRemoveBreakpointMsg(msg.second);
+    return;
+  }
 }
 
 void TcpConnection::handleBreakpointsMsg(const std::string& msg)
 {
   setBreakpoints(msg);
   setAttached();
+}
+
+void TcpConnection::handleAddBreakpointMsg(const std::string& msg)
+{
+  UInt line = static_cast<UInt>(std::stoul(msg));
+  if (line > 0) {
+    breakpoints.add(line);
+  }
+}
+
+void TcpConnection::handleRemoveBreakpointMsg(const std::string& msg)
+{
+  UInt line = static_cast<UInt>(std::stoul(msg));
+  if (line > 0) {
+    breakpoints.remove(line);
+  }
 }
 
 void TcpConnection::handleContinue()
@@ -197,13 +222,11 @@ void TcpConnection::setBreakpoints(const std::string& msg)
     line = static_cast<UInt>(std::stoul(lineStr));
     breakpoints.add(line);
   }
-  Log::out() << "breakpoints set!";
 }
 
 void TcpConnection::setAttached()
 {
   Debugger::getInstance().attach();
-  // Log::out() << "debugger attached!";
 }
 
 }  // namespace dbg
