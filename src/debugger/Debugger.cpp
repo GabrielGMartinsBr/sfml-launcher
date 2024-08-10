@@ -34,8 +34,8 @@ Debugger::Debugger() :
   isPaused = false;
   sentIsPaused = false;
   sentCurrentLine = false;
+  shouldPause = false;
   shouldContinue = false;
-  Log::out() << "(((Debugger constructor)))";
 }
 
 void Debugger::start()
@@ -71,8 +71,12 @@ void Debugger::attach()
 
 void Debugger::handleContinue()
 {
-  // Log::out() << "Received continue command!";
   shouldContinue = true;
+}
+
+void Debugger::handlePause()
+{
+  shouldPause = true;
 }
 
 void Debugger::sendIsPaused()
@@ -121,8 +125,31 @@ void Debugger::trace_function(rb_event_t event, NODE* node, VALUE self, ID mid, 
     std::this_thread::sleep_for(std::chrono::milliseconds(33));
   }
 
-  static Breakpoints& breakpoints = Breakpoints::getInstance();
+  UInt currLine;
 
+  if (instance.shouldPause) {
+    instance.shouldPause = false;
+    instance.shouldContinue = false;
+    instance.isPaused = true;
+
+    currLine = rb_sourceLine() + 1;
+
+    instance.sendCurrentLine(currLine);
+    instance.sendIsPaused();
+
+    while (!instance.shouldContinue) {
+      engine.update();
+      std::this_thread::sleep_for(std::chrono::milliseconds(33));
+    }
+
+    instance.shouldContinue = false;
+    instance.isPaused = false;
+
+    instance.sendIsPaused();
+    instance.sendCurrentLine(0);
+  }
+
+  static Breakpoints& breakpoints = Breakpoints::getInstance();
   if (breakpoints.isEmpty()) {
     return;
   }
@@ -133,7 +160,7 @@ void Debugger::trace_function(rb_event_t event, NODE* node, VALUE self, ID mid, 
     return;
   }
 
-  UInt currLine = rb_sourceLine() + 1;
+  currLine = rb_sourceLine() + 1;
 
   if (breakpoints.contains(currLine)) {
     // Log::out() << "stop at: " << fileName << "\n";

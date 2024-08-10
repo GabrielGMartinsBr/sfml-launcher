@@ -42,6 +42,8 @@ struct TcpConnection : public std::enable_shared_from_this<TcpConnection> {
 
   void handleContinue();
 
+  void handlePause();
+
   void setBreakpoints(const std::string& msg);
 
   void setAttached();

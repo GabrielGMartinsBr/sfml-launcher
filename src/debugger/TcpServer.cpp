@@ -157,6 +157,11 @@ void TcpConnection::handleReceivedMsg()
     return;
   }
 
+  if (data_.compare("pause\n") == 0) {
+    handlePause();
+    return;
+  }
+
   std::pair<std::string, std::string> msg = splitMsg(data_, ':');
 
   if (msg.first.compare("breakpoints") == 0) {
@@ -174,6 +179,11 @@ void TcpConnection::handleBreakpointsMsg(const std::string& msg)
 void TcpConnection::handleContinue()
 {
   Debugger::getInstance().handleContinue();
+}
+
+void TcpConnection::handlePause()
+{
+  Debugger::getInstance().handlePause();
 }
 
 void TcpConnection::setBreakpoints(const std::string& msg)
