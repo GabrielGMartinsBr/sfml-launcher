@@ -4,8 +4,10 @@
 #include <boost/asio/placeholders.hpp>
 #include <boost/bind.hpp>
 #include <memory>
+#include <string>
 
 #include "Log.hpp"
+#include "debugger/Breakpoints.h"
 #include "debugger/Debugger.h"
 
 namespace dbg {
@@ -36,27 +38,50 @@ struct TcpServer {
       [this](const boost::system::error_code& error) {
         if (!error) {
           handleAccept(socket_);
+        } else {
+          startAccept();
         }
-        startAccept();
       }
     );
   }
 
   void handleAccept(std::shared_ptr<tcp::socket> socket)
   {
-    auto connection = std::make_shared<TcpConnection>(socket);
+    if (connection->connected) {
+      connection->close();
+    }
+    connection.reset();
+    connection = std::make_shared<TcpConnection>(socket);
     connection->start();
   }
 
+  void sendCurrentLine(UInt line)
+  {
+    std::string msg = "currentLine:" + std::to_string(line);
+    connection->doWrite(msg);
+  }
+
   struct TcpConnection : public std::enable_shared_from_this<TcpConnection> {
+    bool connected;
+
     TcpConnection(std::shared_ptr<tcp::socket> socket) :
-        socket_(socket) { }
+        socket_(socket),
+        breakpoints(Breakpoints::getInstance())
+    {
+      connected = false;
+    }
 
     void start()
     {
+      connected = true;
       Log::out() << "connected";
-      Debugger::getInstance().attach();
       doRead();
+    }
+
+    void close()
+    {
+      socket_->close();
+      connected = false;
     }
 
     void doRead()
@@ -72,12 +97,23 @@ struct TcpServer {
     void handleRead(const boost::system::error_code& error, size_t bytes_transferred)
     {
       if (!error) {
-        // doWrite(bytes_transferred);
-        // Log::out() << bytes_transferred;
-        Log::out() << data_;
+        handleReceivedMsg();
         data_.erase(0, data_.length());
         doRead();
+      } else {
+        Log::err() << "Failed to read msg!";
+        Log::err() << error.message();
       }
+    }
+
+    void doWrite(std::string str)
+    {
+      auto self(shared_from_this());
+      boost::asio::async_write(
+        *socket_,
+        boost::asio::buffer(str),
+        boost::bind(&TcpConnection::handleWrite, self, boost::asio::placeholders::error)
+      );
     }
 
     void doWrite(size_t bytes_transferred)
@@ -97,9 +133,84 @@ struct TcpServer {
       }
     }
 
+   private:
+
     std::shared_ptr<tcp::socket> socket_;
     std::string data_;
+    Breakpoints& breakpoints;
+
+    std::pair<std::string, std::string> splitMsg(const std::string& str, char delimiter)
+    {
+      size_t pos = str.find(delimiter);
+      if (pos == std::string::npos) {
+        return { str, "" };
+      }
+
+      std::string first_part = str.substr(0, pos);
+      std::string second_part = str.substr(pos + 1);
+
+      return { first_part, second_part };
+    }
+
+    std::vector<std::string> split(const std::string& str, char delimiter)
+    {
+      std::vector<std::string> tokens;
+      std::string token;
+      std::stringstream ss(str);
+
+      while (std::getline(ss, token, delimiter)) {
+        tokens.push_back(token);
+      }
+
+      return tokens;
+    }
+
+    void handleReceivedMsg()
+    {
+      if (data_.compare("continue\n") == 0) {
+        handleContinue();
+        return;
+      }
+
+      std::pair<std::string, std::string> msg = splitMsg(data_, ':');
+
+      if (msg.first.compare("breakpoints") == 0) {
+        handleBreakpointsMsg(msg.second);
+        return;
+      }
+    }
+
+    void handleBreakpointsMsg(const std::string& msg)
+    {
+      setBreakpoints(msg);
+      setAttached();
+    }
+
+    void handleContinue()
+    {
+      Debugger::getInstance().handleContinue();
+    }
+
+    void setBreakpoints(const std::string& msg)
+    {
+      std::vector<std::string> tokens = split(msg, ',');
+      UInt line;
+      breakpoints.clear();
+      for (const std::string& lineStr : tokens) {
+        line = static_cast<UInt>(std::stoul(lineStr));
+        breakpoints.add(line);
+      }
+      Log::out() << "breakpoints set!";
+    }
+
+    void setAttached()
+    {
+      Debugger::getInstance().attach();
+      Log::out() << "debugger attached!";
+    }
   };
+
+  std::shared_ptr<TcpConnection> connection;
 };
 
 }  // namespace dbg

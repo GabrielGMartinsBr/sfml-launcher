@@ -37,6 +37,14 @@ void Breakpoints::remove(UInt line)
   size--;
 }
 
+void Breakpoints::clear()
+{
+  for (int i = 0; i < size; i++) {
+    values[i] = 0;
+  }
+  size = 0;
+}
+
 bool Breakpoints::contains(UInt line)
 {
   return findIndex(line) > -1;

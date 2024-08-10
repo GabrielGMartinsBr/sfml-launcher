@@ -13,6 +13,8 @@ struct Breakpoints {
 
   void remove(UInt line);
 
+  void clear();
+
   bool contains(UInt line);
 
   int getSize();

@@ -29,12 +29,19 @@ struct Debugger {
 
   void attach();
 
+  void handleContinue();
+
+  void sendCurrentLine(UInt line);
+
  private:
 
   Breakpoints& breakpoints;
   boost::asio::io_context io_context;
+
   bool running;
   bool attached;
+  bool sentCurrentLine;
+  bool shouldContinue;
 
   Debugger();
 

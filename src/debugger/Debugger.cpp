@@ -28,6 +28,8 @@ Debugger::Debugger() :
 {
   running = false;
   attached = false;
+  sentCurrentLine = false;
+  shouldContinue = false;
   Log::out() << "(((Debugger constructor)))";
 }
 
@@ -62,6 +64,17 @@ void Debugger::attach()
   attached = true;
 }
 
+void Debugger::handleContinue()
+{
+  // Log::out() << "Received continue command!";
+  shouldContinue = true;
+}
+
+void Debugger::sendCurrentLine(UInt line)
+{
+  sentCurrentLine = true;
+}
+
 /*
   ------------------------------------------------------
 
@@ -87,7 +100,7 @@ void Debugger::trace_function(rb_event_t event, NODE* node, VALUE self, ID mid, 
 
   while (!instance.attached) {
     engine.update();
-    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    std::this_thread::sleep_for(std::chrono::milliseconds(33));
   }
 
   static Breakpoints& breakpoints = Breakpoints::getInstance();
@@ -105,9 +118,20 @@ void Debugger::trace_function(rb_event_t event, NODE* node, VALUE self, ID mid, 
   UInt currLine = rb_sourceLine() + 1;
 
   if (breakpoints.contains(currLine)) {
-    Log::out() << "stop at: " << fileName << "\n";
+    // Log::out() << "stop at: " << fileName << "\n";
+    Log::out() << "stop at line: " << currLine << "\n";
 
-    std::cin.get();
+    while (!instance.shouldContinue) {
+      if (!instance.sentCurrentLine) {
+        instance.sendCurrentLine(currLine);
+      }
+      engine.update();
+      std::this_thread::sleep_for(std::chrono::milliseconds(33));
+    }
+    instance.shouldContinue = false;
+    instance.sentCurrentLine = false;
+
+    // std::cin.get();
   }
 }
 
