@@ -7,7 +7,8 @@
 #include <thread>
 
 #include "AppDefs.h"
-#include "debugger/Breakpoints.h"
+#include "Breakpoints.h"
+#include "TcpServer.h"
 #include "node.h"
 
 namespace dbg {
@@ -31,15 +32,19 @@ struct Debugger {
 
   void handleContinue();
 
+  void sendIsPaused();
+
   void sendCurrentLine(UInt line);
 
  private:
-
+  std::unique_ptr<TcpServer> server;
   Breakpoints& breakpoints;
   boost::asio::io_context io_context;
 
   bool running;
   bool attached;
+  bool isPaused;
+  bool sentIsPaused;
   bool sentCurrentLine;
   bool shouldContinue;
 

@@ -2,9 +2,12 @@
 
 #include <boost/asio/io_context.hpp>
 #include <chrono>
+#include <iostream>
+#include <memory>
+#include <stdexcept>
 
 #include "Log.hpp"
-#include "TcpServer.hpp"
+#include "TcpServer.h"
 #include "debugger/Breakpoints.h"
 #include "engnine/Engine.h"
 
@@ -28,6 +31,8 @@ Debugger::Debugger() :
 {
   running = false;
   attached = false;
+  isPaused = false;
+  sentIsPaused = false;
   sentCurrentLine = false;
   shouldContinue = false;
   Log::out() << "(((Debugger constructor)))";
@@ -70,8 +75,21 @@ void Debugger::handleContinue()
   shouldContinue = true;
 }
 
+void Debugger::sendIsPaused()
+{
+  if (server == nullptr) {
+    std::runtime_error("TcpServer pointer is null.");
+  }
+  server->sendIsPaused(isPaused);
+  sentIsPaused = true;
+}
+
 void Debugger::sendCurrentLine(UInt line)
 {
+  if (server == nullptr) {
+    std::runtime_error("TcpServer pointer is null.");
+  }
+  server->sendCurrentLine(line);
   sentCurrentLine = true;
 }
 
@@ -86,7 +104,7 @@ void Debugger::sendCurrentLine(UInt line)
 void Debugger::startServerThread()
 {
   try {
-    TcpServer server(io_context, PORT);
+    server = std::make_unique<TcpServer>(io_context, PORT);
     io_context.run();
   } catch (std::exception& e) {
     Log::err() << "Debugger server error: " << e.what();
@@ -119,19 +137,30 @@ void Debugger::trace_function(rb_event_t event, NODE* node, VALUE self, ID mid, 
 
   if (breakpoints.contains(currLine)) {
     // Log::out() << "stop at: " << fileName << "\n";
-    Log::out() << "stop at line: " << currLine << "\n";
+    // Log::out() << "stop at line: " << currLine << "\n";
+
+    instance.shouldContinue = false;
+    instance.isPaused = true;
+    instance.sentIsPaused = false;
+    instance.sentCurrentLine = false;
+
+    std::cout.flush();
+    std::cerr.flush();
 
     while (!instance.shouldContinue) {
+      if (!instance.sentIsPaused) {
+        instance.sendIsPaused();
+      }
       if (!instance.sentCurrentLine) {
         instance.sendCurrentLine(currLine);
       }
       engine.update();
       std::this_thread::sleep_for(std::chrono::milliseconds(33));
     }
-    instance.shouldContinue = false;
-    instance.sentCurrentLine = false;
+    instance.isPaused = false;
 
-    // std::cin.get();
+    instance.sendIsPaused();
+    instance.sendCurrentLine(0);
   }
 }
 

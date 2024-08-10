@@ -51,9 +51,15 @@ void TcpServer::handleAccept(std::shared_ptr<tcp::socket> socket)
   connection->start();
 }
 
+void TcpServer::sendIsPaused(bool value)
+{
+  std::string msg = "isPaused:" + std::to_string(value) + '\n';
+  connection->doWrite(msg);
+}
+
 void TcpServer::sendCurrentLine(UInt line)
 {
-  std::string msg = "currentLine:" + std::to_string(line);
+  std::string msg = "currentLine:" + std::to_string(line) + '\n';
   connection->doWrite(msg);
 }
 
@@ -104,25 +110,17 @@ void TcpConnection::doWrite(std::string str)
   auto self(shared_from_this());
   boost::asio::async_write(
     *socket_,
-    boost::asio::buffer(str),
-    boost::bind(&TcpConnection::handleWrite, self, boost::asio::placeholders::error)
-  );
-}
-
-void TcpConnection::doWrite(size_t bytes_transferred)
-{
-  auto self(shared_from_this());
-  boost::asio::async_write(
-    *socket_,
-    boost::asio::buffer(data_, bytes_transferred),
+    boost::asio::buffer(str, str.size()),
     boost::bind(&TcpConnection::handleWrite, self, boost::asio::placeholders::error)
   );
 }
 
 void TcpConnection::handleWrite(const boost::system::error_code& error)
 {
-  if (!error) {
-    doRead();
+  if (error) {
+    Log::err() << "Write tcp message error: " << error.message();
+    Log::err() << error.what();
+    Log::err() << error.value();
   }
 }
 

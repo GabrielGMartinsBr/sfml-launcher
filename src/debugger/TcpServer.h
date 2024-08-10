@@ -6,8 +6,7 @@
 #include <memory>
 #include <string>
 
-#include "debugger/Breakpoints.h"
-#include "debugger/Debugger.h"
+#include "Breakpoints.h"
 
 namespace dbg {
 
@@ -27,8 +26,6 @@ struct TcpConnection : public std::enable_shared_from_this<TcpConnection> {
   void handleRead(const boost::system::error_code& error, size_t bytes_transferred);
 
   void doWrite(std::string str);
-
-  void doWrite(size_t bytes_transferred);
 
   void handleWrite(const boost::system::error_code& error);
 
@@ -64,6 +61,8 @@ struct TcpServer {
   void startAccept();
 
   void handleAccept(std::shared_ptr<tcp::socket> socket);
+
+  void sendIsPaused(bool value);
 
   void sendCurrentLine(UInt line);
 };
