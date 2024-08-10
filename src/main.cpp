@@ -19,22 +19,25 @@ int main(int argc, char** argv)
   Launcher launcher;
   Debugger& debugger = Debugger::getInstance();
 
-  debugger.start();
-
   if (argc == 2) {
     launcher.run(argv[1]);
-  } else {
-    // app::CStr devScriptPath = "../GameData/projects/project-01/Scripts.rxdata";
-    // app::CStr devScriptPath = "../GameData/projects/project-02/Scripts.rxdata";
-    // app::CStr devScriptPath = "../../projects/FullScripts.rxdata";
-    // app::CStr devScriptPath = "../../projects/dev-project-graphics/Data/Scripts.rxdata";
-    // app::CStr devScriptPath = "../../projects/Project1/Data/Scripts.rxdata";
+  } else if (argc == 3) {
+    if (strcmp(argv[1], "debug") == 0) {
+      debugger.start();
+      launcher.run(argv[2]);
+    } else {
+      Log::err() << "Invalid arguments.";
+      return 1;
+    }
+  } else if (argc == 0) {
     app::CStr devScriptPath = "../../projects/Project1";
     launcher.run(devScriptPath);
   }
 
-  debugger.stop();
-  debugger.serverThread->join();
+  if (debugger.isRunning()) {
+    debugger.stop();
+    debugger.serverThread->join();
+  }
 
   return 0;
 }

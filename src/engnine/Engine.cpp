@@ -69,7 +69,7 @@ void Engine::init(sf::RenderWindow& _window, app::CStr _projectPath)
 
   resolvePaths();
 
-  Log::out() << scriptsPath;
+  // Log::out() << scriptsPath;
 
   blendShaders.loadShaders();
 

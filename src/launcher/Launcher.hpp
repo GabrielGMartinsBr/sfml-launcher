@@ -74,7 +74,7 @@ class Launcher {
       lineNumber = script.getEndLine();
     }
 
-    // findErrorLine(scripts, 13021);
+    // findErrorLine(scripts, 6991);
 
     rb_eval_string_protect(code.c_str(), &errorState);
 
@@ -98,7 +98,7 @@ class Launcher {
   {
     VALUE errinfo = ruby_errinfo;
     ruby_errinfo = Qnil;
-    // rb_p(errinfo);
+    rb_p(errinfo);
 
     VALUE backtrace = rb_funcall(errinfo, rb_intern("backtrace"), 0);
     VALUE err_message = rb_funcall(errinfo, rb_intern("message"), 0);
