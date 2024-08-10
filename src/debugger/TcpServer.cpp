@@ -22,8 +22,6 @@ TcpServer::TcpServer(boost::asio::io_context& io_context, short port) :
 {
   socket_ = std::make_shared<tcp::socket>(io_context);
 
-  Log::out() << "socket_->is_open(): " << socket_->is_open();
-
   startAccept();
 }
 
@@ -73,7 +71,7 @@ TcpConnection::TcpConnection(std::shared_ptr<tcp::socket> socket) :
 void TcpConnection::start()
 {
   connected = true;
-  Log::out() << "connected";
+  // Log::out() << "connected";
   doRead();
 }
 
@@ -132,6 +130,10 @@ std::pair<std::string, std::string> TcpConnection::splitMsg(const std::string& s
   }
 
   std::string first_part = str.substr(0, pos);
+  if (pos + 2 >= str.size()) {
+    return { first_part, "" };
+  }
+
   std::string second_part = str.substr(pos + 1);
 
   return { first_part, second_part };
@@ -201,7 +203,7 @@ void TcpConnection::setBreakpoints(const std::string& msg)
 void TcpConnection::setAttached()
 {
   Debugger::getInstance().attach();
-  Log::out() << "debugger attached!";
+  // Log::out() << "debugger attached!";
 }
 
 }  // namespace dbg
