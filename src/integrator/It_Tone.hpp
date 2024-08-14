@@ -304,7 +304,7 @@ class Tone {
     }
 
     if (argc == 4) {
-      rb_scan_args(argc, argv, "3", &_r, &_g, &_b, &_a);
+      rb_scan_args(argc, argv, "4", &_r, &_g, &_b, &_a);
       float r = Convert::toCDouble(_r);
       float g = Convert::toCDouble(_g);
       float b = Convert::toCDouble(_b);

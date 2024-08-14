@@ -172,6 +172,10 @@ class Color {
     return self;
   }
 
+  /*
+    Operators
+  */
+
   static VALUE operator_bind(VALUE self, VALUE value)
   {
     if (rb_class_of(self) != rb_class_of(value)) {
@@ -303,7 +307,7 @@ class Color {
     }
 
     if (argc == 4) {
-      rb_scan_args(argc, argv, "3", &_r, &_g, &_b, &_a);
+      rb_scan_args(argc, argv, "4", &_r, &_g, &_b, &_a);
       float r = Convert::toCDouble2(_r);
       float g = Convert::toCDouble2(_g);
       float b = Convert::toCDouble2(_b);

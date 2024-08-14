@@ -29,7 +29,7 @@ int main(int argc, char** argv)
       Log::err() << "Invalid arguments.";
       return 1;
     }
-  } else if (argc == 0) {
+  } else if (argc == 1) {
     app::CStr devScriptPath = "../../projects/Project1";
     launcher.run(devScriptPath);
   }

@@ -53,12 +53,19 @@ class Rect : public EngineBase {
     height = _rect->height;
   }
 
+  bool operator==(const Rect &other) const
+  {
+    return x == other.x && y == other.y && width == other.width && height == other.height;
+  }
+
   Rect &operator=(const Rect &other)
   {
     if (this == &other) {
       return *this;
     }
 
+    x = other.x;
+    y = other.y;
     width = other.width;
     height = other.height;
     dirty = true;

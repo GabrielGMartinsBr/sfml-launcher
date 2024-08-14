@@ -419,7 +419,7 @@ class Sprite {
   {
     Eng::Sprite *inst = getObjectValue(self);
     inst->setter_angle(
-      Convert::toCDouble(value)
+      Convert::toCDouble2(value)
     );
     return value;
   }
@@ -482,7 +482,7 @@ class Sprite {
   {
     Eng::Sprite *inst = getObjectValue(self);
     inst->setter_opacity(
-      Convert::toCUnsignedInt(value)
+      Convert::toCInt2(value)
     );
     return value;
   }

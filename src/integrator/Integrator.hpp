@@ -37,12 +37,8 @@ class Integrator {
       throw std::runtime_error("Can not initialize Integrator twice.");
     }
 
-    // std::cout << "[Ruby]: Init\n";
-
     ruby_init();
     // ruby_init_loadpath();
-
-    loadScriptsPath();
 
     It::EngineLog::integrate();
     It::LoadSaveData::integrate();
@@ -62,6 +58,7 @@ class Integrator {
     It::Autotiles::integrate();
     It::Plane::integrate();
 
+    loadScriptsPath();
     loadBuiltInScripts();
 
     // require("script_05.rb");
