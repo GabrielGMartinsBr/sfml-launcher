@@ -65,6 +65,8 @@ class Engine {
 
   void updateGraphics();
 
+  void stop();
+
  private:
   bool initialized;
   bool running;

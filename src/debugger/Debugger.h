@@ -34,6 +34,8 @@ struct Debugger {
 
   void handlePause();
 
+  void handleStop();
+
   void sendIsPaused();
 
   void sendCurrentLine(UInt line);
@@ -50,6 +52,7 @@ struct Debugger {
   bool sentCurrentLine;
   bool shouldPause;
   bool shouldContinue;
+  bool shouldStop;
 
   Debugger();
 

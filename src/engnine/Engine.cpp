@@ -142,6 +142,11 @@ void Engine::updateGraphics()
   window->display();
 }
 
+void Engine::stop()
+{
+  handleCloseEvent();
+}
+
 /*
   Private
 */

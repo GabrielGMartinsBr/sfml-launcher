@@ -79,6 +79,12 @@ void Debugger::handlePause()
   shouldPause = true;
 }
 
+void Debugger::handleStop()
+{
+  shouldStop = true;
+  Engine::Engine::getInstance().stop();
+}
+
 void Debugger::sendIsPaused()
 {
   if (server == nullptr) {
@@ -120,7 +126,12 @@ void Debugger::trace_function(rb_event_t event, NODE* node, VALUE self, ID mid, 
   Debugger& instance = getInstance();
   Engine& engine = Engine::getInstance();
 
+  if (instance.shouldStop) {
+    return;
+  }
+
   while (!instance.attached) {
+    if (instance.shouldStop) return;
     engine.update();
     std::this_thread::sleep_for(std::chrono::milliseconds(33));
   }
@@ -175,6 +186,7 @@ void Debugger::trace_function(rb_event_t event, NODE* node, VALUE self, ID mid, 
     std::cerr.flush();
 
     while (!instance.shouldContinue) {
+      if (instance.shouldStop) return;
       if (!instance.sentIsPaused) {
         instance.sendIsPaused();
       }
