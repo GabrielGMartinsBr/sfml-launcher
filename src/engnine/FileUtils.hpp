@@ -17,8 +17,14 @@ struct FileUtils {
     FPath p("/run/media/home/common/gabrielmartins.dev/dev/cpp/orm-xp/sfml-launcher/GameData/RGSS-RTP");
     p.append(assetName);
     p.replace_extension(".png");
-    FPath absolutePath = boost::filesystem::canonical(p);
-    return absolutePath.string();
+    if (boost::filesystem::exists(p)) {
+      return p.string();
+    }
+    p.replace_extension(".jpg");
+    if (boost::filesystem::exists(p)) {
+      return p.string();
+    }
+    return nullptr;
   }
 
   static app::FilePath combine(app::CStr basePath, app::CStr path)
