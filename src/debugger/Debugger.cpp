@@ -9,6 +9,7 @@
 #include "Log.hpp"
 #include "TcpServer.h"
 #include "debugger/Breakpoints.h"
+#include "debugger/DebugUtils.hpp"
 #include "engnine/Engine.h"
 
 namespace dbg {
@@ -36,15 +37,13 @@ Debugger::Debugger() :
   sentCurrentLine = false;
   shouldPause = false;
   shouldContinue = false;
+  shouldStop = false;
 }
 
 void Debugger::start()
 {
   serverThread = std::make_unique<std::thread>(&Debugger::startServerThread, this);
   rb_add_event_hook(trace_function, RUBY_EVENT_LINE);
-
-  // breakpoints.add(1);
-  // breakpoints.add(19);
 
   running = true;
 }
@@ -121,6 +120,15 @@ void Debugger::startServerThread()
   }
 }
 
+void Debugger::sendDebugState(VALUE self, VALUE mid, VALUE classObj)
+{
+  if (server == nullptr) {
+    std::runtime_error("TcpServer pointer is null.");
+  }
+  String data = DebugUtils::getDebugVars(self, mid, classObj);
+  server->sendDebugState(data);
+}
+
 void Debugger::trace_function(rb_event_t event, NODE* node, VALUE self, ID mid, VALUE classObj)
 {
   Debugger& instance = getInstance();
@@ -136,6 +144,10 @@ void Debugger::trace_function(rb_event_t event, NODE* node, VALUE self, ID mid, 
     std::this_thread::sleep_for(std::chrono::milliseconds(33));
   }
 
+  if (nd_type(node) != NODE_NEWLINE) {
+    return;
+  }
+
   UInt currLine;
 
   if (instance.shouldPause) {
@@ -147,6 +159,7 @@ void Debugger::trace_function(rb_event_t event, NODE* node, VALUE self, ID mid, 
 
     instance.sendCurrentLine(currLine);
     instance.sendIsPaused();
+    instance.sendDebugState(self, mid, classObj);
 
     while (!instance.shouldContinue) {
       engine.update();
@@ -174,8 +187,32 @@ void Debugger::trace_function(rb_event_t event, NODE* node, VALUE self, ID mid, 
   currLine = rb_sourceLine() + 1;
 
   if (breakpoints.contains(currLine)) {
-    // Log::out() << "stop at: " << fileName << "\n";
-    // Log::out() << "stop at line: " << currLine << "\n";
+    // auto names = DebugUtils::globalVariables();
+    // auto names = DebugUtils::instanceVariables(self);
+    // for (int i = 0; i < names->size(); i++) {
+    //   Log::out() << names->at(i);
+    // }
+
+    // Log::out(false) << "self: ";
+    // DebugUtils::printType(self);
+
+    // Log::out(false) << "classObj: ";
+    // DebugUtils::printType(classObj);
+
+    // Log::out() << DebugUtils::className(classObj);
+
+    // Log::out(false) << "mid: ";
+    // DebugUtils::printType(mid);
+
+    // DebugUtils::printLocalVariables(mid);
+
+    // VALUE mod_constants = rb_mod_constants(classObj);
+    // rb_p(mod_constants);
+
+    // rb_p(rb_sym_all_symbols());
+    // VALUE vars = rb_mod_constants(classObj);
+
+    instance.sendDebugState(self, mid, classObj);
 
     instance.shouldContinue = false;
     instance.isPaused = true;

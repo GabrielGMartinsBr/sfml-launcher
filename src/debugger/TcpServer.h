@@ -6,11 +6,13 @@
 #include <memory>
 #include <string>
 
+#include "AppDefs.h"
 #include "Breakpoints.h"
 
 namespace dbg {
 
 using namespace boost::asio::ip;
+using app::String;
 
 struct TcpConnection : public std::enable_shared_from_this<TcpConnection> {
   bool connected;
@@ -73,6 +75,8 @@ struct TcpServer {
   void sendIsPaused(bool value);
 
   void sendCurrentLine(UInt line);
+
+  void sendDebugState(String& data);
 };
 
 }  // namespace dbg

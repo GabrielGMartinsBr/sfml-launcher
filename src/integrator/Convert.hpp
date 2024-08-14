@@ -1,5 +1,8 @@
 #pragma once
 
+#include <memory>
+#include <vector>
+
 #include "base/AppDefs.h"
 #include "ruby.h"
 
@@ -41,6 +44,12 @@ struct Convert {
   {
     Check_Type(v, T_FIXNUM);
     return FIX2UINT(v);
+  }
+
+  static long toCLong(VALUE v)
+  {
+    Check_Type(v, T_BIGNUM);
+    return NUM2LONG(v);
   }
 
   static double toCDouble(VALUE v)
@@ -103,6 +112,27 @@ struct Convert {
       entry = rb_ary_entry(arr, i);
       str = Convert::toCStr(entry);
       vec->at(i) = str;
+    }
+
+    return vec;
+  }
+
+  static app::UniqPtr<app::Vector<app::String>> toCStringVector2(VALUE arr)
+  {
+    std::unique_ptr<app::Vector<app::String>> vec = nullptr;
+
+    if (TYPE(arr) != T_ARRAY) {
+      rb_raise(rb_eTypeError, "Expected String or Array");
+      return vec;
+    }
+
+    int length = RARRAY_LEN(arr);
+    vec = std::make_unique<app::Vector<app::String>>(length);
+    VALUE entry;
+
+    for (int i = 0; i < length; i++) {
+      entry = rb_ary_entry(arr, i);
+      vec->at(i) = Convert::toCStr(entry);
     }
 
     return vec;

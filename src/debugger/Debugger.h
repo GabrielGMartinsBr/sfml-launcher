@@ -13,6 +13,7 @@
 
 namespace dbg {
 
+using app::String;
 using app::UInt;
 
 struct Debugger {
@@ -39,6 +40,8 @@ struct Debugger {
   void sendIsPaused();
 
   void sendCurrentLine(UInt line);
+
+  void sendDebugState(VALUE self, VALUE mid, VALUE classObj);
 
  private:
   std::unique_ptr<TcpServer> server;

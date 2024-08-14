@@ -13,6 +13,7 @@
 namespace dbg {
 
 using namespace boost::asio::ip;
+using std::to_string;
 
 TcpServer::TcpServer(boost::asio::io_context& io_context, short port) :
     acceptor_(
@@ -51,13 +52,19 @@ void TcpServer::handleAccept(std::shared_ptr<tcp::socket> socket)
 
 void TcpServer::sendIsPaused(bool value)
 {
-  std::string msg = "isPaused:" + std::to_string(value) + '\n';
+  std::string msg = "isPaused:" + to_string(value) + '\n';
   connection->doWrite(msg);
 }
 
 void TcpServer::sendCurrentLine(UInt line)
 {
-  std::string msg = "currentLine:" + std::to_string(line) + '\n';
+  std::string msg = "currentLine:" + to_string(line) + '\n';
+  connection->doWrite(msg);
+}
+
+void TcpServer::sendDebugState(String& data)
+{
+  std::string msg = "debugState:" + to_string(data.size()) + ";" + data + '\n';
   connection->doWrite(msg);
 }
 
