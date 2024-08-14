@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Convert.hpp"
+#include "RbUtils.hpp"
 #include "engnine/Rect.hpp"
 #include "ruby.h"
 
@@ -17,6 +18,9 @@ class Rect {
 
     rb_define_module_function(rectClass, "_load", RUBY_METHOD_FUNC(method_load), 1);
     rb_define_module_function(rectClass, "_dump", RUBY_METHOD_FUNC(method_dump), 1);
+
+    rb_define_method(rectClass, "=", RUBY_METHOD_FUNC(operator_bind), 1);
+    rb_define_method(rectClass, "==", RUBY_METHOD_FUNC(operator_equal), 1);
 
     // Initialize
     rb_define_method(rectClass, "initialize", RUBY_METHOD_FUNC(initialize), 4);
@@ -130,6 +134,40 @@ class Rect {
     delete[] data;
 
     return str;
+  }
+
+  /*
+    Operators
+  */
+
+  static VALUE operator_bind(VALUE self, VALUE value)
+  {
+    if (rb_class_of(self) != rb_class_of(value)) {
+      RbUtils::raiseCantConvertError(
+        rb_class_of(self),
+        rb_class_of(value)
+      );
+      return Qnil;
+    }
+
+    Eng::Rect *inst = getObjectValue(self);
+    Eng::Rect *other = getObjectValue(value);
+
+    *inst = *other;
+    return self;
+  }
+
+  static VALUE operator_equal(VALUE self, VALUE value)
+  {
+    if (rb_class_of(self) != rb_class_of(value)) {
+      return Qfalse;
+    }
+
+    Eng::Rect *inst = getObjectValue(self);
+    Eng::Rect *other = getObjectValue(value);
+
+    bool isEqual = *inst == *other;
+    return Convert::toRubyBool(isEqual);
   }
 
   /*
