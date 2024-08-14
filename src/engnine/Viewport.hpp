@@ -2,6 +2,7 @@
 
 #include <SFML/Graphics/Rect.hpp>
 
+#include "Log.hpp"
 #include "engnine/Color.hpp"
 #include "engnine/EngineBase.hpp"
 #include "engnine/RGSSViewport.hpp"
