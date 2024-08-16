@@ -3,6 +3,9 @@
 #include <iostream>
 #include <sstream>
 
+#include "StringEnum.hpp"
+#include "debugger/DebugVariableScope.h"
+
 class Log {
   struct Out {
     std::ostringstream* stream = nullptr;
@@ -20,6 +23,15 @@ class Log {
         stream = new std::ostringstream;
       }
       (*stream) << value;
+      return *this;
+    }
+
+    Out& operator<<(const app::StringEnum& value)
+    {
+      if (stream == nullptr) {
+        stream = new std::ostringstream;
+      }
+      (*stream) << value.toString();
       return *this;
     }
 
@@ -49,6 +61,15 @@ class Log {
         stream = new std::ostringstream;
       }
       (*stream) << value;
+      return *this;
+    }
+
+    Err& operator<<(const app::StringEnum& value)
+    {
+      if (stream == nullptr) {
+        stream = new std::ostringstream;
+      }
+      (*stream) << value.toString();
       return *this;
     }
 

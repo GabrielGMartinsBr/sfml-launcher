@@ -37,11 +37,15 @@ struct Debugger {
 
   void handleStop();
 
+  void handleFetchVariable(String& scope, String& name, VALUE rubyObject = 0);
+
   void sendIsPaused();
 
   void sendCurrentLine(UInt line);
 
   void sendDebugState(VALUE self, VALUE mid, VALUE classObj);
+
+  void sendDebugVariable(String& data);
 
  private:
   std::unique_ptr<TcpServer> server;

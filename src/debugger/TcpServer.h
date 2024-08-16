@@ -52,6 +52,8 @@ struct TcpConnection : public std::enable_shared_from_this<TcpConnection> {
 
   void handleStop();
 
+  void handleFetchVariableMsg(const std::string& msg);
+
   void setBreakpoints(const std::string& msg);
 
   void setAttached();
@@ -77,6 +79,8 @@ struct TcpServer {
   void sendCurrentLine(UInt line);
 
   void sendDebugState(String& data);
+
+  void sendDebugVariable(String& data);
 };
 
 }  // namespace dbg

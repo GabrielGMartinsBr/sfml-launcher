@@ -6,13 +6,20 @@
 #include <memory>
 #include <string>
 
+#include "AppDefs.h"
 #include "Log.hpp"
+#include "StringEnum.hpp"
 #include "debugger/Breakpoints.h"
+#include "debugger/DebugVariableScope.h"
 #include "debugger/Debugger.h"
 
 namespace dbg {
 
 using namespace boost::asio::ip;
+using app::String;
+using app::StringEnum;
+using app::StrStream;
+using app::Vector;
 using std::to_string;
 
 TcpServer::TcpServer(boost::asio::io_context& io_context, short port) :
@@ -65,6 +72,12 @@ void TcpServer::sendCurrentLine(UInt line)
 void TcpServer::sendDebugState(String& data)
 {
   std::string msg = "debugState:" + to_string(data.size()) + ";" + data + '\n';
+  connection->doWrite(msg);
+}
+
+void TcpServer::sendDebugVariable(String& data)
+{
+  std::string msg = "debugVariable:" + to_string(data.size()) + ";" + data + '\n';
   connection->doWrite(msg);
 }
 
@@ -145,13 +158,13 @@ std::pair<std::string, std::string> TcpConnection::splitMsg(const std::string& s
   return { first_part, second_part };
 }
 
-std::vector<std::string> TcpConnection::split(const std::string& str, char delimiter)
+Vector<String> TcpConnection::split(const String& str, char delimiter)
 {
-  std::vector<std::string> tokens;
-  std::string token;
-  std::stringstream ss(str);
+  Vector<String> tokens;
+  String token;
+  StrStream stream(str);
 
-  while (std::getline(ss, token, delimiter)) {
+  while (std::getline(stream, token, delimiter)) {
     tokens.push_back(token);
   }
 
@@ -175,6 +188,7 @@ void TcpConnection::handleReceivedMsg()
     return;
   }
 
+  data_.pop_back();
   std::pair<std::string, std::string> msg = splitMsg(data_, ':');
 
   if (msg.first.compare("breakpoints") == 0) {
@@ -189,6 +203,11 @@ void TcpConnection::handleReceivedMsg()
 
   if (msg.first.compare("removeBreakpoint") == 0) {
     handleRemoveBreakpointMsg(msg.second);
+    return;
+  }
+
+  if (msg.first.compare("fetchVariable") == 0) {
+    handleFetchVariableMsg(msg.second);
     return;
   }
 }
@@ -213,6 +232,16 @@ void TcpConnection::handleRemoveBreakpointMsg(const std::string& msg)
   if (line > 0) {
     breakpoints.remove(line);
   }
+}
+
+void TcpConnection::handleFetchVariableMsg(const std::string& msg)
+{
+  Vector<String> args = split(msg, '|');
+  VALUE rubyObject = 0;
+  if (args.size() == 3) {
+    rubyObject = static_cast<VALUE>(std::stoul(args[2]));
+  }
+  Debugger::getInstance().handleFetchVariable(args[0], args[1], rubyObject);
 }
 
 void TcpConnection::handleContinue()

@@ -97,7 +97,7 @@ Bitmap::~Bitmap()
 void Bitmap::bindRubyProps()
 {
   if (rbObj == Qnil) {
-    std::runtime_error("Bitmap doesn't have rbObj defined.");
+    throw std::runtime_error("Bitmap doesn't have rbObj defined.");
   }
 
   if (font->rbObj == Qnil) {

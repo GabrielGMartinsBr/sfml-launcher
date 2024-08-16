@@ -106,7 +106,7 @@ void EngineRenderer::createFpsText()
     "/run/media/home/common/gabrielmartins.dev/dev/cpp/orm-xp/sfml-launcher/assets/arial.ttf"
   );
   if (!result) {
-    std::runtime_error("Could not load font.");
+    throw std::runtime_error("Could not load font.");
   }
   fpsText.setFont(font);
   fpsText.setFillColor(sf::Color::White);

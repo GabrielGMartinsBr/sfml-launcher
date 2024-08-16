@@ -10,6 +10,7 @@
 #include "TcpServer.h"
 #include "debugger/Breakpoints.h"
 #include "debugger/DebugUtils.hpp"
+#include "debugger/DebugVariableScope.h"
 #include "engnine/Engine.h"
 
 namespace dbg {
@@ -84,10 +85,41 @@ void Debugger::handleStop()
   Engine::Engine::getInstance().stop();
 }
 
+void Debugger::handleFetchVariable(String& scope, String& name, VALUE rubyObject)
+{
+  std::ostringstream strStream;
+  strStream << scope.size() << "|" << scope << "|" << name << "|";
+
+  if (DebugVariableScope::LOCAL == scope) {
+    DebugUtils::getDebugLocalVariable(strStream, name.c_str());
+  }
+
+  if (DebugVariableScope::GLOBAL == scope) {
+    DebugUtils::getDebugGlobalVariable(strStream, name.c_str());
+  }
+
+  if (DebugVariableScope::CLASS == scope) {
+    if (rubyObject == 0) {
+      throw std::runtime_error("Invalid class object received.");
+    }
+    DebugUtils::getDebugGlobalVariable(strStream, rubyObject, name.c_str());
+  }
+
+  if (DebugVariableScope::INSTANCE == scope) {
+    if (rubyObject == 0) {
+      throw std::runtime_error("Invalid instance object received.");
+    }
+    DebugUtils::getDebugInstanceVariable(strStream, rubyObject, name.c_str());
+  }
+
+  String outStr = strStream.str();
+  sendDebugVariable(outStr);
+}
+
 void Debugger::sendIsPaused()
 {
   if (server == nullptr) {
-    std::runtime_error("TcpServer pointer is null.");
+    throw std::runtime_error("TcpServer pointer is null.");
   }
   server->sendIsPaused(isPaused);
   sentIsPaused = true;
@@ -96,10 +128,18 @@ void Debugger::sendIsPaused()
 void Debugger::sendCurrentLine(UInt line)
 {
   if (server == nullptr) {
-    std::runtime_error("TcpServer pointer is null.");
+    throw std::runtime_error("TcpServer pointer is null.");
   }
   server->sendCurrentLine(line);
   sentCurrentLine = true;
+}
+
+void Debugger::sendDebugVariable(String& data)
+{
+  if (server == nullptr) {
+    throw std::runtime_error("TcpServer pointer is null.");
+  }
+  server->sendDebugVariable(data);
 }
 
 /*
@@ -123,7 +163,7 @@ void Debugger::startServerThread()
 void Debugger::sendDebugState(VALUE self, VALUE mid, VALUE classObj)
 {
   if (server == nullptr) {
-    std::runtime_error("TcpServer pointer is null.");
+    throw std::runtime_error("TcpServer pointer is null.");
   }
   String data = DebugUtils::getDebugVars(self, mid, classObj);
   server->sendDebugState(data);
@@ -187,28 +227,8 @@ void Debugger::trace_function(rb_event_t event, NODE* node, VALUE self, ID mid, 
   currLine = rb_sourceLine() + 1;
 
   if (breakpoints.contains(currLine)) {
-    // auto names = DebugUtils::globalVariables();
-    // auto names = DebugUtils::instanceVariables(self);
-    // for (int i = 0; i < names->size(); i++) {
-    //   Log::out() << names->at(i);
-    // }
-
-    // Log::out(false) << "self: ";
-    // DebugUtils::printType(self);
-
-    // Log::out(false) << "classObj: ";
-    // DebugUtils::printType(classObj);
-
-    // Log::out() << DebugUtils::className(classObj);
-
-    // Log::out(false) << "mid: ";
-    // DebugUtils::printType(mid);
-
-    // DebugUtils::printLocalVariables(mid);
-
     // VALUE mod_constants = rb_mod_constants(classObj);
     // rb_p(mod_constants);
-
     // rb_p(rb_sym_all_symbols());
     // VALUE vars = rb_mod_constants(classObj);
 
