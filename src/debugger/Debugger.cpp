@@ -6,15 +6,18 @@
 #include <memory>
 #include <stdexcept>
 
+#include "AppDefs.h"
 #include "Log.hpp"
 #include "TcpServer.h"
 #include "debugger/Breakpoints.h"
 #include "debugger/DebugUtils.hpp"
 #include "debugger/DebugVariableScope.h"
+#include "debugger/SerializeUtils.hpp"
 #include "engnine/Engine.h"
 
 namespace dbg {
 
+using app::StrStream;
 using Eng::Engine;
 
 constexpr int PORT = 3333;
@@ -160,13 +163,18 @@ void Debugger::startServerThread()
   }
 }
 
-void Debugger::sendDebugState(VALUE self, VALUE mid, VALUE classObj)
+void Debugger::sendDebugState(VALUE self, VALUE mid, VALUE classObject)
 {
   if (server == nullptr) {
     throw std::runtime_error("TcpServer pointer is null.");
   }
-  String data = DebugUtils::getDebugVars(self, mid, classObj);
+  StrStream ss;
+  SerializeUtils::serializeFirstLayer(ss, self, mid, classObject);
+  String data = ss.str();
   server->sendDebugState(data);
+
+  // String data = DebugUtils::getDebugVars(self, mid, classObject);
+  // server->sendDebugState(data);
 }
 
 void Debugger::trace_function(rb_event_t event, NODE* node, VALUE self, ID mid, VALUE classObj)

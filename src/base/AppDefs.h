@@ -18,7 +18,12 @@ template <typename T>
 using Vector = std::vector<T>;
 
 template <typename T>
-using UniqPtr = std::unique_ptr<T>;
+using UPtr = std::unique_ptr<T>;
+
+template <typename T>
+using VectorPtr = UPtr<Vector<T>>;
+
+using StrVector = VectorPtr<String>;
 
 typedef boost::filesystem::path FilePath;
 

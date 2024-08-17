@@ -6,6 +6,7 @@
 
 #include "AppDefs.h"
 #include "Log.hpp"
+#include "ValueType.hpp"
 #include "integrator/Convert.hpp"
 #include "st.h"
 
@@ -14,7 +15,7 @@ namespace dbg {
 using app::CStr;
 using app::OutStrStream;
 using app::String;
-using app::UniqPtr;
+using app::UPtr;
 using app::Vector;
 using std::to_string;
 
@@ -50,25 +51,25 @@ struct DebugUtils {
     return (mid != 0) ? rb_id2name(mid) : "unknown";
   }
 
-  static UniqPtr<Vector<String>> instanceVariables(VALUE instanceObj)
+  static UPtr<Vector<String>> instanceVariables(VALUE instanceObj)
   {
     VALUE varsArr = rb_obj_instance_variables(instanceObj);
     return Convert::toCStringVector2(varsArr);
   }
 
-  static UniqPtr<Vector<String>> classVariables(VALUE instanceObj)
+  static UPtr<Vector<String>> classVariables(VALUE instanceObj)
   {
     VALUE varsArr = rb_mod_class_variables(instanceObj);
     return Convert::toCStringVector2(varsArr);
   }
 
-  static UniqPtr<Vector<String>> moduleConstants(VALUE instanceObj)
+  static UPtr<Vector<String>> moduleConstants(VALUE instanceObj)
   {
     VALUE varsArr = rb_mod_constants(instanceObj);
     return Convert::toCStringVector2(varsArr);
   }
 
-  static UniqPtr<Vector<String>> globalVariables()
+  static UPtr<Vector<String>> globalVariables()
   {
     VALUE varsArr = rb_f_global_variables();
     return Convert::toCStringVector2(varsArr);
@@ -96,7 +97,7 @@ struct DebugUtils {
   static void printLocalVariables()
   {
     VALUE result = rb_funcall(Qnil, rb_intern("local_variables"), 0);
-    UniqPtr<Vector<String>> names = Convert::toCStringVector2(result);
+    UPtr<Vector<String>> names = Convert::toCStringVector2(result);
 
     // VALUE val = rb_funcall(Qfalse, rb_intern("[]"), 1, ID2SYM(rb_ary_entry(result, 0)));
     // rb_p(val);
@@ -121,7 +122,7 @@ struct DebugUtils {
     }
   }
 
-  static UniqPtr<Vector<String>> localVariables()
+  static UPtr<Vector<String>> localVariables()
   {
     VALUE result = rb_funcall(Qnil, rb_intern("local_variables"), 0);
     return Convert::toCStringVector2(result);
@@ -149,84 +150,8 @@ struct DebugUtils {
 
   static void printType(VALUE obj)
   {
-    int type = TYPE(obj);
-    switch (type) {
-      case T_NONE:
-        Log::out() << "NONE";
-        break;
-      case T_NIL:
-        Log::out() << "nil";
-        break;
-      case T_OBJECT:
-        Log::out() << "OBJECT";
-        break;
-      case T_CLASS:
-        Log::out() << "CLASS";
-        break;
-      case T_ICLASS:
-        Log::out() << "ICLASS";
-        break;
-      case T_MODULE:
-        Log::out() << "MODULE";
-        break;
-      case T_FLOAT:
-        Log::out() << "FLOAT";
-        break;
-      case T_STRING:
-        Log::out() << "STRING";
-        break;
-      case T_REGEXP:
-        Log::out() << "REGEXP";
-        break;
-      case T_ARRAY:
-        Log::out() << "ARRAY";
-        break;
-      case T_FIXNUM:
-        Log::out() << "FIXNUM";
-        break;
-      case T_HASH:
-        Log::out() << "HASH";
-        break;
-      case T_STRUCT:
-        Log::out() << "STRUCT";
-        break;
-      case T_BIGNUM:
-        Log::out() << "BIGNUM";
-        break;
-      case T_FILE:
-        Log::out() << "FILE";
-        break;
-      case T_TRUE:
-        Log::out() << "TRUE";
-        break;
-      case T_FALSE:
-        Log::out() << "FALSE";
-        break;
-      case T_DATA:
-        Log::out() << "DATA";
-        break;
-      case T_MATCH:
-        Log::out() << "MATCH";
-        break;
-      case T_SYMBOL:
-        Log::out() << "SYMBOL";
-        break;
-      case T_BLKTAG:
-        Log::out() << "BLKTAG";
-        break;
-      case T_UNDEF:
-        Log::out() << "UNDEF";
-        break;
-      case T_VARMAP:
-        Log::out() << "VARMAP";
-        break;
-      case T_SCOPE:
-        Log::out() << "SCOPE";
-        break;
-      case T_NODE:
-        Log::out() << "NODE";
-        break;
-    }
+    CStr str = ValueTypeUtils::getTypeStr(obj);
+    Log::out() << str;
   }
 
   static String getDebugVars(VALUE self, ID mid, VALUE classObj)
@@ -267,35 +192,38 @@ struct DebugUtils {
 
   static String getVariableDebugValue(VALUE var)
   {
-    if (TYPE(var) == T_FALSE) {
-      return "bool|false";
-    }
-    if (TYPE(var) == T_TRUE) {
-      return "bool|true";
-    }
-    if (TYPE(var) == T_FIXNUM) {
-      int value = Convert::toCInt(var);
-      return "fix|" + to_string(value);
-    }
-    if (TYPE(var) == T_BIGNUM) {
-      int value = Convert::toCLong(var);
-      return "big|" + to_string(value);
-    }
-    if (TYPE(var) == T_FLOAT) {
-      double value = Convert::toCDouble(var);
-      return "float|" + to_string(value);
-    }
-    if (TYPE(var) == T_STRING) {
-      String value = Convert::toCStr(var);
-      return "string|" + to_string(value.size()) + '|' + value;
-    }
-    if (TYPE(var) == T_NIL) {
-      return "nil";
+    ValueType type = ValueTypeUtils::getType(var);
+    OutStrStream ss;
+
+    switch (type) {
+      case ValueType::NIL: {
+        serializeNil(ss, var);
+        break;
+      }
+      case ValueType::BOOLEAN: {
+        serializeBool(ss, var);
+        break;
+      }
+      case ValueType::FIX_NUM:
+      case ValueType::BIG_NUM:
+      case ValueType::FLOAT: {
+        serializeNumber(ss, var);
+        break;
+      }
+      case ValueType::STRING: {
+        serializeString(ss, var);
+        break;
+      }
+      case ValueType::OBJECT: {
+        serializeObject(ss, var);
+        break;
+      }
+      default: {
+        serializeAny(ss, var);
+      }
     }
 
-    VALUE varStr = rb_any_to_s(var);
-    String value = Convert::toCStr(varStr);
-    return "any|" + to_string(value.size()) + '|' + value;
+    return ss.str();
   }
 
   static String getLocalVariablesDebug()
@@ -306,7 +234,6 @@ struct DebugUtils {
       strStream << name << '|';
       VALUE value = getLocalVariable(name.c_str());
       strStream << getVariableDebugValue(value);
-      strStream << '|';
     }
     return strStream.str();
   }
@@ -319,7 +246,6 @@ struct DebugUtils {
       strStream << name << '|';
       VALUE value = getInstanceVariable(instance, name.c_str());
       strStream << getVariableDebugValue(value);
-      strStream << '|';
     }
     return strStream.str();
   }
@@ -332,7 +258,6 @@ struct DebugUtils {
       strStream << name << '|';
       VALUE value = getClassVariable(classObj, name.c_str());
       strStream << getVariableDebugValue(value);
-      strStream << '|';
     }
     return strStream.str();
   }
@@ -345,7 +270,6 @@ struct DebugUtils {
       strStream << name << '|';
       VALUE value = getGlobalVariable(name.c_str());
       strStream << getVariableDebugValue(value);
-      strStream << '|';
     }
     return strStream.str();
   }
@@ -389,6 +313,75 @@ struct DebugUtils {
 
     strStream << getInstanceVariablesDebug(value);
   }
+
+  /*
+    Serialize variables
+  */
+
+  static void serializeNil(OutStrStream& ss, VALUE var)
+  {
+    ValueTypeUtils::checkType(var, ValueType::NIL);
+
+    ss << "nil|";
+  }
+
+  static void serializeNumber(OutStrStream& ss, VALUE var)
+  {
+    int type = TYPE(var);
+
+    if (ValueTypeUtils::isFixNumber(type)) {
+      int val = Convert::toCInt(var);
+      ss << "fix|" << val << '|';
+      return;
+    }
+
+    if (ValueTypeUtils::isBigNumber(type)) {
+      long val = Convert::toCLong(var);
+      ss << "big|" << val << '|';
+      return;
+    }
+
+    if (ValueTypeUtils::isFloat(type)) {
+      double val = Convert::toCDouble(var);
+      ss << "float|" << val << '|';
+      return;
+    }
+  }
+
+  static void serializeBool(OutStrStream& ss, VALUE var)
+  {
+    ValueTypeUtils::checkIsBoolean(var);
+
+    bool value = Convert::toCBool(var);
+    if (value) {
+      ss << "bool|true|";
+    } else {
+      ss << "bool|false|";
+    }
+  }
+
+  static void serializeString(OutStrStream& ss, VALUE var)
+  {
+    String value = Convert::toCStr(var);
+    ss << "string:" << value.size() << '|' << value << '|';
+  }
+
+  static void serializeObject(OutStrStream& ss, VALUE var)
+  {
+    ValueTypeUtils::checkType(var, ValueType::OBJECT);
+
+    VALUE valueStr = rb_any_to_s(var);
+    String value = Convert::toCStr(valueStr);
+    ss << "object:" << value.size() << '|' << value << '|';
+  }
+
+  static void serializeAny(OutStrStream& ss, VALUE var)
+  {
+    VALUE valueStr = rb_any_to_s(var);
+    String value = Convert::toCStr(valueStr);
+    ss << "any:" << value.size() << '|' << value << '|';
+  }
+  
 };
 
 }  // namespace dbg

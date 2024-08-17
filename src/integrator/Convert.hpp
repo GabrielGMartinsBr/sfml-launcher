@@ -117,7 +117,7 @@ struct Convert {
     return vec;
   }
 
-  static app::UniqPtr<app::Vector<app::String>> toCStringVector2(VALUE arr)
+  static app::UPtr<app::Vector<app::String>> toCStringVector2(VALUE arr)
   {
     std::unique_ptr<app::Vector<app::String>> vec = nullptr;
 
