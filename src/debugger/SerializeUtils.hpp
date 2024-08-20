@@ -2,13 +2,10 @@
 
 #include <ruby.h>
 
-#include <stdexcept>
-
 #include "AppDefs.h"
 #include "StringUtils.hpp"
 #include "ValueType.hpp"
 #include "debugger/DebugUtils.hpp"
-#include "debugger/DebugVariableScope.h"
 #include "integrator/Convert.hpp"
 
 namespace dbg {

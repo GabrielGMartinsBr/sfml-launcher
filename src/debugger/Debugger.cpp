@@ -11,7 +11,6 @@
 #include "TcpServer.h"
 #include "debugger/Breakpoints.h"
 #include "debugger/DebugUtils.hpp"
-#include "debugger/DebugVariableScope.h"
 #include "debugger/SerializeUtils.hpp"
 #include "engnine/Engine.h"
 
@@ -151,9 +150,6 @@ void Debugger::sendDebugState(VALUE self, VALUE mid, VALUE classObject)
   SerializeUtils::serializeFirstLayer(ss, self, mid, classObject);
   String data = ss.str();
   server->sendDebugState(data);
-
-  // String data = DebugUtils::getDebugVars(self, mid, classObject);
-  // server->sendDebugState(data);
 }
 
 void Debugger::trace_function(rb_event_t event, NODE* node, VALUE self, ID mid, VALUE classObj)
