@@ -22,14 +22,14 @@ struct SerializeUtils {
 
     serializeGlobalVarsLayer(groupStream);
     str = groupStream.str();
-    ss << "globalVars:" << str.size() << '|' << str;
+    ss << "globalVars:" << StringUtils::length(str) << '|' << str;
 
     groupStream.str("");
     groupStream.clear();
 
     serializeLocalVarsLayer(groupStream);
     str = groupStream.str();
-    ss << "localVars:" << str.size() << '|' << str;
+    ss << "localVars:" << StringUtils::length(str) << '|' << str;
 
     if (ValueTypeUtils::isFalse(self)) {
       return;
@@ -40,7 +40,7 @@ struct SerializeUtils {
 
     serializeObjectLayer(groupStream, self);
     str = groupStream.str();
-    ss << "instanceVars:" << str.size() << '|' << str;
+    ss << "instanceVars:" << StringUtils::length(str) << '|' << str;
   }
 
   static void serializeGlobalVarsLayer(StrStream &ss)
@@ -74,21 +74,21 @@ struct SerializeUtils {
     String classPath = DebugUtils::getClassPathOf(obj);
     VALUE classObj = rb_class_of(obj);
 
-    ss << "className:" << (className.size() + 1) << '|' << className << '|';
-    ss << "classPath:" << (classPath.size() + 1) << '|' << classPath << '|';
+    ss << "className:" << (StringUtils::length(className) + 1) << '|' << className << '|';
+    ss << "classPath:" << (StringUtils::length(classPath) + 1) << '|' << classPath << '|';
     ss << "classRId|" << classObj << '|';
 
     String name = "self";
     String type = "object";
     String value = StringUtils::format("<%s>", className.c_str());
 
-    ss << "name:" << (name.size() + 1) << '|' << name << '|';
-    ss << "type:" << (type.size() + 1) << '|' << type << '|';
-    ss << "value:" << (value.size() + 1) << '|' << value << '|';
+    ss << "name:" << (StringUtils::length(name) + 1) << '|' << name << '|';
+    ss << "type:" << (StringUtils::length(type) + 1) << '|' << type << '|';
+    ss << "value:" << (StringUtils::length(value) + 1) << '|' << value << '|';
 
     serializeClassVars(groupStream, classObj);
     str = groupStream.str();
-    ss << "classVars:" << str.size() << '|' << str;
+    ss << "classVars:" << StringUtils::length(str) << '|' << str;
 
     groupStream.str("");
     groupStream.clear();
@@ -97,7 +97,7 @@ struct SerializeUtils {
     str = groupStream.str();
 
     ss << "instanceRId|" << obj << '|';
-    ss << "instanceVars:" << str.size() << '|' << str;
+    ss << "instanceVars:" << StringUtils::length(str) << '|' << str;
   }
 
   static void serializeArrayLayer(StrStream &ss, VALUE obj)
@@ -109,23 +109,23 @@ struct SerializeUtils {
     String classPath = DebugUtils::getClassPathOf(obj);
     VALUE classObj = rb_class_of(obj);
 
-    ss << "className:" << (className.size() + 1) << '|' << className << '|';
-    ss << "classPath:" << (classPath.size() + 1) << '|' << classPath << '|';
+    ss << "className:" << (StringUtils::length(className) + 1) << '|' << className << '|';
+    ss << "classPath:" << (StringUtils::length(classPath) + 1) << '|' << classPath << '|';
     ss << "classRId|" << classObj << '|';
 
     String name = "self";
     String type = "object";
     String value = StringUtils::format("<%s>", className.c_str());
 
-    ss << "name:" << (name.size() + 1) << '|' << name << '|';
-    ss << "type:" << (type.size() + 1) << '|' << type << '|';
-    ss << "value:" << (value.size() + 1) << '|' << value << '|';
+    ss << "name:" << (StringUtils::length(name) + 1) << '|' << name << '|';
+    ss << "type:" << (StringUtils::length(type) + 1) << '|' << type << '|';
+    ss << "value:" << (StringUtils::length(value) + 1) << '|' << value << '|';
 
     serializeArrayEntries(groupStream, obj);
     str = groupStream.str();
 
     ss << "instanceRId|" << obj << '|';
-    ss << "instanceVars:" << str.size() << '|' << str;
+    ss << "instanceVars:" << StringUtils::length(str) << '|' << str;
   }
 
   static void serializeClassVars(StrStream &ss, VALUE classObj)
@@ -195,25 +195,25 @@ struct SerializeUtils {
       }
       case ValueType::STRING: {
         String value = Convert::toCStr(var);
-        ss << ':' << value.size() << '|' << value << '|';
+        ss << ':' << StringUtils::length(value) << '|' << value << '|';
         break;
       }
       case ValueType::OBJECT: {
         String className = DebugUtils::getClassNameOf(var);
         String value = StringUtils::format("<%s>", className.c_str());
-        ss << ':' << value.size() << '|' << value << '|';
+        ss << ':' << StringUtils::length(value) << '|' << value << '|';
         break;
       }
       case ValueType::ARRAY: {
         long length = DebugUtils::getArrayLength(var);
         String value = StringUtils::format("<Array:%i>", length);
-        ss << ':' << value.size() << '|' << value << '|';
+        ss << ':' << StringUtils::length(value) << '|' << value << '|';
         break;
       }
       default: {
         VALUE anyStr = rb_any_to_s(var);
         String value = Convert::toCStr(anyStr);
-        ss << ':' << value.size() << '|' << value << '|';
+        ss << ':' << StringUtils::length(value) << '|' << value << '|';
         break;
       }
     }

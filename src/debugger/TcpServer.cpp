@@ -8,16 +8,14 @@
 
 #include "AppDefs.h"
 #include "Log.hpp"
-#include "StringEnum.hpp"
+#include "StringUtils.hpp"
 #include "debugger/Breakpoints.h"
-#include "debugger/DebugVariableScope.h"
 #include "debugger/Debugger.h"
 
 namespace dbg {
 
 using namespace boost::asio::ip;
 using app::String;
-using app::StringEnum;
 using app::StrStream;
 using app::Vector;
 using std::to_string;
@@ -71,13 +69,13 @@ void TcpServer::sendCurrentLine(UInt line)
 
 void TcpServer::sendDebugState(String& data)
 {
-  std::string msg = "debugState:" + to_string(data.size()) + ";" + data + '\n';
+  std::string msg = "debugState:" + StringUtils::lengthStr(data) + ";" + data + '\n';
   connection->doWrite(msg);
 }
 
 void TcpServer::sendDebugVariable(String& data)
 {
-  std::string msg = "debugVariable:" + to_string(data.size()) + ";" + data + '\n';
+  std::string msg = "debugVariable:" + StringUtils::lengthStr(data) + ";" + data + '\n';
   connection->doWrite(msg);
 }
 
