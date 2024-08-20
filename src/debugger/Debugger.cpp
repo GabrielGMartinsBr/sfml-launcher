@@ -88,32 +88,12 @@ void Debugger::handleStop()
   Engine::Engine::getInstance().stop();
 }
 
-void Debugger::handleFetchVariable(String& scope, String& name, VALUE rubyObject)
+void Debugger::handleFetchVariable(String& scope, String& name, VALUE selfRId, VALUE parentRId)
 {
-  std::ostringstream strStream;
-  strStream << scope.size() << "|" << scope << "|" << name << "|";
+  StrStream strStream;
+  // strStream << scope.size() << '|' << scope << '|' << name << '|' << selfRId << '|';
 
-  if (DebugVariableScope::LOCAL == scope) {
-    DebugUtils::getDebugLocalVariable(strStream, name.c_str());
-  }
-
-  if (DebugVariableScope::GLOBAL == scope) {
-    DebugUtils::getDebugGlobalVariable(strStream, name.c_str());
-  }
-
-  if (DebugVariableScope::CLASS == scope) {
-    if (rubyObject == 0) {
-      throw std::runtime_error("Invalid class object received.");
-    }
-    DebugUtils::getDebugGlobalVariable(strStream, rubyObject, name.c_str());
-  }
-
-  if (DebugVariableScope::INSTANCE == scope) {
-    if (rubyObject == 0) {
-      throw std::runtime_error("Invalid instance object received.");
-    }
-    DebugUtils::getDebugInstanceVariable(strStream, rubyObject, name.c_str());
-  }
+  SerializeUtils::serializeFetchVariable(strStream, scope, name.c_str(), parentRId);
 
   String outStr = strStream.str();
   sendDebugVariable(outStr);

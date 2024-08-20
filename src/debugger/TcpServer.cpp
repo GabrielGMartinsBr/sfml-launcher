@@ -237,11 +237,12 @@ void TcpConnection::handleRemoveBreakpointMsg(const std::string& msg)
 void TcpConnection::handleFetchVariableMsg(const std::string& msg)
 {
   Vector<String> args = split(msg, '|');
-  VALUE rubyObject = 0;
-  if (args.size() == 3) {
-    rubyObject = static_cast<VALUE>(std::stoul(args[2]));
+  VALUE selfRId = static_cast<VALUE>(std::stoul(args[2]));
+  VALUE parentRId = 0;
+  if (args.size() == 4) {
+    parentRId = static_cast<VALUE>(std::stoul(args[3]));
   }
-  Debugger::getInstance().handleFetchVariable(args[0], args[1], rubyObject);
+  Debugger::getInstance().handleFetchVariable(args[0], args[1], selfRId, parentRId);
 }
 
 void TcpConnection::handleContinue()

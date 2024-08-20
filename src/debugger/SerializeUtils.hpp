@@ -2,10 +2,13 @@
 
 #include <ruby.h>
 
+#include <stdexcept>
+
 #include "AppDefs.h"
 #include "StringUtils.hpp"
 #include "ValueType.hpp"
 #include "debugger/DebugUtils.hpp"
+#include "debugger/DebugVariableScope.h"
 #include "integrator/Convert.hpp"
 
 namespace dbg {
@@ -43,12 +46,36 @@ struct SerializeUtils {
     ss << "instanceVars:" << str.size() << '|' << str;
   }
 
+  static void serializeFetchVariable(StrStream &strStream, String &scope, CStr name, VALUE parent = 0)
+  {
+    VALUE value = 0;
+
+    if (DebugVariableScope::GLOBAL == scope) {
+      value = DebugUtils::getGlobalVariable(name);
+    } else if (DebugVariableScope::LOCAL == scope) {
+      value = DebugUtils::getLocalVariable(name);
+    } else if (DebugVariableScope::CLASS == scope) {
+      if (parent == 0) {
+        throw std::runtime_error("Invalid parent object id.");
+      }
+      value = DebugUtils::getClassVariable(parent, name);
+    } else if (DebugVariableScope::INSTANCE == scope) {
+      if (parent == 0) {
+        throw std::runtime_error("Invalid parent object id.");
+      }
+      value = DebugUtils::getInstanceVariable(parent, name);
+    }
+
+    serializeObjectLayer(strStream, value);
+  }
+
   static void serializeGlobalVarsLayer(StrStream &ss)
   {
     StrVector names = DebugUtils::globalVariables();
     for (const String &name : *names) {
       ss << name << '|';
       VALUE value = DebugUtils::getGlobalVariable(name.c_str());
+      ss << value << '|';
       serializeSimpleValue(ss, value);
     }
   }
@@ -59,6 +86,7 @@ struct SerializeUtils {
     for (const String &name : *names) {
       ss << name << '|';
       VALUE value = DebugUtils::getLocalVariable(name.c_str());
+      ss << value << '|';
       serializeSimpleValue(ss, value);
     }
   }
@@ -104,6 +132,7 @@ struct SerializeUtils {
     for (const String &name : *names) {
       ss << name << '|';
       VALUE value = DebugUtils::getInstanceVariable(classObj, name.c_str());
+      ss << value << '|';
       serializeSimpleValue(ss, value);
     }
   }
@@ -114,6 +143,7 @@ struct SerializeUtils {
     for (const String &name : *names) {
       ss << name << '|';
       VALUE value = DebugUtils::getInstanceVariable(obj, name.c_str());
+      ss << value << '|';
       serializeSimpleValue(ss, value);
     }
   }

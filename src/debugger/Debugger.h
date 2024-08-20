@@ -37,7 +37,7 @@ struct Debugger {
 
   void handleStop();
 
-  void handleFetchVariable(String& scope, String& name, VALUE rubyObject = 0);
+  void handleFetchVariable(String& scope, String& name, VALUE selfRId, VALUE parentRId = 0);
 
   void sendIsPaused();
 
