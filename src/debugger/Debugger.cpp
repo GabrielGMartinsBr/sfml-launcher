@@ -88,12 +88,11 @@ void Debugger::handleStop()
   Engine::Engine::getInstance().stop();
 }
 
-void Debugger::handleFetchVariable(String& scope, String& name, VALUE selfRId, VALUE parentRId)
+void Debugger::handleFetchVariable(VALUE var)
 {
   StrStream strStream;
-  // strStream << scope.size() << '|' << scope << '|' << name << '|' << selfRId << '|';
 
-  SerializeUtils::serializeFetchVariable(strStream, scope, name.c_str(), parentRId);
+  SerializeUtils::serializeObjectLayer(strStream, var);
 
   String outStr = strStream.str();
   sendDebugVariable(outStr);

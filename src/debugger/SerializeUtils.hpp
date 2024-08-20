@@ -46,29 +46,6 @@ struct SerializeUtils {
     ss << "instanceVars:" << str.size() << '|' << str;
   }
 
-  static void serializeFetchVariable(StrStream &strStream, String &scope, CStr name, VALUE parent = 0)
-  {
-    VALUE value = 0;
-
-    if (DebugVariableScope::GLOBAL == scope) {
-      value = DebugUtils::getGlobalVariable(name);
-    } else if (DebugVariableScope::LOCAL == scope) {
-      value = DebugUtils::getLocalVariable(name);
-    } else if (DebugVariableScope::CLASS == scope) {
-      if (parent == 0) {
-        throw std::runtime_error("Invalid parent object id.");
-      }
-      value = DebugUtils::getClassVariable(parent, name);
-    } else if (DebugVariableScope::INSTANCE == scope) {
-      if (parent == 0) {
-        throw std::runtime_error("Invalid parent object id.");
-      }
-      value = DebugUtils::getInstanceVariable(parent, name);
-    }
-
-    serializeObjectLayer(strStream, value);
-  }
-
   static void serializeGlobalVarsLayer(StrStream &ss)
   {
     StrVector names = DebugUtils::globalVariables();
