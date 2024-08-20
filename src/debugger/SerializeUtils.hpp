@@ -100,6 +100,34 @@ struct SerializeUtils {
     ss << "instanceVars:" << str.size() << '|' << str;
   }
 
+  static void serializeArrayLayer(StrStream &ss, VALUE obj)
+  {
+    StrStream groupStream;
+    String str;
+
+    String className = DebugUtils::getClassNameOf(obj);
+    String classPath = DebugUtils::getClassPathOf(obj);
+    VALUE classObj = rb_class_of(obj);
+
+    ss << "className:" << (className.size() + 1) << '|' << className << '|';
+    ss << "classPath:" << (classPath.size() + 1) << '|' << classPath << '|';
+    ss << "classRId|" << classObj << '|';
+
+    String name = "self";
+    String type = "object";
+    String value = StringUtils::format("<%s>", className.c_str());
+
+    ss << "name:" << (name.size() + 1) << '|' << name << '|';
+    ss << "type:" << (type.size() + 1) << '|' << type << '|';
+    ss << "value:" << (value.size() + 1) << '|' << value << '|';
+
+    serializeArrayEntries(groupStream, obj);
+    str = groupStream.str();
+
+    ss << "instanceRId|" << obj << '|';
+    ss << "instanceVars:" << str.size() << '|' << str;
+  }
+
   static void serializeClassVars(StrStream &ss, VALUE classObj)
   {
     StrVector names = DebugUtils::classVariables(classObj);
@@ -115,10 +143,21 @@ struct SerializeUtils {
   {
     StrVector names = DebugUtils::instanceVariables(obj);
     for (const String &name : *names) {
-      ss << name << '|';
       VALUE value = DebugUtils::getInstanceVariable(obj, name.c_str());
+      ss << name << '|';
       ss << value << '|';
       serializeSimpleValue(ss, value);
+    }
+  }
+
+  static void serializeArrayEntries(StrStream &ss, VALUE array)
+  {
+    VectorPtr<VALUE> entries = DebugUtils::getArrayEntries(array);
+    for (int i = 0; i < entries->size(); i++) {
+      VALUE entry = entries->at(i);
+      ss << '[' << i << "]|";
+      ss << entry << '|';
+      serializeSimpleValue(ss, entry);
     }
   }
 

@@ -9,6 +9,7 @@
 #include "AppDefs.h"
 #include "Log.hpp"
 #include "TcpServer.h"
+#include "ValueType.hpp"
 #include "debugger/Breakpoints.h"
 #include "debugger/DebugUtils.hpp"
 #include "debugger/SerializeUtils.hpp"
@@ -91,7 +92,20 @@ void Debugger::handleFetchVariable(VALUE var)
 {
   StrStream strStream;
 
-  SerializeUtils::serializeObjectLayer(strStream, var);
+  ValueType type = ValueTypeUtils::getType(var);
+  switch (type) {
+    case ValueType::OBJECT: {
+      SerializeUtils::serializeObjectLayer(strStream, var);
+      break;
+    }
+    case ValueType::ARRAY: {
+      SerializeUtils::serializeArrayLayer(strStream, var);
+      break;
+    }
+    default: {
+      return;
+    }
+  }
 
   String outStr = strStream.str();
   sendDebugVariable(outStr);

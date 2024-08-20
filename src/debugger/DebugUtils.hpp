@@ -14,6 +14,7 @@ using app::OutStrStream;
 using app::String;
 using app::UPtr;
 using app::Vector;
+using app::VectorPtr;
 using std::to_string;
 
 struct DebugUtils {
@@ -76,6 +77,16 @@ struct DebugUtils {
   {
     long length = RARRAY_LEN(array);
     return length;
+  }
+
+  static VectorPtr<VALUE> getArrayEntries(VALUE array)
+  {
+    long length = getArrayLength(array);
+    VectorPtr<VALUE> entries = std::make_unique<Vector<VALUE>>(length);;
+    for (int i = 0; i < length; i++) {
+      entries->at(i) = rb_ary_entry(array, i);
+    }
+    return entries;
   }
 
   static int ivarTableForeach(st_data_t key, st_data_t value, st_data_t arg)

@@ -143,6 +143,11 @@ struct ValueTypeUtils {
     return TYPE(var) == T_TRUE;
   }
 
+  static inline bool isArray(VALUE var)
+  {
+    return TYPE(var) == T_ARRAY;
+  }
+
   static ValueType getType(VALUE value)
   {
     return getType(TYPE(value));
