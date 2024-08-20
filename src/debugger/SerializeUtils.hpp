@@ -3,6 +3,7 @@
 #include <ruby.h>
 
 #include "AppDefs.h"
+#include "StringUtils.hpp"
 #include "ValueType.hpp"
 #include "debugger/DebugUtils.hpp"
 #include "integrator/Convert.hpp"
@@ -75,6 +76,14 @@ struct SerializeUtils {
     ss << "classPath:" << (classPath.size() + 1) << '|' << classPath << '|';
     ss << "classRId|" << classObj << '|';
 
+    String name = "self";
+    String type = "object";
+    String value = StringUtils::format("<%s>", className.c_str());
+
+    ss << "name:" << (name.size() + 1) << '|' << name << '|';
+    ss << "type:" << (type.size() + 1) << '|' << type << '|';
+    ss << "value:" << (value.size() + 1) << '|' << value << '|';
+
     serializeClassVars(groupStream, classObj);
     str = groupStream.str();
     ss << "classVars:" << str.size() << '|' << str;
@@ -143,6 +152,18 @@ struct SerializeUtils {
       }
       case ValueType::STRING: {
         String value = Convert::toCStr(var);
+        ss << ':' << value.size() << '|' << value << '|';
+        break;
+      }
+      case ValueType::OBJECT: {
+        String className = DebugUtils::getClassNameOf(var);
+        String value = StringUtils::format("<%s>", className.c_str());
+        ss << ':' << value.size() << '|' << value << '|';
+        break;
+      }
+      case ValueType::ARRAY: {
+        long length = DebugUtils::getArrayLength(var);
+        String value = StringUtils::format("<Array:%i>", length);
         ss << ':' << value.size() << '|' << value << '|';
         break;
       }

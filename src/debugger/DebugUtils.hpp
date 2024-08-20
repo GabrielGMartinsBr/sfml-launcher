@@ -12,7 +12,6 @@
 
 namespace dbg {
 
-using app::CStr;
 using app::OutStrStream;
 using app::String;
 using app::UPtr;
@@ -73,6 +72,12 @@ struct DebugUtils {
   {
     VALUE varsArr = rb_f_global_variables();
     return Convert::toCStringVector2(varsArr);
+  }
+
+  static long getArrayLength(VALUE array)
+  {
+    long length = RARRAY_LEN(array);
+    return length;
   }
 
   static int ivarTableForeach(st_data_t key, st_data_t value, st_data_t arg)
@@ -381,7 +386,6 @@ struct DebugUtils {
     String value = Convert::toCStr(valueStr);
     ss << "any:" << value.size() << '|' << value << '|';
   }
-  
 };
 
 }  // namespace dbg
