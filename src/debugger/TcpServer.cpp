@@ -4,6 +4,7 @@
 #include <boost/asio/placeholders.hpp>
 #include <boost/bind.hpp>
 #include <memory>
+#include <nlohmann/json.hpp>
 #include <string>
 
 #include "AppDefs.h"
@@ -11,14 +12,26 @@
 #include "StringUtils.hpp"
 #include "debugger/Breakpoints.h"
 #include "debugger/Debugger.h"
+#include "debugger/ParentVarLocation.hpp"
+#include "debugger/UnserializeUtils.hpp"
 
 namespace dbg {
 
 using namespace boost::asio::ip;
+using json = nlohmann::json;
 using app::String;
 using app::StrStream;
+using app::StrVector;
 using app::Vector;
 using std::to_string;
+
+/*
+  ------------------------------------------------------
+
+    ⇩⇩⇩⇩⇩⇩⇩⇩⇩ TcpServer ⇩⇩⇩⇩⇩⇩⇩⇩⇩
+
+  ------------------------------------------------------
+*/
 
 TcpServer::TcpServer(boost::asio::io_context& io_context, short port) :
     acceptor_(
@@ -67,17 +80,31 @@ void TcpServer::sendCurrentLine(UInt line)
   connection->doWrite(msg);
 }
 
-void TcpServer::sendDebugState(String& data)
+void TcpServer::sendDebugState(const String& data)
 {
-  std::string msg = "debugState:" + StringUtils::lengthStr(data) + ";" + data + '\n';
+  std::string msg = "debugState:" + StringUtils::lengthStr(data) + "|" + data + '\n';
   connection->doWrite(msg);
 }
 
-void TcpServer::sendDebugVariable(String& data)
+void TcpServer::sendDebugVariable(const String& data)
 {
-  std::string msg = "debugVariable:" + StringUtils::lengthStr(data) + ";" + data + '\n';
+  std::string msg = "debugVariable:" + StringUtils::lengthStr(data) + "|" + data + '\n';
   connection->doWrite(msg);
 }
+
+void TcpServer::sendVariableChangedValue(const String& data)
+{
+  std::string msg = "valueChangedVariable:" + StringUtils::lengthStr(data) + "|" + data + '\n';
+  connection->doWrite(msg);
+}
+
+/*
+  ------------------------------------------------------
+
+    ⇩⇩⇩⇩⇩⇩⇩⇩⇩ TcpConnection ⇩⇩⇩⇩⇩⇩⇩⇩⇩
+
+  ------------------------------------------------------
+*/
 
 TcpConnection::TcpConnection(std::shared_ptr<tcp::socket> socket) :
     socket_(socket),
@@ -208,6 +235,11 @@ void TcpConnection::handleReceivedMsg()
     handleFetchVariableMsg(msg.second);
     return;
   }
+
+  if (msg.first.compare("setVariableValue") == 0) {
+    handleSetVariableValueMsg(msg.second);
+    return;
+  }
 }
 
 void TcpConnection::handleBreakpointsMsg(const std::string& msg)
@@ -236,6 +268,26 @@ void TcpConnection::handleFetchVariableMsg(const std::string& msg)
 {
   VALUE var = static_cast<VALUE>(std::stoul(msg));
   Debugger::getInstance().handleFetchVariable(var);
+}
+
+void TcpConnection::handleSetVariableValueMsg(const std::string& msg)
+{
+
+  json jsonObject = json::parse(msg);
+  
+  ParentVarLocation location = jsonObject["parentLocation"];
+  VALUE parent = jsonObject["parentVar"];
+  String name = jsonObject["name"];
+  String type = jsonObject["type"];
+  String value = jsonObject["value"];
+
+  Debugger::getInstance().handleSetVariableValue(
+    location,
+    parent,
+    name.c_str(),
+    type.c_str(),
+    value.c_str()
+  );
 }
 
 void TcpConnection::handleContinue()

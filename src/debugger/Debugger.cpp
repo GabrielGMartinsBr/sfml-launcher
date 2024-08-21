@@ -4,6 +4,7 @@
 #include <chrono>
 #include <iostream>
 #include <memory>
+#include <nlohmann/json.hpp>
 #include <stdexcept>
 
 #include "AppDefs.h"
@@ -12,6 +13,7 @@
 #include "ValueType.hpp"
 #include "debugger/Breakpoints.h"
 #include "debugger/DebugUtils.hpp"
+#include "debugger/ParentVarLocation.hpp"
 #include "debugger/SerializeUtils.hpp"
 #include "engnine/Engine.h"
 
@@ -19,6 +21,7 @@ namespace dbg {
 
 using app::StrStream;
 using Eng::Engine;
+using json = nlohmann::json;
 
 constexpr int PORT = 3333;
 
@@ -111,6 +114,13 @@ void Debugger::handleFetchVariable(VALUE var)
   sendDebugVariable(outStr);
 }
 
+void Debugger::handleSetVariableValue(ParentVarLocation location, VALUE parent, CStr name, CStr type, CStr value)
+{
+  VALUE resultValue = setVariableValue(location, parent, name, type, value);
+  String resultValueStr = SerializeUtils::getValueString(resultValue);
+  emitVariableChangedValue(location, parent, name, type, resultValueStr.c_str());
+}
+
 void Debugger::sendIsPaused()
 {
   if (server == nullptr) {
@@ -137,24 +147,6 @@ void Debugger::sendDebugVariable(String& data)
   server->sendDebugVariable(data);
 }
 
-/*
-  ------------------------------------------------------
-
-    ⇩⇩⇩⇩⇩⇩⇩⇩⇩ Private ⇩⇩⇩⇩⇩⇩⇩⇩⇩
-
-  ------------------------------------------------------
-*/
-
-void Debugger::startServerThread()
-{
-  try {
-    server = std::make_unique<TcpServer>(io_context, PORT);
-    io_context.run();
-  } catch (std::exception& e) {
-    Log::err() << "Debugger server error: " << e.what();
-  }
-}
-
 void Debugger::sendDebugState(VALUE self, VALUE mid, VALUE classObject)
 {
   if (server == nullptr) {
@@ -165,6 +157,14 @@ void Debugger::sendDebugState(VALUE self, VALUE mid, VALUE classObject)
   String data = ss.str();
   server->sendDebugState(data);
 }
+
+/*
+  ------------------------------------------------------
+
+    ⇩⇩⇩⇩⇩⇩⇩⇩⇩ Private ⇩⇩⇩⇩⇩⇩⇩⇩⇩
+
+  ------------------------------------------------------
+*/
 
 void Debugger::trace_function(rb_event_t event, NODE* node, VALUE self, ID mid, VALUE classObj)
 {
@@ -255,6 +255,73 @@ void Debugger::trace_function(rb_event_t event, NODE* node, VALUE self, ID mid, 
     instance.sendIsPaused();
     instance.sendCurrentLine(0);
   }
+}
+
+void Debugger::startServerThread()
+{
+  try {
+    server = std::make_unique<TcpServer>(io_context, PORT);
+    io_context.run();
+  } catch (std::exception& e) {
+    Log::err() << "Debugger server error: " << e.what();
+  }
+}
+
+VALUE Debugger::setVariableValue(ParentVarLocation location, VALUE parent, CStr name, CStr type, CStr valueStr)
+{
+  VALUE value = DebugUtils::createValue(type, valueStr);
+
+  switch (location) {
+    case ParentVarLocation::LOCAL: {
+      DebugUtils::setLocalVariable(name, valueStr);
+      return DebugUtils::getLocalVariable(name);
+    }
+    case ParentVarLocation::GLOBAL: {
+      DebugUtils::setGlobalVariable(name, value);
+      return DebugUtils::getGlobalVariable(name);
+    }
+    case ParentVarLocation::CLASS: {
+      if (parent == 0) {
+        throw std::runtime_error("Invalid class object received.");
+      }
+      DebugUtils::setClassVariable(parent, name, value);
+      return DebugUtils::getClassVariable(parent, name);
+    }
+    case ParentVarLocation::OBJECT: {
+      if (parent == 0) {
+        throw std::runtime_error("Invalid parent object received.");
+      }
+      DebugUtils::setInstanceVariable(parent, name, value);
+      return DebugUtils::getInstanceVariable(parent, name);
+    }
+    case ParentVarLocation::ARRAY: {
+      if (parent == 0) {
+        throw std::runtime_error("Invalid array object received.");
+      }
+      long index = static_cast<VALUE>(std::stol(name));
+      if (index > -1) {
+        DebugUtils::setArrayEntry(parent, index, value);
+        return DebugUtils::getArrayEntry(parent, index);
+      }
+      throw std::runtime_error("Invalid array index received.");
+    }
+  }
+}
+
+void Debugger::emitVariableChangedValue(ParentVarLocation location, VALUE parent, CStr name, CStr type, CStr value)
+{
+  if (server == nullptr) {
+    throw std::runtime_error("TcpServer pointer is null.");
+  }
+  json obj;
+  obj["parentLocation"] = location;
+  obj["parentVar"] = parent;
+  obj["name"] = name;
+  obj["type"] = type;
+  obj["value"] = value;
+
+  String data = obj.dump();
+  server->sendVariableChangedValue(data);
 }
 
 }  // namespace dbg

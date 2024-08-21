@@ -3,6 +3,7 @@
 #include <boost/filesystem/path.hpp>
 #include <memory>
 #include <sstream>
+#include <string>
 namespace app {
 
 typedef unsigned int UInt;
@@ -11,11 +12,15 @@ typedef unsigned long ULong;
 typedef std::string String;
 typedef const char* CStr;
 
+typedef std::wstring WString;
+
 typedef std::ostringstream OutStrStream;
 typedef std::stringstream StrStream;
 
 template <typename T>
 using Vector = std::vector<T>;
+
+using StrVector = Vector<String>;
 
 template <typename T>
 using UPtr = std::unique_ptr<T>;
@@ -23,7 +28,7 @@ using UPtr = std::unique_ptr<T>;
 template <typename T>
 using VectorPtr = UPtr<Vector<T>>;
 
-using StrVector = VectorPtr<String>;
+using StrVectorPtr = VectorPtr<String>;
 
 typedef boost::filesystem::path FilePath;
 

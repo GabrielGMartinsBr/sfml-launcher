@@ -8,7 +8,9 @@
 
 #include "AppDefs.h"
 #include "Breakpoints.h"
+#include "ParentVarLocation.hpp"
 #include "TcpServer.h"
+#include "debugger/DebugVariableScope.h"
 #include "node.h"
 
 namespace dbg {
@@ -39,6 +41,8 @@ struct Debugger {
 
   void handleFetchVariable(VALUE var);
 
+  void handleSetVariableValue(ParentVarLocation location, VALUE parent, CStr name, CStr type, CStr value);
+
   void sendIsPaused();
 
   void sendCurrentLine(UInt line);
@@ -66,9 +70,13 @@ struct Debugger {
   Debugger(const Debugger&);
   Debugger& operator=(const Debugger&);
 
+  static void trace_function(rb_event_t event, NODE* node, VALUE self, ID mid, VALUE classObj);
+
   void startServerThread();
 
-  static void trace_function(rb_event_t event, NODE* node, VALUE self, ID mid, VALUE classObj);
+  VALUE setVariableValue(ParentVarLocation location, VALUE parent, CStr name, CStr type, CStr value);
+
+  void emitVariableChangedValue(ParentVarLocation location, VALUE parent, CStr name, CStr type, CStr value);
 };
 
 }  // namespace dbg

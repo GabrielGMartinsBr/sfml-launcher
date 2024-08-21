@@ -4,6 +4,7 @@
 
 #include "AppDefs.h"
 #include "Log.hpp"
+#include "StringUtils.hpp"
 #include "ValueType.hpp"
 #include "integrator/Convert.hpp"
 #include "st.h"
@@ -82,11 +83,21 @@ struct DebugUtils {
   static VectorPtr<VALUE> getArrayEntries(VALUE array)
   {
     long length = getArrayLength(array);
-    VectorPtr<VALUE> entries = std::make_unique<Vector<VALUE>>(length);;
+    VectorPtr<VALUE> entries = std::make_unique<Vector<VALUE>>(length);
     for (int i = 0; i < length; i++) {
       entries->at(i) = rb_ary_entry(array, i);
     }
     return entries;
+  }
+
+  static VALUE getArrayEntry(VALUE array, long index)
+  {
+    return rb_ary_entry(array, index);
+  }
+
+  static void setArrayEntry(VALUE array, long index, VALUE value)
+  {
+    rb_ary_store(array, index, value);
   }
 
   static int ivarTableForeach(st_data_t key, st_data_t value, st_data_t arg)
@@ -147,9 +158,19 @@ struct DebugUtils {
     return rb_eval_string(name);
   }
 
+  static void setLocalVariable(CStr name, CStr value)
+  {
+    rb_eval_string(StringUtils::format("%s = %s", name, value).c_str());
+  }
+
   static VALUE getInstanceVariable(VALUE instance, CStr name)
   {
     return rb_iv_get(instance, name);
+  }
+
+  static void setInstanceVariable(VALUE instance, CStr name, VALUE value)
+  {
+    rb_iv_set(instance, name, value);
   }
 
   static VALUE getClassVariable(VALUE instance, CStr name)
@@ -157,15 +178,46 @@ struct DebugUtils {
     return rb_cv_get(instance, name);
   }
 
+  static void setClassVariable(VALUE instance, CStr name, VALUE value)
+  {
+    rb_cv_set(instance, name, value);
+  }
+
   static VALUE getGlobalVariable(CStr name)
   {
     return rb_gv_get(name);
+  }
+
+  static void setGlobalVariable(CStr name, VALUE value)
+  {
+    rb_gv_set(name, value);
   }
 
   static void printType(VALUE obj)
   {
     CStr str = ValueTypeUtils::getTypeStr(obj);
     Log::out() << str;
+  }
+
+  static VALUE createValue(const char* type, const char* value)
+  {
+    if (std::strcmp(type, "nil") == 0) {
+      return Qnil;
+    }
+    if (std::strcmp(type, "bool") == 0) {
+      bool v = std::strcmp(value, "true") == 0;
+      return Convert::toRubyBool(v);
+    }
+    if (std::strcmp(type, "fix") == 0) {
+      return Convert::toRubyNumber(static_cast<int>(std::stoi(value)));
+    }
+    if (std::strcmp(type, "float") == 0) {
+      return Convert::toRubyDouble(static_cast<double>(std::stod(value)));
+    }
+    if (std::strcmp(type, "string") == 0) {
+      return Convert::toRubyString(value);
+    }
+    return Qundef;
   }
 };
 

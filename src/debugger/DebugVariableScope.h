@@ -11,7 +11,7 @@ using app::StringEnum;
 struct DebugVariableScope {
   static const StringEnum GLOBAL;
   static const StringEnum CLASS;
-  static const StringEnum INSTANCE;
+  static const StringEnum CHILD;
   static const StringEnum LOCAL;
 };
 

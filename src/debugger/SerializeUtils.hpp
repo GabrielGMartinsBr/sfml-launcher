@@ -11,7 +11,7 @@
 namespace dbg {
 
 using app::StrStream;
-using app::StrVector;
+using app::StrVectorPtr;
 using app::VectorPtr;
 
 struct SerializeUtils {
@@ -45,7 +45,7 @@ struct SerializeUtils {
 
   static void serializeGlobalVarsLayer(StrStream &ss)
   {
-    StrVector names = DebugUtils::globalVariables();
+    StrVectorPtr names = DebugUtils::globalVariables();
     for (const String &name : *names) {
       ss << name << '|';
       VALUE value = DebugUtils::getGlobalVariable(name.c_str());
@@ -56,7 +56,7 @@ struct SerializeUtils {
 
   static void serializeLocalVarsLayer(StrStream &ss)
   {
-    StrVector names = DebugUtils::localVariables();
+    StrVectorPtr names = DebugUtils::localVariables();
     for (const String &name : *names) {
       ss << name << '|';
       VALUE value = DebugUtils::getLocalVariable(name.c_str());
@@ -130,7 +130,7 @@ struct SerializeUtils {
 
   static void serializeClassVars(StrStream &ss, VALUE classObj)
   {
-    StrVector names = DebugUtils::classVariables(classObj);
+    StrVectorPtr names = DebugUtils::classVariables(classObj);
     for (const String &name : *names) {
       ss << name << '|';
       VALUE value = DebugUtils::getInstanceVariable(classObj, name.c_str());
@@ -141,7 +141,7 @@ struct SerializeUtils {
 
   static void serializeObjectVars(StrStream &ss, VALUE obj)
   {
-    StrVector names = DebugUtils::instanceVariables(obj);
+    StrVectorPtr names = DebugUtils::instanceVariables(obj);
     for (const String &name : *names) {
       VALUE value = DebugUtils::getInstanceVariable(obj, name.c_str());
       ss << name << '|';
@@ -155,7 +155,7 @@ struct SerializeUtils {
     VectorPtr<VALUE> entries = DebugUtils::getArrayEntries(array);
     for (int i = 0; i < entries->size(); i++) {
       VALUE entry = entries->at(i);
-      ss << '[' << i << "]|";
+      ss << i << '|';
       ss << entry << '|';
       serializeSimpleValue(ss, entry);
     }
@@ -215,6 +215,48 @@ struct SerializeUtils {
         String value = Convert::toCStr(anyStr);
         ss << ':' << StringUtils::length(value) << '|' << value << '|';
         break;
+      }
+    }
+  }
+
+  static String getValueString(VALUE var)
+  {
+    ValueType type = ValueTypeUtils::getType(var);
+    return getValueString(var, type);
+  }
+
+  static String getValueString(VALUE var, ValueType type)
+  {
+    switch (type) {
+      case ValueType::NIL: {
+        return "nil";
+      }
+      case ValueType::FIX_NUM: {
+        return to_string(Convert::toCInt(var));
+      }
+      case ValueType::BIG_NUM: {
+        return to_string(Convert::toCLong(var));
+      }
+      case ValueType::FLOAT: {
+        return to_string(Convert::toCDouble(var));
+      }
+      case ValueType::BOOLEAN: {
+        return to_string(Convert::toCBool(var));
+      }
+      case ValueType::STRING: {
+        return Convert::toCStr(var);
+      }
+      case ValueType::OBJECT: {
+        String className = DebugUtils::getClassNameOf(var);
+        return StringUtils::format("<%s>", className.c_str());
+      }
+      case ValueType::ARRAY: {
+        long length = DebugUtils::getArrayLength(var);
+        return StringUtils::format("<Array:%i>", length);
+      }
+      default: {
+        VALUE anyStr = rb_any_to_s(var);
+        return Convert::toCStr(anyStr);
       }
     }
   }
