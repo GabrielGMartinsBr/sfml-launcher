@@ -34,7 +34,7 @@ class Bitmap : public EngineBase {
   Bitmap(unsigned int _width, unsigned int _height, VALUE rbObj = Qnil);
   ~Bitmap();
 
-  void bindRubyProps();
+  void initRubyObj();
 
   // Engine
 
@@ -82,6 +82,8 @@ class Bitmap : public EngineBase {
   unsigned int width;
   unsigned int height;
   bool isDisposed;
+
+  void bindRubyVars();
 
   static void parseColor(sf::Color& dest, Color* src);
 };

@@ -65,8 +65,8 @@ Window::Window(VALUE rbObj, Viewport *viewport) :
 
   cursorAniAlphaId = 0;
 
-  if (rbObj != Qnil) {
-    bindRubyProps();
+  if (hasRbObj()) {
+    bindRubyVars();
   }
 
   addToEngineCycles();
@@ -130,22 +130,43 @@ void Window::onRender(sf::RenderTexture &rd)
 
 // Bind props ruby object to instance object
 
-void Window::bindRubyProps()
+void Window::bindRubyVars()
 {
   if (rbObj == Qnil) {
     std::runtime_error("Window doesn't have rbObj defined.");
   }
 
-  if (viewport != nullptr && viewport->rbObj == Qnil) {
-    viewport->rbObj = It::Viewport::createRubyObject(viewport);
-    rb_iv_set(rbObj, "@viewport", viewport->rbObj);
+  VALUE viewportVal = Qnil;
+  if (viewport && viewport->hasRbObj()) {
+    viewportVal = viewport->rbObj;
   }
 
   if (cursor_rect->rbObj == Qnil) {
     cursor_rect->rbObj = It::Rect::createRubyObject(cursor_rect);
+    cursor_rect->bindRubyVars();
   }
 
+  rb_iv_set(rbObj, "@viewport", viewportVal);
   rb_iv_set(rbObj, "@cursor_rect", cursor_rect->rbObj);
+
+  rb_iv_set(rbObj, "@windowSkin", Qnil);
+  rb_iv_set(rbObj, "@contents", Qnil);
+
+  rb_iv_set(rbObj, "@stretch", Convert::toRubyBool(stretch));
+  rb_iv_set(rbObj, "@visible", Convert::toRubyBool(visible));
+  rb_iv_set(rbObj, "@active", Convert::toRubyBool(active));
+  rb_iv_set(rbObj, "@pause", Convert::toRubyBool(pause));
+
+  rb_iv_set(rbObj, "@x", Convert::toRubyNumber(x));
+  rb_iv_set(rbObj, "@y", Convert::toRubyNumber(y));
+  rb_iv_set(rbObj, "@width", Convert::toRubyNumber(width));
+  rb_iv_set(rbObj, "@height", Convert::toRubyNumber(height));
+  rb_iv_set(rbObj, "@z", Convert::toRubyNumber(z));
+  rb_iv_set(rbObj, "@ox", Convert::toRubyNumber(ox));
+  rb_iv_set(rbObj, "@oy", Convert::toRubyNumber(oy));
+  rb_iv_set(rbObj, "@opacity", Convert::toRubyNumber(opacity));
+  rb_iv_set(rbObj, "@back_opacity", Convert::toRubyNumber(back_opacity));
+  rb_iv_set(rbObj, "@contents_opacity", Convert::toRubyNumber(contents_opacity));
 }
 
 /*
@@ -186,9 +207,7 @@ void Window::setter_contents(Bitmap *value)
     return;
   }
 
-  if (value->rbObj == Qnil) {
-    value->rbObj = It::Bitmap::createRubyObject(value);
-  }
+  value->initRubyObj();
 
   contents = value;
   rb_iv_set(rbObj, "@contents", contents->rbObj);
@@ -404,25 +423,25 @@ void Window::updateCursorRect()
   sf::Image src = windowSkin->renderTexture.getTexture().copyToImage();
 
   sf::Image buff;
-  buff.create(cursor_rect->getter_width(), cursor_rect->getter_height(), sf::Color::Transparent);
+  buff.create(cursor_rect->width.get(), cursor_rect->height.get(), sf::Color::Transparent);
 
-  float xa = cursor_rect->getter_width() / 32.0;
-  float ya = cursor_rect->getter_height() / 32.0;
+  float xa = cursor_rect->width.get() / 32.0;
+  float ya = cursor_rect->height.get() / 32.0;
 
-  int lastLine = cursor_rect->getter_height() - 1;
-  for (int i = 0; i < cursor_rect->getter_width(); i++) {
+  int lastLine = cursor_rect->height.get() - 1;
+  for (int i = 0; i < cursor_rect->width.get(); i++) {
     buff.setPixel(i, 0, src.getPixel(128 + i / xa, 64));
     buff.setPixel(i, lastLine, src.getPixel(128 + i / xa, 95));
   }
 
-  int lastCol = cursor_rect->getter_width() - 1;
-  for (int i = 0; i < cursor_rect->getter_height(); i++) {
+  int lastCol = cursor_rect->width.get() - 1;
+  for (int i = 0; i < cursor_rect->height.get(); i++) {
     buff.setPixel(0, i, src.getPixel(128, 64 + i / ya));
     buff.setPixel(lastCol, i, src.getPixel(159, 64 + i / ya));
   }
 
-  int limitX = cursor_rect->getter_width() - 1;
-  int limitY = cursor_rect->getter_height() - 1;
+  int limitX = cursor_rect->width.get() - 1;
+  int limitY = cursor_rect->height.get() - 1;
   xa = 30.0 / (limitX - 1);
   ya = 30.0 / (limitY - 1);
   for (int i = 1; i < limitX; i++) {
@@ -435,7 +454,7 @@ void Window::updateCursorRect()
 
   cursorTexture.loadFromImage(buff);
 
-  cursorSprite.setPosition(x + 16 + cursor_rect->getter_x(), y + 16 + cursor_rect->getter_y());
+  cursorSprite.setPosition(x + 16 + cursor_rect->x.get(), y + 16 + cursor_rect->y.get());
   cursorSprite.setTexture(cursorTexture);
   cursor_rect->markAsClean();
 }

@@ -5,7 +5,8 @@
 
 #include "MarshalUtils.hpp"
 #include "engnine/EngineBase.hpp"
-#include "integrator/Convert.hpp"
+#include "engnine/base/Prop.hpp"
+#include "engnine/base/PropNumber.hpp"
 
 namespace Eng {
 
@@ -19,8 +20,8 @@ class Rect : public EngineBase {
       throw std::runtime_error("Marshal error: Rect has a bad file format");
     }
 
-    int x = MarshalUtils::readInt32(&data);
-    int y = MarshalUtils::readInt32(&data);
+    float x = MarshalUtils::readFloat(&data);
+    float y = MarshalUtils::readFloat(&data);
     int width = MarshalUtils::readInt32(&data);
     int height = MarshalUtils::readInt32(&data);
 
@@ -30,35 +31,34 @@ class Rect : public EngineBase {
 
   void serialize(char *buffer) const
   {
-    MarshalUtils::writeInt32(&buffer, x);
-    MarshalUtils::writeInt32(&buffer, y);
-    MarshalUtils::writeInt32(&buffer, width);
-    MarshalUtils::writeInt32(&buffer, height);
+    MarshalUtils::writeFloat(&buffer, x.get());
+    MarshalUtils::writeFloat(&buffer, y.get());
+    MarshalUtils::writeInt32(&buffer, width.get());
+    MarshalUtils::writeInt32(&buffer, height.get());
   }
 
-  Rect(float x, float y, int width, int height) :
+  PropNumber<double> x;
+  PropNumber<double> y;
+  PropNumber<int> width;
+  PropNumber<int> height;
+
+  Rect(double x, double y, int width, int height) :
       Rect(Qnil, x, y, width, height) { }
 
-  Rect(VALUE rbObj, float x, float y, int width, int height) :
-      EngineBase(rbObj),
-      dirty(false),
-      x(x),
-      y(y),
-      width(width),
-      height(height)
-  {
-    if (rbObj != Qnil) {
-      initialize();
-    }
-  }
+  Rect(Rect *rect) :
+      Rect(Qnil, rect->x.get(), rect->y.get(), rect->width.get(), rect->height.get()) { }
 
-  Rect(Rect *_rect) :
-      dirty(false)
+  Rect(VALUE rbObj, double x, double y, int width, int height) :
+      EngineBase(rbObj),
+
+      x(Prop::Float("@x", x, this)),
+      y(Prop::Float("@y", y, this)),
+      width(Prop::FixNum("@width", width, this)),
+      height(Prop::FixNum("@height", height, this))
   {
-    x = _rect->x;
-    y = _rect->y;
-    width = _rect->width;
-    height = _rect->height;
+    if (hasRbObj()) {
+      bindRubyVars();
+    }
   }
 
   bool operator==(const Rect &other) const
@@ -76,7 +76,7 @@ class Rect : public EngineBase {
     y = other.y;
     width = other.width;
     height = other.height;
-    dirty = true;
+    markAsDirty();
 
     return *this;
   }
@@ -85,141 +85,45 @@ class Rect : public EngineBase {
   {
   }
 
-  void initialize()
+  void bindRubyVars()
   {
-    rb_iv_set(rbObj, "@x", Convert::toRubyNumber(x));
-    rb_iv_set(rbObj, "@y", Convert::Convert::toRubyNumber(y));
-    rb_iv_set(rbObj, "@width", Convert::toRubyNumber(width));
-    rb_iv_set(rbObj, "@height", Convert::toRubyNumber(height));
+    x.setInstanceVar();
+    y.setInstanceVar();
+    width.setInstanceVar();
+    height.setInstanceVar();
   }
 
-  void set(VALUE xVal, VALUE yVal, VALUE widthVal, VALUE heightVal)
+  void setVALUES(VALUE xVal, VALUE yVal, VALUE widthVal, VALUE heightVal)
   {
-    int _x = Convert::toCInt(xVal);
-    int _y = Convert::toCInt(yVal);
-    int _width = Convert::toCInt(widthVal);
-    int _height = Convert::toCInt(heightVal);
-
-    if (_x == x && y == _y && _width == width && _height == height) {
-      return;
-    }
-    x = _x;
-    y = _y;
-    width = _width;
-    height = _height;
-    if (hasRbObj()) {
-      rb_iv_set(rbObj, "@x", xVal);
-      rb_iv_set(rbObj, "@y", yVal);
-      rb_iv_set(rbObj, "@width", widthVal);
-      rb_iv_set(rbObj, "@height", heightVal);
-    }
-
-    dirty = true;
+    x.setVALUE(xVal);
+    y.setVALUE(yVal);
+    width.setVALUE(widthVal);
+    height.setVALUE(heightVal);
   }
 
-  inline int getter_x() const
+  void set(double x, double y, int width, int height)
   {
-    return x;
-  }
-
-  inline int getter_y() const
-  {
-    return y;
-  }
-
-  inline int getter_width() const
-  {
-    return width;
-  }
-
-  inline int getter_height() const
-  {
-    return height;
-  }
-
-  void setter_x(VALUE value)
-  {
-    int v = Convert::toCInt(value);
-    if (x == v) return;
-    x = v;
-    if (hasRbObj()) {
-      rb_iv_set(rbObj, "@x", value);
-    }
-    dirty = true;
-  }
-
-  void setter_y(VALUE value)
-  {
-    int v = Convert::toCInt(value);
-    if (y == v) return;
-    y = v;
-    if (hasRbObj()) {
-      rb_iv_set(rbObj, "@y", value);
-    }
-    dirty = true;
-  }
-
-  void setter_width(VALUE value)
-  {
-    int v = Convert::toCUnsignedInt(value);
-    if (width == v) return;
-    width = v;
-    if (hasRbObj()) {
-      rb_iv_set(rbObj, "@width", value);
-    }
-    dirty = true;
-  }
-
-  void setter_height(VALUE value)
-  {
-    int v = Convert::toCUnsignedInt(value);
-    if (height == v) return;
-    height = v;
-    if (hasRbObj()) {
-      rb_iv_set(rbObj, "@height", value);
-    }
-    dirty = true;
+    this->x.set(x);
+    this->y.set(y);
+    this->width.set(width);
+    this->height.set(height);
   }
 
   void method_empty()
   {
-    width = 0;
-    height = 0;
-    dirty = true;
+    width.set(0);
+    height.set(0);
   }
 
   inline bool isEmpty() const
   {
-    return width == 0 || height == 0;
+    return width == 0u || height == 0u;
   }
 
   inline sf::IntRect sfRect() const
   {
-    return sf::IntRect(x, y, width, height);
+    return sf::IntRect(x.get(), y.get(), width.get(), height.get());
   }
-
-  void markAsDirty()
-  {
-    dirty = true;
-  }
-
-  void markAsClean()
-  {
-    dirty = false;
-  }
-
-  inline bool isDirty() const
-  {
-    return dirty;
-  }
-
-
- private:
-  bool dirty;
-  float x;
-  float y;
-  int width;
-  int height;
 };
 
 }  // namespace Eng

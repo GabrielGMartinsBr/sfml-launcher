@@ -193,15 +193,14 @@ class Rect {
 
   static VALUE getter_x(VALUE self)
   {
-    auto inst = Rect::getObjectValue(self);
-    return Convert::toRubyNumber(inst->getter_x());
+    Eng::Rect *inst = Rect::getObjectValue(self);
+    return inst->x.getVALUE();
   }
 
   static VALUE setter_x(VALUE self, VALUE value)
   {
-    auto inst = Rect::getObjectValue(self);
-    inst->setter_x(value);
-    return value;
+    Eng::Rect *inst = Rect::getObjectValue(self);
+    return inst->x.setVALUE(value);
   }
 
   /*
@@ -210,15 +209,14 @@ class Rect {
 
   static VALUE getter_y(VALUE self)
   {
-    auto inst = Rect::getObjectValue(self);
-    return Convert::toRubyNumber(inst->getter_y());
+    Eng::Rect *inst = Rect::getObjectValue(self);
+    return inst->y.getVALUE();
   }
 
   static VALUE setter_y(VALUE self, VALUE value)
   {
-    auto inst = Rect::getObjectValue(self);
-    inst->setter_y(value);
-    return value;
+    Eng::Rect *inst = Rect::getObjectValue(self);
+    return inst->y.setVALUE(value);
   }
 
   /*
@@ -227,15 +225,14 @@ class Rect {
 
   static VALUE getter_width(VALUE self)
   {
-    auto inst = Rect::getObjectValue(self);
-    return Convert::toRubyNumber(inst->getter_width());
+    Eng::Rect *inst = Rect::getObjectValue(self);
+    return inst->width.getVALUE();
   }
 
   static VALUE setter_width(VALUE self, VALUE value)
   {
-    auto inst = Rect::getObjectValue(self);
-    inst->setter_width(value);
-    return value;
+    Eng::Rect *inst = Rect::getObjectValue(self);
+    return inst->width.setVALUE(value);
   }
 
   /*
@@ -244,22 +241,21 @@ class Rect {
 
   static VALUE getter_height(VALUE self)
   {
-    auto inst = Rect::getObjectValue(self);
-    return Convert::toRubyNumber(inst->getter_height());
+    Eng::Rect *inst = Rect::getObjectValue(self);
+    return inst->height.getVALUE();
   }
 
   static VALUE setter_height(VALUE self, VALUE value)
   {
-    auto inst = Rect::getObjectValue(self);
-    inst->setter_height(value);
-    return value;
+    Eng::Rect *inst = Rect::getObjectValue(self);
+    return inst->height.setVALUE(value);
   }
 
   // Method set
   static VALUE method_set(VALUE self, VALUE xVal, VALUE yVal, VALUE widthVal, VALUE heightVal)
   {
-    auto inst = Rect::getObjectValue(self);
-    inst->set(xVal, yVal, widthVal, heightVal);
+    Eng::Rect *inst = Rect::getObjectValue(self);
+    inst->setVALUES(xVal, yVal, widthVal, heightVal);
     return Qnil;
   }
 
@@ -278,7 +274,7 @@ class Rect {
   {
     Eng::Rect *inst = getObjectValue(self);
     char buffer[64];
-    sprintf(buffer, "(%i, %i, %i, %i)", inst->getter_x(), inst->getter_y(), inst->getter_width(), inst->getter_height());
+    sprintf(buffer, "(%i, %i, %i, %i)", inst->x.get(), inst->y.get(), inst->width.get(), inst->height.get());
     return Convert::toRubyString(buffer);
   }
 };

@@ -14,6 +14,16 @@ struct MarshalUtils {
     return result;
   }
 
+  static inline int readFloat(const char **data)
+  {
+    float result;
+
+    std::memcpy(&result, *data, 4);
+    *data += 4;
+
+    return result;
+  }
+
   static inline int readDouble(const char **data)
   {
     double result;
@@ -25,6 +35,12 @@ struct MarshalUtils {
   }
 
   static inline void writeInt32(char **data, int32_t value)
+  {
+    memcpy(*data, &value, 4);
+    *data += 4;
+  }
+
+  static inline void writeFloat(char **data, float value)
   {
     memcpy(*data, &value, 4);
     *data += 4;

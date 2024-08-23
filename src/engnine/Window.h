@@ -38,8 +38,6 @@ class Window : public EngineBase, OnUpdate, OnRender {
 
   // Rgss
 
-  void bindRubyProps();
-
   Bitmap *getter_windowskin();
   void setter_windowskin(Bitmap *value);
 
@@ -134,6 +132,8 @@ class Window : public EngineBase, OnUpdate, OnRender {
   bool addedToEngineCycles;
 
   int cursorAniAlphaId;
+
+  void bindRubyVars();
 
   void addToEngineCycles();
   void removeFromEngineCycles();

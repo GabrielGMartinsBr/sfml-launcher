@@ -185,25 +185,25 @@ class Sprite : OnUpdate, OnRender, public EngineBase {
     );
 
     if (src_rect) {
-      dstRect.left = src_rect->getter_x() + ox;
-      dstRect.top = src_rect->getter_y() + oy;
-      dstRect.width = src_rect->getter_width();
-      dstRect.height = src_rect->getter_height();
+      dstRect.left = src_rect->x.get() + ox;
+      dstRect.top = src_rect->y.get() + oy;
+      dstRect.width = src_rect->width.get();
+      dstRect.height = src_rect->height.get();
     }
 
     if (viewport) {
       auto &vpRect = *viewport->getRect();
 
       // ---
-      vp.x = vpRect.getter_x();
-      vp.y = vpRect.getter_y();
-      vp.width = vpRect.getter_width();
-      vp.height = vpRect.getter_height();
+      vp.x = vpRect.x.get();
+      vp.y = vpRect.y.get();
+      vp.width = vpRect.width.get();
+      vp.height = vpRect.height.get();
       dst.x = vp.x;
       dst.y = vp.y;
 
-      int dstX = vpRect.getter_x() + x;
-      int dstY = vpRect.getter_y() + y;
+      int dstX = vpRect.x.get() + x;
+      int dstY = vpRect.y.get() + y;
 
       if (dstX > vp.endX() || dstY > vp.endY()) {
         return;
@@ -307,8 +307,8 @@ class Sprite : OnUpdate, OnRender, public EngineBase {
     bitmap = value;
     rb_iv_set(rbObj, "@bitmap", bitmap->rbObj);
 
-    src_rect->setter_width(bitmap->getter_width());
-    src_rect->setter_height(bitmap->getter_height());
+    src_rect->width.set(bitmap->getter_width());
+    src_rect->height.set(bitmap->getter_height());
 
     dirty = true;
   }

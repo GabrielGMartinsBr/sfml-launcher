@@ -13,12 +13,13 @@
 #include <stdexcept>
 
 #include "AppDefs.h"
-#include "Log.hpp"
 #include "engnine/Color.hpp"
 #include "engnine/FileUtils.hpp"
 #include "engnine/Font.hpp"
 #include "engnine/Rect.hpp"
 #include "engnine/internal/Texts.hpp"
+#include "integrator/Convert.hpp"
+#include "integrator/It_Bitmap.hpp"
 #include "integrator/It_Font.hpp"
 
 namespace Eng {
@@ -55,8 +56,8 @@ Bitmap::Bitmap(const char* assetName, VALUE rbObj) :
   isDisposed = false;
   dirty = false;
 
-  if (rbObj != Qnil) {
-    bindRubyProps();
+  if (hasRbObj()) {
+    bindRubyVars();
   }
 }
 
@@ -79,8 +80,8 @@ Bitmap::Bitmap(unsigned int _width, unsigned int _height, VALUE rbObj) :
   isDisposed = false;
   dirty = false;
 
-  if (rbObj != Qnil) {
-    bindRubyProps();
+  if (hasRbObj()) {
+    bindRubyVars();
   }
 }
 
@@ -92,9 +93,18 @@ Bitmap::~Bitmap()
   dispose();
 }
 
+void Bitmap::initRubyObj()
+{
+  if (hasRbObj()) {
+    return;
+  }
+  rbObj = It::Bitmap::createRubyObject(this);
+  bindRubyVars();
+}
+
 // Bind props ruby object to instance object
 
-void Bitmap::bindRubyProps()
+void Bitmap::bindRubyVars()
 {
   if (rbObj == Qnil) {
     throw std::runtime_error("Bitmap doesn't have rbObj defined.");
@@ -104,7 +114,10 @@ void Bitmap::bindRubyProps()
     font->rbObj = It::Font::createRubyObject(font);
   }
 
-  rb_iv_set(rbObj, "font", font->rbObj);
+  rb_iv_set(rbObj, "@width", Convert::toRubyNumber(width));
+  rb_iv_set(rbObj, "@height", Convert::toRubyNumber(height));
+
+  rb_iv_set(rbObj, "@font", font->rbObj);
 }
 
 // Engine
@@ -133,10 +146,14 @@ void Bitmap::setter_font(Font* v)
     return;
   }
 
-  // if (font != nullptr && font->rbObj != Qnil) {
-  //   rb_gc_mark(font->rbObj);
-  // }
-
+  VALUE fontValue = Qnil;
+  if (v) {
+    if (!v->hasRbObj()) {
+      font->rbObj = It::Font::createRubyObject(font);
+    }
+    fontValue = v->rbObj;
+  }
+  rb_iv_set(rbObj, "@font", fontValue);
   font = v;
 }
 
@@ -249,7 +266,7 @@ void Bitmap::fill_rect(int x, int y, int width, int height, Color* color)
 
 void Bitmap::fill_rect(Rect* _rect, Color* _color)
 {
-  fill_rect(_rect->getter_x(), _rect->getter_y(), _rect->getter_width(), _rect->getter_height(), _color);
+  fill_rect(_rect->x.get(), _rect->y.get(), _rect->width.get(), _rect->height.get(), _color);
 };
 
 // Method clear
@@ -322,7 +339,7 @@ void Bitmap::draw_text(double x, double y, double width, double height, app::CSt
 
 void Bitmap::draw_text(Rect rect, app::CStr str, TextAlign align)
 {
-  Texts::drawText(renderTexture, rect.getter_x(), rect.getter_y(), *font, str);
+  Texts::drawText(renderTexture, rect.x.get(), rect.y.get(), *font, str);
   renderTexture.display();
 }
 
