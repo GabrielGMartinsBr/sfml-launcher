@@ -146,13 +146,18 @@ struct DebugUtils {
     return entries;
   }
 
-  static VALUE lookupHash(VALUE hash, CStr key)
+  static VALUE parseHashKey(CStr key)
   {
-    VALUE rbKey = ID2SYM(rb_intern(key));
-    return rb_hash_lookup(hash, rbKey);
+    return ID2SYM(rb_intern(key));
   }
 
-  static VALUE lookupHash(VALUE hash, VALUE key)
+  static VALUE lookupHashEntry(VALUE hash, CStr key)
+  {
+    VALUE keySym = parseHashKey(key);
+    return rb_hash_lookup(hash, keySym);
+  }
+
+  static VALUE lookupHashEntry(VALUE hash, VALUE key)
   {
     return rb_hash_lookup(hash, key);
   }

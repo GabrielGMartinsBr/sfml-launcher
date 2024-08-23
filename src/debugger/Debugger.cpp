@@ -309,6 +309,14 @@ VALUE Debugger::setVariableValue(ParentVarLocation location, VALUE parent, CStr 
       }
       throw std::runtime_error("Invalid array index received.");
     }
+    case ParentVarLocation::HASH: {
+      if (parent == 0) {
+        throw std::runtime_error("Invalid array object received.");
+      }
+      VALUE key = DebugUtils::parseHashKey(name);
+      DebugUtils::setHashEntry(parent, key, value);
+      return DebugUtils::lookupHashEntry(parent, key);
+    }
   }
 }
 

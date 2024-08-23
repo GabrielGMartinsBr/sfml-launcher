@@ -8,6 +8,7 @@ enum struct ParentVarLocation {
   CLASS = 3,
   OBJECT = 4,
   ARRAY = 5,
+  HASH = 6,
 };
 
 }
