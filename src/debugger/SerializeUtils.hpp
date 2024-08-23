@@ -79,7 +79,7 @@ struct SerializeUtils {
     ss << "classRId|" << classObj << '|';
 
     String name = "self";
-    String type = "object";
+    String type = ValueTypeUtils::getTypeStr(obj);
     String value = StringUtils::format("<%s>", className.c_str());
 
     ss << "name:" << (StringUtils::length(name) + 1) << '|' << name << '|';
@@ -240,6 +240,7 @@ struct SerializeUtils {
         ss << ':' << StringUtils::length(value) << '|' << value << '|';
         break;
       }
+      case ValueType::DATA:
       case ValueType::OBJECT: {
         String className = DebugUtils::getClassNameOf(var);
         String value = StringUtils::format("<%s>", className.c_str());

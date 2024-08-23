@@ -10,6 +10,11 @@ class EngineBase {
 
   EngineBase(VALUE rbObj = Qnil) :
       rbObj(rbObj) { }
+
+  inline bool hasRbObj() const
+  {
+    return rbObj != Qnil;
+  }
 };
 
 }  // namespace Eng

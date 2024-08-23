@@ -107,6 +107,7 @@ void Debugger::handleFetchVariable(VALUE var)
 
   ValueType type = ValueTypeUtils::getType(var);
   switch (type) {
+    case ValueType::DATA:
     case ValueType::OBJECT: {
       SerializeUtils::serializeObjectLayer(strStream, var);
       break;
