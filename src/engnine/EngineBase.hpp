@@ -1,8 +1,11 @@
 #pragma once
 
+#include "AppDefs.h"
 #include "ruby.h"
 
 namespace Eng {
+
+using app::CStr;
 
 class EngineBase {
  public:
@@ -15,6 +18,13 @@ class EngineBase {
   inline bool hasRbObj() const
   {
     return rbObj != Qnil;
+  }
+
+  void setInstanceVar(CStr name, VALUE value)
+  {
+    if (hasRbObj()) {
+      rb_iv_set(rbObj, name, value);
+    }
   }
 
   inline bool isDirty() const

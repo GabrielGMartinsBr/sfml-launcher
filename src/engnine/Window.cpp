@@ -15,9 +15,8 @@
 #include "engnine/Engine.h"
 #include "engnine/Rect.hpp"
 #include "engnine/Viewport.hpp"
-#include "integrator/It_Bitmap.hpp"
+#include "integrator/Convert.hpp"
 #include "integrator/It_Rect.hpp"
-#include "integrator/It_Viewport.hpp"
 
 namespace Eng {
 
@@ -152,7 +151,7 @@ void Window::bindRubyVars()
   rb_iv_set(rbObj, "@windowSkin", Qnil);
   rb_iv_set(rbObj, "@contents", Qnil);
 
-  rb_iv_set(rbObj, "@stretch", Convert::toRubyBool(stretch));
+  rb_iv_set(rbObj, "@stretch", Convert::toRubyBool(_stretch));
   rb_iv_set(rbObj, "@visible", Convert::toRubyBool(visible));
   rb_iv_set(rbObj, "@active", Convert::toRubyBool(active));
   rb_iv_set(rbObj, "@pause", Convert::toRubyBool(pause));
@@ -183,12 +182,15 @@ void Window::setter_windowskin(Bitmap *value)
     return;
   }
 
-  if (value->rbObj == Qnil) {
-    value->rbObj = It::Bitmap::createRubyObject(value);
+  if (value == nullptr) {
+    windowSkin = nullptr;
+    setInstanceVar("@windowskin", Qnil);
+    return;
   }
 
+  value->initRubyObj();
   windowSkin = value;
-  rb_iv_set(rbObj, "@windowskin", windowSkin->rbObj);
+  setInstanceVar("@windowskin", windowSkin->rbObj);
 }
 
 Bitmap *Window::getter_contents()
@@ -203,107 +205,325 @@ void Window::setter_contents(Bitmap *value)
 
   if (value == nullptr) {
     contents = nullptr;
-    rb_iv_set(rbObj, "@contents", Qnil);
+    setInstanceVar("@contents", Qnil);
     return;
   }
 
   value->initRubyObj();
-
   contents = value;
-  rb_iv_set(rbObj, "@contents", contents->rbObj);
+  setInstanceVar("@contents", contents->rbObj);
 }
 
-bool Window::getter_stretch() { return stretch; }
-void Window::setter_stretch(bool v) { stretch = v; }
+VALUE Window::getter_stretch()
+{
+  return Convert::toRubyBool(_stretch);
+}
+
+VALUE Window::setter_stretch(VALUE v)
+{
+  bool value = Convert::toCBool(v);
+  if (_stretch == value) return v;
+  _stretch = value;
+  setInstanceVar("@stretch", v);
+  return v;
+}
+
+bool Window::stretch() { return _stretch; }
+void Window::stretch(bool v)
+{
+  if (_stretch == v) return;
+  _stretch = v;
+  setInstanceVar("@stretch", Convert::toRubyBool(v));
+}
 
 Rect *Window::getter_cursor_rect() { return cursor_rect; }
 void Window::setter_cursor_rect(Rect *v) { cursor_rect = v; }
 
-bool Window::getter_active() { return active; }
-void Window::setter_active(bool v) { active = v; }
+/*
+  Property active
+*/
 
-bool Window::getter_visible() { return visible; }
-void Window::setter_visible(bool v) { visible = v; }
+bool Window::getActive() { return active; }
+void Window::setActive(bool v)
+{
+  if (active == v) return;
+  active = v;
+  setInstanceVar("@active", Convert::toRubyBool(v));
+}
 
-bool Window::getter_pause() { return pause; }
-void Window::setter_pause(bool v) { pause = v; }
+VALUE Window::getter_active()
+{
+  return Convert::toRubyBool(active);
+}
+
+VALUE Window::setter_active(VALUE v)
+{
+  bool value = Convert::toCBool(v);
+  if (active == value) return v;
+  active = value;
+  setInstanceVar("@active", v);
+  return v;
+}
+
+// --------------
+
+/*
+  Property visible
+*/
+
+bool Window::getVisible() { return visible; }
+void Window::setVisible(bool v)
+{
+  if (visible == v) return;
+  visible = v;
+  setInstanceVar("@visible", Convert::toRubyBool(v));
+}
+
+VALUE Window::getter_visible()
+{
+  return Convert::toRubyBool(visible);
+}
+
+VALUE Window::setter_visible(VALUE v)
+{
+  bool value = Convert::toCBool(v);
+  if (visible == value) return v;
+  visible = value;
+  setInstanceVar("@visible", v);
+  return v;
+}
+
+// --------------
+
+/*
+  Property visible
+*/
+
+bool Window::getPause() { return pause; }
+void Window::setPause(bool v)
+{
+  if (pause == v) return;
+  pause = v;
+  setInstanceVar("@pause", Convert::toRubyBool(v));
+}
+
+VALUE Window::getter_pause()
+{
+  return Convert::toRubyBool(pause);
+}
+
+VALUE Window::setter_pause(VALUE v)
+{
+  bool value = Convert::toCBool(v);
+  if (pause == value) return v;
+  pause = value;
+  setInstanceVar("@pause", v);
+  return v;
+}
+
+// --------------
 
 int Window::getX() { return x; }
 void Window::setX(int v)
 {
+  if (x == v) return;
   x = v;
+  setInstanceVar("@x", Convert::toRubyNumber(v));
   skinDirty = true;
+}
+VALUE Window::setter_x(VALUE v)
+{
+  int value = Convert::toCInt2(v);
+  if (x == value) return v;
+  x = value;
+  setInstanceVar("@x", v);
+  skinDirty = true;
+  return v;
 }
 
 int Window::getY() { return y; }
 void Window::setY(int v)
 {
+  if (y == v) return;
   y = v;
+  setInstanceVar("@y", Convert::toRubyNumber(v));
   skinDirty = true;
 }
+VALUE Window::setter_y(VALUE v)
+{
+  int value = Convert::toCInt2(v);
+  if (y == value) return v;
+  y = value;
+  setInstanceVar("@y", v);
+  skinDirty = true;
+  return v;
+}
+
+/*  Property width */
 
 int Window::getWidth() { return width; }
 void Window::setWidth(int v)
 {
+  if (width == v) return;
   width = v;
+  setInstanceVar("@width", Convert::toRubyNumber(v));
   skinDirty = true;
 }
+VALUE Window::setter_width(VALUE v)
+{
+  int value = Convert::toCInt2(v);
+  if (width == value) return v;
+  width = value;
+  setInstanceVar("@width", v);
+  skinDirty = true;
+  return v;
+}
+
+/*  Property height */
 
 int Window::getHeight() { return height; }
 void Window::setHeight(int v)
 {
+  if (height == v) return;
   height = v;
+  setInstanceVar("@height", Convert::toRubyNumber(v));
   skinDirty = true;
 }
+VALUE Window::setter_height(VALUE v)
+{
+  int value = Convert::toCInt2(v);
+  if (height == value) return v;
+  height = value;
+  setInstanceVar("@height", v);
+  skinDirty = true;
+  return v;
+}
+
+/*  Property z */
 
 int Window::getZ() { return z; }
 void Window::setZ(int v)
 {
+  if (z == v) return;
   z = v;
+  setInstanceVar("@z", Convert::toRubyNumber(v));
   Engine::getInstance().markZOrderDirty();
 }
+VALUE Window::setter_z(VALUE v)
+{
+  int value = Convert::toCInt2(v);
+  if (z == value) return v;
+  z = value;
+  setInstanceVar("@z", v);
+  Engine::getInstance().markZOrderDirty();
+  return v;
+}
+
+/*  Property ox */
 
 int Window::getter_ox() { return ox; }
 void Window::setter_ox(int v)
 {
+  if (ox == v) return;
   ox = v;
+  setInstanceVar("@ox", Convert::toRubyNumber(v));
   contentsDirty = true;
 }
+VALUE Window::setter_ox(VALUE v)
+{
+  int value = Convert::toCInt2(v);
+  if (ox == value) return v;
+  ox = value;
+  setInstanceVar("@ox", v);
+  contentsDirty = true;
+  return v;
+}
+
+/*  Property oy */
 
 int Window::getter_oy() { return oy; }
 void Window::setter_oy(int v)
 {
+  if (oy == v) return;
   oy = v;
+  setInstanceVar("@oy", Convert::toRubyNumber(v));
   contentsDirty = true;
 }
+VALUE Window::setter_oy(VALUE v)
+{
+  int value = Convert::toCInt2(v);
+  if (oy == value) return v;
+  oy = value;
+  setInstanceVar("@oy", v);
+  contentsDirty = true;
+  return v;
+}
+
+/*  Property opacity */
 
 int Window::getter_opacity() { return opacity; }
 void Window::setter_opacity(int v)
 {
   int value = Num::clamp(v, 0, 255);
-  if (opacity != value) {
-    opacity = value;
-    skinDirty = true;
-  }
+  if (opacity == value) return;
+  opacity = value;
+  setInstanceVar("@opacity", Convert::toRubyNumber(value));
+  skinDirty = true;
 }
+VALUE Window::setter_opacity(VALUE v)
+{
+  int value = Convert::toCInt2(v);
+  value = Num::clamp(value, 0, 255);
+  if (opacity == value) return v;
+  v = Convert::toRubyNumber(value);
+  opacity = value;
+  setInstanceVar("@opacity", v);
+  skinDirty = true;
+  return v;
+}
+
+/*  Property back_opacity */
 
 int Window::getter_back_opacity() { return back_opacity; }
 void Window::setter_back_opacity(int v)
 {
   int value = Num::clamp(v, 0, 255);
-  if (back_opacity != value) {
-    back_opacity = value;
-  }
+  if (back_opacity == value) return;
+  back_opacity = value;
+  setInstanceVar("@back_opacity", Convert::toRubyNumber(value));
 }
+VALUE Window::setter_back_opacity(VALUE v)
+{
+  int value = Convert::toCInt2(v);
+  value = Num::clamp(value, 0, 255);
+  if (back_opacity == value) return v;
+  v = Convert::toRubyNumber(value);
+  back_opacity = value;
+  setInstanceVar("@back_opacity", v);
+  return v;
+}
+
+/*  Property contents_opacity */
 
 int Window::getter_contents_opacity() { return contents_opacity; }
 void Window::setter_contents_opacity(int v)
 {
   int value = Num::clamp(v, 0, 255);
-  if (contents_opacity != value) {
-    contents_opacity = value;
-    contentsDirty = true;
-  }
+  if (contents_opacity == value) return;
+  contents_opacity = value;
+  setInstanceVar("@contents_opacity", Convert::toRubyNumber(value));
+  contentsDirty = true;
+}
+VALUE Window::setter_contents_opacity(VALUE v)
+{
+  int value = Convert::toCInt2(v);
+  value = Num::clamp(value, 0, 255);
+  if (contents_opacity == value) return v;
+  v = Convert::toRubyNumber(value);
+  contents_opacity = value;
+  setInstanceVar("@contents_opacity", v);
+  contentsDirty = true;
+  return v;
 }
 
 /*

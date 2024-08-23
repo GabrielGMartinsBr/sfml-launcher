@@ -2,6 +2,7 @@
 
 #include "Convert.hpp"
 #include "It_Rect.hpp"
+#include "Log.hpp"
 #include "engnine/Rect.hpp"
 #include "engnine/Window.h"
 #include "integrator/It_Bitmap.hpp"
@@ -221,7 +222,7 @@ class Window {
   static VALUE getter_stretch(VALUE self)
   {
     Eng::Window *inst = getObjectValue(self);
-    return Convert::toRubyBool(inst->getter_stretch());
+    return inst->getter_stretch();
   }
 
   /*
@@ -229,12 +230,8 @@ class Window {
   */
   static VALUE setter_stretch(VALUE self, VALUE value)
   {
-    int v = Convert::toCBool(value);
-
     Eng::Window *inst = getObjectValue(self);
-    inst->setter_stretch(v);
-
-    return Qnil;
+    return inst->setter_stretch(value);
   }
 
   /*
@@ -266,7 +263,7 @@ class Window {
   static VALUE getter_active(VALUE self)
   {
     Eng::Window *inst = getObjectValue(self);
-    return Convert::toRubyBool(inst->getter_active());
+    return inst->getter_active();
   }
 
   /*
@@ -274,12 +271,8 @@ class Window {
   */
   static VALUE setter_active(VALUE self, VALUE value)
   {
-    int v = Convert::toCBool(value);
-
     Eng::Window *inst = getObjectValue(self);
-    inst->setter_active(v);
-
-    return Qnil;
+    return inst->setter_active(value);
   }
 
   /*
@@ -288,7 +281,7 @@ class Window {
   static VALUE getter_visible(VALUE self)
   {
     Eng::Window *inst = getObjectValue(self);
-    return Convert::toRubyBool(inst->getter_visible());
+    return inst->getter_visible();
   }
 
   /*
@@ -296,12 +289,8 @@ class Window {
   */
   static VALUE setter_visible(VALUE self, VALUE value)
   {
-    int v = Convert::toCBool(value);
-
     Eng::Window *inst = getObjectValue(self);
-    inst->setter_visible(v);
-
-    return Qnil;
+    return inst->setter_visible(value);
   }
 
   /*
@@ -310,7 +299,7 @@ class Window {
   static VALUE getter_pause(VALUE self)
   {
     Eng::Window *inst = getObjectValue(self);
-    return Convert::toRubyBool(inst->getter_pause());
+    return Convert::toRubyBool(inst->getPause());
   }
 
   /*
@@ -321,7 +310,7 @@ class Window {
     int v = Convert::toCBool(value);
 
     Eng::Window *inst = getObjectValue(self);
-    inst->setter_pause(v);
+    inst->setPause(v);
 
     return Qnil;
   }
@@ -340,12 +329,8 @@ class Window {
   */
   static VALUE setter_x(VALUE self, VALUE value)
   {
-    int x = Convert::toCInt(value);
-
     Eng::Window *inst = getObjectValue(self);
-    inst->setX(x);
-
-    return Qnil;
+    return inst->setter_x(value);
   }
 
   /*
@@ -362,12 +347,9 @@ class Window {
   */
   static VALUE setter_y(VALUE self, VALUE value)
   {
-    int y = Convert::toCInt(value);
-
+    Log::out() << "set y: ";
     Eng::Window *inst = getObjectValue(self);
-    inst->setY(y);
-
-    return Qnil;
+    return inst->setter_y(value);
   }
 
   /*
@@ -384,12 +366,8 @@ class Window {
   */
   static VALUE setter_width(VALUE self, VALUE value)
   {
-    int width = Convert::toCInt(value);
-
     Eng::Window *inst = getObjectValue(self);
-    inst->setWidth(width);
-
-    return Qnil;
+    return inst->setter_width(value);
   }
 
   /*
@@ -406,12 +384,8 @@ class Window {
   */
   static VALUE setter_height(VALUE self, VALUE value)
   {
-    int height = Convert::toCInt(value);
-
     Eng::Window *inst = getObjectValue(self);
-    inst->setHeight(height);
-
-    return Qnil;
+    return inst->setter_height(value);
   }
 
   /*
@@ -428,12 +402,8 @@ class Window {
   */
   static VALUE setter_z(VALUE self, VALUE value)
   {
-    int z = Convert::toCInt(value);
-
     Eng::Window *inst = getObjectValue(self);
-    inst->setZ(z);
-
-    return Qnil;
+    return inst->setter_z(value);
   }
 
   /*
@@ -450,12 +420,8 @@ class Window {
   */
   static VALUE setter_ox(VALUE self, VALUE value)
   {
-    int z = Convert::toCInt(value);
-
     Eng::Window *inst = getObjectValue(self);
-    inst->setter_ox(z);
-
-    return Qnil;
+    return inst->setter_ox(value);
   }
 
   /*
@@ -472,12 +438,8 @@ class Window {
   */
   static VALUE setter_oy(VALUE self, VALUE value)
   {
-    int z = Convert::toCInt(value);
-
     Eng::Window *inst = getObjectValue(self);
-    inst->setter_oy(z);
-
-    return Qnil;
+    return inst->setter_oy(value);
   }
 
   /*
@@ -494,12 +456,8 @@ class Window {
   */
   static VALUE setter_opacity(VALUE self, VALUE value)
   {
-    int z = Convert::toCInt(value);
-
     Eng::Window *inst = getObjectValue(self);
-    inst->setter_opacity(z);
-
-    return Qnil;
+    return inst->setter_opacity(value);
   }
 
   /*
@@ -516,12 +474,8 @@ class Window {
   */
   static VALUE setter_back_opacity(VALUE self, VALUE value)
   {
-    int z = Convert::toCInt(value);
-
     Eng::Window *inst = getObjectValue(self);
-    inst->setter_back_opacity(z);
-
-    return Qnil;
+    return inst->setter_back_opacity(value);
   }
 
   /*
@@ -538,12 +492,8 @@ class Window {
   */
   static VALUE setter_contents_opacity(VALUE self, VALUE value)
   {
-    int z = Convert::toCInt(value);
-
     Eng::Window *inst = getObjectValue(self);
-    inst->setter_contents_opacity(z);
-
-    return Qnil;
+    return inst->setter_contents_opacity(value);
   }
 
   /*
