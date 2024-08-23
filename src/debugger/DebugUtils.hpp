@@ -50,6 +50,11 @@ struct DebugUtils {
     return (mid != 0) ? rb_id2name(mid) : "unknown";
   }
 
+  static CStr getSymbolName(VALUE sym)
+  {
+    return rb_id2name(SYM2ID(sym));
+  }
+
   static UPtr<Vector<String>> instanceVariables(VALUE instanceObj)
   {
     VALUE varsArr = rb_obj_instance_variables(instanceObj);
@@ -98,6 +103,68 @@ struct DebugUtils {
   static void setArrayEntry(VALUE array, long index, VALUE value)
   {
     rb_ary_store(array, index, value);
+  }
+
+  static int getHashSize(VALUE hash)
+  {
+    int size = RHASH_SIZE(hash);
+    return size;
+  }
+
+  static VectorPtr<CStr> getHashKeysStr(VALUE hash)
+  {
+    VALUE keys = rb_funcall(hash, rb_intern("keys"), 0);
+    long length = getArrayLength(keys);
+    VectorPtr<CStr> entries = std::make_unique<Vector<CStr>>(length);
+    for (int i = 0; i < length; i++) {
+      VALUE key = rb_ary_entry(keys, i);
+      entries->at(i) = rb_id2name(SYM2ID(key));
+    }
+    return entries;
+  }
+
+  static VectorPtr<VALUE> getHashKeys(VALUE hash)
+  {
+    VALUE keys = rb_funcall(hash, rb_intern("keys"), 0);
+    long length = getArrayLength(keys);
+    VectorPtr<VALUE> entries = std::make_unique<Vector<VALUE>>(length);
+    for (int i = 0; i < length; i++) {
+      entries->at(i) = getArrayEntry(keys, i);
+    }
+    return entries;
+  }
+
+  static VectorPtr<VALUE> getHashEntries(VALUE hash)
+  {
+    VALUE keys = rb_funcall(hash, rb_intern("keys"), 0);
+
+    long length = getArrayLength(keys);
+    VectorPtr<VALUE> entries = std::make_unique<Vector<VALUE>>(length);
+    for (int i = 0; i < length; i++) {
+      entries->at(i) = rb_ary_entry(keys, i);
+    }
+    return entries;
+  }
+
+  static VALUE lookupHash(VALUE hash, CStr key)
+  {
+    VALUE rbKey = ID2SYM(rb_intern(key));
+    return rb_hash_lookup(hash, rbKey);
+  }
+
+  static VALUE lookupHash(VALUE hash, VALUE key)
+  {
+    return rb_hash_lookup(hash, key);
+  }
+
+  static VALUE getHashEntry(VALUE hash, VALUE key)
+  {
+    return rb_hash_aref(hash, key);
+  }
+
+  static void setHashEntry(VALUE hash, VALUE key, VALUE value)
+  {
+    rb_hash_aset(hash, key, value);
   }
 
   static int ivarTableForeach(st_data_t key, st_data_t value, st_data_t arg)

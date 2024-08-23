@@ -128,6 +128,34 @@ struct SerializeUtils {
     ss << "instanceVars:" << StringUtils::length(str) << '|' << str;
   }
 
+  static void serializeHashLayer(StrStream &ss, VALUE hash)
+  {
+    StrStream groupStream;
+    String str;
+
+    String className = DebugUtils::getClassNameOf(hash);
+    String classPath = DebugUtils::getClassPathOf(hash);
+    VALUE classObj = rb_class_of(hash);
+
+    ss << "className:" << (StringUtils::length(className) + 1) << '|' << className << '|';
+    ss << "classPath:" << (StringUtils::length(classPath) + 1) << '|' << classPath << '|';
+    ss << "classRId|" << classObj << '|';
+
+    String name = "self";
+    String type = "object";
+    String value = StringUtils::format("<%s>", className.c_str());
+
+    ss << "name:" << (StringUtils::length(name) + 1) << '|' << name << '|';
+    ss << "type:" << (StringUtils::length(type) + 1) << '|' << type << '|';
+    ss << "value:" << (StringUtils::length(value) + 1) << '|' << value << '|';
+
+    serializeHashEntries(groupStream, hash);
+    str = groupStream.str();
+
+    ss << "instanceRId|" << hash << '|';
+    ss << "instanceVars:" << StringUtils::length(str) << '|' << str;
+  }
+
   static void serializeClassVars(StrStream &ss, VALUE classObj)
   {
     StrVectorPtr names = DebugUtils::classVariables(classObj);
@@ -156,6 +184,20 @@ struct SerializeUtils {
     for (int i = 0; i < entries->size(); i++) {
       VALUE entry = entries->at(i);
       ss << i << '|';
+      ss << entry << '|';
+      serializeSimpleValue(ss, entry);
+    }
+  }
+
+  static void serializeHashEntries(StrStream &ss, VALUE hash)
+  {
+    VectorPtr<VALUE> keys = DebugUtils::getHashKeys(hash);
+
+    for (int i = 0; i < keys->size(); i++) {
+      VALUE keySym = keys->at(i);
+      CStr key = DebugUtils::getSymbolName(keySym);
+      VALUE entry = DebugUtils::getHashEntry(hash, keySym);
+      ss << key << '|';
       ss << entry << '|';
       serializeSimpleValue(ss, entry);
     }
@@ -207,6 +249,12 @@ struct SerializeUtils {
       case ValueType::ARRAY: {
         long length = DebugUtils::getArrayLength(var);
         String value = StringUtils::format("<Array:%i>", length);
+        ss << ':' << StringUtils::length(value) << '|' << value << '|';
+        break;
+      }
+      case ValueType::HASH: {
+        long length = DebugUtils::getHashSize(var);
+        String value = StringUtils::format("<Hash:%i>", length);
         ss << ':' << StringUtils::length(value) << '|' << value << '|';
         break;
       }

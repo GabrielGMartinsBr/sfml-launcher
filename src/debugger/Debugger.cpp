@@ -105,6 +105,10 @@ void Debugger::handleFetchVariable(VALUE var)
       SerializeUtils::serializeArrayLayer(strStream, var);
       break;
     }
+    case ValueType::HASH: {
+      SerializeUtils::serializeHashLayer(strStream, var);
+      break;
+    }
     default: {
       return;
     }
