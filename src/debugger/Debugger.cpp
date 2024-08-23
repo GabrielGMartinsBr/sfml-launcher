@@ -37,14 +37,16 @@ Debugger& Debugger::getInstance()
 Debugger::Debugger() :
     breakpoints(Breakpoints::getInstance())
 {
+  state = DebuggerState::WAITING;
   running = false;
   attached = false;
-  isPaused = false;
-  sentIsPaused = false;
-  sentCurrentLine = false;
-  shouldPause = false;
-  shouldContinue = false;
   shouldStop = false;
+}
+
+void Debugger::setState(DebuggerState value)
+{
+  std::lock_guard<std::mutex> lock(mtx);
+  state = value;
 }
 
 void Debugger::start()
@@ -73,16 +75,17 @@ bool Debugger::isAttached()
 void Debugger::attach()
 {
   attached = true;
+  setState(DebuggerState::RUNNING);
 }
 
 void Debugger::handleContinue()
 {
-  shouldContinue = true;
+  setState(DebuggerState::RUNNING);
 }
 
 void Debugger::handlePause()
 {
-  shouldPause = true;
+  setState(DebuggerState::SHOULD_PAUSE);
 }
 
 void Debugger::handleStop()
@@ -130,8 +133,7 @@ void Debugger::sendIsPaused()
   if (server == nullptr) {
     throw std::runtime_error("TcpServer pointer is null.");
   }
-  server->sendIsPaused(isPaused);
-  sentIsPaused = true;
+  server->sendIsPaused(state == DebuggerState::PAUSED);
 }
 
 void Debugger::sendCurrentLine(UInt line)
@@ -140,7 +142,6 @@ void Debugger::sendCurrentLine(UInt line)
     throw std::runtime_error("TcpServer pointer is null.");
   }
   server->sendCurrentLine(line);
-  sentCurrentLine = true;
 }
 
 void Debugger::sendDebugVariable(String& data)
@@ -179,7 +180,7 @@ void Debugger::trace_function(rb_event_t event, NODE* node, VALUE self, ID mid, 
     return;
   }
 
-  while (!instance.attached) {
+  while (instance.state == DebuggerState::WAITING) {
     if (instance.shouldStop) return;
     engine.update();
     std::this_thread::sleep_for(std::chrono::milliseconds(33));
@@ -189,12 +190,16 @@ void Debugger::trace_function(rb_event_t event, NODE* node, VALUE self, ID mid, 
     return;
   }
 
+  if (instance.state == DebuggerState::PAUSED) {
+    return;
+  }
+
   UInt currLine;
 
-  if (instance.shouldPause) {
-    instance.shouldPause = false;
-    instance.shouldContinue = false;
-    instance.isPaused = true;
+  if (instance.state == DebuggerState::SHOULD_PAUSE) {
+    instance.setState(DebuggerState::PAUSED);
+
+    Log::out() << "here again?";
 
     currLine = rb_sourceLine() + 1;
 
@@ -202,13 +207,10 @@ void Debugger::trace_function(rb_event_t event, NODE* node, VALUE self, ID mid, 
     instance.sendIsPaused();
     instance.sendDebugState(self, mid, classObj);
 
-    while (!instance.shouldContinue) {
+    while (instance.state == DebuggerState::PAUSED) {
       engine.update();
       std::this_thread::sleep_for(std::chrono::milliseconds(33));
     }
-
-    instance.shouldContinue = false;
-    instance.isPaused = false;
 
     instance.sendIsPaused();
     instance.sendCurrentLine(0);
@@ -228,33 +230,20 @@ void Debugger::trace_function(rb_event_t event, NODE* node, VALUE self, ID mid, 
   currLine = rb_sourceLine() + 1;
 
   if (breakpoints.contains(currLine)) {
-    // VALUE mod_constants = rb_mod_constants(classObj);
-    // rb_p(mod_constants);
-    // rb_p(rb_sym_all_symbols());
-    // VALUE vars = rb_mod_constants(classObj);
-
-    instance.sendDebugState(self, mid, classObj);
-
-    instance.shouldContinue = false;
-    instance.isPaused = true;
-    instance.sentIsPaused = false;
-    instance.sentCurrentLine = false;
+    instance.setState(DebuggerState::PAUSED);
 
     std::cout.flush();
     std::cerr.flush();
 
-    while (!instance.shouldContinue) {
+    instance.sendIsPaused();
+    instance.sendCurrentLine(currLine);
+    instance.sendDebugState(self, mid, classObj);
+
+    while (instance.state == DebuggerState::PAUSED) {
       if (instance.shouldStop) return;
-      if (!instance.sentIsPaused) {
-        instance.sendIsPaused();
-      }
-      if (!instance.sentCurrentLine) {
-        instance.sendCurrentLine(currLine);
-      }
       engine.update();
       std::this_thread::sleep_for(std::chrono::milliseconds(33));
     }
-    instance.isPaused = false;
 
     instance.sendIsPaused();
     instance.sendCurrentLine(0);

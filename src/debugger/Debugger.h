@@ -18,10 +18,20 @@ namespace dbg {
 using app::String;
 using app::UInt;
 
+enum struct DebuggerState {
+  WAITING,
+  RUNNING,
+  PAUSED,
+  SHOULD_PAUSE,
+  NEXT_LINE
+};
+
 struct Debugger {
   static Debugger& getInstance();
 
   std::unique_ptr<std::thread> serverThread;
+
+  void setState(DebuggerState value);
 
   void start();
 
@@ -55,14 +65,11 @@ struct Debugger {
   std::unique_ptr<TcpServer> server;
   Breakpoints& breakpoints;
   boost::asio::io_context io_context;
+  std::mutex mtx;
 
+  DebuggerState state;
   bool running;
   bool attached;
-  bool isPaused;
-  bool sentIsPaused;
-  bool sentCurrentLine;
-  bool shouldPause;
-  bool shouldContinue;
   bool shouldStop;
 
   Debugger();
