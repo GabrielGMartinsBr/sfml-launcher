@@ -5,6 +5,7 @@
 
 #include "MarshalUtils.hpp"
 #include "engnine/EngineBase.hpp"
+#include "integrator/Convert.hpp"
 
 namespace Eng {
 
@@ -35,13 +36,20 @@ class Rect : public EngineBase {
     MarshalUtils::writeInt32(&buffer, height);
   }
 
-  Rect(float _x, float _y, unsigned int _width, unsigned int _height) :
-      dirty(false)
+  Rect(float x, float y, int width, int height) :
+      Rect(Qnil, x, y, width, height) { }
+
+  Rect(VALUE rbObj, float x, float y, int width, int height) :
+      EngineBase(rbObj),
+      dirty(false),
+      x(x),
+      y(y),
+      width(width),
+      height(height)
   {
-    x = _x;
-    y = _y;
-    width = _width;
-    height = _height;
+    if (rbObj != Qnil) {
+      initialize();
+    }
   }
 
   Rect(Rect *_rect) :
@@ -77,8 +85,21 @@ class Rect : public EngineBase {
   {
   }
 
-  void set(int _x, int _y, int _width, int _height)
+  void initialize()
   {
+    rb_iv_set(rbObj, "@x", Convert::toRubyNumber(x));
+    rb_iv_set(rbObj, "@y", Convert::Convert::toRubyNumber(y));
+    rb_iv_set(rbObj, "@width", Convert::toRubyNumber(width));
+    rb_iv_set(rbObj, "@height", Convert::toRubyNumber(height));
+  }
+
+  void set(VALUE xVal, VALUE yVal, VALUE widthVal, VALUE heightVal)
+  {
+    int _x = Convert::toCInt(xVal);
+    int _y = Convert::toCInt(yVal);
+    int _width = Convert::toCInt(widthVal);
+    int _height = Convert::toCInt(heightVal);
+
     if (_x == x && y == _y && _width == width && _height == height) {
       return;
     }
@@ -86,6 +107,13 @@ class Rect : public EngineBase {
     y = _y;
     width = _width;
     height = _height;
+    if (hasRbObj()) {
+      rb_iv_set(rbObj, "@x", xVal);
+      rb_iv_set(rbObj, "@y", yVal);
+      rb_iv_set(rbObj, "@width", widthVal);
+      rb_iv_set(rbObj, "@height", heightVal);
+    }
+
     dirty = true;
   }
 
@@ -109,39 +137,47 @@ class Rect : public EngineBase {
     return height;
   }
 
-  void setter_x(int v)
+  void setter_x(VALUE value)
   {
-    if (x == v) {
-      return;
-    }
+    int v = Convert::toCInt(value);
+    if (x == v) return;
     x = v;
+    if (hasRbObj()) {
+      rb_iv_set(rbObj, "@x", value);
+    }
     dirty = true;
   }
 
-  void setter_y(int v)
+  void setter_y(VALUE value)
   {
-    if (y == v) {
-      return;
-    }
+    int v = Convert::toCInt(value);
+    if (y == v) return;
     y = v;
+    if (hasRbObj()) {
+      rb_iv_set(rbObj, "@y", value);
+    }
     dirty = true;
   }
 
-  void setter_width(int v)
+  void setter_width(VALUE value)
   {
-    if (width == v) {
-      return;
-    }
+    int v = Convert::toCUnsignedInt(value);
+    if (width == v) return;
     width = v;
+    if (hasRbObj()) {
+      rb_iv_set(rbObj, "@width", value);
+    }
     dirty = true;
   }
 
-  void setter_height(int v)
+  void setter_height(VALUE value)
   {
-    if (height == v) {
-      return;
-    }
+    int v = Convert::toCUnsignedInt(value);
+    if (height == v) return;
     height = v;
+    if (hasRbObj()) {
+      rb_iv_set(rbObj, "@height", value);
+    }
     dirty = true;
   }
 
@@ -182,8 +218,8 @@ class Rect : public EngineBase {
   bool dirty;
   float x;
   float y;
-  unsigned int width;
-  unsigned int height;
+  int width;
+  int height;
 };
 
 }  // namespace Eng

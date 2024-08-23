@@ -181,9 +181,8 @@ class Rect {
     unsigned int width = Convert::toCInt(_w);
     unsigned int height = Convert::toCInt(_h);
 
-    Eng::Rect *inst = new Eng::Rect(x, y, width, height);
+    Eng::Rect *inst = new Eng::Rect(self, x, y, width, height);
     DATA_PTR(self) = inst;
-    inst->rbObj = self;
 
     return self;
   }
@@ -200,9 +199,8 @@ class Rect {
 
   static VALUE setter_x(VALUE self, VALUE value)
   {
-    unsigned int x = Convert::toCInt(value);
     auto inst = Rect::getObjectValue(self);
-    inst->setter_x(x);
+    inst->setter_x(value);
     return value;
   }
 
@@ -218,9 +216,8 @@ class Rect {
 
   static VALUE setter_y(VALUE self, VALUE value)
   {
-    unsigned int y = Convert::toCInt(value);
     auto inst = Rect::getObjectValue(self);
-    inst->setter_y(y);
+    inst->setter_y(value);
     return value;
   }
 
@@ -236,9 +233,8 @@ class Rect {
 
   static VALUE setter_width(VALUE self, VALUE value)
   {
-    unsigned int width = Convert::toCInt(value);
     auto inst = Rect::getObjectValue(self);
-    inst->setter_width(width);
+    inst->setter_width(value);
     return value;
   }
 
@@ -254,23 +250,16 @@ class Rect {
 
   static VALUE setter_height(VALUE self, VALUE value)
   {
-    unsigned int height = Convert::toCInt(value);
     auto inst = Rect::getObjectValue(self);
-    inst->setter_height(height);
+    inst->setter_height(value);
     return value;
   }
 
   // Method set
-  static VALUE method_set(VALUE self, VALUE _x, VALUE _y, VALUE _width, VALUE _height)
+  static VALUE method_set(VALUE self, VALUE xVal, VALUE yVal, VALUE widthVal, VALUE heightVal)
   {
-    int x = Convert::toCInt(_x);
-    int y = Convert::toCInt(_y);
-    int width = Convert::toCInt(_width);
-    int height = Convert::toCInt(_height);
-
     auto inst = Rect::getObjectValue(self);
-    inst->set(x, y, width, height);
-
+    inst->set(xVal, yVal, widthVal, heightVal);
     return Qnil;
   }
 
