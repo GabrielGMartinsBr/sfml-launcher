@@ -133,23 +133,17 @@ class Viewport {
     VALUE _x, _y, _width, _height;
     rb_scan_args(argc, argv, "4", &_x, &_y, &_width, &_height);
 
-    Check_Type(_x, T_FIXNUM);
-    Check_Type(_y, T_FIXNUM);
-    Check_Type(_width, T_FIXNUM);
-    Check_Type(_height, T_FIXNUM);
-
-    int x = FIX2INT(_x);
-    int y = FIX2INT(_y);
-    unsigned int width = FIX2INT(_width);
-    unsigned int height = FIX2INT(_height);
+    int x = Convert::toCInt2(_x);
+    int y = Convert::toCInt2(_y);
+    int width = Convert::toCInt2(_width);
+    int height = Convert::toCInt2(_height);
 
     // SharedPtr<Eng::Viewport> inst = MakeSharedPtr<Eng::Viewport>(x, y, width, height);
     // Eng::Engine::getInstance().addViewport(inst);
     // DATA_PTR(self) = inst.get();
 
-    Eng::Viewport *inst = new Eng::Viewport(x, y, width, height);
+    Eng::Viewport *inst = new Eng::Viewport(self, x, y, width, height);
     DATA_PTR(self) = inst;
-    inst->rbObj = self;
 
     return self;
   }
@@ -165,9 +159,8 @@ class Viewport {
     // Eng::Engine::getInstance().addViewport(inst);
     // DATA_PTR(self) = inst.get();
 
-    Eng::Viewport *inst = new Eng::Viewport(rect);
+    Eng::Viewport *inst = new Eng::Viewport(self, rect);
     DATA_PTR(self) = inst;
-    inst->rbObj = self;
 
     return self;
   }

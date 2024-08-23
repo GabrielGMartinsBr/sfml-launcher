@@ -17,6 +17,7 @@
 #include "engnine/Viewport.hpp"
 #include "integrator/Convert.hpp"
 #include "integrator/It_Rect.hpp"
+#include "integrator/It_Viewport.hpp"
 
 namespace Eng {
 
@@ -136,7 +137,11 @@ void Window::bindRubyVars()
   }
 
   VALUE viewportVal = Qnil;
-  if (viewport && viewport->hasRbObj()) {
+  if (viewport) {
+    if (!viewport->hasRbObj()) {
+      viewport->rbObj = It::Viewport::getRubyObject(viewport);
+      viewport->bindRubyVars();
+    }
     viewportVal = viewport->rbObj;
   }
 
@@ -249,6 +254,8 @@ void Window::setActive(bool v)
   if (active == v) return;
   active = v;
   setInstanceVar("@active", Convert::toRubyBool(v));
+  skinDirty = true;
+  contentsDirty = true;
 }
 
 VALUE Window::getter_active()
@@ -262,6 +269,8 @@ VALUE Window::setter_active(VALUE v)
   if (active == value) return v;
   active = value;
   setInstanceVar("@active", v);
+  skinDirty = true;
+  contentsDirty = true;
   return v;
 }
 

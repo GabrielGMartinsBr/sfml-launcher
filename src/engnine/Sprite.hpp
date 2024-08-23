@@ -24,6 +24,7 @@
 #include "engnine/Tone.hpp"
 #include "engnine/Viewport.hpp"
 #include "engnine/VpRects.hpp"
+#include "integrator/Convert.hpp"
 #include "integrator/It_Bitmap.hpp"
 #include "integrator/It_Color.hpp"
 #include "integrator/It_Rect.hpp"
@@ -36,6 +37,8 @@ class Sprite : OnUpdate, OnRender, public EngineBase {
  public:
 
   // Constructor
+  Sprite() :
+      Sprite(Qnil) { }
 
   Sprite(VALUE rbObj, Viewport *_viewport = nullptr) :
       EngineBase(rbObj),
@@ -72,9 +75,6 @@ class Sprite : OnUpdate, OnRender, public EngineBase {
 
     addToEngineCycles();
   }
-
-  Sprite(Viewport *_viewport = nullptr) :
-      Sprite(Qnil, _viewport) { }
 
   ~Sprite()
   {
@@ -263,9 +263,13 @@ class Sprite : OnUpdate, OnRender, public EngineBase {
       std::runtime_error("Sprite doesn't have rbObj defined.");
     }
 
-    if (viewport != nullptr && viewport->rbObj == Qnil) {
-      viewport->rbObj = It::Viewport::createRubyObject(viewport);
-      rb_iv_set(rbObj, "@viewport", viewport->rbObj);
+    VALUE vp = Qnil;
+    if (viewport != nullptr) {
+      if (!viewport->hasRbObj()) {
+        viewport->rbObj = It::Viewport::createRubyObject(viewport);
+        viewport->bindRubyVars();
+      }
+      vp = viewport->rbObj;
     }
 
     if (src_rect->rbObj == Qnil) {
@@ -278,9 +282,11 @@ class Sprite : OnUpdate, OnRender, public EngineBase {
       tone->rbObj = It::Tone::createRubyObject(tone);
     }
 
+    rb_iv_set(rbObj, "@viewport", vp);
     rb_iv_set(rbObj, "@src_rect", src_rect->rbObj);
     rb_iv_set(rbObj, "@color", color->rbObj);
     rb_iv_set(rbObj, "@tone", tone->rbObj);
+    rb_iv_set(rbObj, "@z", Convert::toRubyNumber(z));
   }
 
   /* --------------------------------------------------- */
@@ -396,6 +402,7 @@ class Sprite : OnUpdate, OnRender, public EngineBase {
   {
     if (z != value) {
       z = value;
+      setInstanceVar("@z", Convert::toRubyNumber(value));
       Engine::getInstance().markZOrderDirty();
     }
   }

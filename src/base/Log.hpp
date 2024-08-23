@@ -4,7 +4,6 @@
 #include <sstream>
 
 #include "StringEnum.hpp"
-#include "debugger/DebugVariableScope.h"
 
 class Log {
   struct Out {

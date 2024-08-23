@@ -8,28 +8,70 @@
 #include "engnine/RGSSViewport.hpp"
 #include "engnine/Rect.hpp"
 #include "engnine/Tone.hpp"
+#include "integrator/Convert.hpp"
+#include "integrator/It_Rect.hpp"
 
 namespace Eng {
 
 class Viewport : public EngineBase {
  public:
 
+  Viewport(Rect* _rect) :
+      Viewport(Qnil, _rect) { }
+
   Viewport(int x, int y, int width, int height) :
+      Viewport(Qnil, x, y, width, height) { }
+
+  Viewport(VALUE rbObj, int x, int y, int width, int height) :
+      EngineBase(rbObj),
       rect(x, y, width, height),
       rgssVp(x, y, width, height)
   {
     color = new Color(0, 0, 0, 0);
     tone = new Tone(0, 0, 0, 0);
     isDisposed = false;
+
+    visible = true;
+    z = 0;
+    ox = 0;
+    oy = 0;
+
+    bindRubyVars();
   }
 
-  Viewport(Rect* _rect) :
+  Viewport(VALUE rbObj, Rect* _rect) :
+      EngineBase(rbObj),
       rect(_rect),
       rgssVp(rect)
   {
     color = new Color(0, 0, 0, 0);
     tone = new Tone(0, 0, 0, 0);
     isDisposed = false;
+
+    visible = true;
+    z = 0;
+    ox = 0;
+    oy = 0;
+
+    bindRubyVars();
+  }
+
+  void bindRubyVars()
+  {
+    if (!hasRbObj()) {
+      return;
+    }
+
+    if (!rect.hasRbObj()) {
+      rect.rbObj = It::Rect::getRubyObject(&rect);
+      rect.bindRubyVars();
+    }
+
+    setInstanceVar("@visible", Convert::toRubyBool(visible));
+    setInstanceVar("@z", Convert::toRubyNumber(z));
+    setInstanceVar("@ox", Convert::toRubyNumber(ox));
+    setInstanceVar("@oy", Convert::toRubyNumber(oy));
+    setInstanceVar("@rect", rect.rbObj);
   }
 
   RGSS::Viewport& getRgssViewport()
@@ -62,6 +104,7 @@ class Viewport : public EngineBase {
   void setZ(int _z)
   {
     z = _z;
+    setInstanceVar("@z", Convert::toRubyNumber(z));
   }
 
   /*
@@ -71,6 +114,7 @@ class Viewport : public EngineBase {
   void setOx(int _ox)
   {
     ox = _ox;
+    setInstanceVar("@ox", Convert::toRubyNumber(ox));
   }
 
   /*
@@ -80,6 +124,7 @@ class Viewport : public EngineBase {
   void setOy(int _oy)
   {
     oy = _oy;
+    setInstanceVar("@oy", Convert::toRubyNumber(oy));
   }
 
   /* --------------------------------------------------- */
@@ -142,10 +187,10 @@ class Viewport : public EngineBase {
 
  private:
   Rect rect;
-  bool visible = true;
-  int z = 0;
-  int ox = 0;
-  int oy = 0;
+  bool visible;
+  int z;
+  int ox;
+  int oy;
   Color* color;
   Tone* tone;
 
