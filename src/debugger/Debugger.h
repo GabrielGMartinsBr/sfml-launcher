@@ -23,7 +23,7 @@ enum struct DebuggerState {
   RUNNING,
   PAUSED,
   SHOULD_PAUSE,
-  NEXT_LINE
+  STEP_OVER
 };
 
 struct Debugger {
@@ -46,6 +46,8 @@ struct Debugger {
   void handleContinue();
 
   void handlePause();
+
+  void handleStepOver();
 
   void handleStop();
 

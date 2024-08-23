@@ -88,6 +88,13 @@ void Debugger::handlePause()
   setState(DebuggerState::SHOULD_PAUSE);
 }
 
+void Debugger::handleStepOver()
+{
+  // This will break the while state is paused loop
+  // And pause it again when receiver the next new line event
+  setState(DebuggerState::STEP_OVER);
+}
+
 void Debugger::handleStop()
 {
   shouldStop = true;
@@ -196,10 +203,8 @@ void Debugger::trace_function(rb_event_t event, NODE* node, VALUE self, ID mid, 
 
   UInt currLine;
 
-  if (instance.state == DebuggerState::SHOULD_PAUSE) {
+  if (instance.state == DebuggerState::SHOULD_PAUSE || instance.state == DebuggerState::STEP_OVER) {
     instance.setState(DebuggerState::PAUSED);
-
-    Log::out() << "here again?";
 
     currLine = rb_sourceLine() + 1;
 

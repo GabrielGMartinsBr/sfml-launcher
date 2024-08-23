@@ -208,6 +208,11 @@ void TcpConnection::handleReceivedMsg()
     return;
   }
 
+  if (data_.compare("stepOver\n") == 0) {
+    handleStepOver();
+    return;
+  }
+
   if (data_.compare("stop\n") == 0) {
     handleStop();
     return;
@@ -272,9 +277,8 @@ void TcpConnection::handleFetchVariableMsg(const std::string& msg)
 
 void TcpConnection::handleSetVariableValueMsg(const std::string& msg)
 {
-
   json jsonObject = json::parse(msg);
-  
+
   ParentVarLocation location = jsonObject["parentLocation"];
   VALUE parent = jsonObject["parentVar"];
   String name = jsonObject["name"];
@@ -298,6 +302,11 @@ void TcpConnection::handleContinue()
 void TcpConnection::handlePause()
 {
   Debugger::getInstance().handlePause();
+}
+
+void TcpConnection::handleStepOver()
+{
+  Debugger::getInstance().handleStepOver();
 }
 
 void TcpConnection::handleStop()

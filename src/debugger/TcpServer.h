@@ -50,6 +50,8 @@ struct TcpConnection : public std::enable_shared_from_this<TcpConnection> {
 
   void handlePause();
 
+  void handleStepOver();
+
   void handleStop();
 
   void handleFetchVariableMsg(const std::string& msg);
