@@ -2,14 +2,13 @@
 
 #include <SFML/Graphics/Rect.hpp>
 
-#include "Log.hpp"
 #include "engnine/Color.hpp"
 #include "engnine/EngineBase.hpp"
-#include "engnine/RGSSViewport.hpp"
 #include "engnine/Rect.hpp"
 #include "engnine/Tone.hpp"
 #include "integrator/Convert.hpp"
-#include "integrator/It_Rect.hpp"
+#include "integrator/It_Color.hpp"
+#include "integrator/It_Tone.hpp"
 
 namespace Eng {
 
@@ -22,70 +21,23 @@ class Viewport : public EngineBase {
   Viewport(int x, int y, int width, int height) :
       Viewport(Qnil, x, y, width, height) { }
 
-  Viewport(VALUE rbObj, int x, int y, int width, int height) :
-      EngineBase(rbObj),
-      rect(x, y, width, height),
-      rgssVp(x, y, width, height)
-  {
-    color = new Color(0, 0, 0, 0);
-    tone = new Tone(0, 0, 0, 0);
-    isDisposed = false;
+  Viewport(VALUE rbObj, int x, int y, int width, int height);
 
-    visible = true;
-    z = 0;
-    ox = 0;
-    oy = 0;
+  Viewport(VALUE rbObj, Rect* _rect);
 
-    bindRubyVars();
-  }
+  ~Viewport();
 
-  Viewport(VALUE rbObj, Rect* _rect) :
-      EngineBase(rbObj),
-      rect(_rect),
-      rgssVp(rect)
-  {
-    color = new Color(0, 0, 0, 0);
-    tone = new Tone(0, 0, 0, 0);
-    isDisposed = false;
+  void initialize();
 
-    visible = true;
-    z = 0;
-    ox = 0;
-    oy = 0;
-
-    bindRubyVars();
-  }
-
-  void bindRubyVars()
-  {
-    if (!hasRbObj()) {
-      return;
-    }
-
-    if (!rect.hasRbObj()) {
-      rect.rbObj = It::Rect::getRubyObject(&rect);
-      rect.bindRubyVars();
-    }
-
-    setInstanceVar("@visible", Convert::toRubyBool(visible));
-    setInstanceVar("@z", Convert::toRubyNumber(z));
-    setInstanceVar("@ox", Convert::toRubyNumber(ox));
-    setInstanceVar("@oy", Convert::toRubyNumber(oy));
-    setInstanceVar("@rect", rect.rbObj);
-  }
-
-  RGSS::Viewport& getRgssViewport()
-  {
-    return rgssVp;
-  }
+  void bindRubyVars();
 
   /*
     Attr rect
   */
-  Rect* getRect() { return &rect; }
+  Rect* getRect() { return rect; }
   void setRect(Rect* _rect)
   {
-    rect = *_rect;
+    rect = _rect;
   }
 
   /*
@@ -140,7 +92,20 @@ class Viewport : public EngineBase {
 
   void setter_color(Color* value)
   {
+    if (color == value) {
+      return;
+    }
+
     color = value;
+    if (color == nullptr) {
+      setInstanceVar("@color", Qnil);
+      return;
+    }
+
+    if (!color->hasRbObj()) {
+      color->rbObj = It::Color::getRubyObject(color);
+    }
+    setInstanceVar("@color", color->rbObj);
   }
 
   /* --------------------------------------------------- */
@@ -156,7 +121,20 @@ class Viewport : public EngineBase {
 
   void setter_tone(Tone* value)
   {
+    if (tone == value) {
+      return;
+    }
+
     tone = value;
+    if (tone == nullptr) {
+      setInstanceVar("@tone", Qnil);
+      return;
+    }
+
+    if (!tone->hasRbObj()) {
+      tone->rbObj = It::Tone::getRubyObject(tone);
+    }
+    setInstanceVar("@tone", tone->rbObj);
   }
 
   /* --------------------------------------------------- */
@@ -165,38 +143,29 @@ class Viewport : public EngineBase {
       RGSS Methods
   */
 
-  void method_dispose()
-  {
-    isDisposed = true;
-  }
+  void method_dispose();
 
-  bool method_disposed()
-  {
-    return isDisposed;
-  }
+  bool method_disposed();
 
-  void method_flash(Color* color, int time)
-  {
-    Log::out() << "Viewport method flash was called but it's not implemented yet.";
-  }
+  void method_flash(Color* color, int time);
 
-  void method_update()
-  {
-    // Log::out() << "ViewportViewport method update was called but it's not implemented yet.";
-  }
+  void method_update();
 
  private:
-  Rect rect;
   bool visible;
   int z;
   int ox;
   int oy;
+  Rect* rect;
   Color* color;
   Tone* tone;
 
   bool isDisposed;
+  bool isAdded;
 
-  RGSS::Viewport rgssVp;
+  void addToLists();
+
+  void removeFromLists();
 };
 
 }  // namespace Eng

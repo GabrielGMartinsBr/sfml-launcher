@@ -128,7 +128,6 @@ void EngineRenderer::clearViewports()
     if (!vp) {
       continue;
     }
-    vp->getRgssViewport().clear();
   }
 }
 
@@ -165,10 +164,6 @@ void EngineRenderer::renderViewports()
 
 void EngineRenderer::renderViewport(Eng::Viewport& vp)
 {
-  vp.getRgssViewport().renderIn(
-    renderTexture, sf::BlendAlpha
-  );
-  vp.getRgssViewport().display();
 }
 
 void EngineRenderer::renderBuffer(sf::RenderTarget* target)

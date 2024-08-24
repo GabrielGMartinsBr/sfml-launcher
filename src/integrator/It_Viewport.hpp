@@ -138,13 +138,8 @@ class Viewport {
     int width = Convert::toCInt2(_width);
     int height = Convert::toCInt2(_height);
 
-    // SharedPtr<Eng::Viewport> inst = MakeSharedPtr<Eng::Viewport>(x, y, width, height);
-    // Eng::Engine::getInstance().addViewport(inst);
-    // DATA_PTR(self) = inst.get();
-
     Eng::Viewport *inst = new Eng::Viewport(self, x, y, width, height);
     DATA_PTR(self) = inst;
-
     return self;
   }
 
@@ -154,10 +149,6 @@ class Viewport {
     rb_scan_args(argc, argv, "1", &_rect);
 
     Eng::Rect *rect = Rect::getObjectValue(_rect);
-
-    // SharedPtr<Eng::Viewport> inst = MakeSharedPtr<Eng::Viewport>(rect);
-    // Eng::Engine::getInstance().addViewport(inst);
-    // DATA_PTR(self) = inst.get();
 
     Eng::Viewport *inst = new Eng::Viewport(self, rect);
     DATA_PTR(self) = inst;

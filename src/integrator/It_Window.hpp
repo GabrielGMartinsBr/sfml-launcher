@@ -2,7 +2,6 @@
 
 #include "Convert.hpp"
 #include "It_Rect.hpp"
-#include "Log.hpp"
 #include "engnine/Rect.hpp"
 #include "engnine/Window.h"
 #include "integrator/It_Bitmap.hpp"
@@ -347,7 +346,6 @@ class Window {
   */
   static VALUE setter_y(VALUE self, VALUE value)
   {
-    Log::out() << "set y: ";
     Eng::Window *inst = getObjectValue(self);
     return inst->setter_y(value);
   }

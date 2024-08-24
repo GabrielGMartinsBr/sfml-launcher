@@ -274,7 +274,7 @@ class Rect {
   {
     Eng::Rect *inst = getObjectValue(self);
     char buffer[64];
-    sprintf(buffer, "(%i, %i, %i, %i)", inst->x.get(), inst->y.get(), inst->width.get(), inst->height.get());
+    sprintf(buffer, "(%f, %f, %i, %i)", inst->x.get(), inst->y.get(), inst->width.get(), inst->height.get());
     return Convert::toRubyString(buffer);
   }
 };
