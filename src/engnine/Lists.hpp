@@ -22,11 +22,9 @@ struct Lists {
     ⇩⇩⇩ Static ⇩⇩⇩
   */
 
-  static Lists& instance()
-  {
-    static Lists _instance;
-    return _instance;
-  }
+  static void Init();
+  static Lists& Instance();
+  static void Destroy();
 
   /*
     ⇩⇩⇩ Instance ⇩⇩⇩
