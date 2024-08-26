@@ -6,14 +6,15 @@
 #include "engnine/EngineBase.hpp"
 #include "engnine/Rect.hpp"
 #include "engnine/Tone.hpp"
-#include "integrator/Convert.hpp"
-#include "integrator/It_Color.hpp"
-#include "integrator/It_Tone.hpp"
 
 namespace Eng {
 
 class Viewport : public EngineBase {
  public:
+
+  /*
+    ⇩⇩⇩ Public ⇩⇩⇩
+  */
 
   Viewport(Rect* _rect) :
       Viewport(Qnil, _rect) { }
@@ -27,115 +28,34 @@ class Viewport : public EngineBase {
 
   ~Viewport();
 
-  void initialize();
+  /* --------------------------------------------------- */
+
+  /*
+      RGSS Properties
+  */
 
   void bindRubyVars();
 
-  /*
-    Attr rect
-  */
-  Rect* getRect() { return rect; }
-  void setRect(Rect* _rect)
-  {
-    rect = _rect;
-  }
+  Rect* getRect();
+  void setRect(Rect* _rect);
 
-  /*
-    Attr visible
-  */
-  int getVisible() { return visible; }
-  void setVisible(int _visible)
-  {
-    visible = _visible;
-  }
+  int getVisible();
+  void setVisible(int _visible);
 
-  /*
-    Attr z
-  */
-  int getZ() { return z; }
-  void setZ(int _z)
-  {
-    z = _z;
-    setInstanceVar("@z", Convert::toRubyNumber(z));
-  }
+  int getZ();
+  void setZ(int _z);
 
-  /*
-    Attr ox
-  */
-  int getOx() { return ox; }
-  void setOx(int _ox)
-  {
-    ox = _ox;
-    setInstanceVar("@ox", Convert::toRubyNumber(ox));
-  }
+  int getOx();
+  void setOx(int _ox);
 
-  /*
-    Attr oy
-  */
-  int getOy() { return oy; }
-  void setOy(int _oy)
-  {
-    oy = _oy;
-    setInstanceVar("@oy", Convert::toRubyNumber(oy));
-  }
+  int getOy();
+  void setOy(int _oy);
 
-  /* --------------------------------------------------- */
+  Color* getter_color();
+  void setter_color(Color* value);
 
-  // Getter color
-
-  Color* getter_color()
-  {
-    return color;
-  }
-
-  // Setter color
-
-  void setter_color(Color* value)
-  {
-    if (color == value) {
-      return;
-    }
-
-    color = value;
-    if (color == nullptr) {
-      setInstanceVar("@color", Qnil);
-      return;
-    }
-
-    if (!color->hasRbObj()) {
-      color->rbObj = It::Color::getRubyObject(color);
-    }
-    setInstanceVar("@color", color->rbObj);
-  }
-
-  /* --------------------------------------------------- */
-
-  // Getter tone
-
-  Tone* getter_tone()
-  {
-    return tone;
-  }
-
-  // Setter tone
-
-  void setter_tone(Tone* value)
-  {
-    if (tone == value) {
-      return;
-    }
-
-    tone = value;
-    if (tone == nullptr) {
-      setInstanceVar("@tone", Qnil);
-      return;
-    }
-
-    if (!tone->hasRbObj()) {
-      tone->rbObj = It::Tone::getRubyObject(tone);
-    }
-    setInstanceVar("@tone", tone->rbObj);
-  }
+  Tone* getter_tone();
+  void setter_tone(Tone* value);
 
   /* --------------------------------------------------- */
 
@@ -151,7 +71,14 @@ class Viewport : public EngineBase {
 
   void method_update();
 
+  /* --------------------------------------------------- */
+
+  /*
+    ⇩⇩⇩ Private ⇩⇩⇩
+  */
+
  private:
+
   bool visible;
   int z;
   int ox;

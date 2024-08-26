@@ -57,10 +57,6 @@ Viewport::~Viewport()
   removeFromLists();
 }
 
-void Viewport::initialize()
-{
-}
-
 void Viewport::bindRubyVars()
 {
   if (!hasRbObj()) {
@@ -87,44 +83,17 @@ void Viewport::bindRubyVars()
   setInstanceVar("@tone", tone->rbObj);
 }
 
-/* --------------------------------------------------- */
-
-/*
-    RGSS Methods
-*/
-
-void Viewport::method_dispose()
-{
-  isDisposed = true;
-  removeFromLists();
-}
-
-bool Viewport::method_disposed()
-{
-  return isDisposed;
-}
-
-void Viewport::method_flash(Color* color, int time)
-{
-  Log::out() << "Viewport method flash was called but it's not implemented yet.";
-}
-
-void Viewport::method_update()
-{
-  // Log::out() << "ViewportViewport method update was called but it's not implemented yet.";
-}
-
 void Viewport::addToLists()
 {
   if (isAdded) return;
-  Lists::instance().addViewport(this);
+  Lists::Instance().addViewport(this);
   isAdded = true;
 }
 
 void Viewport::removeFromLists()
 {
   if (!isAdded) return;
-  Lists::instance().removeViewport(this);
+  Lists::Instance().removeViewport(this);
   isAdded = false;
 }
 
