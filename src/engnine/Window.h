@@ -10,14 +10,14 @@
 
 #include "engnine/Bitmap.h"
 #include "engnine/EngineBase.hpp"
+#include "engnine/IOnUpdate.h"
 #include "engnine/IViewportChild.h"
-#include "engnine/OnUpdate.h"
 #include "engnine/Rect.hpp"
 #include "engnine/Viewport.hpp"
 
 namespace Eng {
 
-class Window : public OnUpdate, IViewportChild, public EngineBase {
+class Window : public IOnUpdate, IViewportChild, public EngineBase {
  public:
 
   Window(Viewport *viewport = nullptr);

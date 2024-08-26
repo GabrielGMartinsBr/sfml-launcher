@@ -6,14 +6,14 @@
 #include "Sugars.hpp"
 #include "engnine/Autotiles.h"
 #include "engnine/EngineBase.hpp"
-#include "engnine/OnUpdate.h"
+#include "engnine/IOnUpdate.h"
 #include "engnine/Table.hpp"
 #include "engnine/TilemapLayer.h"
 #include "engnine/Viewport.hpp"
 
 namespace Eng {
 
-class Tilemap : public EngineBase, OnUpdate {
+class Tilemap : public EngineBase, IOnUpdate {
  public:
 
   Tilemap(Viewport* _viewport = nullptr);

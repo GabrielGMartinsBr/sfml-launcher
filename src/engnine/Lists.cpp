@@ -44,7 +44,7 @@ void Lists::sortZ()
   zDirty = false;
 }
 
-bool Lists::compareZ(const OnRender* a, const OnRender* b)
+bool Lists::compareZ(const IOnRender* a, const IOnRender* b)
 {
   return a->getZIndex() < b->getZIndex();
 }

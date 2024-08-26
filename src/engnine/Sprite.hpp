@@ -18,9 +18,9 @@
 #include "engnine/Color.hpp"
 #include "engnine/Engine.h"
 #include "engnine/EngineBase.hpp"
+#include "engnine/IOnUpdate.h"
 #include "engnine/IViewportChild.h"
 #include "engnine/Lists.hpp"
-#include "engnine/OnUpdate.h"
 #include "engnine/Rect.hpp"
 #include "engnine/Tone.hpp"
 #include "engnine/Viewport.hpp"
@@ -34,7 +34,7 @@
 
 namespace Eng {
 
-class Sprite : OnUpdate, IViewportChild, public EngineBase {
+class Sprite : IOnUpdate, IViewportChild, public EngineBase {
  public:
 
   // Constructor

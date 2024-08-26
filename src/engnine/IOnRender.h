@@ -4,7 +4,7 @@
 
 namespace Eng {
 
-struct OnRender {
+struct IOnRender {
   virtual void onRender(sf::RenderTexture& renderTexture) = 0;
 
   virtual bool shouldRender() const = 0;

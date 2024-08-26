@@ -2,7 +2,7 @@
 
 namespace Eng {
 
-struct OnUpdate {
+struct IOnUpdate {
   virtual void onUpdate() = 0;
 };
 

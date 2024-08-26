@@ -4,9 +4,9 @@
 
 #include "AppDefs.h"
 #include "Log.hpp"
+#include "engnine/IOnRender.h"
+#include "engnine/IOnUpdate.h"
 #include "engnine/IViewportChild.h"
-#include "engnine/OnRender.h"
-#include "engnine/OnUpdate.h"
 #include "engnine/Viewport.hpp"
 
 namespace Eng {
@@ -27,8 +27,8 @@ struct Lists {
   */
 
   Vector<Viewport*> viewports;
-  Vector<OnUpdate*> updateList;
-  Vector<OnRender*> renderList;
+  Vector<IOnUpdate*> updateList;
+  Vector<IOnRender*> renderList;
 
   /*
     Viewport List
@@ -52,12 +52,12 @@ struct Lists {
     Update List
   */
 
-  void addUpdateEntry(OnUpdate* entry)
+  void addUpdateEntry(IOnUpdate* entry)
   {
     updateList.push_back(entry);
   }
 
-  void removeUpdateEntry(OnUpdate* entry)
+  void removeUpdateEntry(IOnUpdate* entry)
   {
     auto it = std::find(updateList.begin(), updateList.end(), entry);
     if (it != updateList.end()) {
@@ -73,7 +73,7 @@ struct Lists {
   {
     Viewport* viewport = instance->getViewport();
     if (viewport == nullptr) {
-      addRenderEntry(static_cast<OnRender*>(instance));
+      addRenderEntry(static_cast<IOnRender*>(instance));
     } else {
       viewport->addChild(instance);
     }
@@ -83,18 +83,18 @@ struct Lists {
   {
     Viewport* viewport = instance->getViewport();
     if (viewport == nullptr) {
-      removeRenderEntry(static_cast<OnRender*>(instance));
+      removeRenderEntry(static_cast<IOnRender*>(instance));
     } else {
       viewport->removeChild(instance);
     }
   }
 
-  void addRenderEntry(OnRender* instance)
+  void addRenderEntry(IOnRender* instance)
   {
     renderList.push_back(instance);
   }
 
-  void removeRenderEntry(OnRender* instance)
+  void removeRenderEntry(IOnRender* instance)
   {
     auto it = std::find(renderList.begin(), renderList.end(), instance);
     if (it != renderList.end()) {
@@ -122,7 +122,7 @@ struct Lists {
     }
   }
 
-  static bool compareZ(const OnRender* a, const OnRender* b);
+  static bool compareZ(const IOnRender* a, const IOnRender* b);
 };
 
 }  // namespace Eng

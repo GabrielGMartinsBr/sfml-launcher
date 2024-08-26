@@ -11,9 +11,9 @@
 #include <stdexcept>
 #include <string>
 
+#include "engnine/IOnRender.h"
 #include "engnine/Lists.hpp"
-#include "engnine/OnRender.h"
-#include "engnine/OnUpdate.h"
+#include "engnine/IOnUpdate.h"
 #include "engnine/Timer.hpp"
 #include "engnine/Viewport.hpp"
 
@@ -86,7 +86,7 @@ void EngineRenderer::clearViewports()
 
 void EngineRenderer::update()
 {
-  for (Eng::OnUpdate* updateInst : lists.updateList) {
+  for (Eng::IOnUpdate* updateInst : lists.updateList) {
     updateInst->onUpdate();
   }
 }
@@ -99,7 +99,7 @@ void EngineRenderer::render()
     if (!viewport->shouldRender()) {
       continue;
     }
-    for (Eng::OnRender* renderInst : viewport->children) {
+    for (Eng::IOnRender* renderInst : viewport->children) {
       if (!renderInst->shouldRender()) {
         continue;
       }
@@ -107,7 +107,7 @@ void EngineRenderer::render()
     }
   }
 
-  for (Eng::OnRender* renderInst : lists.renderList) {
+  for (Eng::IOnRender* renderInst : lists.renderList) {
     if (!renderInst->shouldRender()) {
       continue;
     }

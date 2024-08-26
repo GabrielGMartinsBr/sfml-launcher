@@ -8,21 +8,21 @@
 
 #include "engnine/Color.hpp"
 #include "engnine/EngineBase.hpp"
-#include "engnine/OnRender.h"
+#include "engnine/IOnRender.h"
 #include "engnine/Rect.hpp"
 #include "engnine/Tone.hpp"
 
 namespace Eng {
 using app::Vector;
 
-class Viewport : public OnRender, public EngineBase {
+class Viewport : public IOnRender, public EngineBase {
  public:
 
   /*
     ⇩⇩⇩ Public ⇩⇩⇩
   */
 
-  Vector<OnRender*> children;
+  Vector<IOnRender*> children;
   sf::RenderTexture rd;
   sf::Texture texture;
   sf::Sprite sprite;
@@ -48,9 +48,9 @@ class Viewport : public OnRender, public EngineBase {
 
   void updateSprite();
 
-  void addChild(OnRender* instance);
+  void addChild(IOnRender* instance);
 
-  void removeChild(OnRender* instance);
+  void removeChild(IOnRender* instance);
 
   void clear();
 

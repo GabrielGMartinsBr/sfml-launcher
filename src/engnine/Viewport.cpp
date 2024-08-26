@@ -86,12 +86,12 @@ int Viewport::getZIndex() const
   return z;
 }
 
-void Viewport::addChild(OnRender* instance)
+void Viewport::addChild(IOnRender* instance)
 {
   children.push_back(instance);
 }
 
-void Viewport::removeChild(OnRender* instance)
+void Viewport::removeChild(IOnRender* instance)
 {
   auto it = std::find(children.begin(), children.end(), instance);
   if (it != children.end()) {
