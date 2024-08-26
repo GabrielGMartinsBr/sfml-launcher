@@ -132,9 +132,8 @@ class Sprite : OnUpdate, IViewportChild, public EngineBase {
 
   void onRender(sf::RenderTexture &renderTexture) override
   {
-    // float opacity = getter_opacity() / 255.f;
-    // spriteColor.a = opacity;
-    // spr.setColor(spriteColor);
+    spriteColor.a = opacity;
+    spr.setColor(spriteColor);
     renderTexture.draw(spr);
     return;
 
@@ -292,6 +291,7 @@ class Sprite : OnUpdate, IViewportChild, public EngineBase {
     rb_iv_set(rbObj, "@color", color->rbObj);
     rb_iv_set(rbObj, "@tone", tone->rbObj);
     rb_iv_set(rbObj, "@z", Convert::toRubyNumber(z));
+    rb_iv_set(rbObj, "@opacity", Convert::toRubyNumber(opacity));
   }
 
   /* --------------------------------------------------- */
@@ -545,10 +545,12 @@ class Sprite : OnUpdate, IViewportChild, public EngineBase {
   void setter_opacity(int v)
   {
     int value = Num::clamp(v, 0, 255);
-    if (opacity != value) {
-      opacity = value;
-      dirty = true;
+    if (opacity == value) {
+      return;
     }
+    opacity = value;
+    rb_iv_set(rbObj, "@opacity", Convert::toRubyNumber(opacity));
+    dirty = true;
   }
 
   /* --------------------------------------------------- */
