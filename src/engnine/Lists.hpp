@@ -38,14 +38,12 @@ struct Lists {
   {
     viewports.push_back(viewport);
     renderList.push_back(viewport);
-    Log::out() << "(add)viewports: " << viewports.size();
   }
 
   void removeViewport(Viewport* viewport)
   {
     removeFromViewportList(viewport);
     removeRenderEntry(viewport);
-    Log::out() << "(remove)viewports: " << viewports.size();
   }
 
   /*
