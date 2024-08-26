@@ -11,13 +11,14 @@
 #include "engnine/Bitmap.h"
 #include "engnine/EngineBase.hpp"
 #include "engnine/IOnUpdate.h"
-#include "engnine/IViewportChild.h"
 #include "engnine/Rect.hpp"
 #include "engnine/Viewport.hpp"
+#include "engnine/WindowFrame.h"
+#include "engnine/WindowSprite.h"
 
 namespace Eng {
 
-class Window : public IOnUpdate, IViewportChild, public EngineBase {
+class Window : public IOnUpdate, public EngineBase {
  public:
 
   Window(Viewport *viewport = nullptr);
@@ -28,15 +29,7 @@ class Window : public IOnUpdate, IViewportChild, public EngineBase {
 
   // Engine
 
-  inline Viewport *getViewport() const override;
-
-  int getZIndex() const override;
-
-  bool shouldRender() const override;
-
   void onUpdate() override;
-
-  void onRender(sf::RenderTexture &rd) override;
 
   // Rgss
 
@@ -154,17 +147,14 @@ class Window : public IOnUpdate, IViewportChild, public EngineBase {
   int contents_opacity;
   bool isDisposed;
 
-  sf::Sprite backgroundSprite;
-  sf::Sprite contentsSprite;
+  WindowFrame frame;
+  WindowSprite contentsSprite;
+  WindowSprite cursorSprite;
 
-  sf::Sprite cursorSprite;
-  sf::Texture cursorTexture;
-
-  sf::Sprite borderSprite;
-  sf::Texture borderTexture;
-
+  bool dimensionsDirty;
   bool skinDirty;
   bool contentsDirty;
+  bool opacityDirty;
   bool addedToEngineCycles;
 
   int cursorAniAlphaId;
@@ -172,15 +162,18 @@ class Window : public IOnUpdate, IViewportChild, public EngineBase {
   void bindRubyVars();
 
   void addToEngineCycles();
+
   void removeFromEngineCycles();
 
-  void updateBackgroundSprite();
+  void updateFrameSprites();
 
   void updateContentsSprite();
 
   void updateCursorRect();
 
-  void updateBorder();
+  void updateWindowSpriteZ();
+
+  void updateWindowSprite();
 };
 
 }  // namespace Eng

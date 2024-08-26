@@ -74,7 +74,6 @@ Bitmap::Bitmap(unsigned int _width, unsigned int _height, VALUE rbObj) :
   sf::ContextSettings settings;
   settings.antialiasingLevel = 0;
   renderTexture.create(width, height, settings);
-  renderTexture.setSmooth(false);
   renderTexture.clear(sf::Color::Transparent);
 
   isDisposed = false;
