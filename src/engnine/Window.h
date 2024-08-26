@@ -10,14 +10,14 @@
 
 #include "engnine/Bitmap.h"
 #include "engnine/EngineBase.hpp"
-#include "engnine/OnRender.h"
+#include "engnine/IViewportChild.h"
 #include "engnine/OnUpdate.h"
 #include "engnine/Rect.hpp"
 #include "engnine/Viewport.hpp"
 
 namespace Eng {
 
-class Window : public EngineBase, OnUpdate, OnRender {
+class Window : public OnUpdate, IViewportChild, public EngineBase {
  public:
 
   Window(Viewport *viewport = nullptr);
@@ -27,6 +27,8 @@ class Window : public EngineBase, OnUpdate, OnRender {
   ~Window();
 
   // Engine
+
+  inline Viewport *getViewport() const override;
 
   int getZIndex() const override;
 

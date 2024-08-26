@@ -23,8 +23,6 @@ class Engine {
 
   // Getters
 
-  EngineRenderer* getRenderer();
-
   bool isRunning();
 
   const sf::Vector2i& getDimensions() const;
@@ -40,8 +38,6 @@ class Engine {
   void update();
 
   void cleanup();
-
-  void addViewport(SharedPtr<Eng::Viewport> vp);
 
   // Engine update methods
 

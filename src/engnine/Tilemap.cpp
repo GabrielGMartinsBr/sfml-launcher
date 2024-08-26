@@ -23,6 +23,8 @@
 
 namespace Eng {
 
+using std::make_shared;
+
 constexpr int T_SIZE = 32;
 constexpr int T_COLS = 8;
 
@@ -332,7 +334,7 @@ void Tilemap::checkLayer(int id, int y, int priority, int oy)
     int rows = map_data->getYSize();
     int w = cols * 32;
     int h = rows * 32;
-    layers[id] = std::make_shared<TilemapLayer>(w, h, y, priority, oy / 32);
+    layers[id] = make_shared<TilemapLayer>(viewport, w, h, y, priority, oy / 32);
   }
 }
 

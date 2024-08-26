@@ -157,13 +157,17 @@ class Sprite {
     if (argc == 1) {
       VALUE _viewport;
       rb_scan_args(argc, argv, "1", &_viewport);
-      if (!Viewport::isInstance(_viewport)) {
+      if (_viewport != Qnil && !Viewport::isInstance(_viewport)) {
         RbUtils::raiseCantConvertError(
           rb_class_of(_viewport),
           Viewport::getRbClass()
         );
       }
-      Eng::Viewport *viewport = Viewport::getObjectValue(_viewport);
+      Eng::Viewport *viewport = nullptr;
+      if (_viewport != Qnil) {
+        viewport = Viewport::getObjectValue(_viewport);
+      }
+      
       instance = new Eng::Sprite(self, viewport);
       DATA_PTR(self) = instance;
       return self;

@@ -9,7 +9,6 @@
 #include <stdexcept>
 
 #include "AppDefs.h"
-#include "base/Sugars.hpp"
 #include "engnine/BlenShaders.hpp"
 #include "engnine/EngineRenderer.h"
 #include "engnine/FileUtils.hpp"
@@ -28,11 +27,6 @@ Engine& Engine::getInstance()
 /*
   Getters
 */
-
-EngineRenderer* Engine::getRenderer()
-{
-  return renderer;
-}
 
 bool Engine::isRunning()
 {
@@ -90,11 +84,6 @@ void Engine::update()
 void Engine::cleanup()
 {
   delete renderer;
-}
-
-void Engine::addViewport(SharedPtr<Eng::Viewport> vp)
-{
-  renderer->addViewport(vp);
 }
 
 void Engine::updateInput()

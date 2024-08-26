@@ -1,20 +1,32 @@
 #pragma once
 
+#include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Rect.hpp>
+#include <SFML/Graphics/RenderTexture.hpp>
+#include <SFML/Graphics/Sprite.hpp>
+#include <SFML/System/Vector2.hpp>
 
 #include "engnine/Color.hpp"
 #include "engnine/EngineBase.hpp"
+#include "engnine/OnRender.h"
 #include "engnine/Rect.hpp"
 #include "engnine/Tone.hpp"
 
 namespace Eng {
+using app::Vector;
 
-class Viewport : public EngineBase {
+class Viewport : public OnRender, public EngineBase {
  public:
 
   /*
     ⇩⇩⇩ Public ⇩⇩⇩
   */
+
+  Vector<OnRender*> children;
+  sf::RenderTexture rd;
+  sf::Texture texture;
+  sf::Sprite sprite;
+  sf::IntRect srcRect;
 
   Viewport(Rect* _rect) :
       Viewport(Qnil, _rect) { }
@@ -27,6 +39,20 @@ class Viewport : public EngineBase {
   Viewport(VALUE rbObj, Rect* _rect);
 
   ~Viewport();
+
+  void onRender(sf::RenderTexture& renderTexture) override;
+
+  bool shouldRender() const override;
+
+  int getZIndex() const override;
+
+  void updateSprite();
+
+  void addChild(OnRender* instance);
+
+  void removeChild(OnRender* instance);
+
+  void clear();
 
   /* --------------------------------------------------- */
 
@@ -89,6 +115,8 @@ class Viewport : public EngineBase {
 
   bool isDisposed;
   bool isAdded;
+
+  void initialize();
 
   void addToLists();
 

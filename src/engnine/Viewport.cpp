@@ -1,8 +1,11 @@
 #include "engnine/Viewport.hpp"
 
+#include <SFML/Graphics/BlendMode.hpp>
+#include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Rect.hpp>
 
 #include "engnine/Color.hpp"
+#include "engnine/Engine.h"
 #include "engnine/EngineBase.hpp"
 #include "engnine/Lists.hpp"
 #include "engnine/Rect.hpp"
@@ -29,8 +32,7 @@ Viewport::Viewport(VALUE rbObj, int x, int y, int width, int height) :
   isDisposed = false;
   isAdded = false;
 
-  bindRubyVars();
-  addToLists();
+  initialize();
 }
 
 Viewport::Viewport(VALUE rbObj, Rect* _rect) :
@@ -48,13 +50,71 @@ Viewport::Viewport(VALUE rbObj, Rect* _rect) :
   isDisposed = false;
   isAdded = false;
 
-  bindRubyVars();
-  addToLists();
+  initialize();
 }
 
 Viewport::~Viewport()
 {
   removeFromLists();
+}
+
+void Viewport::initialize()
+{
+  bindRubyVars();
+
+  // Create render texture
+  const sf::Vector2i& dimensions = Engine::getInstance().getDimensions();
+  rd.create(dimensions.x, dimensions.y);
+  rd.clear(sf::Color::Transparent);
+
+  addToLists();
+}
+
+void Viewport::onRender(sf::RenderTexture& renderTexture)
+{
+  updateSprite();
+  renderTexture.draw(sprite, sf::BlendAlpha);
+}
+
+bool Viewport::shouldRender() const
+{
+  return !isDisposed;
+}
+
+int Viewport::getZIndex() const
+{
+  return z;
+}
+
+void Viewport::addChild(OnRender* instance)
+{
+  children.push_back(instance);
+}
+
+void Viewport::removeChild(OnRender* instance)
+{
+  auto it = std::find(children.begin(), children.end(), instance);
+  if (it != children.end()) {
+    children.erase(it);
+  }
+}
+
+void Viewport::clear()
+{
+  rd.clear(sf::Color::Transparent);
+}
+
+void Viewport::updateSprite()
+{
+  rd.display();
+  texture = rd.getTexture();
+  sprite.setTexture(texture);
+
+  srcRect.left = static_cast<int>(rect->x.get());
+  srcRect.top = static_cast<int>(rect->y.get());
+  srcRect.width = rect->width.get();
+  srcRect.height = rect->height.get();
+  sprite.setTextureRect(srcRect);
 }
 
 void Viewport::bindRubyVars()

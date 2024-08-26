@@ -8,7 +8,8 @@
 
 namespace Eng {
 
-TilemapLayer::TilemapLayer(int width, int height, int y, int priority, int oy) :
+TilemapLayer::TilemapLayer(Viewport* viewport, int width, int height, int y, int priority, int oy) :
+    viewport(viewport),
     y(y),
     oy(oy),
     priority(priority)
@@ -53,6 +54,11 @@ void TilemapLayer::update(int oy)
     z = nextZ;
     Lists::Instance().markZOrderDirty();
   }
+}
+
+Viewport* TilemapLayer::getViewport() const
+{
+  return viewport;
 }
 
 int TilemapLayer::getZIndex() const

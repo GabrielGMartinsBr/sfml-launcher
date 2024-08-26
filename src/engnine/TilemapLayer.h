@@ -4,20 +4,23 @@
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/System/Vector2.hpp>
 
-#include "engnine/OnRender.h"
+#include "engnine/IViewportChild.h"
+#include "engnine/Viewport.hpp"
 
 namespace Eng {
 
-class TilemapLayer : OnRender {
+class TilemapLayer : IViewportChild {
  public:
   sf::Sprite sprite;
   sf::RenderTexture rendTex;
 
-  TilemapLayer(int width, int height, int y, int priority, int oy);
+  TilemapLayer(Viewport* viewport, int width, int height, int y, int priority, int oy);
 
   ~TilemapLayer();
 
   // Engine Cycles
+
+  inline Viewport* getViewport() const override;
 
   int getZIndex() const override;
 
@@ -39,6 +42,7 @@ class TilemapLayer : OnRender {
   int nextZ;
   bool isDisposed;
   bool addedToEngineCycles;
+  Viewport* viewport;
 
   void create(int width, int height);
 

@@ -79,6 +79,11 @@ Window::~Window()
 
 // Engine
 
+Viewport *Window::getViewport() const
+{
+  return viewport;
+}
+
 int Window::getZIndex() const
 {
   return z;

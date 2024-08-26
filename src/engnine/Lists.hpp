@@ -1,21 +1,17 @@
 #pragma once
 
 #include <algorithm>
-#include <memory>
 
 #include "AppDefs.h"
 #include "Log.hpp"
+#include "engnine/IViewportChild.h"
 #include "engnine/OnRender.h"
 #include "engnine/OnUpdate.h"
 #include "engnine/Viewport.hpp"
 
 namespace Eng {
 
-using app::SPtr;
-using app::UPtr;
 using app::Vector;
-using app::VectorPtr;
-using std::make_unique;
 
 struct Lists {
   /*
@@ -30,7 +26,6 @@ struct Lists {
     ⇩⇩⇩ Instance ⇩⇩⇩
   */
 
-  UPtr<Viewport> defaultViewport;
   Vector<Viewport*> viewports;
   Vector<OnUpdate*> updateList;
   Vector<OnRender*> renderList;
@@ -42,16 +37,15 @@ struct Lists {
   void addViewport(Viewport* viewport)
   {
     viewports.push_back(viewport);
+    renderList.push_back(viewport);
     Log::out() << "(add)viewports: " << viewports.size();
   }
 
   void removeViewport(Viewport* viewport)
   {
-    auto it = std::find(viewports.begin(), viewports.end(), viewport);
-    if (it != viewports.end()) {
-      viewports.erase(it);
-      Log::out() << "(remove)viewports: " << viewports.size();
-    }
+    removeFromViewportList(viewport);
+    removeRenderEntry(viewport);
+    Log::out() << "(remove)viewports: " << viewports.size();
   }
 
   /*
@@ -75,6 +69,26 @@ struct Lists {
     Render List
   */
 
+  void addRenderEntry(IViewportChild* instance)
+  {
+    Viewport* viewport = instance->getViewport();
+    if (viewport == nullptr) {
+      addRenderEntry(static_cast<OnRender*>(instance));
+    } else {
+      viewport->addChild(instance);
+    }
+  }
+
+  void removeRenderEntry(IViewportChild* instance)
+  {
+    Viewport* viewport = instance->getViewport();
+    if (viewport == nullptr) {
+      removeRenderEntry(static_cast<OnRender*>(instance));
+    } else {
+      viewport->removeChild(instance);
+    }
+  }
+
   void addRenderEntry(OnRender* instance)
   {
     renderList.push_back(instance);
@@ -95,11 +109,18 @@ struct Lists {
  private:
   bool zDirty;
 
-  Lists() :
-      defaultViewport(nullptr) { }
+  Lists();
 
   Lists(const Lists&);
   Lists& operator=(const Lists&);
+
+  void removeFromViewportList(Viewport* viewport)
+  {
+    auto it = std::find(viewports.begin(), viewports.end(), viewport);
+    if (it != viewports.end()) {
+      viewports.erase(it);
+    }
+  }
 
   static bool compareZ(const OnRender* a, const OnRender* b);
 };

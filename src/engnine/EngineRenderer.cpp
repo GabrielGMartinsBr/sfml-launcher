@@ -27,21 +27,14 @@ EngineRenderer::EngineRenderer(
     height(_height)
 {
   createBuffer();
-  createDefaultViewport();
-}
-
-void EngineRenderer::addViewport(SharedPtr<Eng::Viewport> vp)
-{
-  viewports.push_back(vp);
 }
 
 void EngineRenderer::render(sf::RenderTarget* target)
 {
   update();
   renderTexture.clear();
-  // clearViewports();
+  clearViewports();
   render();
-  // renderViewports();
   renderBuffer(target);
 }
 
@@ -81,18 +74,13 @@ void EngineRenderer::createFpsText()
   fpsText.setPosition(4, 458);
 }
 
-void EngineRenderer::createDefaultViewport()
-{
-  defaultVp = MakeSharedPtr<Eng::Viewport>(0, 0, width, height);
-  viewports.push_back(defaultVp);
-}
-
 void EngineRenderer::clearViewports()
 {
-  for (auto& vp : viewports) {
-    if (!vp) {
+  for (Viewport* viewport : lists.viewports) {
+    if (!viewport->shouldRender()) {
       continue;
     }
+    viewport->clear();
   }
 }
 
@@ -106,27 +94,27 @@ void EngineRenderer::update()
 void EngineRenderer::render()
 {
   lists.sortZ();
+
+  for (Eng::Viewport* viewport : lists.viewports) {
+    if (!viewport->shouldRender()) {
+      continue;
+    }
+    for (Eng::OnRender* renderInst : viewport->children) {
+      if (!renderInst->shouldRender()) {
+        continue;
+      }
+      renderInst->onRender(viewport->rd);
+    }
+  }
+
   for (Eng::OnRender* renderInst : lists.renderList) {
     if (!renderInst->shouldRender()) {
       continue;
     }
     renderInst->onRender(renderTexture);
   }
+
   renderFps();
-}
-
-void EngineRenderer::renderViewports()
-{
-  for (SharedPtr<Eng::Viewport>& vp : viewports) {
-    if (!vp) {
-      continue;
-    }
-    renderViewport(*vp);
-  }
-}
-
-void EngineRenderer::renderViewport(Eng::Viewport& vp)
-{
 }
 
 void EngineRenderer::renderBuffer(sf::RenderTarget* target)

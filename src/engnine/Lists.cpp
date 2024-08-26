@@ -1,5 +1,7 @@
 #include "Lists.hpp"
 
+#include "engnine/Viewport.hpp"
+
 namespace Eng {
 
 static Lists* instance = nullptr;
@@ -23,6 +25,8 @@ void Lists::Destroy()
   instance = nullptr;
 }
 
+Lists::Lists() { }
+
 void Lists::markZOrderDirty()
 {
   zDirty = true;
@@ -34,6 +38,9 @@ void Lists::sortZ()
     return;
   }
   std::sort(renderList.begin(), renderList.end(), compareZ);
+  for (Viewport* vp : viewports) {
+    std::sort(vp->children.begin(), vp->children.end(), compareZ);
+  }
   zDirty = false;
 }
 

@@ -18,8 +18,8 @@
 #include "engnine/Color.hpp"
 #include "engnine/Engine.h"
 #include "engnine/EngineBase.hpp"
+#include "engnine/IViewportChild.h"
 #include "engnine/Lists.hpp"
-#include "engnine/OnRender.h"
 #include "engnine/OnUpdate.h"
 #include "engnine/Rect.hpp"
 #include "engnine/Tone.hpp"
@@ -34,7 +34,7 @@
 
 namespace Eng {
 
-class Sprite : OnUpdate, OnRender, public EngineBase {
+class Sprite : OnUpdate, IViewportChild, public EngineBase {
  public:
 
   // Constructor
@@ -86,6 +86,11 @@ class Sprite : OnUpdate, OnRender, public EngineBase {
       Engine Methods
   */
 
+  inline Viewport *getViewport() const override
+  {
+    return viewport;
+  }
+
   inline int getZIndex() const override
   {
     return z;
@@ -131,7 +136,6 @@ class Sprite : OnUpdate, OnRender, public EngineBase {
     // spriteColor.a = opacity;
     // spr.setColor(spriteColor);
     renderTexture.draw(spr);
-
     return;
 
     sf::RenderStates state;
