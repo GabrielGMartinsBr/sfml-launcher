@@ -110,8 +110,9 @@ void Viewport::updateSprite()
   texture = rd.getTexture();
   sprite.setTexture(texture);
 
-  srcRect.left = static_cast<int>(rect->x.get());
-  srcRect.top = static_cast<int>(rect->y.get());
+  sprite.setPosition(rect->x.get(), rect->y.get());
+  srcRect.left = 0;
+  srcRect.top = 0;
   srcRect.width = rect->width.get();
   srcRect.height = rect->height.get();
   sprite.setTextureRect(srcRect);
