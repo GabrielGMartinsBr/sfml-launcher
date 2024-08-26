@@ -88,13 +88,20 @@ struct Lists {
     }
   }
 
+  void markZOrderDirty();
+
+  void sortZ();
 
  private:
+  bool zDirty;
+
   Lists() :
       defaultViewport(nullptr) { }
 
   Lists(const Lists&);
   Lists& operator=(const Lists&);
+
+  static bool compareZ(const OnRender* a, const OnRender* b);
 };
 
 }  // namespace Eng

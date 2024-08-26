@@ -97,37 +97,6 @@ void Engine::addViewport(SharedPtr<Eng::Viewport> vp)
   renderer->addViewport(vp);
 }
 
-// OnUpdate List
-
-void Engine::addToUpdateList(Eng::OnUpdate* instance)
-{
-  renderer->addToUpdateList(instance);
-}
-
-void Engine::removeFromUpdateList(Eng::OnUpdate* instance)
-{
-  renderer->removeFromUpdateList(instance);
-}
-
-// OnRender List
-
-void Engine::addToRenderList(Eng::OnRender* instance)
-{
-  renderer->addToRenderList(instance);
-}
-
-void Engine::removeFromRenderList(Eng::OnRender* instance)
-{
-  renderer->removeFromRenderList(instance);
-}
-
-// ZOrder flag
-
-void Engine::markZOrderDirty()
-{
-  renderer->markZOrderDirty();
-}
-
 void Engine::updateInput()
 {
   pollEvents();

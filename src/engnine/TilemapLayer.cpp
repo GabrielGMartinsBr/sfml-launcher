@@ -4,7 +4,7 @@
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 
-#include "engnine/Engine.h"
+#include "engnine/Lists.hpp"
 
 namespace Eng {
 
@@ -42,7 +42,7 @@ void TilemapLayer::calcZ()
   } else {
     z = (y + priority + 1) * 32;
   }
-  Engine::getInstance().markZOrderDirty();
+  Lists::Instance().markZOrderDirty();
 }
 
 void TilemapLayer::update(int oy)
@@ -51,7 +51,7 @@ void TilemapLayer::update(int oy)
   nextZ = (y - oy + priority + 1) * 32;
   if (nextZ != z) {
     z = nextZ;
-    Engine::getInstance().markZOrderDirty();
+    Lists::Instance().markZOrderDirty();
   }
 }
 
@@ -85,7 +85,7 @@ void TilemapLayer::addToEngineCycles()
   if (addedToEngineCycles) {
     return;
   }
-  Engine::getInstance().addToRenderList(this);
+  Lists::Instance().addRenderEntry(this);
   addedToEngineCycles = true;
 }
 
@@ -94,7 +94,7 @@ void TilemapLayer::removeFromEngineCycles()
   if (!addedToEngineCycles) {
     return;
   }
-  Engine::getInstance().removeFromRenderList(this);
+  Lists::Instance().removeRenderEntry(this);
   addedToEngineCycles = false;
 }
 

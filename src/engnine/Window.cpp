@@ -12,7 +12,7 @@
 
 #include "NumberUtils.hpp"
 #include "engnine/Bitmap.h"
-#include "engnine/Engine.h"
+#include "engnine/Lists.hpp"
 #include "engnine/Rect.hpp"
 #include "engnine/Viewport.hpp"
 #include "integrator/Convert.hpp"
@@ -416,7 +416,7 @@ void Window::setZ(int v)
   if (z == v) return;
   z = v;
   setInstanceVar("@z", Convert::toRubyNumber(v));
-  Engine::getInstance().markZOrderDirty();
+  Lists::Instance().markZOrderDirty();
 }
 VALUE Window::setter_z(VALUE v)
 {
@@ -424,7 +424,7 @@ VALUE Window::setter_z(VALUE v)
   if (z == value) return v;
   z = value;
   setInstanceVar("@z", v);
-  Engine::getInstance().markZOrderDirty();
+  Lists::Instance().markZOrderDirty();
   return v;
 }
 
@@ -580,8 +580,8 @@ void Window::addToEngineCycles()
   if (addedToEngineCycles) {
     return;
   }
-  Engine::getInstance().addToUpdateList(this);
-  Engine::getInstance().addToRenderList(this);
+  Lists::Instance().addUpdateEntry(this);
+  Lists::Instance().addRenderEntry(this);
   addedToEngineCycles = true;
 }
 
@@ -590,8 +590,8 @@ void Window::removeFromEngineCycles()
   if (!addedToEngineCycles) {
     return;
   }
-  Engine::getInstance().removeFromUpdateList(this);
-  Engine::getInstance().removeFromRenderList(this);
+  Lists::Instance().removeUpdateEntry(this);
+  Lists::Instance().removeRenderEntry(this);
   addedToEngineCycles = false;
 }
 

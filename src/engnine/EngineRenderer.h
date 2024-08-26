@@ -10,8 +10,7 @@
 #include <SFML/System/Vector2.hpp>
 
 #include "base/Sugars.hpp"
-#include "engnine/OnRender.h"
-#include "engnine/OnUpdate.h"
+#include "engnine/Lists.hpp"
 #include "engnine/Viewport.hpp"
 
 namespace Eng {
@@ -20,20 +19,6 @@ struct EngineRenderer {
   EngineRenderer(unsigned int _width, unsigned int _height);
 
   void addViewport(SharedPtr<Eng::Viewport> vp);
-
-  // Update
-
-  void addToUpdateList(Eng::OnUpdate* instance);
-
-  void removeFromUpdateList(Eng::OnUpdate* instance);
-
-  // Render
-
-  void addToRenderList(Eng::OnRender* instance);
-
-  void removeFromRenderList(Eng::OnRender* instance);
-
-  void markZOrderDirty();
 
   void render(sf::RenderTarget* target);
 
@@ -46,18 +31,13 @@ struct EngineRenderer {
    */
 
  private:
-  static bool compareZ(const OnRender* a, const OnRender* b);
-
   unsigned int width;
   unsigned int height;
-  bool zDirty;
 
+  Lists& lists;
   sf::RenderWindow* window;
   Vector<SharedPtr<Eng::Viewport>> viewports;
   SharedPtr<Eng::Viewport> defaultVp;
-
-  Vector<Eng::OnUpdate*> updateList;
-  Vector<Eng::OnRender*> renderList;
 
   sf::Sprite bufferSprite;
   sf::RenderTexture renderTexture;
@@ -85,8 +65,6 @@ struct EngineRenderer {
   void renderBuffer(sf::RenderTarget* target);
 
   void renderFps();
-
-  void sortZ();
 };
 
 }  // namespace Eng

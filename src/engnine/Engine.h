@@ -12,8 +12,6 @@
 #include "engnine/BlenShaders.hpp"
 #include "engnine/EngineRenderer.h"
 #include "engnine/Input.hpp"
-#include "engnine/OnRender.h"
-#include "engnine/OnUpdate.h"
 
 namespace Eng {
 
@@ -44,20 +42,6 @@ class Engine {
   void cleanup();
 
   void addViewport(SharedPtr<Eng::Viewport> vp);
-
-  // Update List
-
-  void addToUpdateList(Eng::OnUpdate* instance);
-
-  void removeFromUpdateList(Eng::OnUpdate* instance);
-
-  // Render List
-
-  void addToRenderList(Eng::OnRender* instance);
-
-  void removeFromRenderList(Eng::OnRender* instance);
-
-  void markZOrderDirty();
 
   // Engine update methods
 

@@ -18,6 +18,7 @@
 #include "engnine/Color.hpp"
 #include "engnine/Engine.h"
 #include "engnine/EngineBase.hpp"
+#include "engnine/Lists.hpp"
 #include "engnine/OnRender.h"
 #include "engnine/OnUpdate.h"
 #include "engnine/Rect.hpp"
@@ -403,7 +404,7 @@ class Sprite : OnUpdate, OnRender, public EngineBase {
     if (z != value) {
       z = value;
       setInstanceVar("@z", Convert::toRubyNumber(value));
-      Engine::getInstance().markZOrderDirty();
+      Lists::Instance().markZOrderDirty();
     }
   }
 
@@ -687,8 +688,8 @@ class Sprite : OnUpdate, OnRender, public EngineBase {
     if (addedToEngineCycles) {
       return;
     }
-    Engine::getInstance().addToUpdateList(this);
-    Engine::getInstance().addToRenderList(this);
+    Lists::Instance().addUpdateEntry(this);
+    Lists::Instance().addRenderEntry(this);
     addedToEngineCycles = true;
   }
 
@@ -697,8 +698,8 @@ class Sprite : OnUpdate, OnRender, public EngineBase {
     if (!addedToEngineCycles) {
       return;
     }
-    Engine::getInstance().removeFromUpdateList(this);
-    Engine::getInstance().removeFromRenderList(this);
+    Lists::Instance().removeUpdateEntry(this);
+    Lists::Instance().removeRenderEntry(this);
     addedToEngineCycles = false;
   }
 };

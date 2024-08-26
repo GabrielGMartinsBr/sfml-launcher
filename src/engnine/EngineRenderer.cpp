@@ -11,6 +11,7 @@
 #include <stdexcept>
 #include <string>
 
+#include "engnine/Lists.hpp"
 #include "engnine/OnRender.h"
 #include "engnine/OnUpdate.h"
 #include "engnine/Timer.hpp"
@@ -21,9 +22,9 @@ namespace Eng {
 EngineRenderer::EngineRenderer(
   unsigned int _width, unsigned int _height
 ) :
+    lists(Lists::Instance()),
     width(_width),
-    height(_height),
-    zDirty(false)
+    height(_height)
 {
   createBuffer();
   createDefaultViewport();
@@ -32,42 +33,6 @@ EngineRenderer::EngineRenderer(
 void EngineRenderer::addViewport(SharedPtr<Eng::Viewport> vp)
 {
   viewports.push_back(vp);
-}
-
-// OnUpdate List
-
-void EngineRenderer::addToUpdateList(Eng::OnUpdate* instance)
-{
-  updateList.push_back(instance);
-}
-
-void EngineRenderer::removeFromUpdateList(Eng::OnUpdate* instance)
-{
-  auto it = std::find(updateList.begin(), updateList.end(), instance);
-  if (it != updateList.end()) {
-    updateList.erase(it);
-  }
-}
-
-// OnRender List
-
-void EngineRenderer::addToRenderList(Eng::OnRender* instance)
-{
-  renderList.push_back(instance);
-  zDirty = true;
-}
-
-void EngineRenderer::removeFromRenderList(Eng::OnRender* instance)
-{
-  auto it = std::find(renderList.begin(), renderList.end(), instance);
-  if (it != renderList.end()) {
-    renderList.erase(it);
-  }
-}
-
-void EngineRenderer::markZOrderDirty()
-{
-  zDirty = true;
 }
 
 void EngineRenderer::render(sf::RenderTarget* target)
@@ -133,17 +98,15 @@ void EngineRenderer::clearViewports()
 
 void EngineRenderer::update()
 {
-  for (Eng::OnUpdate* updateInst : updateList) {
+  for (Eng::OnUpdate* updateInst : lists.updateList) {
     updateInst->onUpdate();
   }
 }
 
 void EngineRenderer::render()
 {
-  if (zDirty) {
-    sortZ();
-  }
-  for (Eng::OnRender* renderInst : renderList) {
+  lists.sortZ();
+  for (Eng::OnRender* renderInst : lists.renderList) {
     if (!renderInst->shouldRender()) {
       continue;
     }
@@ -177,17 +140,6 @@ void EngineRenderer::renderFps()
 {
   fpsText.setString(std::to_string(Timer::getInstance().getFps()));
   renderTexture.draw(fpsText);
-}
-
-bool EngineRenderer::compareZ(const OnRender* a, const OnRender* b)
-{
-  return a->getZIndex() < b->getZIndex();
-}
-
-void EngineRenderer::sortZ()
-{
-  std::sort(renderList.begin(), renderList.end(), compareZ);
-  zDirty = false;
 }
 
 }  // namespace Eng

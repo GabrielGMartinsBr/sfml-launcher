@@ -298,7 +298,7 @@ void Tilemap::addToEngineCycles()
   if (addedToEngineCycles) {
     return;
   }
-  Engine::getInstance().addToUpdateList(this);
+  Lists::Instance().addUpdateEntry(this);
   addedToEngineCycles = true;
 }
 
@@ -307,7 +307,7 @@ void Tilemap::removeFromEngineCycles()
   if (!addedToEngineCycles) {
     return;
   }
-  Engine::getInstance().removeFromUpdateList(this);
+  Lists::Instance().removeUpdateEntry(this);
   addedToEngineCycles = false;
 }
 
