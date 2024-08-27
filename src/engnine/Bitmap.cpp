@@ -8,21 +8,27 @@
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/Text.hpp>
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/System/Vector2.hpp>
+#include <cassert>
 #include <stdexcept>
 
 #include "AppDefs.h"
+#include "Log.hpp"
 #include "engnine/Color.hpp"
 #include "engnine/FileUtils.hpp"
 #include "engnine/Font.hpp"
 #include "engnine/Rect.hpp"
+#include "engnine/base/Fonts.h"
 #include "engnine/internal/Texts.hpp"
 #include "integrator/Convert.hpp"
 #include "integrator/It_Bitmap.hpp"
 #include "integrator/It_Font.hpp"
 
 namespace Eng {
+
+using app::CStr;
 
 // Constructor
 
@@ -318,27 +324,64 @@ void Bitmap::hue_change(int _hue) { }
 
 // Method draw_text
 
-void Bitmap::draw_text(double x, double y, double width, double height, app::CStr str, TextAlign align)
+void Bitmap::draw_text(Rect rect, app::CStr str, TextAlign align)
 {
-  if (align == TextAlign::TEXT_LEFT) {
-    Texts::drawText(renderTexture, x, y, *font, str);
-  } else if (align == TextAlign::TEXT_RIGHT) {
-    sf::FloatRect size = getTextBounds(str, font->getter_size());
-    double _x = x + width - size.width;
-    Texts::drawText(renderTexture, _x, y, *font, str);
-  } else if (align == TextAlign::TEXT_CENTER) {
-    sf::FloatRect size = getTextBounds(str, font->getter_size());
-    double _x = x + (width - size.width) / 2;
-    Texts::drawText(renderTexture, _x, y, *font, str);
-  }
-  renderTexture.display();
+  draw_text(rect.x.get(), rect.y.get(), static_cast<double>(rect.width.get()), static_cast<double>(rect.height.get()), str, align);
 }
 
 // Method draw_text
 
-void Bitmap::draw_text(Rect rect, app::CStr str, TextAlign align)
+void Bitmap::draw_text(double x, double y, double width, double height, CStr str, TextAlign align)
 {
-  Texts::drawText(renderTexture, rect.x.get(), rect.y.get(), *font, str);
+  const sf::Font* fontPtr = Fonts::Instance().getFont("Arial-bold-ce");
+
+  if (!fontPtr) {
+    Log::err() << "Requested font was not found.";
+    return;
+  }
+
+  sf::Text text = Texts::createText(str);
+  text.setFont(*fontPtr);
+  text.setCharacterSize(font->getter_size());
+  text.setLetterSpacing(0.9);
+  // text.setLineSpacing(1.3);
+
+  const sf::Color& fillColor = font->getter_color()->getSfColor();
+  text.setFillColor(fillColor);
+
+  sf::Vector2f position;
+
+  sf::FloatRect bounds = text.getLocalBounds();
+
+  if (align == TextAlign::TEXT_LEFT) {
+    position.x = x;
+  } else if (align == TextAlign::TEXT_RIGHT) {
+    position.x = x + width - bounds.width;
+  } else if (align == TextAlign::TEXT_CENTER) {
+    position.x = x + (width - bounds.width) / 2;
+  }
+
+  position.y = y + height / 2;
+  text.setPosition(position);
+
+  float lineSpacing = fontPtr->getLineSpacing(font->getter_size());
+  // text.setOrigin(0, bounds.top + bounds.height / 2.0f);
+  text.setOrigin(0, lineSpacing / 2.0f);
+
+  sf::Vector2f scale(1, 1);
+  if (bounds.width > width) {
+    scale.x = width / bounds.width;
+  }
+  if (bounds.height > height) {
+    scale.y = height / bounds.height;
+  }
+
+  scale.x -= .07;
+  scale.y -= .1;
+
+  text.setScale(scale);
+
+  renderTexture.draw(text, sf::BlendAlpha);
   renderTexture.display();
 }
 
@@ -346,26 +389,18 @@ void Bitmap::draw_text(Rect rect, app::CStr str, TextAlign align)
 
 Eng::Rect* Bitmap::get_text_size(app::CStr str)
 {
-  sf::Font sfFont;
-  Texts::loadFont(sfFont);
+  const sf::Font* fontPtr = Fonts::Instance().getFont("Arial-bold-ce");
+  assert(fontPtr);
+
   sf::Text text;
-  text.setFont(sfFont);
+  text.setFont(*fontPtr);
   text.setString(str);
-  text.setCharacterSize(24);
+  text.setCharacterSize(font->getter_size());
+  // text.setLetterSpacing(0.9);
+  // text.setLineSpacing(1.3);
   sf::FloatRect textBounds = text.getLocalBounds();
   Eng::Rect* rect = new Eng::Rect(textBounds.left, textBounds.top, textBounds.width, textBounds.height);
   return rect;
-}
-
-sf::FloatRect Bitmap::getTextBounds(app::CStr str, int fontSize)
-{
-  sf::Font sfFont;
-  Texts::loadFont(sfFont);
-  sf::Text text;
-  text.setFont(sfFont);
-  text.setString(str);
-  text.setCharacterSize(fontSize);
-  return text.getLocalBounds();
 }
 
 // Static method parseColor

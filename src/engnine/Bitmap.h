@@ -72,10 +72,6 @@ class Bitmap : public EngineBase {
   void draw_text(Rect rect, app::CStr str, TextAlign align = TextAlign::TEXT_LEFT);
   Eng::Rect* get_text_size(app::CStr str);
 
-  // Engine
-
-  sf::FloatRect getTextBounds(app::CStr str, int fontSize);
-
  private:
 
   Font* font;

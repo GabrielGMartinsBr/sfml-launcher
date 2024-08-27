@@ -13,7 +13,6 @@
 #include "engnine/EngineRenderer.h"
 #include "engnine/FileUtils.hpp"
 #include "engnine/Input.hpp"
-#include "engnine/internal/Texts.hpp"
 #include "ruby.h"
 
 namespace Eng {
@@ -67,7 +66,6 @@ void Engine::init(sf::RenderWindow& _window, app::CStr _projectPath)
 
   blendShaders.loadShaders();
 
-  Texts::loadFonts();
   auto size = window->getSize();
 
   window->display();

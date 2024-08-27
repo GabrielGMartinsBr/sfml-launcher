@@ -8,6 +8,7 @@
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Text.hpp>
 #include <SFML/System/Vector2.hpp>
+#include <cassert>
 #include <stdexcept>
 #include <string>
 
@@ -16,6 +17,7 @@
 #include "engnine/IOnUpdate.h"
 #include "engnine/Timer.hpp"
 #include "engnine/Viewport.hpp"
+#include "engnine/base/Fonts.h"
 
 namespace Eng {
 
@@ -60,12 +62,9 @@ void EngineRenderer::createBuffer()
 
 void EngineRenderer::createFpsText()
 {
-  bool result = font.loadFromFile(
-    "/run/media/home/common/gabrielmartins.dev/dev/cpp/orm-xp/sfml-launcher/assets/arial.ttf"
-  );
-  if (!result) {
-    throw std::runtime_error("Could not load font.");
-  }
+  auto result = Fonts::Instance().getFont("Arial");
+  assert(result);
+  font = *result;
   fpsText.setFont(font);
   fpsText.setFillColor(sf::Color::White);
   fpsText.setOutlineColor(sf::Color::Black);

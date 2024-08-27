@@ -7,47 +7,20 @@
 #include <SFML/Graphics/Text.hpp>
 #include <SFML/System/String.hpp>
 #include <SFML/System/Utf.hpp>
-#include <stdexcept>
 
 #include "base/AppDefs.h"
-#include "engnine/Font.hpp"
 
 namespace Eng {
 
-class Texts {
+using app::CStr;
 
-
- public:
-  static sf::Font font;
-
-  static void loadFonts()
-  {
-    static sf::Font font;
-    if (!font.loadFromFile("/run/media/home/common/gabrielmartins.dev/dev/cpp/orm-xp/sfml-launcher/assets/Roboto-Medium.ttf")) {
-      throw std::runtime_error("Load fonts failed");
-    }
-  }
-
-  static void loadFont(sf::Font &font)
-  {
-    if (!font.loadFromFile("/run/media/home/common/gabrielmartins.dev/dev/cpp/orm-xp/sfml-launcher/assets/Roboto-Medium.ttf")) {
-      throw std::runtime_error("Load fonts failed");
-    }
-  }
-
-  static void drawText(sf::RenderTexture &texture, int x, int y, Eng::Font &font, const app::CStr &str)
+struct Texts {
+  static sf::Text createText(CStr str)
   {
     sf::String s = fromUtf8(str);
-    sf::Font sfFont;
-    loadFont(sfFont);
-    // sfFont.setSmooth(true);
     sf::Text text;
-    text.setFont(sfFont);
     text.setString(s);
-    text.setCharacterSize(font.getter_size() - 1);
-    text.setFillColor(font.getter_color()->getSfColor());
-    text.setPosition(x, y);
-    texture.draw(text, sf::BlendNone);
+    return text;
   }
 
   static sf::String fromUtf8(const std::string &in)

@@ -11,6 +11,7 @@
 #include "base/BacktraceUtils.hpp"
 #include "engnine/Engine.h"
 #include "engnine/Lists.hpp"
+#include "engnine/base/Fonts.h"
 #include "integrator/Integrator.hpp"
 #include "loaders/PlayerScript.hpp"
 #include "loaders/ScriptsLoader.hpp"
@@ -44,7 +45,9 @@ class Launcher {
 
     ScriptsLoader& scriptsLoader = ScriptsLoader::getInstance();
 
+    Eng::Fonts::Init();
     Eng::Lists::Init();
+
     engine.init(window, projectPath);
     integrator.init();
 
@@ -52,7 +55,10 @@ class Launcher {
     loadScripts(scriptsPath.c_str());
 
     integrator.cleanup();
+
     Eng::Lists::Destroy();
+    Eng::Fonts::Destroy();
+
     window.close();
   }
 

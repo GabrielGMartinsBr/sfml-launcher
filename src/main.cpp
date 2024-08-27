@@ -30,7 +30,8 @@ int main(int argc, char** argv)
       return 1;
     }
   } else if (argc == 1) {
-    app::CStr devScriptPath = "../../projects/Project1";
+    // app::CStr devScriptPath = "../../projects/Project1";
+    app::CStr devScriptPath = "../../projects/dev-project-graphics";
     launcher.run(devScriptPath);
   }
 

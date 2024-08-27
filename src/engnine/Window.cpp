@@ -197,7 +197,7 @@ void Window::updateWindowSpriteZ()
 {
   frame.setZ(z);
   contentsSprite.setZ(z + 2);
-  cursorSprite.setZ(z + 2);
+  cursorSprite.setZ(z + 1);
   Lists::Instance().markZOrderDirty();
 }
 void Window::updateWindowSprite()
