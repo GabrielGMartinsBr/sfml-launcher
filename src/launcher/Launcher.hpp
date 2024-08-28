@@ -10,6 +10,7 @@
 #include "base/AppDefs.h"
 #include "base/BacktraceUtils.hpp"
 #include "engnine/Engine.h"
+#include "engnine/Graphics.h"
 #include "engnine/Lists.hpp"
 #include "engnine/base/Fonts.h"
 #include "integrator/Integrator.hpp"
@@ -47,6 +48,7 @@ class Launcher {
 
     Eng::Fonts::Init();
     Eng::Lists::Init();
+    Eng::Graphics::Init();
 
     engine.init(window, projectPath);
     integrator.init();
@@ -56,6 +58,7 @@ class Launcher {
 
     integrator.cleanup();
 
+    Eng::Graphics::Destroy();
     Eng::Lists::Destroy();
     Eng::Fonts::Destroy();
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "engnine/Graphics.hpp"
+#include "engnine/Graphics.h"
 #include "ruby.h"
 
 namespace It {
@@ -36,7 +36,7 @@ class Graphics {
 
   static VALUE attrGet_frame_rate(VALUE self)
   {
-    unsigned int rate = Eng::Graphics::getInstance().getFrameRate();
+    unsigned int rate = Eng::Graphics::GetInstance().getFrameRate();
     return INT2FIX(rate);
   }
 
@@ -44,7 +44,7 @@ class Graphics {
   {
     Check_Type(value, T_FIXNUM);
     unsigned int rate = FIX2INT(value);
-    Eng::Graphics::getInstance().setFrameRate(rate);
+    Eng::Graphics::GetInstance().setFrameRate(rate);
     return value;
   }
 
@@ -54,7 +54,7 @@ class Graphics {
 
   static VALUE attrGet_frame_count(VALUE self)
   {
-    unsigned long count = Eng::Graphics::getInstance().frame_count;
+    unsigned long count = Eng::Graphics::GetInstance().frame_count;
     return INT2NUM(count);
   }
 
@@ -62,7 +62,7 @@ class Graphics {
   {
     Check_Type(value, T_FIXNUM);
     unsigned long count = NUM2INT(value);
-    Eng::Graphics::getInstance().frame_count = count;
+    Eng::Graphics::GetInstance().frame_count = count;
     return value;
   }
 
@@ -71,7 +71,7 @@ class Graphics {
   */
   static VALUE method_update(VALUE self)
   {
-    Eng::Graphics::getInstance().update();
+    Eng::Graphics::GetInstance().update();
     return Qnil;
   }
 
@@ -80,7 +80,7 @@ class Graphics {
   */
   static VALUE method_transition(VALUE self)
   {
-    Eng::Graphics::getInstance().transition();
+    Eng::Graphics::GetInstance().transition();
     return Qnil;
   }
 
@@ -89,7 +89,7 @@ class Graphics {
   */
   static VALUE method_frame_reset(VALUE self)
   {
-    Eng::Graphics::getInstance().frame_reset();
+    Eng::Graphics::GetInstance().frame_reset();
     return Qnil;
   }
 };
