@@ -59,13 +59,6 @@ void WindowSprite::setOpacity(int v)
   sprite.setColor(color);
 }
 
-void WindowSprite::drawnSprite()
-{
-  texture = rendTex.getTexture();
-  sprite.setTexture(texture);
-  sprite.setColor(color);
-}
-
 /*
   ⇩⇩⇩ Private ⇩⇩⇩
 */

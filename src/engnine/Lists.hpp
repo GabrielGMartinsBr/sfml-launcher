@@ -3,7 +3,6 @@
 #include <algorithm>
 
 #include "AppDefs.h"
-#include "Log.hpp"
 #include "engnine/IOnRender.h"
 #include "engnine/IOnUpdate.h"
 #include "engnine/IViewportChild.h"

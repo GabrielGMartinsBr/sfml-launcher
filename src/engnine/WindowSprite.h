@@ -34,8 +34,6 @@ struct WindowSprite : IOnRender {
 
   void setOpacity(int v);
 
-  void drawnSprite();
-
  private:
   Viewport* viewport;
   int z;

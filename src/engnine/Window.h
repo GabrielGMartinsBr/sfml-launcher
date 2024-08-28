@@ -174,6 +174,8 @@ class Window : public IOnUpdate, public EngineBase {
   void updateWindowSpriteZ();
 
   void updateWindowSprite();
+
+  void updateOpacity();
 };
 
 }  // namespace Eng

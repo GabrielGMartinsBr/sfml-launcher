@@ -79,9 +79,7 @@ void Window::onUpdate()
     cursorSprite.rendTex.create(width, height);
     dimensionsDirty = false;
   }
-  if (opacityDirty) {
-    frame.setOpacity(back_opacity);
-  }
+  updateOpacity();
   if (skinDirty) {
     updateFrameSprites();
     updateCursorRect();
@@ -205,6 +203,18 @@ void Window::updateWindowSprite()
   frame.visible = visible;
   contentsSprite.visible = visible;
   cursorSprite.visible = visible;
+}
+
+void Window::updateOpacity()
+{
+  if (!opacityDirty) {
+    return;
+  }
+
+  frame.setOpacity(back_opacity);
+  contentsSprite.setOpacity(contents_opacity);
+
+  opacityDirty = false;
 }
 
 }  // namespace Eng

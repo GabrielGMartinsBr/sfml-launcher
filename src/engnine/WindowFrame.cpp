@@ -111,6 +111,7 @@ void WindowFrame::updateBackgroundSprite(Bitmap* windowSkin)
   spr.setScale(scaleX, scaleY);
   spr.setPosition(1, 1);
 
+  spr.setColor(color);
   backSprite = spr;
 }
 

@@ -378,7 +378,7 @@ void Window::setter_opacity(int v)
   if (opacity == value) return;
   opacity = value;
   setInstanceVar("@opacity", Convert::toRubyNumber(value));
-  skinDirty = true;
+  opacityDirty = true;
 }
 VALUE Window::setter_opacity(VALUE v)
 {
@@ -388,7 +388,7 @@ VALUE Window::setter_opacity(VALUE v)
   v = Convert::toRubyNumber(value);
   opacity = value;
   setInstanceVar("@opacity", v);
-  skinDirty = true;
+  opacityDirty = true;
   return v;
 }
 
@@ -424,7 +424,7 @@ void Window::setter_contents_opacity(int v)
   if (contents_opacity == value) return;
   contents_opacity = value;
   setInstanceVar("@contents_opacity", Convert::toRubyNumber(value));
-  contentsDirty = true;
+  opacityDirty = true;
 }
 VALUE Window::setter_contents_opacity(VALUE v)
 {
@@ -434,7 +434,7 @@ VALUE Window::setter_contents_opacity(VALUE v)
   v = Convert::toRubyNumber(value);
   contents_opacity = value;
   setInstanceVar("@contents_opacity", v);
-  contentsDirty = true;
+  opacityDirty = true;
   return v;
 }
 
