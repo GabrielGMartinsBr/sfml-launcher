@@ -12,6 +12,7 @@
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <cassert>
+#include <cmath>
 #include <stdexcept>
 
 #include "AppDefs.h"
@@ -333,7 +334,7 @@ void Bitmap::draw_text(Rect rect, app::CStr str, TextAlign align)
 
 void Bitmap::draw_text(double x, double y, double width, double height, CStr str, TextAlign align)
 {
-  const sf::Font* fontPtr = Fonts::Instance().getFont("Arial-bold-ce");
+  const sf::Font* fontPtr = Fonts::Instance().getFont("Arial-bold");
 
   if (!fontPtr) {
     Log::err() << "Requested font was not found.";
@@ -343,30 +344,34 @@ void Bitmap::draw_text(double x, double y, double width, double height, CStr str
   sf::Text text = Texts::createText(str);
   text.setFont(*fontPtr);
   text.setCharacterSize(font->getter_size());
-  text.setLetterSpacing(0.9);
-  // text.setLineSpacing(1.3);
+  text.setLetterSpacing(1);
+  text.setLineSpacing(1.5);
 
   const sf::Color& fillColor = font->getter_color()->getSfColor();
   text.setFillColor(fillColor);
 
-  sf::Vector2f position;
+  float lineSpacing = fontPtr->getLineSpacing(font->getter_size()) * 1.25;
 
-  sf::FloatRect bounds = text.getLocalBounds();
+  sf::Vector2f position;
+  sf::Vector2f origin(0, lineSpacing / 2.0f);
+  // text.setOrigin(0, bounds.top + bounds.height / 2.0f);
+
+  sf::FloatRect bounds = text.getGlobalBounds();
 
   if (align == TextAlign::TEXT_LEFT) {
     position.x = x;
   } else if (align == TextAlign::TEXT_RIGHT) {
-    position.x = x + width - bounds.width;
+    position.x = std::floor(x + width);
+    origin.x = std::round(bounds.width + bounds.left + 3.3);
   } else if (align == TextAlign::TEXT_CENTER) {
+    origin.x = bounds.left;
     position.x = x + (width - bounds.width) / 2;
   }
 
   position.y = y + height / 2;
   text.setPosition(position);
 
-  float lineSpacing = fontPtr->getLineSpacing(font->getter_size());
-  // text.setOrigin(0, bounds.top + bounds.height / 2.0f);
-  text.setOrigin(0, lineSpacing / 2.0f);
+  text.setOrigin(origin);
 
   sf::Vector2f scale(1, 1);
   if (bounds.width > width) {
@@ -376,8 +381,8 @@ void Bitmap::draw_text(double x, double y, double width, double height, CStr str
     scale.y = height / bounds.height;
   }
 
-  scale.x -= .07;
-  scale.y -= .1;
+  scale.x -= .1;
+  scale.y -= .12;
 
   text.setScale(scale);
 
@@ -389,17 +394,17 @@ void Bitmap::draw_text(double x, double y, double width, double height, CStr str
 
 Eng::Rect* Bitmap::get_text_size(app::CStr str)
 {
-  const sf::Font* fontPtr = Fonts::Instance().getFont("Arial-bold-ce");
+  const sf::Font* fontPtr = Fonts::Instance().getFont("Arial-bold");
   assert(fontPtr);
 
   sf::Text text;
   text.setFont(*fontPtr);
   text.setString(str);
   text.setCharacterSize(font->getter_size());
-  // text.setLetterSpacing(0.9);
-  // text.setLineSpacing(1.3);
-  sf::FloatRect textBounds = text.getLocalBounds();
-  Eng::Rect* rect = new Eng::Rect(textBounds.left, textBounds.top, textBounds.width, textBounds.height);
+  text.setLetterSpacing(0.6);
+  text.setLineSpacing(1.5);
+  sf::FloatRect textBounds = text.getGlobalBounds();
+  Eng::Rect* rect = new Eng::Rect(textBounds.left, textBounds.top, textBounds.width + 1, textBounds.height);
   return rect;
 }
 
