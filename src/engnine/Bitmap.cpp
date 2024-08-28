@@ -22,7 +22,7 @@
 #include "engnine/Font.hpp"
 #include "engnine/Rect.hpp"
 #include "engnine/base/Fonts.h"
-#include "engnine/internal/Texts.hpp"
+#include "engnine/base/Texts.hpp"
 #include "integrator/Convert.hpp"
 #include "integrator/It_Bitmap.hpp"
 #include "integrator/It_Font.hpp"
