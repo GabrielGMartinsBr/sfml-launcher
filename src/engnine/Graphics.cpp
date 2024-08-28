@@ -1,6 +1,8 @@
 
 #include "engnine/Graphics.h"
 
+#include <SFML/Graphics/Color.hpp>
+
 #include "engnine/Engine.h"
 #include "engnine/Timer.hpp"
 
@@ -11,10 +13,10 @@ namespace Eng {
 */
 static Graphics* instance = nullptr;
 
-void Graphics::Init()
+void Graphics::Init(UInt width, UInt height, sf::RenderWindow& window)
 {
   assert(!instance);
-  instance = new Graphics();
+  instance = new Graphics(width, height, window);
 }
 
 Graphics& Graphics::GetInstance()
@@ -34,10 +36,20 @@ void Graphics::Destroy()
   ⇩⇩⇩ Instance ⇩⇩⇩
 */
 
-Graphics::Graphics()
+Graphics::Graphics(UInt width, UInt height, sf::RenderWindow& window) :
+    width(width),
+    height(height),
+    window(window),
+    renderer(rdt)
 {
   frame_rate = 40;
   frame_count = 0;
+  setup();
+}
+
+sf::RenderTexture& Graphics::getRenderTexture()
+{
+  return rdt;
 }
 
 unsigned int Graphics::getFrameRate()
@@ -58,7 +70,7 @@ void Graphics::setFrameRate(unsigned int v)
 
 void Graphics::update()
 {
-  Engine::getInstance().updateGraphics();
+  updateGraphics();
   Engine::getInstance().updateInput();
 
   // Timer::getInstance().printFps();
@@ -70,16 +82,39 @@ void Graphics::update()
 // TODO: Implement this method
 void Graphics::freeze() { }
 
-// TODO: Implement this method
-void Graphics::transition()
+void Graphics::transition(int duration, CStr fileName, int vague)
 {
-  Log::out() << "Graphics transition was called, but it is not implemented yet.";
+  int end = frame_count + duration;
+  while (frame_count <= end) {
+    update();
+  }
 }
 
 // TODO: Implement this method
 void Graphics::frame_reset()
 {
   Log::out() << "Graphics frame_reset was called, but it is not implemented yet.";
+}
+
+/*
+  ⇩⇩⇩ Private ⇩⇩⇩
+*/
+
+void Graphics::setup()
+{
+  sf::ContextSettings settings;
+  settings.antialiasingLevel = 0;
+  rdt.create(width, height, settings);
+  rdt.clear(sf::Color::Transparent);
+}
+
+void Graphics::updateGraphics()
+{
+  window.clear();
+
+  renderer.render(window);
+
+  window.display();
 }
 
 }  // namespace Eng

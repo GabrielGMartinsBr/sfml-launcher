@@ -1,9 +1,13 @@
 #pragma once
 
+#include "AppDefs.h"
 #include "engnine/Graphics.h"
+#include "integrator/Convert.hpp"
 #include "ruby.h"
 
 namespace It {
+
+using app::CStr;
 
 class Graphics {
  public:
@@ -78,9 +82,22 @@ class Graphics {
   /*
     Method frame_reset
   */
-  static VALUE method_transition(VALUE self)
+  static VALUE method_transition(int argc, VALUE *argv, VALUE self)
   {
-    Eng::Graphics::GetInstance().transition();
+    int duration;
+    CStr fileName;
+    int vague;
+
+    if (argc == 0) {
+      Eng::Graphics::GetInstance().transition();
+      return Qnil;
+    }
+
+    if (argc == 1) {
+      duration = Convert::toCInt2(argv[0]);
+      Eng::Graphics::GetInstance().transition(duration);
+    }
+
     return Qnil;
   }
 

@@ -15,6 +15,7 @@
 #include "engnine/Bitmap.h"
 #include "engnine/Engine.h"
 #include "engnine/EngineBase.hpp"
+#include "engnine/Lists.hpp"
 #include "engnine/Table.hpp"
 #include "engnine/TilemapLayer.h"
 #include "engnine/Viewport.hpp"

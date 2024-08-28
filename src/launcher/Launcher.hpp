@@ -2,6 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Window/WindowStyle.hpp>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -27,13 +28,11 @@ class Launcher {
 
   Integrator integrator;
 
-  Eng::Engine& engine = Eng::Engine::getInstance();
-
  public:
 
   Launcher() :
       mode(width, height),
-      window(mode, title) { }
+      window(mode, title, sf::Style::Titlebar | sf::Style::Close) { }
 
   void run(app::CStr projectPath)
   {
@@ -48,17 +47,18 @@ class Launcher {
 
     Eng::Fonts::Init();
     Eng::Lists::Init();
-    Eng::Graphics::Init();
+    Eng::Engine::Init(window, projectPath);
+    Eng::Graphics::Init(width, height, window);
 
-    engine.init(window, projectPath);
     integrator.init();
 
-    app::String scriptsPath = engine.getScriptsPath();
+    app::String scriptsPath = Eng::Engine::getInstance().getScriptsPath();
     loadScripts(scriptsPath.c_str());
 
     integrator.cleanup();
 
     Eng::Graphics::Destroy();
+    Eng::Engine::Destroy();
     Eng::Lists::Destroy();
     Eng::Fonts::Destroy();
 

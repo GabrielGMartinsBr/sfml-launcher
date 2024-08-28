@@ -6,21 +6,64 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/VideoMode.hpp>
-#include <stdexcept>
 
 #include "AppDefs.h"
 #include "engnine/BlenShaders.hpp"
-#include "engnine/EngineRenderer.h"
 #include "engnine/FileUtils.hpp"
+#include "engnine/Graphics.h"
 #include "engnine/Input.hpp"
 #include "ruby.h"
 
 namespace Eng {
 
+/*
+  ⇩⇩⇩ Static ⇩⇩⇩
+*/
+
+static Engine* instance = nullptr;
+
+void Engine::Init(sf::RenderWindow& window, CStr projectPath)
+{
+  assert(!instance);
+  instance = new Engine(window, projectPath);
+}
+
 Engine& Engine::getInstance()
 {
-  static Engine instance;
-  return instance;
+  assert(instance);
+  return *instance;
+}
+
+void Engine::Destroy()
+{
+  assert(instance);
+  delete instance;
+  instance = nullptr;
+}
+
+/*
+  ⇩⇩⇩ Instance ⇩⇩⇩
+*/
+
+Engine::Engine(sf::RenderWindow& window, CStr projectPath) :
+    input(Input::getInstance()),
+    dimensions(640, 480),
+    window(window),
+    projectPath(projectPath)
+{
+  running = false;
+  resolvePaths();
+}
+
+void Engine::run()
+{
+  running = true;
+
+  blendShaders.loadShaders();
+
+  auto size = window.getSize();
+
+  window.display();
 }
 
 /*
@@ -51,29 +94,6 @@ const app::String& Engine::getScriptsPath() const
   Methods
 */
 
-void Engine::init(sf::RenderWindow& _window, app::CStr _projectPath)
-{
-  if (initialized) {
-    throw std::runtime_error("Engine can be initialized only once.");
-  }
-  running = true;
-  window = &_window;
-  projectPath = _projectPath;
-
-  resolvePaths();
-
-  // Log::out() << scriptsPath;
-
-  blendShaders.loadShaders();
-
-  auto size = window->getSize();
-
-  window->display();
-
-  renderer = new EngineRenderer(size.x, size.y);
-  initialized = true;
-}
-
 void Engine::update()
 {
   pollEvents();
@@ -81,21 +101,11 @@ void Engine::update()
 
 void Engine::cleanup()
 {
-  delete renderer;
 }
 
 void Engine::updateInput()
 {
   pollEvents();
-}
-
-void Engine::updateGraphics()
-{
-  window->clear();
-
-  renderer->render(window);
-
-  window->display();
 }
 
 void Engine::stop()
@@ -107,18 +117,10 @@ void Engine::stop()
   Private
 */
 
-Engine::Engine() :
-    input(Input::getInstance()),
-    dimensions(640, 480)
-{
-  initialized = false;
-  running = false;
-}
-
 void Engine::pollEvents()
 {
   sf::Event event;
-  while (window->pollEvent(event)) {
+  while (window.pollEvent(event)) {
     switch (event.type) {
       case sf::Event::Closed:
         handleCloseEvent();

@@ -10,14 +10,25 @@
 
 #include "AppDefs.h"
 #include "engnine/BlenShaders.hpp"
-#include "engnine/EngineRenderer.h"
 #include "engnine/Input.hpp"
 
 namespace Eng {
 
+using app::CStr;
+
 class Engine {
  public:
+  /*
+    ⇩⇩⇩ Static ⇩⇩⇩
+  */
+
+  static void Init(sf::RenderWindow& window, CStr projectPath);
   static Engine& getInstance();
+  static void Destroy();
+
+  /*
+    ⇩⇩⇩ Instance ⇩⇩⇩
+  */
 
   BlenShaders blendShaders;
 
@@ -33,7 +44,7 @@ class Engine {
 
   // Methods
 
-  void init(sf::RenderWindow& _window, app::CStr projectPath);
+  void run();
 
   void update();
 
@@ -43,12 +54,9 @@ class Engine {
 
   void updateInput();
 
-  void updateGraphics();
-
   void stop();
 
  private:
-  bool initialized;
   bool running;
   sf::Vector2i dimensions;
   app::String projectPath;
@@ -56,10 +64,9 @@ class Engine {
 
   Input& input;
 
-  sf::RenderWindow* window;
-  EngineRenderer* renderer;
+  sf::RenderWindow& window;
 
-  Engine();
+  Engine(sf::RenderWindow& window, CStr projectPath);
 
   Engine(const Engine&);
   Engine& operator=(const Engine&);
