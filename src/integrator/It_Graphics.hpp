@@ -1,6 +1,7 @@
 #pragma once
 
 #include "AppDefs.h"
+#include "RbUtils.hpp"
 #include "engnine/Graphics.h"
 #include "integrator/Convert.hpp"
 #include "ruby.h"
@@ -23,6 +24,7 @@ class Graphics {
     rb_define_module_function(graphicsModule, "frame_count=", RUBY_METHOD_FUNC(attrSet_frame_count), 1);
 
     rb_define_module_function(graphicsModule, "update", RUBY_METHOD_FUNC(method_update), 0);
+    rb_define_module_function(graphicsModule, "freeze", RUBY_METHOD_FUNC(method_freeze), 0);
     rb_define_module_function(graphicsModule, "transition", RUBY_METHOD_FUNC(method_transition), -1);
     rb_define_module_function(graphicsModule, "frame_reset", RUBY_METHOD_FUNC(method_frame_reset), 0);
   }
@@ -80,6 +82,15 @@ class Graphics {
   }
 
   /*
+    Method freeze
+  */
+  static VALUE method_freeze(VALUE self)
+  {
+    Eng::Graphics::GetInstance().freeze();
+    return Qnil;
+  }
+
+  /*
     Method frame_reset
   */
   static VALUE method_transition(int argc, VALUE *argv, VALUE self)
@@ -96,8 +107,23 @@ class Graphics {
     if (argc == 1) {
       duration = Convert::toCInt2(argv[0]);
       Eng::Graphics::GetInstance().transition(duration);
+      return Qnil;
+    }
+    if (argc == 2) {
+      duration = Convert::toCInt2(argv[0]);
+      fileName = Convert::toCStr(argv[1]);
+      Eng::Graphics::GetInstance().transition(duration, fileName);
+      return Qnil;
+    }
+    if (argc == 3) {
+      duration = Convert::toCInt2(argv[0]);
+      fileName = Convert::toCStr(argv[1]);
+      vague = Convert::toCInt2(argv[2]);
+      Eng::Graphics::GetInstance().transition(duration, fileName, vague);
+      return Qnil;
     }
 
+    RbUtils::raiseRuntimeException("Bad number of arguments was receive.");
     return Qnil;
   }
 

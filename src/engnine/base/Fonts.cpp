@@ -73,7 +73,7 @@ void Fonts::loadFont(String name, CStr fileName)
   }
 
   fontMap[name] = font;
-  Log::out() << "Font '" << name << "' was loaded!";
+  // Log::out() << "Font '" << name << "' was loaded!";
 }
 
 }  // namespace Eng

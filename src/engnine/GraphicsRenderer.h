@@ -1,8 +1,11 @@
 #pragma once
 
+#include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Font.hpp>
+#include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Text.hpp>
+#include <SFML/Graphics/Texture.hpp>
 
 #include "engnine/Lists.hpp"
 
@@ -16,12 +19,23 @@ struct GraphicsRenderer {
 
   sf::RenderTexture& renderTexture;
   sf::Sprite renderSprite;
+  sf::Sprite frozenSprite;
 
-  GraphicsRenderer(sf::RenderTexture& renderTexture);
+  GraphicsRenderer(sf::RenderWindow& target, sf::RenderTexture& renderTexture);
 
-  void render(sf::RenderTarget& target);
+  void render();
+
+  void freeze();
+
+  void transition(float progress);
+
+  void transitionEnd();
 
  private:
+  sf::RenderWindow& window;
+  bool frozen;
+  sf::Color transitionColor;
+  sf::Texture frozenTexture;
 
   void createFpsSprite();
 

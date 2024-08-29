@@ -1,6 +1,11 @@
 #include "engnine/GraphicsRenderer.h"
 
+#include <SFML/Graphics/BlendMode.hpp>
+#include <SFML/Graphics/CircleShape.hpp>
+#include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Font.hpp>
+#include <SFML/Graphics/Texture.hpp>
+#include <SFML/Window/Window.hpp>
 
 #include "engnine/IOnUpdate.h"
 #include "engnine/Lists.hpp"
@@ -9,20 +14,56 @@
 
 namespace Eng {
 
-GraphicsRenderer::GraphicsRenderer(sf::RenderTexture& renderTexture) :
+GraphicsRenderer::GraphicsRenderer(sf::RenderWindow& window, sf::RenderTexture& renderTexture) :
     lists(Lists::Instance()),
-    renderTexture(renderTexture)
+    window(window),
+    renderTexture(renderTexture),
+    transitionColor(255, 255, 255, 255)
 {
+  frozen = false;
   createFpsSprite();
 }
 
-void GraphicsRenderer::render(sf::RenderTarget& target)
+void GraphicsRenderer::render()
 {
   clearRenderTexture();
   updateSprites();
   renderSprites();
   setRenderSpriteTexture();
-  target.draw(renderSprite);
+
+  window.clear(sf::Color::Transparent);
+  if (frozen) {
+    window.draw(frozenSprite);
+    window.draw(renderSprite);
+  } else {
+    window.draw(renderSprite);
+  }
+  window.display();
+}
+
+void GraphicsRenderer::freeze()
+{
+  clearRenderTexture();
+  renderSprites();
+  renderTexture.display();
+  frozenTexture = renderTexture.getTexture();
+  frozenSprite.setTexture(frozenTexture);
+  frozen = true;
+}
+
+void GraphicsRenderer::transition(float progress)
+{
+  transitionColor.a = 255 * progress;
+  renderSprite.setColor(transitionColor);
+}
+
+void GraphicsRenderer::transitionEnd()
+{
+  clearRenderTexture();
+  updateSprites();
+  renderSprites();
+  setRenderSpriteTexture();
+  frozen = false;
 }
 
 /*
@@ -44,7 +85,7 @@ void GraphicsRenderer::createFpsSprite()
 
 void GraphicsRenderer::clearRenderTexture()
 {
-  renderTexture.clear();
+  renderTexture.clear(sf::Color::Transparent);
   clearViewports();
 }
 

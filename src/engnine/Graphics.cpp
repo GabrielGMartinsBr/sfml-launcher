@@ -40,7 +40,7 @@ Graphics::Graphics(UInt width, UInt height, sf::RenderWindow& window) :
     width(width),
     height(height),
     window(window),
-    renderer(rdt)
+    renderer(window, rdt)
 {
   frame_rate = 40;
   frame_count = 0;
@@ -70,24 +70,29 @@ void Graphics::setFrameRate(unsigned int v)
 
 void Graphics::update()
 {
-  updateGraphics();
+  // updateGraphics();
+  renderer.render();
   Engine::getInstance().updateInput();
 
-  // Timer::getInstance().printFps();
   Timer::getInstance().controlFrameRate();
 
   frame_count++;
 }
 
-// TODO: Implement this method
-void Graphics::freeze() { }
+void Graphics::freeze()
+{
+  renderer.freeze();
+}
 
 void Graphics::transition(int duration, CStr fileName, int vague)
 {
   int end = frame_count + duration;
   while (frame_count <= end) {
+    float progress = 1 - static_cast<float>(end - frame_count) / duration;
+    renderer.transition(progress);
     update();
   }
+  renderer.transitionEnd();
 }
 
 // TODO: Implement this method
@@ -110,11 +115,7 @@ void Graphics::setup()
 
 void Graphics::updateGraphics()
 {
-  window.clear();
-
-  renderer.render(window);
-
-  window.display();
+  renderer.render();
 }
 
 }  // namespace Eng
