@@ -89,7 +89,7 @@ void Graphics::transition(int duration, CStr fileName, int vague)
   int end = frame_count + duration;
   while (frame_count <= end) {
     float progress = 1 - static_cast<float>(end - frame_count) / duration;
-    renderer.transition(progress);
+    renderer.setTransitionProgress(progress);
     update();
   }
   renderer.transitionEnd();

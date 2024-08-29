@@ -9,6 +9,7 @@
 
 #include "engnine/IOnUpdate.h"
 #include "engnine/Lists.hpp"
+#include "engnine/Shaders.h"
 #include "engnine/Timer.hpp"
 #include "engnine/base/Fonts.h"
 
@@ -16,11 +17,12 @@ namespace Eng {
 
 GraphicsRenderer::GraphicsRenderer(sf::RenderWindow& window, sf::RenderTexture& renderTexture) :
     lists(Lists::Instance()),
+    shaders(Shaders::Instance()),
     window(window),
-    renderTexture(renderTexture),
-    transitionColor(255, 255, 255, 255)
+    renderTexture(renderTexture)
 {
   frozen = false;
+  progress = 0;
   createFpsSprite();
 }
 
@@ -33,8 +35,9 @@ void GraphicsRenderer::render()
 
   window.clear(sf::Color::Transparent);
   if (frozen) {
-    window.draw(frozenSprite);
-    window.draw(renderSprite);
+    shaders.fadeTransitionShader->setUniform("alpha", progress);
+    shaders.fadeTransitionShader->setUniform("frozenTexture", frozenTexture);
+    window.draw(renderSprite, shaders.fadeTransitionShader.get());
   } else {
     window.draw(renderSprite);
   }
@@ -47,14 +50,12 @@ void GraphicsRenderer::freeze()
   renderSprites();
   renderTexture.display();
   frozenTexture = renderTexture.getTexture();
-  frozenSprite.setTexture(frozenTexture);
   frozen = true;
 }
 
-void GraphicsRenderer::transition(float progress)
+void GraphicsRenderer::setTransitionProgress(float progress)
 {
-  transitionColor.a = 255 * progress;
-  renderSprite.setColor(transitionColor);
+  this->progress = progress;
 }
 
 void GraphicsRenderer::transitionEnd()
@@ -62,7 +63,6 @@ void GraphicsRenderer::transitionEnd()
   clearRenderTexture();
   updateSprites();
   renderSprites();
-  setRenderSpriteTexture();
   frozen = false;
 }
 

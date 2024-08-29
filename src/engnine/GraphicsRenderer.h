@@ -8,14 +8,13 @@
 #include <SFML/Graphics/Texture.hpp>
 
 #include "engnine/Lists.hpp"
+#include "engnine/Shaders.h"
 
 namespace Eng {
 
 struct GraphicsRenderer {
   sf::Font font;
   sf::Text fpsSprite;
-
-  Lists& lists;
 
   sf::RenderTexture& renderTexture;
   sf::Sprite renderSprite;
@@ -27,15 +26,17 @@ struct GraphicsRenderer {
 
   void freeze();
 
-  void transition(float progress);
+  void setTransitionProgress(float progress);
 
   void transitionEnd();
 
  private:
+  Lists& lists;
+  Shaders& shaders;
   sf::RenderWindow& window;
-  bool frozen;
-  sf::Color transitionColor;
   sf::Texture frozenTexture;
+  bool frozen;
+  float progress;
 
   void createFpsSprite();
 
