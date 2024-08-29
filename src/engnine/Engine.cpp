@@ -8,7 +8,6 @@
 #include <SFML/Window/VideoMode.hpp>
 
 #include "AppDefs.h"
-#include "engnine/BlenShaders.hpp"
 #include "engnine/FileUtils.hpp"
 #include "engnine/Graphics.h"
 #include "engnine/Input.hpp"
