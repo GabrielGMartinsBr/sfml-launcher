@@ -13,6 +13,7 @@
 #include "engnine/Engine.h"
 #include "engnine/Graphics.h"
 #include "engnine/Lists.hpp"
+#include "engnine/Shaders.h"
 #include "engnine/base/Fonts.h"
 #include "integrator/Integrator.hpp"
 #include "loaders/PlayerScript.hpp"
@@ -46,6 +47,7 @@ class Launcher {
     ScriptsLoader& scriptsLoader = ScriptsLoader::getInstance();
 
     Eng::Fonts::Init();
+    Eng::Shaders::Init();
     Eng::Lists::Init();
     Eng::Engine::Init(window, projectPath);
     Eng::Graphics::Init(width, height, window);
@@ -60,6 +62,7 @@ class Launcher {
     Eng::Graphics::Destroy();
     Eng::Engine::Destroy();
     Eng::Lists::Destroy();
+    Eng::Shaders::Destroy();
     Eng::Fonts::Destroy();
 
     window.close();
