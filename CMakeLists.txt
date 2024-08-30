@@ -3,7 +3,7 @@ project(ORM-SLauncher VERSION 0.1.0)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 
 # Debug
@@ -34,6 +34,7 @@ add_executable(${PROJECT_NAME} ${source_files})
 find_package(RubyStatic REQUIRED)
 include_directories(${RubyStatic_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} ${RubyStatic_LIBRARIES} -lcrypt)
+target_compile_options(${PROJECT_NAME} PRIVATE -Wno-register)
 
 
 # Boost Filesystem
