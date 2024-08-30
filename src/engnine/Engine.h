@@ -9,7 +9,6 @@
 #include <SFML/Window/VideoMode.hpp>
 
 #include "AppDefs.h"
-#include "engnine/BlenShaders.hpp"
 #include "engnine/Input.hpp"
 
 namespace Eng {
@@ -29,8 +28,6 @@ class Engine {
   /*
     ⇩⇩⇩ Instance ⇩⇩⇩
   */
-
-  BlenShaders blendShaders;
 
   // Getters
 

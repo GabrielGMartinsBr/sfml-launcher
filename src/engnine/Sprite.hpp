@@ -16,7 +16,6 @@
 #include "base/NumberUtils.hpp"
 #include "engnine/Bitmap.h"
 #include "engnine/Color.hpp"
-#include "engnine/Engine.h"
 #include "engnine/EngineBase.hpp"
 #include "engnine/IOnUpdate.h"
 #include "engnine/IViewportChild.h"
@@ -137,28 +136,28 @@ class Sprite : IOnUpdate, IViewportChild, public EngineBase {
     renderTexture.draw(spr);
     return;
 
-    sf::RenderStates state;
+    // sf::RenderStates state;
     // state.blendMode = sf::BlendNone;
 
-    if (getter_blend_type() == 2) {
-      Engine::getInstance().blendShaders.sprInvertShader.setUniform("opacity", opacity);
-      state.shader = &Engine::getInstance().blendShaders.sprInvertShader;
-      state.blendMode = sf::BlendMultiply;
-    } else {
-      Engine::getInstance().blendShaders.sprNormalShader.setUniform("opacity", opacity);
-      state.shader = &Engine::getInstance().blendShaders.sprNormalShader;
-      state.blendMode = sf::BlendAlpha;
-    }
+    // if (getter_blend_type() == 2) {
+    //   Engine::getInstance().blendShaders.sprInvertShader.setUniform("opacity", opacity);
+    //   state.shader = &Engine::getInstance().blendShaders.sprInvertShader;
+    //   state.blendMode = sf::BlendMultiply;
+    // } else {
+    //   Engine::getInstance().blendShaders.sprNormalShader.setUniform("opacity", opacity);
+    //   state.shader = &Engine::getInstance().blendShaders.sprNormalShader;
+    //   state.blendMode = sf::BlendAlpha;
+    // }
     // Engine::getInstance().blendShaders.sprInvertShader.setUniform("opacity", opacity);
     // state.shader = &Engine::getInstance().blendShaders.sprInvertShader;
     // state.blendMode = sf::BlendMultiply;
     // state.blendMode = sf::BlendAlpha;
 
-    renderTexture.draw(
-      spr,
-      state
-    );
-    renderTexture.display();
+    // renderTexture.draw(
+    //   spr,
+    //   state
+    // );
+    // renderTexture.display();
   }
 
   void applyChanges()

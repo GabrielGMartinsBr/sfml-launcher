@@ -58,8 +58,6 @@ void Engine::run()
 {
   running = true;
 
-  blendShaders.loadShaders();
-
   auto size = window.getSize();
 
   window.display();
