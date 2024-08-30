@@ -47,6 +47,7 @@ void Shaders::Destroy()
 Shaders::Shaders()
 {
   fadeTransitionShader = loadFragment("FadeTransition.frag");
+  imageTransitionShader = loadFragment("ImageTransition.frag");
 }
 
 UPtr<Shader> Shaders::loadFragment(CStr fileName)

@@ -16,7 +16,7 @@ using app::String;
 static CStr RTP_PATH = "/run/media/home/common/gabrielmartins.dev/dev/cpp/orm-xp/sfml-launcher/GameData/RGSS-RTP";
 
 struct FileUtils {
-  static String parseRtpPath(CStr assetName)
+  static String resolveRtpImagePath(CStr assetName)
   {
     FilePath path(RTP_PATH);
     path.append(assetName);

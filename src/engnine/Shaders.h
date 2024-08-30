@@ -24,6 +24,7 @@ struct Shaders {
   */
 
   UPtr<Shader> fadeTransitionShader;
+  UPtr<Shader> imageTransitionShader;
 
   Shaders();
 

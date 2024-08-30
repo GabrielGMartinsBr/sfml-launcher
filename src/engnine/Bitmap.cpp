@@ -39,7 +39,7 @@ Bitmap::Bitmap(const char* assetName, VALUE rbObj) :
     renderTexture()
 {
   sf::Image image;
-  app::String filename = FileUtils::parseRtpPath(assetName);
+  app::String filename = FileUtils::resolveRtpImagePath(assetName);
   bool loaded = image.loadFromFile(filename);
   if (!loaded) {
     throw std::runtime_error("Could not load image.");

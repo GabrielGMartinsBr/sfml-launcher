@@ -15,14 +15,14 @@
 
 namespace Eng {
 
+using sf::Texture;
+
 GraphicsRenderer::GraphicsRenderer(sf::RenderWindow& window, sf::RenderTexture& renderTexture) :
     lists(Lists::Instance()),
     shaders(Shaders::Instance()),
     window(window),
     renderTexture(renderTexture)
 {
-  frozen = false;
-  progress = 0;
   createFpsSprite();
 }
 
@@ -34,13 +34,7 @@ void GraphicsRenderer::render()
   setRenderSpriteTexture();
 
   window.clear(sf::Color::Transparent);
-  if (frozen) {
-    shaders.fadeTransitionShader->setUniform("alpha", progress);
-    shaders.fadeTransitionShader->setUniform("frozenTexture", frozenTexture);
-    window.draw(renderSprite, shaders.fadeTransitionShader.get());
-  } else {
-    window.draw(renderSprite);
-  }
+  window.draw(renderSprite);
   window.display();
 }
 
@@ -50,12 +44,37 @@ void GraphicsRenderer::freeze()
   renderSprites();
   renderTexture.display();
   frozenTexture = renderTexture.getTexture();
-  frozen = true;
 }
 
-void GraphicsRenderer::setTransitionProgress(float progress)
+void GraphicsRenderer::renderFadeTransitionState(float progress)
 {
-  this->progress = progress;
+  clearRenderTexture();
+  updateSprites();
+  renderSprites();
+  setRenderSpriteTexture();
+
+  window.clear(sf::Color::Transparent);
+  shaders.fadeTransitionShader->setUniform("alpha", progress);
+  shaders.fadeTransitionShader->setUniform("frozenTexture", frozenTexture);
+  window.draw(renderSprite, shaders.fadeTransitionShader.get());
+  window.display();
+}
+
+void GraphicsRenderer::renderImageTransitionState(float progress, const Texture& transTexture, float vague)
+{
+  clearRenderTexture();
+  updateSprites();
+  renderSprites();
+  setRenderSpriteTexture();
+
+  shaders.imageTransitionShader->setUniform("frozenTexture", frozenTexture);
+  shaders.imageTransitionShader->setUniform("progress", progress);
+  shaders.imageTransitionShader->setUniform("vague", vague);
+  shaders.imageTransitionShader->setUniform("transitionTexture", transTexture);
+
+  window.clear(sf::Color::Transparent);
+  window.draw(renderSprite, shaders.imageTransitionShader.get());
+  window.display();
 }
 
 void GraphicsRenderer::transitionEnd()
@@ -63,7 +82,6 @@ void GraphicsRenderer::transitionEnd()
   clearRenderTexture();
   updateSprites();
   renderSprites();
-  frozen = false;
 }
 
 /*

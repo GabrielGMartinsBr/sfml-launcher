@@ -52,6 +52,8 @@ class Graphics {
   sf::RenderTexture rdt;
   sf::Sprite renderSprite;
   GraphicsRenderer renderer;
+  sf::Image transitionImage;
+  sf::Texture transitionTexture;
 
   UInt frame_rate;
   UInt timestamp;
@@ -63,7 +65,11 @@ class Graphics {
 
   void setup();
 
-  void updateGraphics();
+  void frameUpdate();
+
+  void doFadeTransition(int duration);
+
+  void doImageTransition(int duration, CStr fileName, float vague);
 };
 
 }  // namespace Eng

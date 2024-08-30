@@ -2,9 +2,12 @@
 #include "engnine/Graphics.h"
 
 #include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/Texture.hpp>
 
+#include "NumberUtils.hpp"
 #include "engnine/Audio.h"
 #include "engnine/Engine.h"
+#include "engnine/FileUtils.hpp"
 #include "engnine/Timer.hpp"
 
 namespace Eng {
@@ -72,16 +75,8 @@ void Graphics::setFrameRate(unsigned int v)
 
 void Graphics::update()
 {
-  timestamp = frame_count / frame_rate;
-  // updateGraphics();
   renderer.render();
-  Engine::getInstance().updateInput();
-
-  Timer::getInstance().controlFrameRate();
-
-  Audio::Instance().update(timestamp);
-
-  frame_count++;
+  frameUpdate();
 }
 
 void Graphics::freeze()
@@ -89,15 +84,14 @@ void Graphics::freeze()
   renderer.freeze();
 }
 
-void Graphics::transition(int duration, CStr fileName, int vague)
+void Graphics::transition(int duration, CStr fileName, int _vague)
 {
-  int end = frame_count + duration;
-  while (frame_count <= end) {
-    float progress = 1 - static_cast<float>(end - frame_count) / duration;
-    renderer.setTransitionProgress(progress);
-    update();
+  if (fileName == nullptr) {
+    doFadeTransition(duration);
+  } else {
+    float vague = Num::clamp(_vague, 1, 256) / 256.0f;
+    doImageTransition(duration, fileName, vague);
   }
-  renderer.transitionEnd();
 }
 
 // TODO: Implement this method
@@ -118,9 +112,47 @@ void Graphics::setup()
   rdt.clear(sf::Color::Transparent);
 }
 
-void Graphics::updateGraphics()
+void Graphics::frameUpdate()
 {
-  renderer.render();
+  Engine::getInstance().updateInput();
+  Timer::getInstance().controlFrameRate();
+  Audio::Instance().update(timestamp);
+
+  frame_count++;
+  timestamp = frame_count / frame_rate;
+}
+
+void Graphics::doFadeTransition(int duration)
+{
+  int end = frame_count + duration;
+
+  while (frame_count <= end) {
+    float progress = 1 - static_cast<float>(end - frame_count) / duration;
+    renderer.renderFadeTransitionState(progress);
+    frameUpdate();
+  }
+
+  renderer.transitionEnd();
+}
+
+void Graphics::doImageTransition(int duration, CStr fileName, float vague)
+{
+  int end = frame_count + duration;
+
+  app::String filename = FileUtils::resolveRtpImagePath(fileName);
+  bool loaded = transitionImage.loadFromFile(filename);
+  if (!loaded) {
+    throw std::runtime_error("Could not load image.");
+  }
+  transitionTexture.loadFromImage(transitionImage);
+
+  while (frame_count <= end) {
+    float progress = 1 - static_cast<float>(end - frame_count) / duration;
+    renderer.renderImageTransitionState(progress, transitionTexture, vague);
+    frameUpdate();
+  }
+
+  renderer.transitionEnd();
 }
 
 }  // namespace Eng

@@ -2,6 +2,7 @@
 
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Font.hpp>
+#include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Text.hpp>
@@ -12,31 +13,34 @@
 
 namespace Eng {
 
+using sf::RenderTexture;
+using sf::RenderWindow;
+using sf::Texture;
+
 struct GraphicsRenderer {
-  sf::Font font;
-  sf::Text fpsSprite;
-
-  sf::RenderTexture& renderTexture;
-  sf::Sprite renderSprite;
-  sf::Sprite frozenSprite;
-
-  GraphicsRenderer(sf::RenderWindow& target, sf::RenderTexture& renderTexture);
+  GraphicsRenderer(RenderWindow& target, RenderTexture& renderTexture);
 
   void render();
 
   void freeze();
 
-  void setTransitionProgress(float progress);
+  void renderFadeTransitionState(float progress);
+
+  void renderImageTransitionState(float progress, const Texture& transitionTexture, float vague);
 
   void transitionEnd();
 
  private:
   Lists& lists;
   Shaders& shaders;
-  sf::RenderWindow& window;
-  sf::Texture frozenTexture;
-  bool frozen;
-  float progress;
+  RenderWindow& window;
+
+  RenderTexture& renderTexture;
+  sf::Sprite renderSprite;
+  Texture frozenTexture;
+
+  sf::Font font;
+  sf::Text fpsSprite;
 
   void createFpsSprite();
 
