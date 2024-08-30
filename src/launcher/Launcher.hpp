@@ -10,6 +10,7 @@
 #include "Log.hpp"
 #include "base/AppDefs.h"
 #include "base/BacktraceUtils.hpp"
+#include "engnine/Audio.h"
 #include "engnine/Engine.h"
 #include "engnine/Graphics.h"
 #include "engnine/Lists.hpp"
@@ -51,6 +52,7 @@ class Launcher {
     Eng::Lists::Init();
     Eng::Engine::Init(window, projectPath);
     Eng::Graphics::Init(width, height, window);
+    Eng::Audio::Init();
 
     integrator.init();
 
@@ -59,6 +61,7 @@ class Launcher {
 
     integrator.cleanup();
 
+    Eng::Audio::Destroy();
     Eng::Graphics::Destroy();
     Eng::Engine::Destroy();
     Eng::Lists::Destroy();

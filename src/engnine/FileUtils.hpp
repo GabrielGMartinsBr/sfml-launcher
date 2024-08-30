@@ -7,54 +7,65 @@
 
 #include "base/AppDefs.h"
 
-typedef boost::filesystem::path FPath;
-
 namespace Eng {
 
+using app::CStr;
+using app::FilePath;
+using app::String;
+
+static CStr RTP_PATH = "/run/media/home/common/gabrielmartins.dev/dev/cpp/orm-xp/sfml-launcher/GameData/RGSS-RTP";
+
 struct FileUtils {
-  static app::String parseRtpPath(app::CStr assetName)
+  static String parseRtpPath(CStr assetName)
   {
-    FPath p("/run/media/home/common/gabrielmartins.dev/dev/cpp/orm-xp/sfml-launcher/GameData/RGSS-RTP");
-    p.append(assetName);
-    p.replace_extension(".png");
-    if (boost::filesystem::exists(p)) {
-      return p.string();
+    FilePath path(RTP_PATH);
+    path.append(assetName);
+    path.replace_extension(".png");
+    if (boost::filesystem::exists(path)) {
+      return path.string();
     }
-    p.replace_extension(".jpg");
-    if (boost::filesystem::exists(p)) {
-      return p.string();
+    path.replace_extension(".jpg");
+    if (boost::filesystem::exists(path)) {
+      return path.string();
     }
     return nullptr;
   }
 
-  static app::FilePath combine(app::CStr basePath, app::CStr path)
+  static String resolveRtpPath(CStr assetName)
   {
-    boost::filesystem::path combined_path = boost::filesystem::path(basePath) / path;
+    FilePath path(RTP_PATH);
+    path.append(assetName);
+    return path.string();
+  }
+
+  static FilePath combine(CStr basePath, CStr path)
+  {
+    FilePath combined_path = FilePath(basePath) / path;
     return combined_path;
   }
 
-  static app::FilePath combine(app::String basePath, app::CStr path)
+  static FilePath combine(String basePath, CStr path)
   {
-    boost::filesystem::path combined_path = boost::filesystem::path(basePath) / path;
+    FilePath combined_path = FilePath(basePath) / path;
     return boost::filesystem::canonical(combined_path);
   }
 
-  static bool exist(app::CStr path)
+  static bool exist(CStr path)
   {
     return boost::filesystem::exists(path);
   }
 
-  static bool isFile(app::CStr path)
+  static bool isFile(CStr path)
   {
     return boost::filesystem::is_regular_file(path);
   }
 
-  static bool isDirectory(app::CStr path)
+  static bool isDirectory(CStr path)
   {
     return boost::filesystem::is_directory(path);
   }
 
-  static int getFileSize(app::CStr path)
+  static int getFileSize(CStr path)
   {
     return boost::filesystem::file_size(path);
   }

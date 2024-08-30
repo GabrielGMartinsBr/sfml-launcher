@@ -29,9 +29,9 @@ class Graphics {
 
   sf::RenderTexture& getRenderTexture();
 
-  unsigned int getFrameRate();
+  UInt getFrameRate();
 
-  void setFrameRate(unsigned int v);
+  void setFrameRate(UInt v);
 
   void update();
 
@@ -53,7 +53,8 @@ class Graphics {
   sf::Sprite renderSprite;
   GraphicsRenderer renderer;
 
-  unsigned int frame_rate;
+  UInt frame_rate;
+  UInt timestamp;
 
   Graphics(UInt width, UInt height, sf::RenderWindow& window);
 

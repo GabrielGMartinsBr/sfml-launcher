@@ -3,11 +3,14 @@
 #include <stdexcept>
 #include <string>
 
-#include "engnine/Audio.hpp"
+#include "AppDefs.h"
+#include "engnine/Audio.h"
 #include "integrator/Convert.hpp"
 #include "ruby.h"
 
 namespace It {
+
+using app::CStr;
 
 class Audio {
  public:
@@ -44,17 +47,17 @@ class Audio {
     switch (argc) {
       case 1: {
         rb_scan_args(argc, argv, "1", &_filename);
-        Eng::Audio::bgm_play();
+        Eng::Audio::Instance().bgm_play();
         break;
       }
       case 2: {
         rb_scan_args(argc, argv, "2", &_filename, &_volume);
-        Eng::Audio::bgm_play();
+        Eng::Audio::Instance().bgm_play();
         break;
       }
       case 3: {
         rb_scan_args(argc, argv, "3", &_filename, &_volume, &_pitch);
-        Eng::Audio::bgm_play();
+        Eng::Audio::Instance().bgm_play();
         break;
       }
       default: {
@@ -66,7 +69,7 @@ class Audio {
 
   static VALUE bgm_stop(VALUE self)
   {
-    Eng::Audio::bgm_stop();
+    Eng::Audio::Instance().bgm_stop();
     return Qnil;
   }
 
@@ -74,7 +77,7 @@ class Audio {
   {
     int time = Convert::toCInt(_time);
 
-    Eng::Audio::bgm_fade(time);
+    Eng::Audio::Instance().bgm_fade(time);
     return Qnil;
   }
 
@@ -84,21 +87,21 @@ class Audio {
 
   static VALUE bgs_play(int argc, VALUE *argv, VALUE self)
   {
-    VALUE _filename, _volume, _pitch;
+    CStr fileName = Convert::toCStr(argv[0]);
     switch (argc) {
       case 1: {
-        rb_scan_args(argc, argv, "1", &_filename);
-        Eng::Audio::bgs_play();
+        Eng::Audio::Instance().bgs_play(fileName);
         break;
       }
       case 2: {
-        rb_scan_args(argc, argv, "2", &_filename, &_volume);
-        Eng::Audio::bgs_play();
+        float volume = Convert::toCDouble2(argv[1]);
+        Eng::Audio::Instance().bgs_play(fileName, volume);
         break;
       }
       case 3: {
-        rb_scan_args(argc, argv, "3", &_filename, &_volume, &_pitch);
-        Eng::Audio::bgs_play();
+        float volume = Convert::toCDouble2(argv[1]);
+        float pitch = Convert::toCDouble2(argv[2]);
+        Eng::Audio::Instance().bgs_play(fileName, volume, pitch / 100);
         break;
       }
       default: {
@@ -110,7 +113,7 @@ class Audio {
 
   static VALUE bgs_stop(VALUE self)
   {
-    Eng::Audio::bgs_stop();
+    Eng::Audio::Instance().bgs_stop();
     return Qnil;
   }
 
@@ -118,7 +121,7 @@ class Audio {
   {
     int time = Convert::toCInt(_time);
 
-    Eng::Audio::bgs_fade(time);
+    Eng::Audio::Instance().bgs_fade(time);
     return Qnil;
   }
 
@@ -132,17 +135,17 @@ class Audio {
     switch (argc) {
       case 1: {
         rb_scan_args(argc, argv, "1", &_filename);
-        Eng::Audio::me_play();
+        Eng::Audio::Instance().me_play();
         break;
       }
       case 2: {
         rb_scan_args(argc, argv, "2", &_filename, &_volume);
-        Eng::Audio::me_play();
+        Eng::Audio::Instance().me_play();
         break;
       }
       case 3: {
         rb_scan_args(argc, argv, "3", &_filename, &_volume, &_pitch);
-        Eng::Audio::me_play();
+        Eng::Audio::Instance().me_play();
         break;
       }
       default: {
@@ -154,7 +157,7 @@ class Audio {
 
   static VALUE me_stop(VALUE self)
   {
-    Eng::Audio::me_stop();
+    Eng::Audio::Instance().me_stop();
     return Qnil;
   }
 
@@ -162,7 +165,7 @@ class Audio {
   {
     int time = Convert::toCInt(_time);
 
-    Eng::Audio::me_fade(time);
+    Eng::Audio::Instance().me_fade(time);
     return Qnil;
   }
 
@@ -172,21 +175,21 @@ class Audio {
 
   static VALUE se_play(int argc, VALUE *argv, VALUE self)
   {
-    VALUE _filename, _volume, _pitch;
+    CStr fileName = Convert::toCStr(argv[0]);
     switch (argc) {
       case 1: {
-        rb_scan_args(argc, argv, "1", &_filename);
-        Eng::Audio::se_play();
+        Eng::Audio::Instance().se_play(fileName);
         break;
       }
       case 2: {
-        rb_scan_args(argc, argv, "2", &_filename, &_volume);
-        Eng::Audio::se_play();
+        float volume = Convert::toCDouble2(argv[1]);
+        Eng::Audio::Instance().se_play(fileName, volume);
         break;
       }
       case 3: {
-        rb_scan_args(argc, argv, "3", &_filename, &_volume, &_pitch);
-        Eng::Audio::se_play();
+        float volume = Convert::toCDouble2(argv[1]);
+        float pitch = Convert::toCDouble2(argv[2]);
+        Eng::Audio::Instance().se_play(fileName, volume, pitch / 100);
         break;
       }
       default: {
@@ -198,15 +201,14 @@ class Audio {
 
   static VALUE se_stop(VALUE self)
   {
-    Eng::Audio::se_stop();
+    Eng::Audio::Instance().se_stop();
     return Qnil;
   }
 
   static VALUE se_fade(VALUE self, VALUE _time)
   {
     int time = Convert::toCInt(_time);
-
-    Eng::Audio::se_fade(time);
+    Eng::Audio::Instance().se_fade(time);
     return Qnil;
   }
 };

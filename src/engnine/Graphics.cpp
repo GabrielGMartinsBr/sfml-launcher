@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics/Color.hpp>
 
+#include "engnine/Audio.h"
 #include "engnine/Engine.h"
 #include "engnine/Timer.hpp"
 
@@ -44,6 +45,7 @@ Graphics::Graphics(UInt width, UInt height, sf::RenderWindow& window) :
 {
   frame_rate = 40;
   frame_count = 0;
+  timestamp = 0;
   setup();
 }
 
@@ -70,11 +72,14 @@ void Graphics::setFrameRate(unsigned int v)
 
 void Graphics::update()
 {
+  timestamp = frame_count / frame_rate;
   // updateGraphics();
   renderer.render();
   Engine::getInstance().updateInput();
 
   Timer::getInstance().controlFrameRate();
+
+  Audio::Instance().update(timestamp);
 
   frame_count++;
 }
