@@ -131,20 +131,26 @@ void Sprite::onUpdate()
 
 void Sprite::onRender(sf::RenderTexture &renderTexture)
 {
+  states.blendMode = sf::BlendAlpha;
+
   if (flashTicks == 0) {
     Shaders::Instance().spriteColor->setUniform("color", spriteColor);
     Shaders::Instance().spriteColor->setUniform("opacity", opacity / 255.0f);
-    renderTexture.draw(spr, Shaders::Instance().spriteColor.get());
+    states.shader = Shaders::Instance().spriteColor.get();
+    renderTexture.draw(spr, states);
     return;
   }
 
   if (flashColorIsNil) return;
 
   flashProgress = static_cast<float>(flashTicks) / flashDuration;
+  Shaders::Instance().spriteFlash->setUniform("color", spriteColor);
   Shaders::Instance().spriteFlash->setUniform("opacity", opacity / 255.0f);
+  // Shaders::Instance().spriteFlash->setUniform("flash", flashColor.w >= spriteColor.w ? flashColor : spriteColor);
   Shaders::Instance().spriteFlash->setUniform("flash", flashColor);
   Shaders::Instance().spriteFlash->setUniform("progress", flashProgress);
-  renderTexture.draw(spr, Shaders::Instance().spriteFlash.get());
+  states.shader = Shaders::Instance().spriteFlash.get();
+  renderTexture.draw(spr, states);
 
   return;
   // sf::RenderStates state;

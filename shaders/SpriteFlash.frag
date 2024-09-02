@@ -1,4 +1,5 @@
 uniform sampler2D texture;
+uniform vec4 color;
 uniform float opacity;
 uniform vec4 flash;
 uniform float progress;
@@ -9,6 +10,9 @@ void main() {
 
     spriteColor.a *= opacity;
 
+    spriteColor.rgb = mix(spriteColor.rgb, color.rgb, color.a);
+
     spriteColor.rgb = mix(spriteColor.rgb, flash.rgb, flash.a * progress);
+
     gl_FragColor = spriteColor;
 }
