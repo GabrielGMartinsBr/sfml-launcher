@@ -2,7 +2,7 @@
 
 #include "RbUtils.hpp"
 #include "engnine/Color.hpp"
-#include "engnine/Sprite.hpp"
+#include "engnine/Sprite.h"
 #include "engnine/Viewport.hpp"
 #include "integrator/Convert.hpp"
 #include "integrator/It_Bitmap.hpp"
@@ -167,7 +167,7 @@ class Sprite {
       if (_viewport != Qnil) {
         viewport = Viewport::getObjectValue(_viewport);
       }
-      
+
       instance = new Eng::Sprite(self, viewport);
       DATA_PTR(self) = instance;
       return self;
@@ -592,7 +592,7 @@ class Sprite {
 
   static VALUE method_flash(VALUE self, VALUE _color, VALUE _time)
   {
-    if (_color == Qnil || !Color::isInstance(_color)) {
+    if (_color != Qnil && !Color::isInstance(_color)) {
       RbUtils::raiseCantConvertError(
         rb_class_of(_color),
         Color::getRbClass()
@@ -600,15 +600,12 @@ class Sprite {
       return Qnil;
     }
 
-    int time = Convert::toCInt(_time);
-    Eng::Color *color = Color::getObjectValue(_color);
-
-    if (color == nullptr) {
-      RbUtils::raiseRuntimeException(
-        "Sprite flash method received a null pointer color arg."
-      );
-      return Qnil;
+    Eng::Color *color = nullptr;
+    if (_color != Qnil) {
+      color = Color::getObjectValue(_color);
     }
+
+    int time = Convert::toCInt(_time);
 
     Eng::Sprite *inst = getObjectValue(self);
     inst->method_flash(color, time);

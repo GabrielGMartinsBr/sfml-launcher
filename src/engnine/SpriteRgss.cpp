@@ -35,15 +35,21 @@ void Sprite::bindRubyProps()
     std::runtime_error("Sprite doesn't have rbObj defined.");
   }
 
-  VALUE vp = Qnil;
+  VALUE viewportRb = Qnil;
   if (viewport != nullptr) {
     if (!viewport->hasRbObj()) {
       viewport->rbObj = It::Viewport::createRubyObject(viewport);
       viewport->bindRubyVars();
     }
-    vp = viewport->rbObj;
+    viewportRb = viewport->rbObj;
   }
 
+  VALUE bitmapRb = Qnil;
+
+  if (bitmap) {
+    bitmap->initRubyObj();
+    bitmapRb = bitmap->rbObj;
+  }
   if (src_rect->rbObj == Qnil) {
     src_rect->rbObj = It::Rect::createRubyObject(src_rect);
   }
@@ -54,7 +60,8 @@ void Sprite::bindRubyProps()
     tone->rbObj = It::Tone::createRubyObject(tone);
   }
 
-  rb_iv_set(rbObj, "@viewport", vp);
+  rb_iv_set(rbObj, "@viewport", viewportRb);
+  rb_iv_set(rbObj, "@bitmap", bitmapRb);
   rb_iv_set(rbObj, "@src_rect", src_rect->rbObj);
   rb_iv_set(rbObj, "@color", color->rbObj);
   rb_iv_set(rbObj, "@tone", tone->rbObj);
@@ -413,12 +420,14 @@ bool Sprite::method_disposed()
 
 void Sprite::method_flash(Color *color, int time)
 {
-  Log::out() << "Sprite method flash was called but it's not implemented yet.";
+  setFlashStart(color, time);
 }
 
 void Sprite::method_update()
 {
-  // Log::out() << "Sprite method update was called but it's not implemented yet.";
+  if (flashTicks > 0) {
+    flashTicks--;
+  }
 }
 
 }  // namespace Eng

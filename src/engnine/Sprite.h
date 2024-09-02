@@ -170,13 +170,21 @@ class Sprite : IOnUpdate, IViewportChild, public EngineBase {
   bool addedToEngineCycles;
 
   sf::Color spriteColor;
+  sf::Glsl::Vec4 flashColor;
   sf::Sprite spr;
   sf::Texture texture;
   sf::Vector2f position;
 
+  bool flashColorIsNil;
+  int flashTicks;
+  int flashDuration;
+  float flashProgress;
+
   void addToEngineCycles();
 
   void removeFromEngineCycles();
+
+  void setFlashStart(Color *color, int time);
 };
 
 }  // namespace Eng

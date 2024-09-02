@@ -25,6 +25,7 @@ struct Shaders {
 
   UPtr<Shader> fadeTransitionShader;
   UPtr<Shader> imageTransitionShader;
+  UPtr<Shader> spriteFlash;
 
   Shaders();
 

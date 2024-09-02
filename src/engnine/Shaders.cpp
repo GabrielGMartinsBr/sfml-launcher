@@ -48,6 +48,7 @@ Shaders::Shaders()
 {
   fadeTransitionShader = loadFragment("FadeTransition.frag");
   imageTransitionShader = loadFragment("ImageTransition.frag");
+  spriteFlash = loadFragment("SpriteFlash.frag");
 }
 
 UPtr<Shader> Shaders::loadFragment(CStr fileName)

@@ -18,6 +18,7 @@
 #include "engnine/EngineBase.hpp"
 #include "engnine/Lists.hpp"
 #include "engnine/Rect.hpp"
+#include "engnine/Shaders.h"
 #include "engnine/Tone.hpp"
 #include "engnine/Viewport.hpp"
 #include "engnine/VpRects.hpp"
@@ -30,6 +31,7 @@ Sprite::Sprite() :
 Sprite::Sprite(VALUE rbObj, Viewport *_viewport) :
     EngineBase(rbObj),
     spriteColor(255, 255, 255, 255),
+    flashColor(0, 0, 0, 0),
     position(0, 0)
 {
   viewport = _viewport;
@@ -55,6 +57,11 @@ Sprite::Sprite(VALUE rbObj, Viewport *_viewport) :
   isDisposed = false;
   loadedBitmap = false;
   addedToEngineCycles = false;
+
+  flashColorIsNil = false;
+  flashTicks = 0;
+  flashDuration = 0;
+  flashProgress = 0;
 
   if (rbObj != Qnil) {
     bindRubyProps();
@@ -120,9 +127,19 @@ void Sprite::onRender(sf::RenderTexture &renderTexture)
 {
   spriteColor.a = opacity;
   spr.setColor(spriteColor);
-  renderTexture.draw(spr);
-  return;
+  if (flashTicks == 0) {
+    renderTexture.draw(spr);
+    return;
+  }
 
+  if (flashColorIsNil) return;
+
+  flashProgress = static_cast<float>(flashTicks) / flashDuration;
+  Shaders::Instance().spriteFlash->setUniform("flash", flashColor);
+  Shaders::Instance().spriteFlash->setUniform("progress", flashProgress);
+  renderTexture.draw(spr, Shaders::Instance().spriteFlash.get());
+
+  return;
   // sf::RenderStates state;
   // state.blendMode = sf::BlendNone;
 
@@ -265,6 +282,24 @@ void Sprite::removeFromEngineCycles()
   Lists::Instance().removeUpdateEntry(this);
   Lists::Instance().removeRenderEntry(this);
   addedToEngineCycles = false;
+}
+
+void Sprite::setFlashStart(Color *color, int time)
+{
+  if (color) {
+    flashColor = sf::Glsl::Vec4(
+      color->red / 255.f,
+      color->green / 255.f,
+      color->blue / 255.f,
+      color->alpha / 255.f
+    );
+    flashColorIsNil = false;
+  } else {
+    flashColorIsNil = true;
+  }
+
+  flashTicks = time;
+  flashDuration = time;
 }
 
 }  // namespace Eng
