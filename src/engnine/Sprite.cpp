@@ -1,5 +1,3 @@
-#pragma once
-
 #include "engnine/Sprite.h"
 
 #include <SFML/Graphics/BlendMode.hpp>
@@ -143,6 +141,7 @@ void Sprite::onRender(sf::RenderTexture &renderTexture)
   if (flashColorIsNil) return;
 
   flashProgress = static_cast<float>(flashTicks) / flashDuration;
+  Shaders::Instance().spriteFlash->setUniform("opacity", opacity / 255.0f);
   Shaders::Instance().spriteFlash->setUniform("flash", flashColor);
   Shaders::Instance().spriteFlash->setUniform("progress", flashProgress);
   renderTexture.draw(spr, Shaders::Instance().spriteFlash.get());
