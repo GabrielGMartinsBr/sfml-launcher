@@ -5,8 +5,10 @@
 #include <SFML/Graphics/Color.hpp>
 #include <stdexcept>
 
+#include "NumberUtils.hpp"
 #include "base/MarshalUtils.hpp"
 #include "engnine/EngineBase.hpp"
+#include "integrator/Convert.hpp"
 
 namespace Eng {
 
@@ -77,15 +79,60 @@ class Color : public EngineBase {
 
   void set(double r, double g, double b, double a = 255)
   {
-    clamp(r);
-    clamp(g);
-    clamp(b);
-    clamp(a);
-    red = r;
-    green = g;
-    blue = b;
-    alpha = a;
+    red = Num::clamp<double>(r, 0.0, 255.0);
+    green = Num::clamp<double>(g, 0.0, 255.0);
+    blue = Num::clamp<double>(b, 0.0, 255.0);
+    alpha = Num::clamp<double>(a, 0.0, 255.0);
+    setInstanceVar("@red", red);
+    setInstanceVar("@green", green);
+    setInstanceVar("@blue", blue);
+    setInstanceVar("@alpha", alpha);
     syncSfColor();
+    markAsDirty();
+  }
+
+  VALUE setter_red(VALUE value)
+  {
+    double v = Convert::toCDouble2(value);
+    red = Num::clamp<double>(v, 0.0, 255.0);
+    value = Convert::toRubyDouble(red);
+    setInstanceVar("@red", value);
+    sfColor.r = red;
+    markAsDirty();
+    return value;
+  }
+
+  VALUE setter_green(VALUE value)
+  {
+    double v = Convert::toCDouble2(value);
+    green = Num::clamp<double>(v, 0.0, 255.0);
+    value = Convert::toRubyDouble(green);
+    setInstanceVar("@green", value);
+    sfColor.g = green;
+    markAsDirty();
+    return value;
+  }
+
+  VALUE setter_blue(VALUE value)
+  {
+    double v = Convert::toCDouble2(value);
+    blue = Num::clamp<double>(v, 0.0, 255.0);
+    value = Convert::toRubyDouble(blue);
+    setInstanceVar("@blue", value);
+    sfColor.b = blue;
+    markAsDirty();
+    return value;
+  }
+
+  VALUE setter_alpha(VALUE value)
+  {
+    double v = Convert::toCDouble2(value);
+    alpha = Num::clamp<double>(v, 0.0, 255.0);
+    value = Convert::toRubyDouble(alpha);
+    setInstanceVar("@alpha", value);
+    sfColor.a = alpha;
+    markAsDirty();
+    return value;
   }
 
   sf::Color &getSfColor()
@@ -100,15 +147,6 @@ class Color : public EngineBase {
 
  private:
   sf::Color sfColor;
-
-  void clamp(double &v)
-  {
-    if (v < 0) {
-      v = 0;
-    } else if (v > 255) {
-      v = 255;
-    }
-  }
 
   void syncSfColor()
   {

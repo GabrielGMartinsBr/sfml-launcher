@@ -225,8 +225,7 @@ class Color {
   static VALUE setter_red(VALUE self, VALUE value)
   {
     Eng::Color *inst = getObjectValue(self);
-    inst->red = Convert::toCDouble2(value);
-    return value;
+    return inst->setter_red(value);
   }
 
   // Getter green
@@ -244,8 +243,7 @@ class Color {
   static VALUE setter_green(VALUE self, VALUE value)
   {
     Eng::Color *inst = getObjectValue(self);
-    inst->green = Convert::toCDouble2(value);
-    return value;
+    return inst->setter_red(value);
   }
 
   // Getter blue
