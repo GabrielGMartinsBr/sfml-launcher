@@ -15,7 +15,7 @@ class PlayerScript {
 
   PlayerScript(VALUE id, VALUE name, VALUE code)
   {
-    this->id = RbUtils::parseFix(id);
+    this->id = rb_num2uint(id);
     this->name = RbUtils::parseString(name);
     this->code = parseCode(code);
     this->linesNumber = BacktraceUtils::countLines(this->code);

@@ -39,16 +39,22 @@ struct RbUtils {
     return app::String(strPtr, length);
   }
 
-  static long parseFix(VALUE rbFixNum)
+  static int parseFix(VALUE rbFixNum)
   {
     Check_Type(rbFixNum, T_FIXNUM);
     return FIX2INT(rbFixNum);
   }
 
-  static long parseNum(VALUE rbFixNum)
+  static long parseFix2Long(VALUE rbFixNum)
   {
     Check_Type(rbFixNum, T_FIXNUM);
-    return NUM2INT(rbFixNum);
+    return FIX2LONG(rbFixNum);
+  }
+
+  static long parseNum(VALUE rbFixNum)
+  {
+    Check_Type(rbFixNum, T_BIGNUM);
+    return NUM2LONG(rbFixNum);
   }
 
   static void raiseRuntimeException(app::String msg)

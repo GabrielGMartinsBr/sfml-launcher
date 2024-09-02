@@ -13,6 +13,7 @@ namespace dbg {
 
 using app::OutStrStream;
 using app::String;
+using app::CStr;
 using app::UPtr;
 using app::Vector;
 using app::VectorPtr;
