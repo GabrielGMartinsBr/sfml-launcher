@@ -169,7 +169,7 @@ class Sprite : IOnUpdate, IViewportChild, public EngineBase {
   bool loadedBitmap;
   bool addedToEngineCycles;
 
-  sf::Color spriteColor;
+  sf::Glsl::Vec4 spriteColor;
   sf::Glsl::Vec4 flashColor;
   sf::Sprite spr;
   sf::Texture texture;

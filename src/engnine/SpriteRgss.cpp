@@ -325,7 +325,6 @@ void Sprite::setter_opacity(int v)
   }
   opacity = value;
   rb_iv_set(rbObj, "@opacity", Convert::toRubyNumber(opacity));
-  dirty = true;
 }
 
 /* --------------------------------------------------- */

@@ -30,7 +30,7 @@ Sprite::Sprite() :
 
 Sprite::Sprite(VALUE rbObj, Viewport *_viewport) :
     EngineBase(rbObj),
-    spriteColor(255, 255, 255, 255),
+    spriteColor(0, 0, 0, 0),
     flashColor(0, 0, 0, 0),
     position(0, 0)
 {
@@ -105,6 +105,14 @@ void Sprite::onUpdate()
     return;
   }
 
+  if (color->isDirty()) {
+    spriteColor.x = color->red / 255;
+    spriteColor.y = color->green / 255;
+    spriteColor.z = color->blue / 255;
+    spriteColor.w = color->alpha / 255;
+    color->markAsClean();
+  }
+
   if (!loadedBitmap || bitmap->dirty) {
     spr.setTexture(
       bitmap->renderTexture.getTexture()
@@ -125,10 +133,10 @@ void Sprite::onUpdate()
 
 void Sprite::onRender(sf::RenderTexture &renderTexture)
 {
-  spriteColor.a = opacity;
-  spr.setColor(spriteColor);
   if (flashTicks == 0) {
-    renderTexture.draw(spr);
+    Shaders::Instance().spriteColor->setUniform("color", spriteColor);
+    Shaders::Instance().spriteColor->setUniform("opacity", opacity / 255.0f);
+    renderTexture.draw(spr, Shaders::Instance().spriteColor.get());
     return;
   }
 
@@ -178,7 +186,7 @@ void Sprite::applyChanges()
     loadedBitmap = true;
   }
 
-  spr.setColor(spriteColor);
+  // spr.setColor(spriteColor);
 
   vp::ViewportRect vp;
   vp::DestinyRect dst;
