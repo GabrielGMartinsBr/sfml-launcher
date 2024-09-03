@@ -50,10 +50,10 @@ class Color : public EngineBase {
   Color(VALUE rbObj = Qnil) :
       Color(rbObj, 0, 0, 0) { }
 
-  Color(Color *color, VALUE rbObj = Qnil) :
-      Color(rbObj, color->red, color->green, color->blue, color->alpha) { }
+  Color(Color *color) :
+      Color(Qnil, color->red, color->green, color->blue, color->alpha) { }
 
-  Color(double red, double green, double blue, double alpha = 255) :
+  Color(double red, double green, double blue, double alpha) :
       Color(Qnil, red, green, blue, alpha) { }
 
   Color(VALUE rbObj, double red, double green, double blue, double alpha) :
@@ -69,10 +69,7 @@ class Color : public EngineBase {
 
   void initInstanceVars()
   {
-    setInstanceVar("@red", red);
-    setInstanceVar("@green", green);
-    setInstanceVar("@blue", blue);
-    setInstanceVar("@alpha", alpha);
+    syncInstanceVars();
   }
 
   bool operator==(const Color &other) const
@@ -86,6 +83,7 @@ class Color : public EngineBase {
     green = other.green;
     blue = other.blue;
     alpha = other.alpha;
+    syncInstanceVars();
     syncSfColor();
     return *this;
   }
@@ -96,10 +94,7 @@ class Color : public EngineBase {
     green = Num::clamp<double>(g, 0.0, 255.0);
     blue = Num::clamp<double>(b, 0.0, 255.0);
     alpha = Num::clamp<double>(a, 0.0, 255.0);
-    setInstanceVar("@red", red);
-    setInstanceVar("@green", green);
-    setInstanceVar("@blue", blue);
-    setInstanceVar("@alpha", alpha);
+    syncInstanceVars();
     syncSfColor();
     markAsDirty();
   }
@@ -167,6 +162,14 @@ class Color : public EngineBase {
     sfColor.b = blue;
     sfColor.g = green;
     sfColor.a = alpha;
+  }
+
+  void syncInstanceVars()
+  {
+    setInstanceVar("@red", Convert::toRubyDouble(red));
+    setInstanceVar("@green", Convert::toRubyDouble(green));
+    setInstanceVar("@blue", Convert::toRubyDouble(blue));
+    setInstanceVar("@alpha", Convert::toRubyDouble(alpha));
   }
 };
 

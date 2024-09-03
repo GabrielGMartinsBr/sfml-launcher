@@ -153,14 +153,14 @@ class Color {
       double r = Convert::toCDouble2(rb_r);
       double g = Convert::toCDouble2(rb_g);
       double b = Convert::toCDouble2(rb_b);
-      instance = new Eng::Color(self, r, g, b);
+      instance = new Eng::Color(self, r, g, b, 255);
     } else if (argc == 4) {
       rb_scan_args(argc, argv, "4", &rb_r, &rb_g, &rb_b, &rb_a);
       double r = Convert::toCDouble2(rb_r);
       double g = Convert::toCDouble2(rb_g);
       double b = Convert::toCDouble2(rb_b);
       double a = Convert::toCDouble2(rb_a);
-      instance = new Eng::Color(r, g, b, a);
+      instance = new Eng::Color(self, r, g, b, a);
     } else {
       RbUtils::raiseRuntimeException(
         "Color initialize takes 3 or 4 arguments, but " + std::to_string(argc) + " were received."
@@ -252,7 +252,7 @@ class Color {
   static VALUE setter_green(VALUE self, VALUE value)
   {
     Eng::Color *inst = getObjectValue(self);
-    return inst->setter_red(value);
+    return inst->setter_green(value);
   }
 
   // Getter blue
@@ -270,8 +270,7 @@ class Color {
   static VALUE setter_blue(VALUE self, VALUE value)
   {
     Eng::Color *inst = getObjectValue(self);
-    inst->blue = Convert::toCDouble2(value);
-    return value;
+    return inst->setter_blue(value);
   }
 
   // Getter alpha
@@ -289,8 +288,7 @@ class Color {
   static VALUE setter_alpha(VALUE self, VALUE value)
   {
     Eng::Color *inst = getObjectValue(self);
-    inst->alpha = Convert::toCDouble2(value);
-    return value;
+    return inst->setter_alpha(value);
   }
 
   /*

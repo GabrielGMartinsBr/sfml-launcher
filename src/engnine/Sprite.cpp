@@ -146,7 +146,6 @@ void Sprite::onRender(sf::RenderTexture &renderTexture)
   flashProgress = static_cast<float>(flashTicks) / flashDuration;
   Shaders::Instance().spriteFlash->setUniform("color", spriteColor);
   Shaders::Instance().spriteFlash->setUniform("opacity", opacity / 255.0f);
-  // Shaders::Instance().spriteFlash->setUniform("flash", flashColor.w >= spriteColor.w ? flashColor : spriteColor);
   Shaders::Instance().spriteFlash->setUniform("flash", flashColor);
   Shaders::Instance().spriteFlash->setUniform("progress", flashProgress);
   states.shader = Shaders::Instance().spriteFlash.get();

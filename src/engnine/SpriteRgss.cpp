@@ -12,7 +12,6 @@
 #include <SFML/System/Vector2.hpp>
 #include <stdexcept>
 
-#include "Log.hpp"
 #include "base/NumberUtils.hpp"
 #include "engnine/Bitmap.h"
 #include "engnine/Color.hpp"
@@ -50,13 +49,13 @@ void Sprite::bindRubyProps()
     bitmap->initRubyObj();
     bitmapRb = bitmap->rbObj;
   }
-  if (src_rect->rbObj == Qnil) {
+  if (!src_rect->hasRbObj()) {
     src_rect->rbObj = It::Rect::createRubyObject(src_rect);
   }
-  if (color->rbObj == Qnil) {
+  if (!color->hasRbObj()) {
     color->rbObj = It::Color::createRubyObject(color);
   }
-  if (tone->rbObj == Qnil) {
+  if (!tone->hasRbObj()) {
     tone->rbObj = It::Tone::createRubyObject(tone);
   }
 

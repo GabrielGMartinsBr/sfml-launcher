@@ -315,7 +315,7 @@ Color* Bitmap::get_pixel(unsigned int _x, unsigned int _y)
   sf::Texture texture = renderTexture.getTexture();
   sf::Image image = texture.copyToImage();
   sf::Color px = image.getPixel(_x, _y);
-  Color* color = new Color(px.r, px.g, px.b);
+  Color* color = new Color(px.r, px.g, px.b, 255);
   return color;
 }
 
