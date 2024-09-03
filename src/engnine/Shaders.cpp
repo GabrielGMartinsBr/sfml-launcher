@@ -50,6 +50,7 @@ Shaders::Shaders()
   imageTransitionShader = loadFragment("ImageTransition.frag");
   spriteFlash = loadFragment("SpriteFlash.frag");
   spriteColor = loadFragment("SpriteColor.frag");
+  changeHue = loadFragment("ChangeHue.frag");
 }
 
 UPtr<Shader> Shaders::loadFragment(CStr fileName)

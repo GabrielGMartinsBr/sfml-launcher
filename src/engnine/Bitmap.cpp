@@ -21,6 +21,7 @@
 #include "engnine/FileUtils.hpp"
 #include "engnine/Font.hpp"
 #include "engnine/Rect.hpp"
+#include "engnine/Shaders.h"
 #include "engnine/base/Fonts.h"
 #include "engnine/base/Texts.hpp"
 #include "integrator/Convert.hpp"
@@ -344,7 +345,15 @@ void Bitmap::set_pixel(unsigned int x, unsigned int y, Color* _color)
 
 // Method hue_change
 
-void Bitmap::hue_change(int _hue) { }
+void Bitmap::hue_change(int hue)
+{
+  texture.update(renderTexture.getTexture());
+  sprite.setTexture(texture);
+  renderTexture.clear(sf::Color::Transparent);
+  Shaders::Instance().changeHue->setUniform("hue", hue / 360.f);
+  renderTexture.draw(sprite, Shaders::Instance().changeHue.get());
+  renderTexture.display();
+}
 
 // Method draw_text
 

@@ -77,6 +77,7 @@ class Bitmap : public EngineBase {
 
   Font* font;
   sf::Texture texture;
+  sf::Sprite sprite;
   unsigned int width;
   unsigned int height;
   bool isDisposed;
