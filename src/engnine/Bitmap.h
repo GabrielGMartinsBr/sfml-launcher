@@ -32,6 +32,7 @@ class Bitmap : public EngineBase {
 
   Bitmap(const char* assetName, VALUE rbObj = Qnil);
   Bitmap(unsigned int _width, unsigned int _height, VALUE rbObj = Qnil);
+  Bitmap(Bitmap* bitmap);
   ~Bitmap();
 
   void initRubyObj();
@@ -75,13 +76,12 @@ class Bitmap : public EngineBase {
  private:
 
   Font* font;
+  sf::Texture texture;
   unsigned int width;
   unsigned int height;
   bool isDisposed;
 
   void bindRubyVars();
-
-  static void parseColor(sf::Color& dest, Color* src);
 };
 
 }  // namespace Eng

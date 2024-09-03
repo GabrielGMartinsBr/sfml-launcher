@@ -1,7 +1,9 @@
 #pragma once
 
 #include "Convert.hpp"
+#include "Log.hpp"
 #include "RbUtils.hpp"
+#include "debugger/DebugUtils.hpp"
 #include "engnine/Bitmap.h"
 #include "engnine/Rect.hpp"
 #include "integrator/It_Color.hpp"
@@ -21,6 +23,7 @@ class Bitmap {
     rb_define_alloc_func(bitmapClass, instance_allocator);
 
     rb_define_method(bitmapClass, "initialize", RUBY_METHOD_FUNC(initialize), -1);
+    rb_define_method(bitmapClass, "clone", RUBY_METHOD_FUNC(method_clone), 0);
 
     rb_define_method(bitmapClass, "font", RUBY_METHOD_FUNC(getter_font), 0);
     rb_define_method(bitmapClass, "font=", RUBY_METHOD_FUNC(setter_font), 1);
@@ -35,6 +38,8 @@ class Bitmap {
 
     rb_define_method(bitmapClass, "get_pixel", RUBY_METHOD_FUNC(method_get_pixel), 2);
     rb_define_method(bitmapClass, "set_pixel", RUBY_METHOD_FUNC(method_set_pixel), 3);
+
+    rb_define_method(bitmapClass, "hue_change", RUBY_METHOD_FUNC(method_hue_change), 1);
 
     rb_define_method(bitmapClass, "fill_rect", RUBY_METHOD_FUNC(method_fill_rect), -1);
 
@@ -163,6 +168,16 @@ class Bitmap {
     return self;
   }
 
+  static VALUE method_clone(VALUE self)
+  {
+    Eng::Bitmap *inst = getObjectValue(self);
+
+    Eng::Bitmap *clone = new Eng::Bitmap(inst);
+    clone->initRubyObj();
+
+    return clone->rbObj;
+  }
+
   /*
    Get font
   */
@@ -288,6 +303,18 @@ class Bitmap {
 
     inst->set_pixel(x, y, color);
 
+    return Qnil;
+  }
+
+  /*
+    Method hue_change
+  */
+
+  static VALUE method_hue_change(VALUE self, VALUE value)
+  {
+    Eng::Bitmap *inst = getObjectValue(self);
+    int hue = Convert::toCInt(value);
+    inst->hue_change(hue);
     return Qnil;
   }
 

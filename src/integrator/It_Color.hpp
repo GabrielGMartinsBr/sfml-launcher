@@ -23,6 +23,7 @@ class Color {
     // Initialize
 
     rb_define_method(colorClass, "initialize", RUBY_METHOD_FUNC(method_initialize), -1);
+    rb_define_method(colorClass, "clone", RUBY_METHOD_FUNC(method_clone), 0);
 
     // Operators
 
@@ -152,7 +153,7 @@ class Color {
       double r = Convert::toCDouble2(rb_r);
       double g = Convert::toCDouble2(rb_g);
       double b = Convert::toCDouble2(rb_b);
-      instance = new Eng::Color(r, g, b);
+      instance = new Eng::Color(self, r, g, b);
     } else if (argc == 4) {
       rb_scan_args(argc, argv, "4", &rb_r, &rb_g, &rb_b, &rb_a);
       double r = Convert::toCDouble2(rb_r);
@@ -168,8 +169,16 @@ class Color {
     }
 
     DATA_PTR(self) = instance;
-    instance->rbObj = self;
     return self;
+  }
+
+  static VALUE method_clone(VALUE self)
+  {
+    Eng::Color *inst = getObjectValue(self);
+    Eng::Color *clone = new Eng::Color(inst);
+    clone->rbObj = createRubyObject(clone);
+    clone->initInstanceVars();
+    return clone->rbObj;
   }
 
   /*

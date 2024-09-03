@@ -36,7 +36,8 @@ using app::CStr;
 Bitmap::Bitmap(const char* assetName, VALUE rbObj) :
     EngineBase(rbObj),
     font(new Font()),
-    renderTexture()
+    renderTexture(),
+    texture()
 {
   sf::Image image;
   app::String filename = FileUtils::resolveRtpImagePath(assetName);
@@ -53,10 +54,8 @@ Bitmap::Bitmap(const char* assetName, VALUE rbObj) :
   renderTexture.create(width, height, settings);
   renderTexture.clear(sf::Color::Transparent);
 
-  sf::Sprite spr;
-  sf::Texture texture;
   texture.loadFromImage(image);
-  spr.setTexture(texture);
+  sf::Sprite spr(texture);
   renderTexture.draw(spr, sf::BlendAlpha);
   renderTexture.display();
 
@@ -89,6 +88,30 @@ Bitmap::Bitmap(unsigned int _width, unsigned int _height, VALUE rbObj) :
   if (hasRbObj()) {
     bindRubyVars();
   }
+}
+
+// Clone constructor
+
+Bitmap::Bitmap(Bitmap* bitmap) :
+    EngineBase(Qnil),
+    renderTexture(),
+    font(new Font())
+{
+  width = bitmap->width;
+  height = bitmap->height;
+
+  isDisposed = false;
+  dirty = false;
+
+  sf::ContextSettings settings;
+  settings.antialiasingLevel = 0;
+  renderTexture.create(width, height, settings);
+  renderTexture.clear(sf::Color::Transparent);
+
+  texture = bitmap->getTexture();
+  sf::Sprite contents(texture);
+  renderTexture.draw(contents, sf::BlendAlpha);
+  renderTexture.display();
 }
 
 // Destructor
@@ -406,16 +429,6 @@ Eng::Rect* Bitmap::get_text_size(app::CStr str)
   sf::FloatRect textBounds = text.getGlobalBounds();
   Eng::Rect* rect = new Eng::Rect(textBounds.left, textBounds.top, textBounds.width + 1, textBounds.height);
   return rect;
-}
-
-// Static method parseColor
-
-void Bitmap::parseColor(sf::Color& dest, Color* src)
-{
-  dest.r = src->red;
-  dest.g = src->green;
-  dest.b = src->blue;
-  dest.a = src->alpha;
 }
 
 }  // namespace Eng

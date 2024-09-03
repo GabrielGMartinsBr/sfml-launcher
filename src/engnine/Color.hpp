@@ -47,12 +47,17 @@ class Color : public EngineBase {
   double blue;
   double alpha;
 
-  Color() :
-      Color(0, 0, 0)
-  {
-  }
+  Color(VALUE rbObj = Qnil) :
+      Color(rbObj, 0, 0, 0) { }
 
-  Color(double red, double green, double blue, double alpha = 255)
+  Color(Color *color, VALUE rbObj = Qnil) :
+      Color(rbObj, color->red, color->green, color->blue, color->alpha) { }
+
+  Color(double red, double green, double blue, double alpha = 255) :
+      Color(Qnil, red, green, blue, alpha) { }
+
+  Color(VALUE rbObj, double red, double green, double blue, double alpha) :
+      EngineBase(rbObj)
   {
     set(red, green, blue, alpha);
     syncSfColor();
@@ -60,6 +65,14 @@ class Color : public EngineBase {
 
   ~Color()
   {
+  }
+
+  void initInstanceVars()
+  {
+    setInstanceVar("@red", red);
+    setInstanceVar("@green", green);
+    setInstanceVar("@blue", blue);
+    setInstanceVar("@alpha", alpha);
   }
 
   bool operator==(const Color &other) const
