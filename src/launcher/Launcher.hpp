@@ -24,7 +24,7 @@
 #include "loaders/ScriptsLoader.hpp"
 
 class Launcher {
-  sf::Vector2i dimensions = { 800, 600 };
+  sf::Vector2i dimensions = { 960, 720 };
   app::String title = DEFAULT_WINDOW_TILE;
 
  public:
