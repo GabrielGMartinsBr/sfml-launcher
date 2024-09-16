@@ -408,10 +408,10 @@ class Bitmap {
       }
       case 5: {
         rb_scan_args(argc, argv, "5", &_x, &_y, &_width, &_height, &_str);
-        int x = Convert::toCInt(_x);
-        int y = Convert::toCInt(_y);
-        int width = Convert::toCInt(_width);
-        int height = Convert::toCInt(_height);
+        double x = Convert::toCDouble2(_x);
+        double y = Convert::toCDouble2(_y);
+        double width = Convert::toCDouble2(_width);
+        double height = Convert::toCDouble2(_height);
         app::CStr str = Convert::toCStr(_str);
         inst->draw_text(x, y, width, height, str);
         break;
@@ -453,8 +453,8 @@ class Bitmap {
     if (argc == 4) {
       rb_scan_args(argc, argv, "4", &_x, &_y, &_src_bitmap, &_src_rect);
 
-      int x = Convert::toCInt(_x);
-      int y = Convert::toCInt(_y);
+      int x = Convert::toCInt2(_x);
+      int y = Convert::toCInt2(_y);
       Eng::Bitmap *src_bitmap = Bitmap::getObjectValue(_src_bitmap);
       Eng::Rect *src_rect = Rect::getObjectValue(_src_rect);
 
@@ -465,8 +465,8 @@ class Bitmap {
     if (argc == 5) {
       rb_scan_args(argc, argv, "5", &_x, &_y, &_src_bitmap, &_src_rect, &_opacity);
 
-      int x = Convert::toCInt(_x);
-      int y = Convert::toCInt(_y);
+      int x = Convert::toCInt2(_x);
+      int y = Convert::toCInt2(_y);
       int opacity = Convert::toCInt(_opacity);
       Eng::Bitmap *src_bitmap = Bitmap::getObjectValue(_src_bitmap);
       Eng::Rect *src_rect = Rect::getObjectValue(_src_rect);
