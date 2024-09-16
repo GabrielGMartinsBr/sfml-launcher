@@ -17,11 +17,10 @@ namespace Eng {
 
 using sf::Texture;
 
-GraphicsRenderer::GraphicsRenderer(sf::Vector2i& dimensions, sf::RenderWindow& window, sf::RenderTexture& renderTexture) :
-    dimensions(dimensions),
+GraphicsRenderer::GraphicsRenderer(ProjectWindow& projectWindow, sf::RenderTexture& renderTexture) :
+    projectWindow(projectWindow),
     lists(Lists::Instance()),
     shaders(Shaders::Instance()),
-    window(window),
     renderTexture(renderTexture)
 {
   createFpsSprite();
@@ -34,10 +33,9 @@ void GraphicsRenderer::render()
   renderSprites();
   setRenderSpriteTexture();
 
-  window.clear(sf::Color::Transparent);
-  // renderSprite.setScale(1.5f, 1.5f);
-  window.draw(renderSprite);
-  window.display();
+  projectWindow.window.clear(sf::Color::Transparent);
+  projectWindow.window.draw(renderSprite);
+  projectWindow.window.display();
 }
 
 void GraphicsRenderer::freeze()
@@ -55,11 +53,11 @@ void GraphicsRenderer::renderFadeTransitionState(float progress)
   renderSprites();
   setRenderSpriteTexture();
 
-  window.clear(sf::Color::Transparent);
+  projectWindow.window.clear(sf::Color::Transparent);
   shaders.fadeTransitionShader->setUniform("alpha", progress);
   shaders.fadeTransitionShader->setUniform("frozenTexture", frozenTexture);
-  window.draw(renderSprite, shaders.fadeTransitionShader.get());
-  window.display();
+  projectWindow.window.draw(renderSprite, shaders.fadeTransitionShader.get());
+  projectWindow.window.display();
 }
 
 void GraphicsRenderer::renderImageTransitionState(float progress, const Texture& transTexture, float vague)
@@ -74,9 +72,9 @@ void GraphicsRenderer::renderImageTransitionState(float progress, const Texture&
   shaders.imageTransitionShader->setUniform("vague", vague);
   shaders.imageTransitionShader->setUniform("transitionTexture", transTexture);
 
-  window.clear(sf::Color::Transparent);
-  window.draw(renderSprite, shaders.imageTransitionShader.get());
-  window.display();
+  projectWindow.window.clear(sf::Color::Transparent);
+  projectWindow.window.draw(renderSprite, shaders.imageTransitionShader.get());
+  projectWindow.window.display();
 }
 
 void GraphicsRenderer::transitionEnd()
@@ -100,7 +98,7 @@ void GraphicsRenderer::createFpsSprite()
   fpsSprite.setOutlineColor(sf::Color::Black);
   fpsSprite.setOutlineThickness(1.5);
   fpsSprite.setCharacterSize(14);
-  fpsSprite.setPosition(4, dimensions.y - 22);
+  fpsSprite.setPosition(4, projectWindow.height() - 22);
 }
 
 void GraphicsRenderer::clearRenderTexture()

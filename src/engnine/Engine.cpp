@@ -22,10 +22,10 @@ namespace Eng {
 
 static Engine* instance = nullptr;
 
-void Engine::Init(sf::RenderWindow& window, CStr projectPath, sf::Vector2i& dimensions)
+void Engine::Init(ProjectWindow& projectWindow, CStr projectPath)
 {
   assert(!instance);
-  instance = new Engine(window, projectPath, dimensions);
+  instance = new Engine(projectWindow, projectPath);
 }
 
 Engine& Engine::getInstance()
@@ -45,10 +45,9 @@ void Engine::Destroy()
   ⇩⇩⇩ Instance ⇩⇩⇩
 */
 
-Engine::Engine(sf::RenderWindow& window, CStr projectPath, sf::Vector2i& dimensions) :
+Engine::Engine(ProjectWindow& projectWindow, CStr projectPath) :
     input(Input::getInstance()),
-    dimensions(dimensions),
-    window(window),
+    projectWindow(projectWindow),
     projectPath(projectPath)
 {
   running = false;
@@ -59,9 +58,7 @@ void Engine::run()
 {
   running = true;
 
-  auto size = window.getSize();
-
-  window.display();
+  projectWindow.window.display();
 }
 
 /*
@@ -75,7 +72,7 @@ bool Engine::isRunning()
 
 const sf::Vector2i& Engine::getDimensions() const
 {
-  return dimensions;
+  return projectWindow.dimensions;
 }
 
 const app::String& Engine::getProjectPath() const
@@ -118,7 +115,7 @@ void Engine::stop()
 void Engine::pollEvents()
 {
   sf::Event event;
-  while (window.pollEvent(event)) {
+  while (projectWindow.window.pollEvent(event)) {
     switch (event.type) {
       case sf::Event::Closed:
         handleCloseEvent();

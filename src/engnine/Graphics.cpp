@@ -11,6 +11,7 @@
 #include "engnine/Engine.h"
 #include "engnine/FileUtils.hpp"
 #include "engnine/Timer.hpp"
+#include "launcher/ProjectWindow.h"
 
 namespace Eng {
 
@@ -19,10 +20,10 @@ namespace Eng {
 */
 static Graphics* instance = nullptr;
 
-void Graphics::Init(const String& title, sf::Vector2i& dimensions, sf::RenderWindow& window)
+void Graphics::Init(ProjectWindow& projectWindow)
 {
   assert(!instance);
-  instance = new Graphics(title, dimensions, window);
+  instance = new Graphics(projectWindow);
 }
 
 Graphics& Graphics::GetInstance()
@@ -42,12 +43,10 @@ void Graphics::Destroy()
   ⇩⇩⇩ Instance ⇩⇩⇩
 */
 
-Graphics::Graphics(const String& title, sf::Vector2i& dimensions, sf::RenderWindow& window) :
-    title(title),
-    dimensions(dimensions),
-    window(window),
-    gameView(sf::FloatRect(0, 0, dimensions.x, dimensions.y)),
-    renderer(dimensions, window, rdt)
+Graphics::Graphics(ProjectWindow& projectWindow) :
+    projectWindow(projectWindow),
+    gameView(sf::FloatRect(0, 0, projectWindow.width(), projectWindow.height())),
+    renderer(projectWindow, rdt)
 {
   isFullScreen = false;
   frame_rate = 40;
@@ -107,16 +106,10 @@ void Graphics::frame_reset()
 void Graphics::toggleFullScreen()
 {
   if (isFullScreen) {
-    window.create(sf::VideoMode(dimensions.x, dimensions.y), title, sf::Style::Titlebar | sf::Style::Close);
-    sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
-    sf::Vector2i winPos(
-      (desktop.width - dimensions.x) / 2,
-      (desktop.height - dimensions.y) / 2
-    );
-    window.setPosition(winPos);
+    projectWindow.setWindowMode();
     isFullScreen = false;
   } else {
-    window.create(sf::VideoMode::getDesktopMode(), title, sf::Style::Fullscreen);
+    projectWindow.setFullScreen();
     isFullScreen = true;
   }
   adjustScreen();
@@ -124,8 +117,8 @@ void Graphics::toggleFullScreen()
 
 void Graphics::adjustScreen()
 {
-  sf::Vector2u gameResolution(dimensions);
-  sf::Vector2u screenResolution = window.getSize();
+  sf::Vector2u gameResolution(projectWindow.dimensions);
+  sf::Vector2u screenResolution = projectWindow.window.getSize();
 
   float gameAspectRatio = static_cast<float>(gameResolution.x) / gameResolution.y;
   float screenAspectRatio = static_cast<float>(screenResolution.x) / screenResolution.y;
@@ -149,7 +142,7 @@ void Graphics::adjustScreen()
 
   gameView.setViewport(viewport);
   gameView.setSize(gameResolution.x, gameResolution.y);
-  window.setView(gameView);
+  projectWindow.window.setView(gameView);
 }
 
 /*
@@ -162,7 +155,7 @@ void Graphics::setup()
 
   sf::ContextSettings settings;
   settings.antialiasingLevel = 0;
-  rdt.create(dimensions.x, dimensions.y, settings);
+  rdt.create(projectWindow.width(), projectWindow.height(), settings);
   rdt.clear(sf::Color::Transparent);
 }
 

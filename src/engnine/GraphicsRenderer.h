@@ -10,6 +10,7 @@
 
 #include "engnine/Lists.hpp"
 #include "engnine/Shaders.h"
+#include "launcher/ProjectWindow.h"
 
 namespace Eng {
 
@@ -18,7 +19,7 @@ using sf::RenderWindow;
 using sf::Texture;
 
 struct GraphicsRenderer {
-  GraphicsRenderer(sf::Vector2i& dimensions, RenderWindow& target, RenderTexture& renderTexture);
+  GraphicsRenderer(ProjectWindow& projectWindow, RenderTexture& renderTexture);
 
   void render();
 
@@ -33,8 +34,7 @@ struct GraphicsRenderer {
  private:
   Lists& lists;
   Shaders& shaders;
-  sf::Vector2i& dimensions;
-  RenderWindow& window;
+  ProjectWindow& projectWindow;
 
   RenderTexture& renderTexture;
   sf::Sprite renderSprite;

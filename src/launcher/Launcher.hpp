@@ -19,6 +19,7 @@
 #include "engnine/base/Fonts.h"
 #include "integrator/Integrator.hpp"
 #include "launcher/PackageReader.h"
+#include "launcher/ProjectWindow.h"
 #include "loaders/PlayerScript.hpp"
 #include "loaders/ScriptsLoader.hpp"
 
@@ -26,40 +27,28 @@ class Launcher {
   sf::Vector2i dimensions = { 800, 600 };
   app::String title = DEFAULT_WINDOW_TILE;
 
-  sf::VideoMode mode;
-  sf::RenderWindow window;
-
-  Integrator integrator;
-
  public:
 
-  Launcher() :
-      mode(dimensions.x, dimensions.y),
-      window(mode, title, sf::Style::Titlebar | sf::Style::Close) { }
+  Launcher() { }
 
   void run(app::CStr projectPath)
   {
-    sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
-    sf::Vector2i winPos(
-      (desktop.width - dimensions.x) / 2,
-      (desktop.height - dimensions.y) / 2
-    );
-    window.setPosition(winPos);
-
     pkg::PackageReader::Init(projectPath);
-
     title = pkg::PackageReader::Instance().getProjectTile();
-    window.setTitle(title);
+
+    ProjectWindow projectWindow(title, dimensions);
+    projectWindow.centralize();
 
     ScriptsLoader& scriptsLoader = ScriptsLoader::getInstance();
 
     Eng::Fonts::Init();
     Eng::Shaders::Init();
     Eng::Lists::Init();
-    Eng::Engine::Init(window, projectPath, dimensions);
-    Eng::Graphics::Init(title, dimensions, window);
+    Eng::Engine::Init(projectWindow, projectPath);
+    Eng::Graphics::Init(projectWindow);
     Eng::Audio::Init();
 
+    Integrator integrator;
     integrator.init();
 
     app::String scriptsPath = Eng::Engine::getInstance().getScriptsPath();
@@ -75,7 +64,7 @@ class Launcher {
     Eng::Fonts::Destroy();
     pkg::PackageReader::Destroy();
 
-    window.close();
+    projectWindow.close();
   }
 
   void loadScripts(app::CStr scriptsPath)

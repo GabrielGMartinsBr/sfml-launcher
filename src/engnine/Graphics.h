@@ -6,6 +6,8 @@
 
 #include "AppDefs.h"
 #include "engnine/GraphicsRenderer.h"
+#include "launcher/ProjectWindow.h"
+
 namespace Eng {
 
 using app::CStr;
@@ -18,7 +20,7 @@ class Graphics {
     ⇩⇩⇩ Static ⇩⇩⇩
   */
 
-  static void Init(const String& title, sf::Vector2i& dimensions, sf::RenderWindow& window);
+  static void Init(ProjectWindow& projectWindow);
   static Graphics& GetInstance();
   static void Destroy();
 
@@ -51,11 +53,9 @@ class Graphics {
   /*
     ⇩⇩⇩ Private ⇩⇩⇩
   */
-  sf::Vector2i& dimensions;
-  const String& title;
+  ProjectWindow& projectWindow;
 
   bool isFullScreen;
-  sf::RenderWindow& window;
   sf::View gameView;
   sf::RenderTexture rdt;
   sf::Sprite renderSprite;
@@ -66,7 +66,7 @@ class Graphics {
   UInt frame_rate;
   UInt timestamp;
 
-  Graphics(const String& title, sf::Vector2i& dimensions, sf::RenderWindow& window);
+  Graphics(ProjectWindow& projectWindow);
 
   Graphics(const Graphics&);
   Graphics& operator=(const Graphics&);

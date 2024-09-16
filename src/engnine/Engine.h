@@ -10,6 +10,7 @@
 
 #include "AppDefs.h"
 #include "engnine/Input.hpp"
+#include "launcher/ProjectWindow.h"
 
 namespace Eng {
 
@@ -21,7 +22,7 @@ class Engine {
     ⇩⇩⇩ Static ⇩⇩⇩
   */
 
-  static void Init(sf::RenderWindow& window, CStr projectPath, sf::Vector2i& dimensions);
+  static void Init(ProjectWindow& projectWindow, CStr projectPath);
   static Engine& getInstance();
   static void Destroy();
 
@@ -54,16 +55,14 @@ class Engine {
   void stop();
 
  private:
+  Input& input;
+
   bool running;
-  sf::Vector2i& dimensions;
+  ProjectWindow& projectWindow;
   app::String projectPath;
   app::String scriptsPath;
 
-  Input& input;
-
-  sf::RenderWindow& window;
-
-  Engine(sf::RenderWindow& window, CStr projectPath, sf::Vector2i& dimensions);
+  Engine(ProjectWindow& projectWindow, CStr projectPath);
 
   Engine(const Engine&);
   Engine& operator=(const Engine&);
