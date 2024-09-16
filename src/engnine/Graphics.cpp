@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Texture.hpp>
+#include <SFML/Window/WindowStyle.hpp>
 
 #include "NumberUtils.hpp"
 #include "engnine/Audio.h"
@@ -17,10 +18,10 @@ namespace Eng {
 */
 static Graphics* instance = nullptr;
 
-void Graphics::Init(UInt width, UInt height, sf::RenderWindow& window)
+void Graphics::Init(const char* title, sf::Vector2i& dimensions, sf::RenderWindow& window)
 {
   assert(!instance);
-  instance = new Graphics(width, height, window);
+  instance = new Graphics(title, dimensions, window);
 }
 
 Graphics& Graphics::GetInstance()
@@ -40,12 +41,14 @@ void Graphics::Destroy()
   ⇩⇩⇩ Instance ⇩⇩⇩
 */
 
-Graphics::Graphics(UInt width, UInt height, sf::RenderWindow& window) :
-    width(width),
-    height(height),
+Graphics::Graphics(const char* title, sf::Vector2i& dimensions, sf::RenderWindow& window) :
+    title(title),
+    dimensions(dimensions),
     window(window),
-    renderer(window, rdt)
+    gameView(sf::FloatRect(0, 0, dimensions.x, dimensions.y)),
+    renderer(dimensions, window, rdt)
 {
+  isFullScreen = false;
   frame_rate = 40;
   frame_count = 0;
   timestamp = 0;
@@ -100,15 +103,65 @@ void Graphics::frame_reset()
   Log::out() << "Graphics frame_reset was called, but it is not implemented yet.";
 }
 
+void Graphics::toggleFullScreen()
+{
+  if (isFullScreen) {
+    window.create(sf::VideoMode(dimensions.x, dimensions.y), title, sf::Style::Titlebar | sf::Style::Close);
+    sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
+    sf::Vector2i winPos(
+      (desktop.width - dimensions.x) / 2,
+      (desktop.height - dimensions.y) / 2
+    );
+    window.setPosition(winPos);
+    isFullScreen = false;
+  } else {
+    window.create(sf::VideoMode::getDesktopMode(), title, sf::Style::Fullscreen);
+    isFullScreen = true;
+  }
+  adjustScreen();
+}
+
+void Graphics::adjustScreen()
+{
+  sf::Vector2u gameResolution(dimensions);
+  sf::Vector2u screenResolution = window.getSize();
+
+  float gameAspectRatio = static_cast<float>(gameResolution.x) / gameResolution.y;
+  float screenAspectRatio = static_cast<float>(screenResolution.x) / screenResolution.y;
+
+  float scaleFactor;
+  sf::FloatRect viewport;
+
+  if (screenAspectRatio > gameAspectRatio) {
+    scaleFactor = static_cast<float>(screenResolution.y) / gameResolution.y;
+    viewport.width = (gameAspectRatio / screenAspectRatio);
+    viewport.height = 1.f;
+    viewport.left = (1.f - viewport.width) / 2.f;  // Center horizontally
+    viewport.top = 0.f;
+  } else {
+    scaleFactor = static_cast<float>(screenResolution.x) / gameResolution.x;
+    viewport.width = 1.f;
+    viewport.height = (screenAspectRatio / gameAspectRatio);
+    viewport.left = 0.f;
+    viewport.top = (1.f - viewport.height) / 2.f;
+  }
+
+  gameView.setViewport(viewport);
+  gameView.setSize(gameResolution.x, gameResolution.y);
+  window.setView(gameView);
+}
+
 /*
   ⇩⇩⇩ Private ⇩⇩⇩
 */
 
 void Graphics::setup()
 {
+  adjustScreen();
+
   sf::ContextSettings settings;
   settings.antialiasingLevel = 0;
-  rdt.create(width, height, settings);
+  rdt.create(dimensions.x, dimensions.y, settings);
   rdt.clear(sf::Color::Transparent);
 }
 

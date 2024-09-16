@@ -5,6 +5,7 @@
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
+#include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/VideoMode.hpp>
 
 #include "AppDefs.h"
@@ -123,6 +124,10 @@ void Engine::pollEvents()
         handleCloseEvent();
         break;
       case sf::Event::KeyPressed:
+        if (event.key.alt && event.key.code == sf::Keyboard::Enter) {
+          Graphics::GetInstance().toggleFullScreen();
+          continue;
+        }
         input.handleKeyPressed(event.key);
         break;
       case sf::Event::KeyReleased:

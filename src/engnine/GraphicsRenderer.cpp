@@ -17,7 +17,8 @@ namespace Eng {
 
 using sf::Texture;
 
-GraphicsRenderer::GraphicsRenderer(sf::RenderWindow& window, sf::RenderTexture& renderTexture) :
+GraphicsRenderer::GraphicsRenderer(sf::Vector2i& dimensions, sf::RenderWindow& window, sf::RenderTexture& renderTexture) :
+    dimensions(dimensions),
     lists(Lists::Instance()),
     shaders(Shaders::Instance()),
     window(window),
@@ -34,6 +35,7 @@ void GraphicsRenderer::render()
   setRenderSpriteTexture();
 
   window.clear(sf::Color::Transparent);
+  // renderSprite.setScale(1.5f, 1.5f);
   window.draw(renderSprite);
   window.display();
 }
@@ -98,7 +100,7 @@ void GraphicsRenderer::createFpsSprite()
   fpsSprite.setOutlineColor(sf::Color::Black);
   fpsSprite.setOutlineThickness(1.5);
   fpsSprite.setCharacterSize(14);
-  fpsSprite.setPosition(4, 458);
+  fpsSprite.setPosition(4, dimensions.y - 22);
 }
 
 void GraphicsRenderer::clearRenderTexture()

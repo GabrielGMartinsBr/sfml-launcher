@@ -18,7 +18,7 @@ using sf::RenderWindow;
 using sf::Texture;
 
 struct GraphicsRenderer {
-  GraphicsRenderer(RenderWindow& target, RenderTexture& renderTexture);
+  GraphicsRenderer(sf::Vector2i& dimensions, RenderWindow& target, RenderTexture& renderTexture);
 
   void render();
 
@@ -33,6 +33,7 @@ struct GraphicsRenderer {
  private:
   Lists& lists;
   Shaders& shaders;
+  sf::Vector2i& dimensions;
   RenderWindow& window;
 
   RenderTexture& renderTexture;

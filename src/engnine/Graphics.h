@@ -17,7 +17,7 @@ class Graphics {
     ⇩⇩⇩ Static ⇩⇩⇩
   */
 
-  static void Init(UInt width, UInt height, sf::RenderWindow& window);
+  static void Init(const char* title, sf::Vector2i& dimensions, sf::RenderWindow& window);
   static Graphics& GetInstance();
   static void Destroy();
 
@@ -42,13 +42,20 @@ class Graphics {
   // TODO: Implement this method
   void frame_reset();
 
+  void toggleFullScreen();
+
+  void adjustScreen();
+
  private:
   /*
     ⇩⇩⇩ Private ⇩⇩⇩
   */
-  UInt width;
-  UInt height;
+  sf::Vector2i& dimensions;
+  const char* title;
+
+  bool isFullScreen;
   sf::RenderWindow& window;
+  sf::View gameView;
   sf::RenderTexture rdt;
   sf::Sprite renderSprite;
   GraphicsRenderer renderer;
@@ -58,7 +65,7 @@ class Graphics {
   UInt frame_rate;
   UInt timestamp;
 
-  Graphics(UInt width, UInt height, sf::RenderWindow& window);
+  Graphics(const char* title, sf::Vector2i& dimensions, sf::RenderWindow& window);
 
   Graphics(const Graphics&);
   Graphics& operator=(const Graphics&);

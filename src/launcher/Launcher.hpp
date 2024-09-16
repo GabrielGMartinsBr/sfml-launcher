@@ -51,7 +51,7 @@ class Launcher {
     Eng::Shaders::Init();
     Eng::Lists::Init();
     Eng::Engine::Init(window, projectPath, dimensions);
-    Eng::Graphics::Init(dimensions.x, dimensions.y, window);
+    Eng::Graphics::Init(title, dimensions, window);
     Eng::Audio::Init();
 
     integrator.init();
