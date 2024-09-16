@@ -146,6 +146,20 @@ void Graphics::adjustScreen()
 }
 
 /*
+  ⇩⇩⇩ Extended Methods ⇩⇩⇩
+*/
+
+int Graphics::getWidth()
+{
+  return projectWindow.dimensions.x;
+}
+
+int Graphics::getHeight()
+{
+  return projectWindow.dimensions.y;
+}
+
+/*
   ⇩⇩⇩ Private ⇩⇩⇩
 */
 

@@ -49,7 +49,8 @@ class Graphics {
 
   void adjustScreen();
 
- private:
+  int getWidth();
+  int getHeight();
   /*
     ⇩⇩⇩ Private ⇩⇩⇩
   */

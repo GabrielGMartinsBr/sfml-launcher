@@ -27,6 +27,10 @@ class Graphics {
     rb_define_module_function(graphicsModule, "freeze", RUBY_METHOD_FUNC(method_freeze), 0);
     rb_define_module_function(graphicsModule, "transition", RUBY_METHOD_FUNC(method_transition), -1);
     rb_define_module_function(graphicsModule, "frame_reset", RUBY_METHOD_FUNC(method_frame_reset), 0);
+
+    // Extended methods
+    rb_define_module_function(graphicsModule, "width", RUBY_METHOD_FUNC(getter_width), 0);
+    rb_define_module_function(graphicsModule, "height", RUBY_METHOD_FUNC(getter_height), 0);
   }
 
   static VALUE getRbClass()
@@ -134,6 +138,24 @@ class Graphics {
   {
     Eng::Graphics::GetInstance().frame_reset();
     return Qnil;
+  }
+
+  /*
+    ⇩⇩⇩ Extended Methods ⇩⇩⇩
+  */
+
+  static VALUE getter_width(VALUE self)
+  {
+    return Convert::toRubyNumber(
+      Eng::Graphics::GetInstance().getWidth()
+    );
+  }
+
+  static VALUE getter_height(VALUE self)
+  {
+    return Convert::toRubyNumber(
+      Eng::Graphics::GetInstance().getHeight()
+    );
   }
 };
 
