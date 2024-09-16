@@ -44,6 +44,16 @@ const String& PackageReader::getProjectTile()
   return projectTile;
 }
 
+int PackageReader::getWidth()
+{
+  return width;
+}
+
+int PackageReader::getHeight()
+{
+  return height;
+}
+
 /*
     ⇩⇩⇩ Instance Private ⇩⇩⇩
 */
@@ -52,6 +62,8 @@ PackageReader::PackageReader(String projectPath) :
     projectPath(projectPath),
     projectTile(DEFAULT_WINDOW_TILE)
 {
+  width = 0;
+  height = 0;
   read();
 }
 
@@ -72,6 +84,16 @@ void PackageReader::read()
   while (std::getline(file, line)) {
     if (startsWith(line, "Title=")) {
       projectTile = line.substr(6);
+    } else if (startsWith(line, "Width=")) {
+      int value = std::stoi(line.substr(6));
+      if (value > 128) {
+        width = value;
+      }
+    } else if (startsWith(line, "Height=")) {
+      int value = std::stoi(line.substr(7));
+      if (value > 96) {
+        height = value;
+      }
     }
   }
 

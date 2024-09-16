@@ -24,17 +24,21 @@
 #include "loaders/ScriptsLoader.hpp"
 
 class Launcher {
-  sf::Vector2i dimensions = { 960, 720 };
-  app::String title = DEFAULT_WINDOW_TILE;
+  sf::Vector2i dimensions;
+  app::String title;
 
  public:
 
-  Launcher() { }
+  Launcher() :
+      dimensions(DEFAULT_DIMENSIONS),
+      title(DEFAULT_WINDOW_TILE)
+  {
+  }
 
   void run(app::CStr projectPath)
   {
     pkg::PackageReader::Init(projectPath);
-    title = pkg::PackageReader::Instance().getProjectTile();
+    loadPackageParams();
 
     ProjectWindow projectWindow(title, dimensions);
     projectWindow.centralize();
@@ -65,6 +69,23 @@ class Launcher {
     pkg::PackageReader::Destroy();
 
     projectWindow.close();
+  }
+
+  void loadPackageParams()
+  {
+    using pkg::PackageReader;
+    PackageReader& packageReader = PackageReader::Instance();
+
+    if (packageReader.getProjectTile().length() > 0) {
+      title = packageReader.getProjectTile();
+    }
+
+    if (packageReader.getWidth() > 0) {
+      dimensions.x = packageReader.getWidth();
+    }
+    if (packageReader.getHeight() > 0) {
+      dimensions.y = packageReader.getHeight();
+    }
   }
 
   void loadScripts(app::CStr scriptsPath)

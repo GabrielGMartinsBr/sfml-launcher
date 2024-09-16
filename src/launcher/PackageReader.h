@@ -21,10 +21,14 @@ class PackageReader {
   */
 
   const String& getProjectTile();
+  int getWidth();
+  int getHeight();
 
  private:
   String projectPath;
   String projectTile;
+  int width;
+  int height;
 
   PackageReader(String projectPath);
 
