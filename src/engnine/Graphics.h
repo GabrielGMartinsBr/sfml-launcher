@@ -9,6 +9,7 @@
 namespace Eng {
 
 using app::CStr;
+using app::String;
 using app::UInt;
 
 class Graphics {
@@ -17,7 +18,7 @@ class Graphics {
     ⇩⇩⇩ Static ⇩⇩⇩
   */
 
-  static void Init(const char* title, sf::Vector2i& dimensions, sf::RenderWindow& window);
+  static void Init(const String& title, sf::Vector2i& dimensions, sf::RenderWindow& window);
   static Graphics& GetInstance();
   static void Destroy();
 
@@ -51,7 +52,7 @@ class Graphics {
     ⇩⇩⇩ Private ⇩⇩⇩
   */
   sf::Vector2i& dimensions;
-  const char* title;
+  const String& title;
 
   bool isFullScreen;
   sf::RenderWindow& window;
@@ -65,7 +66,7 @@ class Graphics {
   UInt frame_rate;
   UInt timestamp;
 
-  Graphics(const char* title, sf::Vector2i& dimensions, sf::RenderWindow& window);
+  Graphics(const String& title, sf::Vector2i& dimensions, sf::RenderWindow& window);
 
   Graphics(const Graphics&);
   Graphics& operator=(const Graphics&);

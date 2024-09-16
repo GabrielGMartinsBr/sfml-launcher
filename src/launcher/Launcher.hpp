@@ -10,6 +10,7 @@
 #include "Log.hpp"
 #include "base/AppDefs.h"
 #include "base/BacktraceUtils.hpp"
+#include "consts/PackageConsts.h"
 #include "engnine/Audio.h"
 #include "engnine/Engine.h"
 #include "engnine/Graphics.h"
@@ -17,13 +18,13 @@
 #include "engnine/Shaders.h"
 #include "engnine/base/Fonts.h"
 #include "integrator/Integrator.hpp"
+#include "launcher/PackageReader.h"
 #include "loaders/PlayerScript.hpp"
 #include "loaders/ScriptsLoader.hpp"
 
 class Launcher {
   sf::Vector2i dimensions = { 800, 600 };
-
-  const char* title = "ORM S-Launcher";
+  app::String title = DEFAULT_WINDOW_TILE;
 
   sf::VideoMode mode;
   sf::RenderWindow window;
@@ -44,6 +45,11 @@ class Launcher {
       (desktop.height - dimensions.y) / 2
     );
     window.setPosition(winPos);
+
+    pkg::PackageReader::Init(projectPath);
+
+    title = pkg::PackageReader::Instance().getProjectTile();
+    window.setTitle(title);
 
     ScriptsLoader& scriptsLoader = ScriptsLoader::getInstance();
 
@@ -67,6 +73,7 @@ class Launcher {
     Eng::Lists::Destroy();
     Eng::Shaders::Destroy();
     Eng::Fonts::Destroy();
+    pkg::PackageReader::Destroy();
 
     window.close();
   }

@@ -5,6 +5,7 @@
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Window/WindowStyle.hpp>
 
+#include "AppDefs.h"
 #include "NumberUtils.hpp"
 #include "engnine/Audio.h"
 #include "engnine/Engine.h"
@@ -18,7 +19,7 @@ namespace Eng {
 */
 static Graphics* instance = nullptr;
 
-void Graphics::Init(const char* title, sf::Vector2i& dimensions, sf::RenderWindow& window)
+void Graphics::Init(const String& title, sf::Vector2i& dimensions, sf::RenderWindow& window)
 {
   assert(!instance);
   instance = new Graphics(title, dimensions, window);
@@ -41,7 +42,7 @@ void Graphics::Destroy()
   ⇩⇩⇩ Instance ⇩⇩⇩
 */
 
-Graphics::Graphics(const char* title, sf::Vector2i& dimensions, sf::RenderWindow& window) :
+Graphics::Graphics(const String& title, sf::Vector2i& dimensions, sf::RenderWindow& window) :
     title(title),
     dimensions(dimensions),
     window(window),
