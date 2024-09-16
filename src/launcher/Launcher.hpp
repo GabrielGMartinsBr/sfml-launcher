@@ -21,8 +21,8 @@
 #include "loaders/ScriptsLoader.hpp"
 
 class Launcher {
-  int width = 640;
-  int height = 480;
+  sf::Vector2i dimensions = { 800, 600 };
+
   const char* title = "ORM S-Launcher";
 
   sf::VideoMode mode;
@@ -33,15 +33,15 @@ class Launcher {
  public:
 
   Launcher() :
-      mode(width, height),
+      mode(dimensions.x, dimensions.y),
       window(mode, title, sf::Style::Titlebar | sf::Style::Close) { }
 
   void run(app::CStr projectPath)
   {
     sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
     sf::Vector2i winPos(
-      (desktop.width - width) / 2,
-      (desktop.height - height) / 2
+      (desktop.width - dimensions.x) / 2,
+      (desktop.height - dimensions.y) / 2
     );
     window.setPosition(winPos);
 
@@ -50,8 +50,8 @@ class Launcher {
     Eng::Fonts::Init();
     Eng::Shaders::Init();
     Eng::Lists::Init();
-    Eng::Engine::Init(window, projectPath);
-    Eng::Graphics::Init(width, height, window);
+    Eng::Engine::Init(window, projectPath, dimensions);
+    Eng::Graphics::Init(dimensions.x, dimensions.y, window);
     Eng::Audio::Init();
 
     integrator.init();
@@ -92,7 +92,7 @@ class Launcher {
       lineNumber = script.getEndLine();
     }
 
-    // findErrorLine(scripts, 6991);
+    // findErrorLine(scripts, 690);
 
     rb_eval_string_protect(code.c_str(), &errorState);
 

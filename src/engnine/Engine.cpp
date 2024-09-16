@@ -21,10 +21,10 @@ namespace Eng {
 
 static Engine* instance = nullptr;
 
-void Engine::Init(sf::RenderWindow& window, CStr projectPath)
+void Engine::Init(sf::RenderWindow& window, CStr projectPath, sf::Vector2i& dimensions)
 {
   assert(!instance);
-  instance = new Engine(window, projectPath);
+  instance = new Engine(window, projectPath, dimensions);
 }
 
 Engine& Engine::getInstance()
@@ -44,9 +44,9 @@ void Engine::Destroy()
   ⇩⇩⇩ Instance ⇩⇩⇩
 */
 
-Engine::Engine(sf::RenderWindow& window, CStr projectPath) :
+Engine::Engine(sf::RenderWindow& window, CStr projectPath, sf::Vector2i& dimensions) :
     input(Input::getInstance()),
-    dimensions(640, 480),
+    dimensions(dimensions),
     window(window),
     projectPath(projectPath)
 {

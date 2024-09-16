@@ -21,7 +21,7 @@ class Engine {
     ⇩⇩⇩ Static ⇩⇩⇩
   */
 
-  static void Init(sf::RenderWindow& window, CStr projectPath);
+  static void Init(sf::RenderWindow& window, CStr projectPath, sf::Vector2i& dimensions);
   static Engine& getInstance();
   static void Destroy();
 
@@ -55,7 +55,7 @@ class Engine {
 
  private:
   bool running;
-  sf::Vector2i dimensions;
+  sf::Vector2i& dimensions;
   app::String projectPath;
   app::String scriptsPath;
 
@@ -63,7 +63,7 @@ class Engine {
 
   sf::RenderWindow& window;
 
-  Engine(sf::RenderWindow& window, CStr projectPath);
+  Engine(sf::RenderWindow& window, CStr projectPath, sf::Vector2i& dimensions);
 
   Engine(const Engine&);
   Engine& operator=(const Engine&);

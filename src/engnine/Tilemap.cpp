@@ -34,9 +34,9 @@ Tilemap::Tilemap(Viewport* _viewport) :
 
 Tilemap::Tilemap(VALUE rbObj, Viewport* viewport) :
     EngineBase(rbObj),
-    srcRect(0, 0, 640, 480),
-    viewport(viewport),
-    dimensions(Engine::getInstance().getDimensions())
+    dimensions(Engine::getInstance().getDimensions()),
+    srcRect(0, 0, dimensions.x, dimensions.y),
+    viewport(viewport)
 {
   tileset = nullptr;
   autotiles = new Autotiles();
