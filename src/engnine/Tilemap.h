@@ -3,12 +3,11 @@
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 
-#include "Sugars.hpp"
 #include "engnine/Autotiles.h"
 #include "engnine/EngineBase.hpp"
 #include "engnine/IOnUpdate.h"
 #include "engnine/Table.hpp"
-#include "engnine/TilemapLayer.h"
+#include "engnine/TileLayerTable.h"
 #include "engnine/Viewport.hpp"
 
 namespace Eng {
@@ -99,7 +98,7 @@ class Tilemap : public EngineBase, IOnUpdate {
   bool layersIsSetup;
 
   const sf::Vector2i& dimensions;
-  Vector<SharedPtr<TilemapLayer>> layers;
+  TileLayerTable layersTable;
   int layersN;
 
   sf::IntRect srcRect;
