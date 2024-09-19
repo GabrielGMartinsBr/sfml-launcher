@@ -13,6 +13,7 @@ class TilemapLayer : IViewportChild {
  public:
   sf::Sprite sprite;
   sf::RenderTexture rendTex;
+  bool visible;
 
   TilemapLayer(Viewport* viewport, int width, int height, int y, int priority, int oy);
 

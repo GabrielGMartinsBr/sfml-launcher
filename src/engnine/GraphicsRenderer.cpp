@@ -7,13 +7,17 @@
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Window/Window.hpp>
 
+#include "Log.hpp"
 #include "engnine/IOnUpdate.h"
 #include "engnine/Lists.hpp"
+#include "engnine/Performance.hpp"
 #include "engnine/Shaders.h"
 #include "engnine/Timer.hpp"
 #include "engnine/base/Fonts.h"
 
 namespace Eng {
+
+Performance renderPer;
 
 using sf::Texture;
 
@@ -126,6 +130,8 @@ void GraphicsRenderer::updateSprites()
 
 void GraphicsRenderer::renderSprites()
 {
+  renderPer.start();
+
   lists.sortZ();
 
   for (Eng::Viewport* viewport : lists.viewports) {
@@ -148,6 +154,8 @@ void GraphicsRenderer::renderSprites()
   }
 
   renderFpsSprite();
+
+  renderPer.average();
 }
 
 void GraphicsRenderer::renderFpsSprite()

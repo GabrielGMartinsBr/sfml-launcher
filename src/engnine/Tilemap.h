@@ -105,13 +105,15 @@ class Tilemap : public EngineBase, IOnUpdate {
 
   sf::Sprite tileSprite;
   sf::Sprite autotileSpr[7];
+  int autotileFrameN[7];
+  int frameCount;
 
   void addToEngineCycles();
   void removeFromEngineCycles();
 
   void setupLayers();
 
-  void checkLayer(int id, int y, int priority, int oy);
+  void checkLayer(int id, int y, int priority, int oy, int frameId = 0);
 
   void updateIsEligible();
 

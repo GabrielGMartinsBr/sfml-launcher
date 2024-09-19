@@ -10,12 +10,14 @@
 #include <memory>
 #include <stdexcept>
 
+#include "Log.hpp"
 #include "engnine/AutotilePositions.h"
 #include "engnine/Autotiles.h"
 #include "engnine/Bitmap.h"
 #include "engnine/Engine.h"
 #include "engnine/EngineBase.hpp"
 #include "engnine/Lists.hpp"
+#include "engnine/Performance.hpp"
 #include "engnine/Table.hpp"
 #include "engnine/TilemapLayer.h"
 #include "engnine/Viewport.hpp"
@@ -57,6 +59,7 @@ Tilemap::Tilemap(VALUE rbObj, Viewport* viewport) :
   dirty = false;
   addedToEngineCycles = false;
   layersN = 0;
+  frameCount = 0;
   layersIsSetup = false;
 
   if (rbObj != Qnil) {
@@ -74,6 +77,7 @@ Tilemap::~Tilemap()
 
 void Tilemap::onUpdate()
 {
+  // Performance onUpPer;
   if (!dirty || tileset == nullptr || map_data == nullptr) {
     return;
   }
@@ -94,13 +98,33 @@ void Tilemap::onUpdate()
     srcRect.left = ox;
     srcRect.top = oy;
     int _oy = oy / 32;
-    for (int i = 0; i < layersN; i++) {
-      if (layersTable.isEmpty(i)) continue;
-      layersTable.getValue(i).update(_oy);
-      layersTable.getValue(i).sprite.setTextureRect(srcRect);
+    // for (int i = 0; i < layersN; i++) {
+    //   if (!layersTable.isEmpty(i)) {
+    //     layersTable.getValue(i).update(_oy);
+    //     layersTable.getValue(i).sprite.setTextureRect(srcRect);
+    //   }
+    //   if (!layersTable.isEmpty(i, 1)) {
+    //     layersTable.getValue(i, 1).update(_oy);
+    //     layersTable.getValue(i, 1).sprite.setTextureRect(srcRect);
+    //   }
+    // }
+
+    for (int f = 0; f < 4; f++) {
+      for (int i = 0; i < layersN; i++) {
+        if (!layersTable.isEmpty(i, f)) {
+          layersTable.getValue(i, f).update(_oy);
+          layersTable.getValue(i, f).sprite.setTextureRect(srcRect);
+        }
+      }
     }
     shouldUpdateSprRect = false;
   }
+
+  // for (int i = 0; i < layersN; i++) {
+  //   if (layersTable.isEmpty(i, 1)) continue;
+  //   Log::out() << i;
+  //   layersTable.getValue(i, 1).visible = false;
+  // }
 
   dirty = false;
   ready = true;
@@ -291,7 +315,24 @@ Viewport* Tilemap::method_viewport()
 
 // update
 
-void Tilemap::method_update() { }
+void Tilemap::method_update()
+{
+  frameCount++;
+  int vis = (frameCount / 20) % 4;
+
+  for (int f = 0; f < 4; f++) {
+    for (int i = 0; i < layersN; i++) {
+      if (!layersTable.isEmpty(i, f)) {
+        layersTable.getValue(i, f).visible = vis == f;
+      }
+    }
+
+    // if (!layersTable.isEmpty(i, 1)) {
+    //   layersTable.getValue(i, 1).visible = vis == 1;
+    //   // layersTable.getValue(i, 1).getZIndex()
+    // }
+  }
+}
 
 /*
   Private
@@ -323,20 +364,20 @@ void Tilemap::setupLayers()
   int rows = map_data->getYSize();
   layersN = rows + 5;
 
-  layersTable.resize(layersN, 3);
+  layersTable.resize(layersN, 4);
 
   layersIsSetup = true;
 }
 
-void Tilemap::checkLayer(int id, int y, int priority, int oy)
+void Tilemap::checkLayer(int id, int y, int priority, int oy, int frameId)
 {
-  if (layersTable.isEmpty(id)) {
+  if (layersTable.isEmpty(id, frameId)) {
     int cols = map_data->getXSize();
     int rows = map_data->getYSize();
     int w = cols * 32;
     int h = rows * 32;
     UPtr<TilemapLayer> layer = make_unique<TilemapLayer>(viewport, w, h, y, priority, oy / 32);
-    layersTable.setValue(std::move(layer), id);
+    layersTable.setValue(std::move(layer), id, frameId);
   }
 }
 
@@ -357,9 +398,11 @@ void Tilemap::buildSprites()
   for (int i = 0; i < 7; i++) {
     bp = autotiles->getter(i);
     if (bp == nullptr) {
+      autotileFrameN[i] = 0;
       continue;
     } else {
       autotileSpr[i].setTexture(bp->getTexture());
+      autotileFrameN[i] = bp->getter_width() / 96;
     }
   }
 
@@ -382,8 +425,32 @@ void Tilemap::buildSprites()
       continue;
     }
     layersTable.getValue(i).rendTex.display();
-    layersTable.getValue(i).sprite.setTexture(layersTable.getValue(i).rendTex.getTexture());
   }
+
+  // for (int i = 0; i < layersN; i++) {
+  //   if (layersTable.isEmpty(i, 1)) {
+  //     continue;
+  //   }
+  //   layersTable.getValue(i, 1).rendTex.display();
+  // }
+
+  for (int f = 0; f < 4; f++)
+    for (int i = 0; i < layersN; i++) {
+      if (!layersTable.isEmpty(i, f)) {
+        layersTable.getValue(i, f).rendTex.display();
+      }
+    }
+
+  int n = 0;
+  for (int i = 0; i < layersTable.xSize(); i++)
+    for (int j = 0; j < layersTable.ySize(); j++) {
+      if (!layersTable.isEmpty(i, j)) {
+        n++;
+      }
+    }
+  Log::out() << "Layers x: " << layersTable.xSize();
+  Log::out() << "Layers y: " << layersTable.ySize();
+  Log::out() << "Layers n: " << n;
 }
 
 void Tilemap::handleTile(int x, int y, int z)
@@ -406,7 +473,11 @@ void Tilemap::handleTile(int x, int y, int z)
       layerId = y + priority;
     }
   }
-  checkLayer(layerId, y, priority, oy);
+  // checkLayer(layerId, y, priority, oy);
+  checkLayer(layerId, y, priority, oy, 0);
+  checkLayer(layerId, y, priority, oy, 1);
+  checkLayer(layerId, y, priority, oy, 2);
+  checkLayer(layerId, y, priority, oy, 3);
 
   id -= 48 * 8;
 
@@ -417,6 +488,9 @@ void Tilemap::handleTile(int x, int y, int z)
   tileSprite.setPosition(x * T_SIZE, y * T_SIZE);
 
   layersTable.getValue(layerId).rendTex.draw(tileSprite);
+  layersTable.getValue(layerId, 1).rendTex.draw(tileSprite);
+  layersTable.getValue(layerId, 2).rendTex.draw(tileSprite);
+  layersTable.getValue(layerId, 3).rendTex.draw(tileSprite);
 }
 
 void Tilemap::handleAutoTile(int id, int x, int y, int z)
@@ -432,7 +506,15 @@ void Tilemap::handleAutoTile(int id, int x, int y, int z)
       layerId = y + priority;
     }
   }
-  checkLayer(layerId, y, priority, oy);
+
+  // int frameN = autotileFrameN[autoTileId];
+  checkLayer(layerId, y, priority, oy, 0);
+  checkLayer(layerId, y, priority, oy, 1);
+  checkLayer(layerId, y, priority, oy, 2);
+  checkLayer(layerId, y, priority, oy, 3);
+  // for (int frameId = 0; frameId < 4; frameId++) {
+  //   checkLayer(layerId, y, priority, oy, frameId);
+  // }
 
   sf::Sprite& tile = autotileSpr[autoTileId];
 
@@ -443,18 +525,70 @@ void Tilemap::handleAutoTile(int id, int x, int y, int z)
   int _y = y * T_SIZE;
 
   int tile_position, tx, ty;
+  // for (int i = 0; i < 4; i++) {
+  //   tile_position = tiles[i] - 1;
+  //   tx = (tile_position % 6) * 16;
+  //   ty = (tile_position / 6) * 16;
+  //   tile.setTextureRect(
+  //     sf::IntRect(tx, ty, 16, 16)
+  //   );
+  //   tile.setPosition(
+  //     _x + i % 2 * 16,
+  //     std::floor(_y + i / 2 * 16)
+  //   );
+  //   layersTable.getValue(layerId).rendTex.draw(tile);
+  // }
+
+  // if (autotileFrameN[autoTileId] < 2) {
+  //   return;
+  // }
+
+  // _x = x * T_SIZE;
+  // _y = y * T_SIZE;
+
+  sf::IntRect tileSrcRect(0, 0, 16, 16);
+
   for (int i = 0; i < 4; i++) {
     tile_position = tiles[i] - 1;
     tx = (tile_position % 6) * 16;
     ty = (tile_position / 6) * 16;
-    tile.setTextureRect(
-      sf::IntRect(tx, ty, 16, 16)
-    );
+    tileSrcRect.left = tx;
+    tileSrcRect.top = ty;
+    tile.setTextureRect(tileSrcRect);
     tile.setPosition(
       _x + i % 2 * 16,
       std::floor(_y + i / 2 * 16)
     );
-    layersTable.getValue(layerId).rendTex.draw(tile);
+    // layersTable.getValue(layerId, 0).rendTex.draw(tile);
+
+    int frameN = autotileFrameN[autoTileId];
+    for (int f = 0; f < 4; f++) {
+      if (frameN > f) {
+        tileSrcRect.left = tx + 96 * f;
+      } else {
+        tileSrcRect.left = tx;
+      }
+      tile.setTextureRect(tileSrcRect);
+      layersTable.getValue(layerId, f).rendTex.draw(tile);
+    }
+
+    // if (autotileFrameN[autoTileId] > 1) {
+    //   tileSrcRect.left = tx + 96;
+    //   tile.setTextureRect(tileSrcRect);
+    //   layersTable.getValue(layerId, 1).rendTex.draw(tile);
+    // }
+
+    // if (autotileFrameN[autoTileId] > 2) {
+    //   tileSrcRect.left = tx + 96 * 2;
+    //   tile.setTextureRect(tileSrcRect);
+    //   layersTable.getValue(layerId, 2).rendTex.draw(tile);
+    // }
+
+    // if (autotileFrameN[autoTileId] > 3) {
+    //   tileSrcRect.left = tx + 96 * 3;
+    //   tile.setTextureRect(tileSrcRect);
+    //   layersTable.getValue(layerId, 3).rendTex.draw(tile);
+    // }
   }
 }
 void Tilemap::disposeLayers()

@@ -16,6 +16,8 @@ TilemapLayer::TilemapLayer(Viewport* viewport, int width, int height, int y, int
 {
   isDisposed = false;
   addedToEngineCycles = false;
+  visible = true;
+  // visible = false;
 
   create(width, height);
   calcZ();
@@ -34,6 +36,7 @@ void TilemapLayer::create(int width, int height)
 {
   rendTex.create(width, height);
   rendTex.clear(sf::Color::Transparent);
+  sprite.setTexture(rendTex.getTexture());
 }
 
 void TilemapLayer::calcZ()
@@ -73,7 +76,9 @@ inline bool TilemapLayer::shouldRender() const
 
 void TilemapLayer::onRender(sf::RenderTexture& renderTexture)
 {
-  renderTexture.draw(sprite);
+  if (visible) {
+    renderTexture.draw(sprite);
+  }
 }
 
 void TilemapLayer::dispose()
