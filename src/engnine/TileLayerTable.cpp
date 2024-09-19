@@ -8,33 +8,32 @@ namespace Eng {
     ⇩⇩⇩ Public ⇩⇩⇩
 */
 
-TileLayerTable::TileLayerTable(int x, int y, int z) :
+TileLayerTable::TileLayerTable(int x, int y) :
     xSizeVal(x),
     ySizeVal(y),
-    zSizeVal(z),
-    sizeVal(x * y * z),
+    sizeVal(x * y),
     values(sizeVal)
 {
 }
 
-bool TileLayerTable::isEmpty(int x, int y, int z)
+bool TileLayerTable::isEmpty(int x, int y)
 {
-  return values[calcIndex(x, y, z)] == nullptr;
+  return values[calcIndex(x, y)] == nullptr;
 }
 
-TilemapLayer& TileLayerTable::getValue(int x, int y, int z)
+TilemapLayer& TileLayerTable::getValue(int x, int y)
 {
-  return *values[calcIndex(x, y, z)];
+  return *values[calcIndex(x, y)];
 }
 
-void TileLayerTable::setValue(UPtr<TilemapLayer> layer, int x, int y, int z)
+void TileLayerTable::setValue(UPtr<TilemapLayer> layer, int x, int y)
 {
-  values[calcIndex(x, y, z)] = std::move(layer);
+  values[calcIndex(x, y)] = std::move(layer);
 }
 
-void TileLayerTable::dispose(int x, int y, int z)
+void TileLayerTable::dispose(int x, int y)
 {
-  int index = calcIndex(x, y, z);
+  int index = calcIndex(x, y);
   if (values[index] != nullptr) {
     values[index]->dispose();
     values[index].reset();
@@ -51,11 +50,6 @@ int TileLayerTable::ySize() const
   return ySizeVal;
 }
 
-int TileLayerTable::zSize() const
-{
-  return zSizeVal;
-}
-
 int TileLayerTable::size() const
 {
   return sizeVal;
@@ -63,26 +57,23 @@ int TileLayerTable::size() const
 
 void TileLayerTable::resize(int x)
 {
-  resize(x, ySizeVal, zSizeVal);
+  resize(x, ySizeVal);
 }
 
 void TileLayerTable::resize(int x, int y)
 {
-  resize(x, y, zSizeVal);
-}
-
-void TileLayerTable::resize(int x, int y, int z)
-{
-  if (x == xSizeVal && y == ySizeVal && z == zSizeVal) {
+  if (x == xSizeVal && y == ySizeVal) {
     return;
   }
+  xSizeVal = x;
+  ySizeVal = y;
 
   for (size_t i = 0; i < values.size(); ++i) {
     values[i]->dispose();
     values[i].reset();
   }
 
-  size_t newSize = x * y * z;
+  size_t newSize = x * y;
   values.resize(newSize);
 }
 
@@ -90,9 +81,9 @@ void TileLayerTable::resize(int x, int y, int z)
     ⇩⇩⇩ Private ⇩⇩⇩
 */
 
-inline const int TileLayerTable::calcIndex(int x, int y, int z) const
+inline const int TileLayerTable::calcIndex(int x, int y) const
 {
-  return xSizeVal * ySizeVal * z + xSizeVal * y + x;
+  return xSizeVal * y + x;
 };
 
 }  // namespace Eng
