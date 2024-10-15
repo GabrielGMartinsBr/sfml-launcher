@@ -13,7 +13,8 @@ using Eng::Lists;
 
 AeonWindow::AeonWindow(VALUE rbObj, Eng::Viewport* viewport) :
     Eng::Window(rbObj, viewport),
-    ring(0, 0, 0, 0, 3)
+    ring(3),
+    timestamp(0)
 {
   addedToEngineCycles = false;
   ring.fillColor("#0000");
@@ -28,7 +29,16 @@ AeonWindow::~AeonWindow()
 }
 
 /*
-  ⇩⇩⇩ IOnRender ⇩⇩⇩
+  ⇩⇩⇩ Aeon lifecycle methods ⇩⇩⇩
+*/
+
+void AeonWindow::handleAeonUpdate(UInt ts)
+{
+  timestamp = ts;
+}
+
+/*
+  ⇩⇩⇩ Nrgss lifecycle methods ⇩⇩⇩
 */
 
 void AeonWindow::onRender(sf::RenderTexture& renderTexture)
@@ -77,6 +87,16 @@ VALUE AeonWindow::setter_height(VALUE v)
   ring.height(height + 12);
   return v;
 }
+
+void AeonWindow::method_dispose()
+{
+  Window::method_dispose();
+  removeFromEngineCycles();
+}
+
+/*
+  ⇩⇩⇩ Private ⇩⇩⇩
+*/
 
 void AeonWindow::addToEngineCycles()
 {

@@ -47,6 +47,13 @@ void AeonWindowManager::removeEntry(AeonWindow* entry)
   }
 }
 
-void AeonWindowManager::update() { }
+void AeonWindowManager::updateEntries()
+{
+  ts = clock.getElapsedTime().asSeconds();
+
+  for (AeonWindow* entry : entries) {
+    entry->handleAeonUpdate(ts);
+  }
+}
 
 }  // namespace ae

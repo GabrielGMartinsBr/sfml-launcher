@@ -11,6 +11,7 @@
 
 namespace ae {
 
+using app::UInt;
 using sf::RenderTarget;
 
 class AeonWindow : public Eng::Window, Eng::IOnRender {
@@ -19,11 +20,11 @@ class AeonWindow : public Eng::Window, Eng::IOnRender {
 
   ~AeonWindow();
 
+  void handleAeonUpdate(UInt ts);
+
   void onRender(sf::RenderTexture& renderTexture) override;
   bool shouldRender() const override;
   int getZIndex() const override;
-
-  void aeonUpdate() { }
 
   VALUE setter_x(VALUE v);
   VALUE setter_y(VALUE v);
@@ -31,9 +32,11 @@ class AeonWindow : public Eng::Window, Eng::IOnRender {
   VALUE setter_width(VALUE v);
   VALUE setter_height(VALUE v);
 
+  void method_dispose();
 
  private:
   RoundedRectShape ring;
+  UInt timestamp;
   bool addedToEngineCycles;
 
   void addToEngineCycles();
