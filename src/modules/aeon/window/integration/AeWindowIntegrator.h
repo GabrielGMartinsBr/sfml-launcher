@@ -2,7 +2,7 @@
 
 #include <ruby.h>
 
-#include "modules/aeon/window/AeonWindow.h"
+#include "aeon/window/AeonWindow.h"
 
 namespace ae {
 

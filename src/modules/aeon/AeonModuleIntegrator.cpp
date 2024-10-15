@@ -3,7 +3,7 @@
 #include <ruby.h>
 
 #include "Log.hpp"
-#include "modules/aeon/window/integration/AeWindowIntegrator.h"
+#include "aeon/window/integration/AeWindowIntegrator.h"
 
 namespace ae {
 

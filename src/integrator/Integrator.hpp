@@ -23,7 +23,7 @@
 #include "integrator/It_Tilemap.hpp"
 #include "integrator/It_Tone.hpp"
 #include "integrator/It_Viewport.hpp"
-#include "modules/aeon/AeonModuleIntegrator.h"
+#include "aeon/AeonModuleIntegrator.h"
 
 typedef VALUE (*Cb)(VALUE);
 typedef boost::filesystem::path FPath;

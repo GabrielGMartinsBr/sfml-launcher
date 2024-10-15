@@ -126,6 +126,15 @@ class Window : public IOnUpdate, public EngineBase {
 
   void method_update();
 
+ protected:
+  int x;
+  int y;
+  int z;
+  int width;
+  int height;
+  bool visible;
+  bool isDisposed;
+
  private:
   Viewport *viewport;
   Bitmap *windowSkin;
@@ -133,19 +142,14 @@ class Window : public IOnUpdate, public EngineBase {
   bool _stretch;
   Rect *cursor_rect;
   bool active;
-  bool visible;
   bool pause;
-  int x;
-  int y;
-  int width;
-  int height;
-  int z;
+  bool addedToEngineCycles;
+
   int ox;
   int oy;
   int opacity;
   int back_opacity;
   int contents_opacity;
-  bool isDisposed;
 
   WindowFrame frame;
   WindowSprite contentsSprite;
@@ -155,15 +159,14 @@ class Window : public IOnUpdate, public EngineBase {
   bool skinDirty;
   bool contentsDirty;
   bool opacityDirty;
-  bool addedToEngineCycles;
+  
 
   int cursorAniAlphaId;
 
-  void bindRubyVars();
-
   void addToEngineCycles();
-
   void removeFromEngineCycles();
+
+  void bindRubyVars();
 
   void updateFrameSprites();
 

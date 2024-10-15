@@ -5,7 +5,7 @@
 #include "RbUtils.hpp"
 #include "integrator/It_Bitmap.hpp"
 #include "integrator/It_Viewport.hpp"
-#include "modules/aeon/window/AeonWindow.h"
+#include "aeon/window/AeonWindow.h"
 
 namespace ae {
 
