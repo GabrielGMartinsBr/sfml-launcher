@@ -71,6 +71,7 @@ float RoundedRectShape::x()
 
 void RoundedRectShape::x(float value)
 {
+  positionVal.x = value;
   dirtyPosition = true;
 }
 
@@ -81,6 +82,7 @@ float RoundedRectShape::y()
 
 void RoundedRectShape::y(float value)
 {
+  positionVal.y = value;
   dirtyPosition = true;
 }
 
@@ -113,6 +115,7 @@ float RoundedRectShape::width()
 
 void RoundedRectShape::width(float value)
 {
+  sizeVal.x = value;
   dirtyPoints = true;
 }
 
@@ -123,6 +126,7 @@ float RoundedRectShape::height()
 
 void RoundedRectShape::height(float value)
 {
+  sizeVal.y = value;
   dirtyPoints = true;
 }
 
@@ -221,7 +225,7 @@ void RoundedRectShape::setPosition()
 void RoundedRectShape::setStyle()
 {
   shape.setOutlineThickness(style.borderSize);
-  shape.setOutlineColor(style.bgColor.getSfColor());
+  shape.setOutlineColor(style.borderColor.getSfColor());
   shape.setFillColor(style.bgColor.getSfColor());
 }
 
