@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ruby.h>
+
 #include <boost/filesystem.hpp>
 #include <cstdlib>
 #include <stdexcept>
@@ -21,16 +23,12 @@
 #include "integrator/It_Tilemap.hpp"
 #include "integrator/It_Tone.hpp"
 #include "integrator/It_Viewport.hpp"
-#include "ruby.h"
+#include "modules/aeon/AeonModuleIntegrator.h"
 
 typedef VALUE (*Cb)(VALUE);
 typedef boost::filesystem::path FPath;
 
-class Integrator {
-  bool initialized = false;
-
- public:
-
+struct Integrator {
   void init()
   {
     if (initialized) {
@@ -58,6 +56,8 @@ class Integrator {
     It::Autotiles::integrate();
     It::Plane::integrate();
 
+    ae::AeonModuleIntegrator::integrate();
+
     loadScriptsPath();
     loadBuiltInScripts();
 
@@ -73,6 +73,7 @@ class Integrator {
   }
 
  private:
+  bool initialized = false;
 
   void loadBuiltInScripts()
   {
