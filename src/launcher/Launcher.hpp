@@ -22,6 +22,7 @@
 #include "launcher/ProjectWindow.h"
 #include "loaders/PlayerScript.hpp"
 #include "loaders/ScriptsLoader.hpp"
+#include "aeon/window/AeonWindowManager.h"
 
 class Launcher {
   sf::Vector2i dimensions;
@@ -51,6 +52,7 @@ class Launcher {
     Eng::Engine::Init(projectWindow, projectPath);
     Eng::Graphics::Init(projectWindow);
     Eng::Audio::Init();
+    ae::AeonWindowManager::Init();
 
     Integrator integrator;
     integrator.init();
@@ -67,6 +69,7 @@ class Launcher {
     Eng::Shaders::Destroy();
     Eng::Fonts::Destroy();
     pkg::PackageReader::Destroy();
+    ae::AeonWindowManager::Destroy();
 
     projectWindow.close();
   }

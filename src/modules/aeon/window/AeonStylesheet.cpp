@@ -1,9 +1,9 @@
 
-#include "modules/aeon/window/AeonStylesheet.h"
+#include "aeon/window/AeonStylesheet.h"
 
 #include <SFML/System/Vector2.hpp>
 
-#include "modules/aeon/toolkit/ColorParser.hpp"
+#include "aeon/toolkit/ColorParser.hpp"
 
 namespace ae {
 

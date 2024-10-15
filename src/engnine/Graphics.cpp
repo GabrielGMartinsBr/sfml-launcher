@@ -7,6 +7,7 @@
 
 #include "AppDefs.h"
 #include "NumberUtils.hpp"
+#include "aeon/window/AeonWindowManager.h"
 #include "engnine/Audio.h"
 #include "engnine/Engine.h"
 #include "engnine/FileUtils.hpp"
@@ -78,6 +79,7 @@ void Graphics::setFrameRate(unsigned int v)
 
 void Graphics::update()
 {
+  ae::AeonWindowManager::Instance().updateEntries();
   renderer.render();
   frameUpdate();
 }
