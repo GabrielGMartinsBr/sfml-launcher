@@ -2,6 +2,8 @@
 
 #include <cmath>
 
+#include "aeon/toolkit/ColorParser.hpp"
+
 namespace ae {
 
 /*
@@ -26,14 +28,12 @@ RoundedRectShape::RoundedRectShape(const Rect& bounds, float radius) :
 RoundedRectShape::RoundedRectShape(float x, float y, float width, float height, float radius) :
     positionVal(x, y),
     sizeVal(width, height),
-    dirtyStyle(false),
+    radiusValue(radius),
     dirtyPosition(false),
     dirtyPoints(false)
 {
-  style.radius = radius;
   setPoints();
   setPosition();
-  setStyle();
 }
 
 void RoundedRectShape::drawTo(RenderTarget& target)
@@ -64,7 +64,7 @@ void RoundedRectShape::position(const Vector2f& value)
   dirtyPosition = true;
 }
 
-float RoundedRectShape::x()
+float RoundedRectShape::x() const
 {
   return positionVal.x;
 }
@@ -75,7 +75,7 @@ void RoundedRectShape::x(float value)
   dirtyPosition = true;
 }
 
-float RoundedRectShape::y()
+float RoundedRectShape::y() const
 {
   return positionVal.y;
 }
@@ -108,7 +108,7 @@ void RoundedRectShape::size(const Vector2f& value)
   dirtyPoints = true;
 }
 
-float RoundedRectShape::width()
+float RoundedRectShape::width() const
 {
   return sizeVal.x;
 }
@@ -119,7 +119,7 @@ void RoundedRectShape::width(float value)
   dirtyPoints = true;
 }
 
-float RoundedRectShape::height()
+float RoundedRectShape::height() const
 {
   return sizeVal.y;
 }
@@ -133,8 +133,6 @@ void RoundedRectShape::height(float value)
 /*
   Bounds
 */
-
-// const Rect& RoundedRectShape::bounds() const { }
 
 void RoundedRectShape::bounds(float x, float y, float width, float height)
 {
@@ -168,29 +166,65 @@ void RoundedRectShape::bounds(const Rect& value)
   Rounded radius
 */
 
-float RoundedRectShape::radius()
+float RoundedRectShape::radius() const
 {
-  return style.radius;
+  return radiusValue;
 }
 
 void RoundedRectShape::radius(float radius)
 {
-  style.radius = radius;
-  markDirtyPoints();
+  radiusValue = radius;
+  dirtyPoints = true;
 }
 
 /*
-  Mark dirty flags
+  Style
 */
 
-void RoundedRectShape::markDirtyStyle()
+// Border size
+
+float RoundedRectShape::borderSize() const
 {
-  dirtyStyle = true;
+  return shape.getOutlineThickness();
 }
 
-void RoundedRectShape::markDirtyPoints()
+void RoundedRectShape::borderSize(float value)
 {
-  dirtyPoints = true;
+  shape.setOutlineThickness(value);
+}
+
+// Border color
+
+const sf::Color& RoundedRectShape::borderColor() const
+{
+  return shape.getOutlineColor();
+}
+
+void RoundedRectShape::borderColor(const String& hex)
+{
+  borderColor(ColorParser::hexToSfmlColor(hex));
+}
+
+void RoundedRectShape::borderColor(const sf::Color& value)
+{
+  shape.setOutlineColor(value);
+}
+
+// Fill color
+
+const sf::Color& RoundedRectShape::fillColor() const
+{
+  return shape.getFillColor();
+}
+
+void RoundedRectShape::fillColor(const String& hex)
+{
+  fillColor(ColorParser::hexToSfmlColor(hex));
+}
+
+void RoundedRectShape::fillColor(const sf::Color& value)
+{
+  shape.setFillColor(value);
 }
 
 /*
@@ -203,10 +237,6 @@ void RoundedRectShape::markDirtyPoints()
 
 void RoundedRectShape::refreshValues()
 {
-  if (dirtyStyle) {
-    setStyle();
-    dirtyStyle = false;
-  }
   if (dirtyPosition) {
     setPosition();
     dirtyPosition = false;
@@ -222,17 +252,9 @@ void RoundedRectShape::setPosition()
   shape.setPosition(positionVal);
 }
 
-void RoundedRectShape::setStyle()
-{
-  shape.setOutlineThickness(style.borderSize);
-  shape.setOutlineColor(style.borderColor.getSfColor());
-  shape.setFillColor(style.bgColor.getSfColor());
-}
-
 void RoundedRectShape::setPoints()
 {
   int points = 16;
-  float radius = style.radius;
   Vector2f c(0, 0);
   int point = 0;
   float start = M_PI * 0.5;
@@ -243,10 +265,10 @@ void RoundedRectShape::setPoints()
   for (int i = 0; i < points; i++) {
     float angle = start + (i * (end - start)) / points;
     float rad = angle * M_PI / 180.0f;
-    float dx = std::cos(angle) * radius;
-    float dy = std::sin(angle) * radius;
-    c.x = sizeVal.x - radius + dx;
-    c.y = radius - dy;
+    float dx = std::cos(angle) * radiusValue;
+    float dy = std::sin(angle) * radiusValue;
+    c.x = sizeVal.x - radiusValue + dx;
+    c.y = radiusValue - dy;
     shape.setPoint(point, Vector2f(c));
     point++;
   }
@@ -256,10 +278,10 @@ void RoundedRectShape::setPoints()
   for (int i = 0; i < points; i++) {
     float angle = start + (i * (end - start)) / points;
     float rad = angle * M_PI / 180.0f;
-    float dx = std::cos(angle) * radius;
-    float dy = std::sin(angle) * radius;
-    c.x = sizeVal.x - radius + dx;
-    c.y = sizeVal.y - radius - dy;
+    float dx = std::cos(angle) * radiusValue;
+    float dy = std::sin(angle) * radiusValue;
+    c.x = sizeVal.x - radiusValue + dx;
+    c.y = sizeVal.y - radiusValue - dy;
     shape.setPoint(point, Vector2f(c));
     point++;
   }
@@ -269,10 +291,10 @@ void RoundedRectShape::setPoints()
   for (int i = 0; i < points; i++) {
     float angle = start + (i * (end - start)) / points;
     float rad = angle * M_PI / 180.0f;
-    float dx = std::cos(angle) * radius;
-    float dy = std::sin(angle) * radius;
-    c.x = radius + dx;
-    c.y = sizeVal.y - radius - dy;
+    float dx = std::cos(angle) * radiusValue;
+    float dy = std::sin(angle) * radiusValue;
+    c.x = radiusValue + dx;
+    c.y = sizeVal.y - radiusValue - dy;
     shape.setPoint(point, Vector2f(c));
     point++;
   }
@@ -282,10 +304,10 @@ void RoundedRectShape::setPoints()
   for (int i = 0; i < points; i++) {
     float angle = start + (i * (end - start)) / points;
     float rad = angle * M_PI / 180.0f;
-    float dx = std::cos(angle) * radius;
-    float dy = std::sin(angle) * radius;
-    c.x = radius + dx;
-    c.y = radius - dy;
+    float dx = std::cos(angle) * radiusValue;
+    float dy = std::sin(angle) * radiusValue;
+    c.x = radiusValue + dx;
+    c.y = radiusValue - dy;
     shape.setPoint(point, Vector2f(c));
     point++;
   }
