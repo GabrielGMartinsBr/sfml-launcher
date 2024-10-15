@@ -7,7 +7,6 @@
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Window/Window.hpp>
 
-#include "Log.hpp"
 #include "engnine/IOnUpdate.h"
 #include "engnine/Lists.hpp"
 #include "engnine/Performance.hpp"
