@@ -32,7 +32,14 @@ void AeonWindowManager::Destroy()
   ⇩⇩⇩ Instance ⇩⇩⇩
 */
 
-Vector<AeonWindow*> entries;
+void AeonWindowManager::handleMouseMoved(const Event::MouseMoveEvent& event)
+{
+  bool hasIntersection = false;
+  for (AeonWindow* entry : entries) {
+    hasIntersection = entry->intersects(event.x, event.y);
+    entry->setRingVisibility(hasIntersection);
+  }
+}
 
 void AeonWindowManager::addEntry(AeonWindow* entry)
 {

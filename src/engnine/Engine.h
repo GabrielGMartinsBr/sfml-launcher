@@ -9,6 +9,7 @@
 #include <SFML/Window/VideoMode.hpp>
 
 #include "AppDefs.h"
+#include "aeon/window/AeonWindowManager.h"
 #include "engnine/Input.hpp"
 #include "launcher/ProjectWindow.h"
 
@@ -56,6 +57,7 @@ class Engine {
 
  private:
   Input& input;
+  ae::AeonWindowManager& aeonWinMng;
 
   bool running;
   ProjectWindow& projectWindow;

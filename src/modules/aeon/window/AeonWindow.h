@@ -4,6 +4,7 @@
 
 #include <SFML/Graphics/RenderTarget.hpp>
 
+#include "aeon/toolkit/AeonHitbox.hpp"
 #include "aeon/toolkit/RoundedRectShape.h"
 #include "engnine/IOnRender.h"
 #include "engnine/Viewport.hpp"
@@ -26,6 +27,10 @@ class AeonWindow : public Eng::Window, Eng::IOnRender {
   bool shouldRender() const override;
   int getZIndex() const override;
 
+  bool intersects(float x, float y);
+
+  void setRingVisibility(bool value);
+
   VALUE setter_x(VALUE v);
   VALUE setter_y(VALUE v);
 
@@ -35,7 +40,9 @@ class AeonWindow : public Eng::Window, Eng::IOnRender {
   void method_dispose();
 
  private:
+  AeonHitBox hitBox;
   RoundedRectShape ring;
+  bool isRingVisible;
   UInt timestamp;
   bool addedToEngineCycles;
 

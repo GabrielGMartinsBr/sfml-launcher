@@ -13,7 +13,9 @@ using Eng::Lists;
 
 AeonWindow::AeonWindow(VALUE rbObj, Eng::Viewport* viewport) :
     Eng::Window(rbObj, viewport),
+    hitBox(),
     ring(3),
+    isRingVisible(false),
     timestamp(0)
 {
   addedToEngineCycles = false;
@@ -48,7 +50,7 @@ void AeonWindow::onRender(sf::RenderTexture& renderTexture)
 
 bool AeonWindow::shouldRender() const
 {
-  return !isDisposed && visible;
+  return !isDisposed && visible && isRingVisible;
 }
 
 int AeonWindow::getZIndex() const
@@ -60,9 +62,20 @@ int AeonWindow::getZIndex() const
   ⇩⇩⇩ Self ⇩⇩⇩
 */
 
+bool AeonWindow::intersects(float x, float y)
+{
+  return hitBox.intersects(x, y);
+}
+
+void AeonWindow::setRingVisibility(bool value)
+{
+  isRingVisible = value;
+}
+
 VALUE AeonWindow::setter_x(VALUE v)
 {
   v = Window::setter_x(v);
+  hitBox.updateX(x);
   ring.x(Window::x - 6);
   return v;
 }
@@ -70,6 +83,7 @@ VALUE AeonWindow::setter_x(VALUE v)
 VALUE AeonWindow::setter_y(VALUE v)
 {
   v = Window::setter_y(v);
+  hitBox.updateY(y);
   ring.y(y - 6);
   return v;
 }
@@ -77,6 +91,7 @@ VALUE AeonWindow::setter_y(VALUE v)
 VALUE AeonWindow::setter_width(VALUE v)
 {
   v = Window::setter_width(v);
+  hitBox.updateWidth(width);
   ring.width(width + 12);
   return v;
 }
@@ -84,6 +99,7 @@ VALUE AeonWindow::setter_width(VALUE v)
 VALUE AeonWindow::setter_height(VALUE v)
 {
   v = Window::setter_height(v);
+  hitBox.updateHeight(height);
   ring.height(height + 12);
   return v;
 }

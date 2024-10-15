@@ -1,5 +1,7 @@
 #include "Engine.h"
 
+#include <ruby.h>
+
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
@@ -9,10 +11,10 @@
 #include <SFML/Window/VideoMode.hpp>
 
 #include "AppDefs.h"
+#include "aeon/window/AeonWindowManager.h"
 #include "engnine/FileUtils.hpp"
 #include "engnine/Graphics.h"
 #include "engnine/Input.hpp"
-#include "ruby.h"
 
 namespace Eng {
 
@@ -47,6 +49,7 @@ void Engine::Destroy()
 
 Engine::Engine(ProjectWindow& projectWindow, CStr projectPath) :
     input(Input::getInstance()),
+    aeonWinMng(ae::AeonWindowManager::Instance()),
     projectWindow(projectWindow),
     projectPath(projectPath)
 {
@@ -129,6 +132,9 @@ void Engine::pollEvents()
         break;
       case sf::Event::KeyReleased:
         input.handleKeyRelease(event.key);
+        break;
+      case sf::Event::MouseMoved:
+        aeonWinMng.handleMouseMoved(event.mouseMove);
         break;
       default:
         break;
