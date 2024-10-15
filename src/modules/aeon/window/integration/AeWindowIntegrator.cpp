@@ -3,9 +3,9 @@
 #include <ruby.h>
 
 #include "RbUtils.hpp"
+#include "aeon/window/AeonWindow.h"
 #include "integrator/It_Bitmap.hpp"
 #include "integrator/It_Viewport.hpp"
-#include "aeon/window/AeonWindow.h"
 
 namespace ae {
 
@@ -14,6 +14,8 @@ VALUE AeWindowIntegrator::windowClass;
 void AeWindowIntegrator::integrate(VALUE aeonModule)
 {
   windowClass = rb_define_class_under(aeonModule, "Window", rb_cObject);
+
+  rb_define_alloc_func(windowClass, instance_allocator);
 
   rb_define_method(windowClass, "initialize", RUBY_METHOD_FUNC(meth_initialize), -1);
 
@@ -36,10 +38,31 @@ void AeWindowIntegrator::integrate(VALUE aeonModule)
   rb_define_method(windowClass, "height=", RUBY_METHOD_FUNC(setter_height), 1);
 }
 
-AeonWindow *AeWindowIntegrator::getObjectValue(VALUE rbObj)
+/*
+  Allocator
+*/
+
+VALUE AeWindowIntegrator::instance_allocator(VALUE instanceClass)
 {
-  return (AeonWindow *)DATA_PTR(rbObj);
+  return Data_Wrap_Struct(instanceClass, instance_mark, instance_free, nullptr);
 }
+
+/*
+  Deallocator
+*/
+
+void AeWindowIntegrator::instance_free(void *ptr)
+{
+  delete static_cast<AeonWindow *>(ptr);
+}
+
+void AeWindowIntegrator::instance_mark(void *ptr)
+{
+}
+
+/*
+  Method initialize
+*/
 
 VALUE AeWindowIntegrator::meth_initialize(int argc, VALUE *argv, VALUE self)
 {
@@ -188,4 +211,14 @@ VALUE AeWindowIntegrator::setter_height(VALUE self, VALUE value)
   AeonWindow *inst = AeWindowIntegrator::getObjectValue(self);
   return inst->setter_height(value);
 }
+
+/*
+  Utils
+*/
+
+AeonWindow *AeWindowIntegrator::getObjectValue(VALUE rbObj)
+{
+  return (AeonWindow *)DATA_PTR(rbObj);
+}
+
 }  // namespace ae

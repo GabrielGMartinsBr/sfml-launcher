@@ -11,7 +11,9 @@ struct AeWindowIntegrator {
 
   static void integrate(VALUE aeonModule);
 
-  static AeonWindow *getObjectValue(VALUE rbObj);
+  static VALUE instance_allocator(VALUE instanceClass);
+  static void instance_free(void *ptr);
+  static void instance_mark(void *ptr);
 
   static VALUE meth_initialize(int argc, VALUE *argv, VALUE self);
 
@@ -32,6 +34,9 @@ struct AeWindowIntegrator {
 
   static VALUE getter_height(VALUE self);
   static VALUE setter_height(VALUE self, VALUE value);
+
+  // Utils
+  static AeonWindow *getObjectValue(VALUE rbObj);
 };
 
 }  // namespace ae
