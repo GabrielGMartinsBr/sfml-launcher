@@ -17,6 +17,7 @@ using sf::RenderTarget;
 using sf::Vector2f;
 
 struct RoundedRectShape {
+  RoundedRectShape(float radius = 0);
   RoundedRectShape(const Rect& bounds, float radius = 0);
   RoundedRectShape(float x, float y, float width, float height, float radius = 0);
 

@@ -14,6 +14,11 @@ namespace ae {
   ------------------------------------------------------
 */
 
+RoundedRectShape::RoundedRectShape(float radius) :
+    RoundedRectShape(0, 0, 0, 0, radius)
+{
+}
+
 RoundedRectShape::RoundedRectShape(const Rect& bounds, float radius) :
     RoundedRectShape(
       bounds.x.get(),
