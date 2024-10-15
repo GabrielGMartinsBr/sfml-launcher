@@ -14,7 +14,9 @@ enable_testing()
 file(GLOB_RECURSE source_files src/*.cpp src/*.hpp)
 
 include_directories(src/base)
+include_directories(GLOB_RECURSE src/modules)
 include_directories(src)
+
 
 # CPack 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
