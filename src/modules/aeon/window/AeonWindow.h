@@ -3,16 +3,23 @@
 #include <ruby.h>
 
 #include <SFML/Graphics/RenderTarget.hpp>
+#include <SFML/Graphics/RenderTexture.hpp>
+#include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/Texture.hpp>
 
+#include "AppDefs.h"
 #include "aeon/toolkit/AeonHitbox.hpp"
 #include "aeon/toolkit/RoundedRectShape.h"
+#include "aeon/window/AeonElement.h"
 #include "engnine/IOnRender.h"
 #include "engnine/Viewport.hpp"
 #include "engnine/Window.h"
 
 namespace ae {
 
+using app::SPtr;
 using app::UInt;
+using app::Vector;
 using sf::RenderTarget;
 
 class AeonWindow : public Eng::Window, Eng::IOnRender {
@@ -39,15 +46,26 @@ class AeonWindow : public Eng::Window, Eng::IOnRender {
 
   void method_dispose();
 
+  void addElement(AeonElement* element);
+  void removeElement(AeonElement* element);
+
+  void drawElements(sf::RenderTarget& target);
+
  private:
+  Vector<AeonElement*> elements;
+  UInt timestamp;
   AeonHitBox hitBox;
   RoundedRectShape ring;
+  sf::RenderTexture aeContent;
+  sf::Sprite aeContentSpr;
   bool isRingVisible;
-  UInt timestamp;
   bool addedToEngineCycles;
 
   void addToEngineCycles();
   void removeFromEngineCycles();
+
+  void updateContentPosition();
+  void updateContentDimension();
 };
 
 }  // namespace ae

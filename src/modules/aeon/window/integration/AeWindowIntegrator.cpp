@@ -2,40 +2,45 @@
 
 #include <ruby.h>
 
+#include "AppDefs.h"
 #include "RbUtils.hpp"
+#include "aeon/window/AeonElement.h"
 #include "aeon/window/AeonWindow.h"
 #include "integrator/It_Bitmap.hpp"
 #include "integrator/It_Viewport.hpp"
 
 namespace ae {
 
-VALUE AeWindowIntegrator::windowClass;
+using app::SPtr;
+
+VALUE AeWindowIntegrator::classObject;
 
 void AeWindowIntegrator::integrate(VALUE aeonModule)
 {
-  windowClass = rb_define_class_under(aeonModule, "Window", rb_cObject);
+  classObject = rb_define_class_under(aeonModule, "Window", rb_cObject);
+  rb_define_alloc_func(classObject, instance_allocator);
 
-  rb_define_alloc_func(windowClass, instance_allocator);
+  rb_define_method(classObject, "initialize", RUBY_METHOD_FUNC(meth_initialize), -1);
 
-  rb_define_method(windowClass, "initialize", RUBY_METHOD_FUNC(meth_initialize), -1);
+  rb_define_method(classObject, "addElement", RUBY_METHOD_FUNC(addElement), 1);
 
-  rb_define_method(windowClass, "windowskin", RUBY_METHOD_FUNC(getter_windowSkin), 0);
-  rb_define_method(windowClass, "windowskin=", RUBY_METHOD_FUNC(setter_windowSkin), 1);
+  rb_define_method(classObject, "windowskin", RUBY_METHOD_FUNC(getter_windowSkin), 0);
+  rb_define_method(classObject, "windowskin=", RUBY_METHOD_FUNC(setter_windowSkin), 1);
 
-  rb_define_method(windowClass, "contents", RUBY_METHOD_FUNC(getter_contents), 0);
-  rb_define_method(windowClass, "contents=", RUBY_METHOD_FUNC(setter_contents), 1);
+  rb_define_method(classObject, "contents", RUBY_METHOD_FUNC(getter_contents), 0);
+  rb_define_method(classObject, "contents=", RUBY_METHOD_FUNC(setter_contents), 1);
 
-  rb_define_method(windowClass, "x", RUBY_METHOD_FUNC(getter_x), 0);
-  rb_define_method(windowClass, "x=", RUBY_METHOD_FUNC(setter_x), 1);
+  rb_define_method(classObject, "x", RUBY_METHOD_FUNC(getter_x), 0);
+  rb_define_method(classObject, "x=", RUBY_METHOD_FUNC(setter_x), 1);
 
-  rb_define_method(windowClass, "y", RUBY_METHOD_FUNC(getter_y), 0);
-  rb_define_method(windowClass, "y=", RUBY_METHOD_FUNC(setter_y), 1);
+  rb_define_method(classObject, "y", RUBY_METHOD_FUNC(getter_y), 0);
+  rb_define_method(classObject, "y=", RUBY_METHOD_FUNC(setter_y), 1);
 
-  rb_define_method(windowClass, "width", RUBY_METHOD_FUNC(getter_width), 0);
-  rb_define_method(windowClass, "width=", RUBY_METHOD_FUNC(setter_width), 1);
+  rb_define_method(classObject, "width", RUBY_METHOD_FUNC(getter_width), 0);
+  rb_define_method(classObject, "width=", RUBY_METHOD_FUNC(setter_width), 1);
 
-  rb_define_method(windowClass, "height", RUBY_METHOD_FUNC(getter_height), 0);
-  rb_define_method(windowClass, "height=", RUBY_METHOD_FUNC(setter_height), 1);
+  rb_define_method(classObject, "height", RUBY_METHOD_FUNC(getter_height), 0);
+  rb_define_method(classObject, "height=", RUBY_METHOD_FUNC(setter_height), 1);
 }
 
 /*
@@ -94,9 +99,19 @@ VALUE AeWindowIntegrator::meth_initialize(int argc, VALUE *argv, VALUE self)
   return Qnil;
 }
 
+VALUE AeWindowIntegrator::addElement(VALUE self, VALUE value)
+{
+  AeonWindow *inst = getObjectValue(self);
+  AeonElement *element = static_cast<AeonElement *>(DATA_PTR(value));
+
+  inst->addElement(element);
+
+  return Qnil;
+}
+
 /*
     Get windowSkin
-  */
+*/
 
 VALUE AeWindowIntegrator::getter_windowSkin(VALUE self)
 {

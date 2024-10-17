@@ -7,7 +7,7 @@
 namespace ae {
 
 struct AeWindowIntegrator {
-  static VALUE windowClass;
+  static VALUE classObject;
 
   static void integrate(VALUE aeonModule);
 
@@ -34,6 +34,8 @@ struct AeWindowIntegrator {
 
   static VALUE getter_height(VALUE self);
   static VALUE setter_height(VALUE self, VALUE value);
+
+  static VALUE addElement(VALUE self, VALUE value);
 
   // Utils
   static AeonWindow *getObjectValue(VALUE rbObj);
