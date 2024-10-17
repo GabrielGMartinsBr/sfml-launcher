@@ -109,7 +109,8 @@ void RoundedRectShape::size(float width, float height)
 
 void RoundedRectShape::size(const Vector2f& value)
 {
-  sizeVal = value;
+  sizeVal.x = value.x;
+  sizeVal.y = value.y;
   dirtyPoints = true;
 }
 
@@ -259,6 +260,15 @@ void RoundedRectShape::setPosition()
 
 void RoundedRectShape::setPoints()
 {
+  if (radiusValue == 0) {
+    shape.setPointCount(4);
+    shape.setPoint(0, Vector2f(0, 0));
+    shape.setPoint(1, Vector2f(sizeVal.x, 0));
+    shape.setPoint(2, Vector2f(sizeVal.x, sizeVal.y));
+    shape.setPoint(3, Vector2f(0, sizeVal.y));
+    return;
+  }
+
   int points = 16;
   Vector2f c(0, 0);
   int point = 0;
@@ -274,7 +284,7 @@ void RoundedRectShape::setPoints()
     float dy = std::sin(angle) * radiusValue;
     c.x = sizeVal.x - radiusValue + dx;
     c.y = radiusValue - dy;
-    shape.setPoint(point, Vector2f(c));
+    shape.setPoint(point, c);
     point++;
   }
 
@@ -287,7 +297,7 @@ void RoundedRectShape::setPoints()
     float dy = std::sin(angle) * radiusValue;
     c.x = sizeVal.x - radiusValue + dx;
     c.y = sizeVal.y - radiusValue - dy;
-    shape.setPoint(point, Vector2f(c));
+    shape.setPoint(point, c);
     point++;
   }
 
@@ -300,7 +310,7 @@ void RoundedRectShape::setPoints()
     float dy = std::sin(angle) * radiusValue;
     c.x = radiusValue + dx;
     c.y = sizeVal.y - radiusValue - dy;
-    shape.setPoint(point, Vector2f(c));
+    shape.setPoint(point, c);
     point++;
   }
 
@@ -313,7 +323,7 @@ void RoundedRectShape::setPoints()
     float dy = std::sin(angle) * radiusValue;
     c.x = radiusValue + dx;
     c.y = radiusValue - dy;
-    shape.setPoint(point, Vector2f(c));
+    shape.setPoint(point, c);
     point++;
   }
 }

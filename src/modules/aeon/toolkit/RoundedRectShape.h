@@ -5,7 +5,7 @@
 #include <SFML/Graphics/RenderTarget.hpp>
 
 #include "AppDefs.h"
-#include "aeon/window/AeonStylesheet.h"
+#include "aeon/window/AeonStyleSheet.h"
 #include "engnine/Rect.hpp"
 
 namespace ae {
