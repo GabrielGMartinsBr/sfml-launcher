@@ -55,10 +55,12 @@ struct RoundedRectShape {
 
   const sf::Color& borderColor() const;
   void borderColor(const String& hex);
+  void borderColor(const Eng::Color& value);
   void borderColor(const sf::Color& value);
 
   const sf::Color& fillColor() const;
   void fillColor(const String& hex);
+  void fillColor(const Eng::Color& value);
   void fillColor(const sf::Color& value);
 
  private:

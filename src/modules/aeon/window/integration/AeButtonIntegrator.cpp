@@ -4,7 +4,9 @@
 #include <cassert>
 
 #include "AppDefs.h"
+#include "aeon/toolkit/ColorParser.hpp"
 #include "aeon/window/AeonButtonElement.h"
+#include "aeon/window/AeonStyleSheet.h"
 #include "integrator/Convert.hpp"
 
 namespace ae {
@@ -65,6 +67,15 @@ VALUE AeButtonIntegrator::initialize(int argc, VALUE *argv, VALUE self)
 
   DATA_PTR(self) = instance;
   instance->handleInitialize(self);
+
+  AeonPartialStyleSheet hoverStyle;
+  hoverStyle.borderColor = ColorParser::hexToNrgssColor("#fa4");
+  instance->setStateStyle(AeonElementState::HOVER, hoverStyle);
+
+  AeonPartialStyleSheet clickedStyle;
+  // clickedStyle.borderColor = ColorParser::hexToNrgssColor("#f30");
+  clickedStyle.bgColor = ColorParser::hexToNrgssColor("#fdd");
+  instance->setStateStyle(AeonElementState::CLICKED, clickedStyle);
 
   return self;
 }

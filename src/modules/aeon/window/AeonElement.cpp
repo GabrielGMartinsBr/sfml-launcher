@@ -1,23 +1,22 @@
 
 #include "aeon/window/AeonElement.h"
 
+#include <cstdint>
+
+#include "aeon/enums/AeonElementState.h"
 #include "aeon/toolkit/ElementBounds.h"
 
 namespace ae {
 
 AeonElement::AeonElement(const ElementBounds& bounds, const AeonStyleSheet& style) :
     bounds(bounds),
+    states(static_cast<uint8_t>(AeonElementState::DEFAULT)),
     defaultStyle(style),
-    elementState(AeonElementState::DEFAULT),
     dirtyBounds(false),
+    dirtyState(false),
     dirtyStyle(false),
     focusable(true)
 {
-}
-
-inline bool AeonElement::intersects(float x, float y) const
-{
-  return bounds.intersects(x, y);
 }
 
 void AeonElement::drawTo(RenderTarget& target) { }
@@ -71,6 +70,29 @@ void AeonElement::y(float value)
   dirtyBounds = true;
 }
 
+void AeonElement::addState(AeonElementState state)
+{
+  states |= static_cast<uint8_t>(state);
+  dirtyState = true;
+}
+
+void AeonElement::removeState(AeonElementState state)
+{
+  states &= ~static_cast<uint8_t>(state);
+  dirtyState = true;
+}
+
+bool AeonElement::hasState(AeonElementState state) const
+{
+  return states & static_cast<uint8_t>(state);
+}
+
+void AeonElement::clearState()
+{
+  states = static_cast<uint8_t>(AeonElementState::DEFAULT);
+  dirtyState = true;
+}
+
 const AeonStyleSheet& AeonElement::getStyle()
 {
   return defaultStyle;
@@ -99,7 +121,7 @@ const AeonPartialStyleSheet& AeonElement::getStateStyle(AeonElementState state)
 
 void AeonElement::setStateStyle(AeonElementState state, const AeonPartialStyleSheet& style)
 {
-  AeonPartialStyleSheet target = stateStyles[state];
+  AeonPartialStyleSheet& target = stateStyles[state];
   if (style.ringSize) target.ringSize = *style.ringSize;
   if (style.ringOffset) target.ringOffset = *style.ringOffset;
   if (style.borderSize) target.borderSize = *style.borderSize;
@@ -111,16 +133,6 @@ void AeonElement::setStateStyle(AeonElementState state, const AeonPartialStyleSh
   if (style.borderColor) target.borderColor = *style.borderColor;
   if (style.bgColor) target.bgColor = *style.bgColor;
   if (style.textColor) target.textColor = *style.textColor;
-}
-
-const AeonElementState& AeonElement::getState()
-{
-  return elementState;
-}
-
-void AeonElement::setState(const AeonElementState& value)
-{
-  elementState = value;
 }
 
 bool AeonElement::isFocusable() const

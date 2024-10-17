@@ -32,12 +32,29 @@ void AeonWindowManager::Destroy()
   ⇩⇩⇩ Instance ⇩⇩⇩
 */
 
-void AeonWindowManager::handleMouseMoved(const Event::MouseMoveEvent& event)
+void AeonWindowManager::handleMouseMoved(const AeMouseMoveEvent& event)
 {
   bool hasIntersection = false;
   for (AeonWindow* entry : entries) {
     hasIntersection = entry->intersects(event.x, event.y);
     entry->setRingVisibility(hasIntersection);
+    entry->handleMouseMoved(event);
+  }
+}
+
+void AeonWindowManager::handleMousePressed(const AeMouseButtonEvent& event)
+{
+  for (AeonWindow* entry : entries) {
+    if (entry->intersects(event.x, event.y)) {
+      entry->handleMousePressed(event);
+    }
+  }
+}
+
+void AeonWindowManager::handleMouseReleased(const AeMouseButtonEvent& event)
+{
+  for (AeonWindow* entry : entries) {
+    entry->handleMouseReleased(event);
   }
 }
 

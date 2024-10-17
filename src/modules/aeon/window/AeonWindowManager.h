@@ -4,13 +4,13 @@
 #include <SFML/Window/Event.hpp>
 
 #include "AppDefs.h"
+#include "aeon/base/AeonEvents.h"
 #include "aeon/window/AeonWindow.h"
 
 namespace ae {
 
 using app::UInt;
 using app::Vector;
-using sf::Event;
 
 struct AeonWindowManager {
   /*
@@ -27,7 +27,9 @@ struct AeonWindowManager {
 
   Vector<AeonWindow*> entries;
 
-  void handleMouseMoved(const Event::MouseMoveEvent& event);
+  void handleMouseMoved(const AeMouseMoveEvent& event);
+  void handleMousePressed(const AeMouseButtonEvent& event);
+  void handleMouseReleased(const AeMouseButtonEvent& event);
 
   void addEntry(AeonWindow* entry);
   void removeEntry(AeonWindow* entry);

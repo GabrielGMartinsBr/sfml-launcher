@@ -211,6 +211,11 @@ void RoundedRectShape::borderColor(const String& hex)
   borderColor(ColorParser::hexToSfmlColor(hex));
 }
 
+void RoundedRectShape::borderColor(const Eng::Color& value)
+{
+  borderColor(value.getSfColor());
+}
+
 void RoundedRectShape::borderColor(const sf::Color& value)
 {
   shape.setOutlineColor(value);
@@ -226,6 +231,11 @@ const sf::Color& RoundedRectShape::fillColor() const
 void RoundedRectShape::fillColor(const String& hex)
 {
   fillColor(ColorParser::hexToSfmlColor(hex));
+}
+
+void RoundedRectShape::fillColor(const Eng::Color& value)
+{
+  fillColor(value.getSfColor());
 }
 
 void RoundedRectShape::fillColor(const sf::Color& value)

@@ -8,6 +8,7 @@
 #include <SFML/Graphics/Texture.hpp>
 
 #include "AppDefs.h"
+#include "aeon/base/AeonEvents.h"
 #include "aeon/toolkit/AeonHitbox.hpp"
 #include "aeon/toolkit/RoundedRectShape.h"
 #include "aeon/window/AeonElement.h"
@@ -29,6 +30,9 @@ class AeonWindow : public Eng::Window, Eng::IOnRender {
   ~AeonWindow();
 
   void handleAeonUpdate(UInt ts);
+  void handleMouseMoved(const AeMouseMoveEvent& event);
+  void handleMousePressed(const AeMouseButtonEvent& event);
+  void handleMouseReleased(const AeMouseButtonEvent& event);
 
   void onRender(sf::RenderTexture& renderTexture) override;
   bool shouldRender() const override;

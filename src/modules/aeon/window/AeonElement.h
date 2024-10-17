@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics/RenderTarget.hpp>
+#include <cstdint>
 
 #include "AppDefs.h"
 #include "aeon/enums/AeonElementState.h"
@@ -20,7 +21,10 @@ class AeonElement {
 
   inline virtual AeonElementType getType() const = 0;
 
-  inline bool intersects(float x, float y) const;
+  inline bool intersects(float x, float y) const
+  {
+    return bounds.intersects(x, y, defaultStyle.borderSize);
+  }
 
   virtual void drawTo(RenderTarget& target);
 
@@ -36,14 +40,16 @@ class AeonElement {
   void x(float value);
   void y(float value);
 
+  void addState(AeonElementState state);
+  void removeState(AeonElementState state);
+  bool hasState(AeonElementState state) const;
+  void clearState();
+
   const AeonStyleSheet& getStyle();
   void setStyle(const AeonPartialStyleSheet& style);
 
   const AeonPartialStyleSheet& getStateStyle(AeonElementState state);
   void setStateStyle(AeonElementState state, const AeonPartialStyleSheet& style);
-
-  const AeonElementState& getState();
-  void setState(const AeonElementState& value);
 
   bool isFocusable() const;
   void setFocusable(bool value);
@@ -51,10 +57,11 @@ class AeonElement {
 
  protected:
   ElementBounds bounds;
+  uint8_t states;
   AeonStyleSheet defaultStyle;
   UnMap<AeonElementState, AeonPartialStyleSheet> stateStyles;
-  AeonElementState elementState;
   bool dirtyBounds;
+  bool dirtyState;
   bool dirtyStyle;
   bool focusable;
 };

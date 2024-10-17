@@ -38,7 +38,13 @@ struct ElementBounds {
 
   inline bool intersects(float x, float y) const
   {
-    return wValue == 0 || hValue == 0;
+    return !isEmpty() && x >= xValue && x <= xEndValue && y >= yValue && y < yEndValue;
+  }
+
+  inline bool intersects(float x, float y, float border) const
+  {
+    return !isEmpty() && x >= (xValue - border) && x <= (xEndValue + border)
+           && y >= (yValue - border) && y < (yEndValue + border);
   }
 
   inline bool operator==(const ElementBounds& other) const

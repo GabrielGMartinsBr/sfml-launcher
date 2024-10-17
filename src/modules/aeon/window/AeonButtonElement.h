@@ -3,6 +3,7 @@
 #include <SFML/System/String.hpp>
 
 #include "aeon/base/AeonIntegrable.h"
+#include "aeon/enums/AeonElementState.h"
 #include "aeon/toolkit/ElementBounds.h"
 #include "aeon/toolkit/RoundedRectShape.h"
 #include "aeon/window/AeonElement.h"
@@ -35,6 +36,8 @@ class AeonButtonElement : public AeonElement, public AeonIntegrable {
   void refreshValues();
   void applyBounds();
   void applyStyle();
+  void applyState();
+  void applyStateStyle(AeonElementState state);
 };
 
 }  // namespace ae

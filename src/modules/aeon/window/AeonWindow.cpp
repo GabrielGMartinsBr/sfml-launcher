@@ -5,6 +5,8 @@
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/System/Vector2.hpp>
 
+#include "Log.hpp"
+#include "aeon/enums/AeonElementState.h"
 #include "aeon/toolkit/ColorParser.hpp"
 #include "aeon/window/AeonElement.h"
 #include "aeon/window/AeonWindowManager.h"
@@ -41,6 +43,41 @@ AeonWindow::~AeonWindow()
 void AeonWindow::handleAeonUpdate(UInt ts)
 {
   timestamp = ts;
+}
+
+void AeonWindow::handleMouseMoved(const AeMouseMoveEvent& event)
+{
+  float evX = event.x - x - 4;
+  float evY = event.y - y - 4;
+  bool hasIntersection = false;
+  for (AeonElement* element : elements) {
+    hasIntersection = element->intersects(evX, evY);
+    if (hasIntersection) {
+      element->addState(AeonElementState::HOVER);
+    } else {
+      element->removeState(AeonElementState::HOVER);
+    }
+  }
+}
+
+void AeonWindow::handleMousePressed(const AeMouseButtonEvent& event)
+{
+  float evX = event.x - x - 4;
+  float evY = event.y - y - 4;
+  for (AeonElement* element : elements) {
+    if (element->intersects(evX, evY)) {
+      element->addState(AeonElementState::CLICKED);
+    }
+  }
+}
+
+void AeonWindow::handleMouseReleased(const AeMouseButtonEvent& event)
+{
+  float evX = event.x - x - 4;
+  float evY = event.y - y - 4;
+  for (AeonElement* element : elements) {
+    element->removeState(AeonElementState::CLICKED);
+  }
 }
 
 /*
