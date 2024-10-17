@@ -4,6 +4,8 @@
 #include <memory>
 #include <sstream>
 #include <string>
+#include <unordered_map>
+
 namespace app {
 
 typedef unsigned int UInt;
@@ -32,6 +34,9 @@ template <typename T>
 using VectorPtr = UPtr<Vector<T>>;
 
 using StrVectorPtr = VectorPtr<String>;
+
+template <typename Key, typename Tp>
+using UnMap = std::unordered_map<Key, Tp>;
 
 typedef boost::filesystem::path FilePath;
 
