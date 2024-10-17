@@ -13,7 +13,13 @@ struct Convert {
     return StringValueCStr(rbStr);
   }
 
-  static VALUE toRubyString(app::String str)
+  static app::String toCString(VALUE rbStr)
+  {
+    Check_Type(rbStr, T_STRING);
+    return StringValueCStr(rbStr);
+  }
+
+  static VALUE toRubyString(const app::String& str)
   {
     VALUE rbStr = rb_str_new(str.c_str(), str.size());
     if (NIL_P(rbStr)) {
@@ -73,6 +79,26 @@ struct Convert {
   static VALUE toRubyNumber(int v)
   {
     return INT2FIX(v);
+  }
+
+  static VALUE toRubyBigNumber(int v)
+  {
+    return INT2NUM(v);
+  }
+
+  static VALUE toRubyBigNumber(long v)
+  {
+    return LONG2NUM(v);
+  }
+
+  static VALUE uToRubyNumber(unsigned int v)
+  {
+    return UINT2NUM(v);
+  }
+
+  static VALUE uToRubyBigNumber(unsigned long v)
+  {
+    return ULONG2NUM(v);
   }
 
   static VALUE toRubyDouble(double v)
