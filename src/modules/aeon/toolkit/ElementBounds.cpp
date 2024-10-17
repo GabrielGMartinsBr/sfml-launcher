@@ -10,10 +10,9 @@ ElementBounds::ElementBounds(float x, float y, float width, float height) :
     xValue(x),
     yValue(y),
     wValue(width),
-    hValue(height),
-    xEndValue(x + width),
-    yEndValue(y + height)
+    hValue(height)
 {
+  recalculateBounds();
 }
 
 /*
@@ -79,6 +78,9 @@ float ElementBounds::width() const
 
 float ElementBounds::width(float value)
 {
+  wValue = value;
+  xEndValue = xValue + wValue;
+  sizeValue.x = value;
   return w(value);
 }
 
@@ -89,11 +91,25 @@ float ElementBounds::height() const
 
 float ElementBounds::height(float value)
 {
+  hValue = value;
+  yEndValue = xValue + hValue;
+  sizeValue.y = value;
   return h(value);
 }
 
 const Vector2f& ElementBounds::position() const
 {
+  return positionValue;
+}
+
+const Vector2f& ElementBounds::position(float x, float y)
+{
+  xValue = x;
+  yValue = y;
+  xEndValue = xValue + wValue;
+  yEndValue = yValue + hValue;
+  positionValue.x = xValue;
+  positionValue.y = yValue;
   return positionValue;
 }
 
@@ -123,28 +139,8 @@ const Vector2f& ElementBounds::size(const Vector2f& value)
 }
 
 /*
-  ⇩⇩⇩ Methods ⇩⇩⇩
-*/
-
-inline bool ElementBounds::isEmpty() const
-{
-  return wValue == 0 || hValue == 0;
-}
-
-inline bool ElementBounds::intersects(float x, float y) const
-{
-  return !isEmpty() && x >= xValue && x <= xEndValue && y >= yValue && y < yEndValue;
-}
-
-/*
   ⇩⇩⇩ Operators ⇩⇩⇩
 */
-
-inline bool ElementBounds::operator==(const ElementBounds& other) const
-{
-  return xValue == other.xValue && yValue == other.yValue
-         && wValue == other.wValue && hValue == other.hValue;
-}
 
 ElementBounds& ElementBounds::operator=(const ElementBounds& other)
 {
