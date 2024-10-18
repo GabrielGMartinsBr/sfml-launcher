@@ -2,6 +2,8 @@
 
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Text.hpp>
+#include <SFML/Window/Keyboard.hpp>
+#include <unordered_set>
 
 #include "aeon/enums/AeonElementState.h"
 #include "aeon/toolkit/ElementBounds.h"
@@ -36,6 +38,36 @@ void AeonTextBoxElement::handleAeonUpdate(ULong ts)
   }
 }
 
+void AeonTextBoxElement::handleKeyPressed(const AeKeyEvent& event)
+{
+  switch (event.code) {
+    case sf::Keyboard::Left:
+      handleArrowLeftPressed(event.control);
+      break;
+    case sf::Keyboard::Right:
+      handleArrowRightPressed(event.control);
+      break;
+    case sf::Keyboard::BackSpace:
+      handleBackspace(event.control);
+      break;
+    default:
+      break;
+  }
+}
+
+void AeonTextBoxElement::handleTextEntered(const AeTextEvent& event)
+{
+  static const std::unordered_set<char32_t> ignoredCharacters = { '\t', '\b', 13 };
+  if (ignoredCharacters.count(event.unicode) > 0) {
+    return;
+  }
+  handleInput(event.unicode);
+}
+
+/*
+
+*/
+
 void AeonTextBoxElement::drawTo(RenderTarget& target)
 {
   refreshValues();
@@ -67,8 +99,7 @@ void AeonTextBoxElement::setFocus(bool value)
 {
   AeonElement::setFocus(value);
   if (hasFocusValue) {
-    lastCursorBlinkTs = AeonWindowManager::Instance().getTimestamp();
-    showCursor = true;
+    revealCursor();
   }
 }
 
@@ -213,6 +244,85 @@ void AeonTextBoxElement::alignCursor()
 
   cursorPosition.y -= 1;
   cursorShape.setPosition(cursorPosition);
+}
+
+void AeonTextBoxElement::revealCursor()
+{
+  lastCursorBlinkTs = AeonWindowManager::Instance().getTimestamp();
+  showCursor = true;
+}
+
+/*
+    Text input event handlers
+*/
+
+void AeonTextBoxElement::handleArrowLeftPressed(bool isCtrlPressed)
+{
+  moveCursorLeft(isCtrlPressed);
+}
+
+void AeonTextBoxElement::handleArrowRightPressed(bool isCtrlPressed)
+{
+  moveCursorRight(isCtrlPressed);
+}
+
+void AeonTextBoxElement::handleBackspace(bool isCtrlPressed)
+{
+  if (valueString.isEmpty() || cursorIndex < 1) {
+    return;
+  }
+  if (isCtrlPressed) {
+    valueString.erase(0, cursorIndex);
+    cursorIndex = 0;
+  } else {
+    valueString.erase(cursorIndex - 1, 1);
+    moveCursorLeft();
+  }
+  text.setString(valueString);
+  alignCursor();
+  revealCursor();
+}
+
+void AeonTextBoxElement::handleInput(sf::Uint32 unicode)
+{
+  if (unicode < 128 || unicode >= 32) {
+    valueString.insert(cursorIndex, unicode);
+    text.setString(valueString);
+    moveCursorRight();
+    // revealCursor();
+  }
+}
+
+/*
+    Text input methods
+*/
+
+void AeonTextBoxElement::moveCursorLeft(bool isCtrlPressed)
+{
+  if (cursorIndex == 0) {
+    return;
+  }
+  if (isCtrlPressed) {
+    cursorIndex = 0;
+  } else {
+    cursorIndex--;
+  }
+  alignCursor();
+  revealCursor();
+}
+
+void AeonTextBoxElement::moveCursorRight(bool isCtrlPressed)
+{
+  if (cursorIndex >= valueString.getSize()) {
+    return;
+  }
+  if (isCtrlPressed) {
+    cursorIndex = valueString.getSize();
+  } else {
+    cursorIndex++;
+  }
+  alignCursor();
+  revealCursor();
 }
 
 }  // namespace ae

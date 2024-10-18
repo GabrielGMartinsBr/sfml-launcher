@@ -32,6 +32,11 @@ void AeonWindowManager::Destroy()
   ⇩⇩⇩ Instance ⇩⇩⇩
 */
 
+AeonWindowManager::AeonWindowManager() :
+    focusedWindow(nullptr)
+{
+}
+
 void AeonWindowManager::handleMouseMoved(const AeMouseMoveEvent& event)
 {
   bool hasIntersection = false;
@@ -49,11 +54,13 @@ void AeonWindowManager::handleMousePressed(const AeMouseButtonEvent& event)
 {
   for (AeonWindow* entry : entries) {
     bool isHover = entry->intersects(event.x, event.y);
-    entry->setIsFocused(isHover);
     if (isHover) {
+      setFocusOn(entry);
       entry->handleMousePressed(event);
+      return;
     }
   }
+  setFocusOn(nullptr);
 }
 
 void AeonWindowManager::handleMouseReleased(const AeMouseButtonEvent& event)
@@ -62,6 +69,24 @@ void AeonWindowManager::handleMouseReleased(const AeMouseButtonEvent& event)
     entry->handleMouseReleased(event);
   }
 }
+
+void AeonWindowManager::handleKeyPressed(const AeKeyEvent& event)
+{
+  if (focusedWindow) {
+    focusedWindow->handleKeyPressed(event);
+  }
+}
+
+void AeonWindowManager::handleTextEntered(const AeTextEvent& event)
+{
+  if (focusedWindow) {
+    focusedWindow->handleTextEntered(event);
+  }
+}
+
+/*
+
+*/
 
 void AeonWindowManager::addEntry(AeonWindow* entry)
 {
@@ -88,6 +113,18 @@ void AeonWindowManager::updateEntries()
 ULong AeonWindowManager::getTimestamp()
 {
   return clock.getElapsedTime().asMilliseconds();
+}
+
+void AeonWindowManager::setFocusOn(AeonWindow* window)
+{
+  if (focusedWindow == window) return;
+  if (focusedWindow) {
+    focusedWindow->setIsFocused(false);
+  }
+  focusedWindow = window;
+  if (focusedWindow) {
+    focusedWindow->setIsFocused(true);
+  }
 }
 
 }  // namespace ae

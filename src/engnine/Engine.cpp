@@ -129,6 +129,7 @@ void Engine::pollEvents()
           continue;
         }
         input.handleKeyPressed(event.key);
+        aeonWinMng.handleKeyPressed(event.key);
         break;
       case sf::Event::KeyReleased:
         input.handleKeyRelease(event.key);
@@ -141,6 +142,9 @@ void Engine::pollEvents()
         break;
       case sf::Event::MouseButtonReleased:
         aeonWinMng.handleMouseReleased(event.mouseButton);
+        break;
+      case sf::Event::TextEntered:
+        aeonWinMng.handleTextEntered(event.text);
         break;
       default:
         break;

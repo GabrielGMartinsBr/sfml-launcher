@@ -33,6 +33,8 @@ class AeonWindow : public Eng::Window, Eng::IOnRender {
   void handleMouseMoved(const AeMouseMoveEvent& event);
   void handleMousePressed(const AeMouseButtonEvent& event);
   void handleMouseReleased(const AeMouseButtonEvent& event);
+  void handleKeyPressed(const AeKeyEvent& event);
+  void handleTextEntered(const AeTextEvent& event);
 
   void setIsHover(bool value);
   void setIsFocused(bool value);

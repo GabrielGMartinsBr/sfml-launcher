@@ -25,17 +25,24 @@ struct AeonWindowManager {
     ⇩⇩⇩ Instance ⇩⇩⇩
   */
 
+  AeonWindowManager();
+
   Vector<AeonWindow*> entries;
+  AeonWindow* focusedWindow;
 
   void handleMouseMoved(const AeMouseMoveEvent& event);
   void handleMousePressed(const AeMouseButtonEvent& event);
   void handleMouseReleased(const AeMouseButtonEvent& event);
+  void handleKeyPressed(const AeKeyEvent& event);
+  void handleTextEntered(const AeTextEvent& event);
 
   void addEntry(AeonWindow* entry);
   void removeEntry(AeonWindow* entry);
   void updateEntries();
 
   ULong getTimestamp();
+
+  void setFocusOn(AeonWindow* window);
 
  private:
   sf::Clock clock;

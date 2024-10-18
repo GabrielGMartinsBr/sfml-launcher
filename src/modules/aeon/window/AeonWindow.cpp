@@ -92,6 +92,28 @@ void AeonWindow::handleMouseReleased(const AeMouseButtonEvent& event)
   }
 }
 
+void AeonWindow::handleKeyPressed(const AeKeyEvent& event)
+{
+  if (!focusedElement || focusedElement->getType() != AeonElementType::TEXT_BOX) {
+    return;
+  }
+  AeonTextBoxElement* textBox = static_cast<AeonTextBoxElement*>(focusedElement);
+  textBox->handleKeyPressed(event);
+}
+
+void AeonWindow::handleTextEntered(const AeTextEvent& event)
+{
+  if (!focusedElement || focusedElement->getType() != AeonElementType::TEXT_BOX) {
+    return;
+  }
+  AeonTextBoxElement* textBox = static_cast<AeonTextBoxElement*>(focusedElement);
+  textBox->handleTextEntered(event);
+}
+
+/*
+
+*/
+
 void AeonWindow::setIsHover(bool value)
 {
   isHover = value;
@@ -100,6 +122,7 @@ void AeonWindow::setIsHover(bool value)
 void AeonWindow::setIsFocused(bool value)
 {
   isFocused = value;
+  isRingVisible = value;
 }
 
 /*

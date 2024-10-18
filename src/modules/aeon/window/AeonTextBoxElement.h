@@ -5,6 +5,7 @@
 #include <SFML/System/String.hpp>
 #include <SFML/System/Vector2.hpp>
 
+#include "aeon/base/AeonEvents.h"
 #include "aeon/base/AeonIntegrable.h"
 #include "aeon/toolkit/RoundedRectShape.h"
 #include "aeon/window/AeonElement.h"
@@ -26,6 +27,8 @@ class AeonTextBoxElement : public AeonElement, public AeonIntegrable {
   }
 
   void handleAeonUpdate(ULong ts);
+  void handleKeyPressed(const AeKeyEvent& event);
+  void handleTextEntered(const AeTextEvent& event);
 
   void drawTo(RenderTarget& target) override;
 
@@ -60,6 +63,16 @@ class AeonTextBoxElement : public AeonElement, public AeonIntegrable {
 
   void alignText();
   void alignCursor();
+  void revealCursor();
+
+  void handleArrowLeftPressed(bool isCtrlPressed);
+  void handleArrowRightPressed(bool isCtrlPressed);
+  void handleBackspace(bool isCtrlPressed);
+  void handleInput(sf::Uint32 unicode);
+
+
+  void moveCursorLeft(bool isCtrlPressed = false);
+  void moveCursorRight(bool isCtrlPressed = false);
 };
 
 }  // namespace ae
