@@ -23,7 +23,7 @@ struct AeTextBoxIntegrator : public AeonIntegratorBase<AeonTextBoxElement> {
 
   static VALUE setStyleProp(VALUE self, VALUE propKey, VALUE value);
 
-  static VALUE setText(VALUE self, VALUE value);
+  static VALUE setValue(VALUE self, VALUE value);
 
   // Variables
   static VALUE getter_x(VALUE self);

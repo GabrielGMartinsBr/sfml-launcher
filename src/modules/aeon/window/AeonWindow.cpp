@@ -6,8 +6,10 @@
 #include <SFML/System/Vector2.hpp>
 
 #include "aeon/enums/AeonElementState.h"
+#include "aeon/enums/AeonElementType.h"
 #include "aeon/toolkit/ColorParser.hpp"
 #include "aeon/window/AeonElement.h"
+#include "aeon/window/AeonTextBoxElement.h"
 #include "aeon/window/AeonWindowManager.h"
 #include "engnine/Lists.hpp"
 #include "engnine/Window.h"
@@ -39,9 +41,16 @@ AeonWindow::~AeonWindow()
   ⇩⇩⇩ Aeon lifecycle methods ⇩⇩⇩
 */
 
-void AeonWindow::handleAeonUpdate(UInt ts)
+void AeonWindow::handleAeonUpdate(ULong ts)
 {
   timestamp = ts;
+  for (AeonElement* element : elements) {
+    if (element->getType() != AeonElementType::TEXT_BOX) {
+      continue;
+    }
+    AeonTextBoxElement* textBox = static_cast<AeonTextBoxElement*>(element);
+    textBox->handleAeonUpdate(ts);
+  }
 }
 
 void AeonWindow::handleMouseMoved(const AeMouseMoveEvent& event)

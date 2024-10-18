@@ -25,9 +25,9 @@ void AeTextBoxIntegrator::integrate(VALUE aeonModule)
   rb_define_method(classObject, "initialize", RUBY_METHOD_FUNC(initialize), -1);
   rb_define_method(classObject, "setPosition", RUBY_METHOD_FUNC(setPosition), 2);
   rb_define_method(classObject, "setSize", RUBY_METHOD_FUNC(setSize), 2);
-  rb_define_method(classObject, "setText", RUBY_METHOD_FUNC(setText), 1);
-
   rb_define_method(classObject, "setStyle", RUBY_METHOD_FUNC(setStyleProp), 2);
+
+  rb_define_method(classObject, "setValue", RUBY_METHOD_FUNC(setValue), 1);
 
   rb_define_method(classObject, "x", RUBY_METHOD_FUNC(getter_x), 0);
   rb_define_method(classObject, "x=", RUBY_METHOD_FUNC(setter_x), 1);
@@ -115,13 +115,13 @@ VALUE AeTextBoxIntegrator::setStyleProp(VALUE self, VALUE propKey, VALUE value)
   return Qnil;
 }
 
-// Set text var
+// Set text box value
 
-VALUE AeTextBoxIntegrator::setText(VALUE self, VALUE value)
+VALUE AeTextBoxIntegrator::setValue(VALUE self, VALUE value)
 {
   AeonTextBoxElement &inst = AeonIntegratorBase::getWrappedObject(self);
-  // const String &resValue = inst.setText(Convert::toCStr(value));
-  // inst.setInstanceVar("@text", resValue);
+  const String &resValue = inst.setValue(Convert::toCStr(value));
+  inst.setInstanceVar("@value", resValue);
   return Qnil;
 }
 

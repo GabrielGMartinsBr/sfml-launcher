@@ -19,7 +19,7 @@
 namespace ae {
 
 using app::SPtr;
-using app::UInt;
+using app::ULong;
 using app::Vector;
 using sf::RenderTarget;
 
@@ -29,7 +29,7 @@ class AeonWindow : public Eng::Window, Eng::IOnRender {
 
   ~AeonWindow();
 
-  void handleAeonUpdate(UInt ts);
+  void handleAeonUpdate(ULong ts);
   void handleMouseMoved(const AeMouseMoveEvent& event);
   void handleMousePressed(const AeMouseButtonEvent& event);
   void handleMouseReleased(const AeMouseButtonEvent& event);
@@ -57,7 +57,7 @@ class AeonWindow : public Eng::Window, Eng::IOnRender {
 
  private:
   Vector<AeonElement*> elements;
-  UInt timestamp;
+  ULong timestamp;
   AeonHitBox hitBox;
   RoundedRectShape ring;
   sf::RenderTexture aeContent;

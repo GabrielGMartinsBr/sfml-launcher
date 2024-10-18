@@ -9,7 +9,7 @@
 
 namespace ae {
 
-using app::UInt;
+using app::ULong;
 using app::Vector;
 
 struct AeonWindowManager {
@@ -35,11 +35,11 @@ struct AeonWindowManager {
   void removeEntry(AeonWindow* entry);
   void updateEntries();
 
-  UInt getTimestamp();
+  ULong getTimestamp();
 
  private:
   sf::Clock clock;
-  UInt ts;
+  ULong ts;
 };
 
 }  // namespace ae

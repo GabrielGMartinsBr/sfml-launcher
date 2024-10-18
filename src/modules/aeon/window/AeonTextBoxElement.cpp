@@ -1,5 +1,8 @@
 #include "./AeonTextBoxElement.h"
 
+#include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/Text.hpp>
+
 #include "aeon/enums/AeonElementState.h"
 #include "aeon/toolkit/ElementBounds.h"
 #include "aeon/window/AeonStyleSheet.h"
@@ -7,14 +10,29 @@
 
 namespace ae {
 
+static const float cursorBlinkTime = 0.5f;
+
 AeonTextBoxElement::AeonTextBoxElement() :
     AeonElement(ElementBounds(), textBoxDefaultStyle),
     textFont(nullptr),
-    fontSize(16)
+    fontSize(16),
+    showCursor(true),
+    dirtyTextValue(false)
 {
   applyStyle();
   applyBounds();
-  text.setString("TextBox works!");
+  valueString = "TextBox works!";
+  text.setString(valueString);
+  cursorIndex = valueString.getSize();
+}
+
+void AeonTextBoxElement::handleAeonUpdate(ULong ts)
+{
+  timestamp = ts;
+  if (timestamp - lastCursorBlinkTs > cursorBlinkTime) {
+    showCursor = !showCursor;
+    lastCursorBlinkTs = timestamp;
+  }
 }
 
 void AeonTextBoxElement::drawTo(RenderTarget& target)
@@ -22,11 +40,26 @@ void AeonTextBoxElement::drawTo(RenderTarget& target)
   refreshValues();
   shape.drawTo(target);
   target.draw(text);
+  if (showCursor) {
+    target.draw(cursorShape);
+  }
 }
 
 void AeonTextBoxElement::flush()
 {
   refreshValues();
+}
+
+const sf::String& AeonTextBoxElement::getValue()
+{
+  return valueString;
+}
+
+const sf::String& AeonTextBoxElement::setValue(const sf::String& value)
+{
+  valueString = value;
+  dirtyTextValue = true;
+  return valueString;
 }
 
 /*
@@ -35,6 +68,10 @@ void AeonTextBoxElement::flush()
 
 void AeonTextBoxElement::refreshValues()
 {
+  if (dirtyTextValue) {
+    applyTextValue();
+    dirtyTextValue = false;
+  }
   if (dirtyState) {
     applyState();
     alignText();
@@ -77,7 +114,11 @@ void AeonTextBoxElement::applyStyle(const AeonStyleSheet& style)
   if (style.borderColor.has_value()) shape.borderColor(style.borderColor.value());
   if (style.fillColor.has_value()) shape.fillColor(style.fillColor.value());
   if (style.textColor.has_value()) {
-    text.setFillColor(style.textColor.value().getSfColor());
+    const sf::Color& textColor = style.textColor.value().getSfColor();
+    text.setFillColor(textColor);
+    text.setOutlineColor(textColor);
+    text.setOutlineThickness(0.1);
+    cursorShape.setFillColor(textColor);
   }
   if (style.fontSize.has_value()) {
     fontSize = style.fontSize.value();
@@ -99,6 +140,25 @@ void AeonTextBoxElement::applyStateStyle(AeonElementState state)
   applyStyle(getStateStyle(state));
 }
 
+void AeonTextBoxElement::applyTextValue()
+{
+  text.setString(valueString);
+  cursorIndex = valueString.getSize();
+  alignText();
+}
+
+const Vector2f AeonTextBoxElement::getCurrentPadding()
+{
+  Vector2f padding = defaultStyle.padding.value_or(Vector2f(0, 0));
+  if (hasState(AeonElementState::HOVER)) {
+    const AeonStyleSheet& style = getStateStyle(AeonElementState::HOVER);
+    if (style.padding.has_value()) {
+      padding = style.padding.value();
+    }
+  }
+  return padding;
+}
+
 void AeonTextBoxElement::alignText()
 {
   if (!textFont) return;
@@ -118,18 +178,31 @@ void AeonTextBoxElement::alignText()
 
   text.setOrigin(textOrigin);
   text.setPosition(bounds.position());
+
+  cursorShape.setSize(sf::Vector2f(1, leading + 2));
+  cursorShape.setOrigin(textOrigin);
+  alignCursor();
 }
 
-const Vector2f AeonTextBoxElement::getCurrentPadding()
+void AeonTextBoxElement::alignCursor()
 {
-  Vector2f padding = defaultStyle.padding.value_or(Vector2f(0, 0));
-  if (hasState(AeonElementState::HOVER)) {
-    const AeonStyleSheet& style = getStateStyle(AeonElementState::HOVER);
-    if (style.padding.has_value()) {
-      padding = style.padding.value();
+  sf::Vector2f cursorPosition(bounds.position());
+  bool isPassword = false;
+
+  if (valueString.getSize() > 0) {
+    if (!isPassword && textFont) {
+      sf::String befStr = valueString.substring(0, cursorIndex);
+      sf::Text befText(befStr, *textFont);
+      befText.setCharacterSize(fontSize);
+      cursorPosition.x = bounds.x() + befText.getGlobalBounds().width + 1;
+    } else {
+      int index = std::max<int>(0, cursorIndex - 1);
+      cursorPosition.x = text.findCharacterPos(index).x;
     }
   }
-  return padding;
+
+  cursorPosition.y -= 1;
+  cursorShape.setPosition(cursorPosition);
 }
 
 }  // namespace ae
