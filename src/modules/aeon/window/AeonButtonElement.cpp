@@ -73,7 +73,7 @@ void AeonButtonElement::applyStyle()
   applyStyle(defaultStyle);
 }
 
-void AeonButtonElement::applyStyle(const AeonPartialStyleSheet& style)
+void AeonButtonElement::applyStyle(const AeonStyleSheet& style)
 {
   if (style.radius.has_value()) shape.radius(style.radius.value());
   if (style.borderSize.has_value()) shape.borderSize(style.borderSize.value());

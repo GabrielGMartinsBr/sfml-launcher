@@ -33,7 +33,7 @@ struct AeElementStyleParser {
       return;
     }
 
-    AeonPartialStyleSheet* style = nullptr;
+    AeonStyleSheet* style = nullptr;
     if (state == AeonElementState::DEFAULT) {
       style = &element.getMutableStyle();
     } else {

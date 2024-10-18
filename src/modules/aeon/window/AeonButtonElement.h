@@ -34,7 +34,7 @@ class AeonButtonElement : public AeonElement, public AeonIntegrable {
   void applyBounds();
   void applyState();
   void applyStyle();
-  void applyStyle(const AeonPartialStyleSheet& style);
+  void applyStyle(const AeonStyleSheet& style);
   void applyStateStyle(AeonElementState state);
 };
 

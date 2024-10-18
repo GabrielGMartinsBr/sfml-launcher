@@ -18,7 +18,7 @@ class AeonElement {
  public:
 
   AeonElement(const ElementBounds& bounds);
-  AeonElement(const ElementBounds& bounds, const AeonStyleSheet& defaultStyle);
+  AeonElement(const ElementBounds& bounds, const AeonStyleSheetBase& defaultStyle);
 
   inline virtual AeonElementType getType() const = 0;
 
@@ -46,15 +46,15 @@ class AeonElement {
   bool hasState(AeonElementState state) const;
   void clearState();
 
-  const AeonPartialStyleSheet& getStyle();
-  void setStyle(const AeonPartialStyleSheet& style);
+  const AeonStyleSheet& getStyle();
+  void setStyle(const AeonStyleSheet& style);
 
-  const AeonPartialStyleSheet& getStateStyle(AeonElementState state);
-  void setStateStyle(AeonElementState state, const AeonPartialStyleSheet& style);
+  const AeonStyleSheet& getStateStyle(AeonElementState state);
+  void setStateStyle(AeonElementState state, const AeonStyleSheet& style);
 
-  AeonPartialStyleSheet& getMutableStyle();
-  AeonPartialStyleSheet& getMutableStyle(AeonElementState state);
-  AeonPartialStyleSheet& getMutableStyle(const String& stateName);
+  AeonStyleSheet& getMutableStyle();
+  AeonStyleSheet& getMutableStyle(AeonElementState state);
+  AeonStyleSheet& getMutableStyle(const String& stateName);
 
   bool isFocusable() const;
   void setFocusable(bool value);
@@ -63,8 +63,8 @@ class AeonElement {
  protected:
   ElementBounds bounds;
   uint8_t states;
-  AeonPartialStyleSheet defaultStyle;
-  UnMap<AeonElementState, AeonPartialStyleSheet> stateStyles;
+  AeonStyleSheet defaultStyle;
+  UnMap<AeonElementState, AeonStyleSheet> stateStyles;
   bool dirtyBounds;
   bool dirtyState;
   bool dirtyStyle;

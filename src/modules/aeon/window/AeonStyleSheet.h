@@ -12,7 +12,7 @@ using app::String;
 using Eng::Color;
 using sf::Vector2f;
 
-struct AeonStyleSheet {
+struct AeonStyleSheetBase {
   float ringSize;
   float ringOffset;
   float borderSize;
@@ -26,7 +26,7 @@ struct AeonStyleSheet {
   String textColor;
 };
 
-struct AeonPartialStyleSheet {
+struct AeonStyleSheet {
   std::optional<float> ringSize;
   std::optional<float> ringOffset;
   std::optional<float> borderSize;
@@ -39,10 +39,10 @@ struct AeonPartialStyleSheet {
   std::optional<Color> bgColor;
   std::optional<Color> textColor;
 
-  AeonPartialStyleSheet() = default;
-  AeonPartialStyleSheet(const AeonStyleSheet& base);
+  AeonStyleSheet() = default;
+  AeonStyleSheet(const AeonStyleSheetBase& base);
 };
 
-extern AeonStyleSheet buttonDefaultStyle;
+extern AeonStyleSheetBase buttonDefaultStyle;
 
 }  // namespace ae

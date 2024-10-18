@@ -7,7 +7,7 @@
 
 namespace ae {
 
-AeonPartialStyleSheet::AeonPartialStyleSheet(const AeonStyleSheet& style) :
+AeonStyleSheet::AeonStyleSheet(const AeonStyleSheetBase& style) :
     ringSize(style.ringSize),
     ringOffset(style.ringOffset),
     borderSize(style.borderSize),
@@ -22,7 +22,7 @@ AeonPartialStyleSheet::AeonPartialStyleSheet(const AeonStyleSheet& style) :
 {
 }
 
-AeonStyleSheet buttonDefaultStyle = {
+AeonStyleSheetBase buttonDefaultStyle = {
   .ringSize = 0,
   .ringOffset = 0,
   .borderSize = 2.5,

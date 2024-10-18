@@ -19,7 +19,7 @@ AeonElement::AeonElement(const ElementBounds& bounds) :
 {
 }
 
-AeonElement::AeonElement(const ElementBounds& bounds, const AeonStyleSheet& defaultStyle) :
+AeonElement::AeonElement(const ElementBounds& bounds, const AeonStyleSheetBase& defaultStyle) :
     bounds(bounds),
     defaultStyle(defaultStyle),
     states(static_cast<uint8_t>(AeonElementState::DEFAULT)),
@@ -104,12 +104,12 @@ void AeonElement::clearState()
   dirtyState = true;
 }
 
-const AeonPartialStyleSheet& AeonElement::getStyle()
+const AeonStyleSheet& AeonElement::getStyle()
 {
   return defaultStyle;
 }
 
-void AeonElement::setStyle(const AeonPartialStyleSheet& style)
+void AeonElement::setStyle(const AeonStyleSheet& style)
 {
   if (style.ringSize) defaultStyle.ringSize = *style.ringSize;
   if (style.ringOffset) defaultStyle.ringOffset = *style.ringOffset;
@@ -125,14 +125,14 @@ void AeonElement::setStyle(const AeonPartialStyleSheet& style)
   dirtyStyle = true;
 }
 
-const AeonPartialStyleSheet& AeonElement::getStateStyle(AeonElementState state)
+const AeonStyleSheet& AeonElement::getStateStyle(AeonElementState state)
 {
   return stateStyles[state];
 }
 
-void AeonElement::setStateStyle(AeonElementState state, const AeonPartialStyleSheet& style)
+void AeonElement::setStateStyle(AeonElementState state, const AeonStyleSheet& style)
 {
-  AeonPartialStyleSheet& target = stateStyles[state];
+  AeonStyleSheet& target = stateStyles[state];
   if (style.ringSize) target.ringSize = *style.ringSize;
   if (style.ringOffset) target.ringOffset = *style.ringOffset;
   if (style.borderSize) target.borderSize = *style.borderSize;
@@ -146,19 +146,19 @@ void AeonElement::setStateStyle(AeonElementState state, const AeonPartialStyleSh
   if (style.textColor) target.textColor = *style.textColor;
 }
 
-AeonPartialStyleSheet& AeonElement::getMutableStyle()
+AeonStyleSheet& AeonElement::getMutableStyle()
 {
   dirtyState = true;
   return defaultStyle;
 }
 
-AeonPartialStyleSheet& AeonElement::getMutableStyle(AeonElementState state)
+AeonStyleSheet& AeonElement::getMutableStyle(AeonElementState state)
 {
   dirtyState = true;
   return stateStyles[state];
 }
 
-AeonPartialStyleSheet& AeonElement::getMutableStyle(const String& stateName)
+AeonStyleSheet& AeonElement::getMutableStyle(const String& stateName)
 {
   if (stateName == "hover") {
     return getMutableStyle(AeonElementState::HOVER);
