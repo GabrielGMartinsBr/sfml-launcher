@@ -59,6 +59,8 @@ class AeonElement {
   bool isFocusable() const;
   void setFocusable(bool value);
 
+  bool hasFocus();
+  void setFocus(bool value);
 
  protected:
   ElementBounds bounds;
@@ -70,6 +72,7 @@ class AeonElement {
   bool dirtyStyle;
   bool sizeUndefined;
   bool focusable;
+  bool hasFocusValue;
 };
 
 }  // namespace ae

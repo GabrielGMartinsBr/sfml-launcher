@@ -34,6 +34,9 @@ class AeonWindow : public Eng::Window, Eng::IOnRender {
   void handleMousePressed(const AeMouseButtonEvent& event);
   void handleMouseReleased(const AeMouseButtonEvent& event);
 
+  void setIsHover(bool value);
+  void setIsFocused(bool value);
+
   void onRender(sf::RenderTexture& renderTexture) override;
   bool shouldRender() const override;
   int getZIndex() const override;
@@ -57,12 +60,15 @@ class AeonWindow : public Eng::Window, Eng::IOnRender {
 
  private:
   Vector<AeonElement*> elements;
+  AeonElement* focusedElement;
   ULong timestamp;
   AeonHitBox hitBox;
   RoundedRectShape ring;
   sf::RenderTexture aeContent;
   sf::Sprite aeContentSpr;
   bool isRingVisible;
+  bool isHover;
+  bool isFocused;
   bool addedToEngineCycles;
 
   void addToEngineCycles();
@@ -70,6 +76,8 @@ class AeonWindow : public Eng::Window, Eng::IOnRender {
 
   void updateContentPosition();
   void updateContentDimension();
+
+  void setFocused(AeonElement* element);
 };
 
 }  // namespace ae

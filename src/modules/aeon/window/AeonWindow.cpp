@@ -21,8 +21,11 @@ using Eng::Lists;
 AeonWindow::AeonWindow(VALUE rbObj, Eng::Viewport* viewport) :
     Eng::Window(rbObj, viewport),
     hitBox(),
+    focusedElement(nullptr),
     ring(3),
     isRingVisible(false),
+    isHover(false),
+    isFocused(false),
     timestamp(0)
 {
   addedToEngineCycles = false;
@@ -74,6 +77,7 @@ void AeonWindow::handleMousePressed(const AeMouseButtonEvent& event)
   float evY = event.y - y - 4;
   for (AeonElement* element : elements) {
     if (element->intersects(evX, evY)) {
+      setFocused(element);
       element->addState(AeonElementState::CLICKED);
     }
   }
@@ -88,13 +92,23 @@ void AeonWindow::handleMouseReleased(const AeMouseButtonEvent& event)
   }
 }
 
+void AeonWindow::setIsHover(bool value)
+{
+  isHover = value;
+}
+
+void AeonWindow::setIsFocused(bool value)
+{
+  isFocused = value;
+}
+
 /*
   ⇩⇩⇩ Nrgss lifecycle methods ⇩⇩⇩
 */
 
 void AeonWindow::onRender(sf::RenderTexture& renderTexture)
 {
-  ring.drawTo(renderTexture);
+  if (isRingVisible) ring.drawTo(renderTexture);
   drawElements(renderTexture);
 }
 
@@ -221,6 +235,16 @@ void AeonWindow::updateContentDimension()
     aeContent.create(width - 8, height - 8, settings);
     aeContentSpr.setTexture(aeContent.getTexture());
   }
+}
+
+void AeonWindow::setFocused(AeonElement* element)
+{
+  if (focusedElement == element) return;
+  if (focusedElement) {
+    focusedElement->setFocus(false);
+  }
+  focusedElement = element;
+  focusedElement->setFocus(true);
 }
 
 }  // namespace ae

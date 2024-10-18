@@ -16,7 +16,8 @@ AeonElement::AeonElement(const ElementBounds& bounds) :
     dirtyState(false),
     dirtyStyle(false),
     sizeUndefined(true),
-    focusable(true)
+    focusable(true),
+    hasFocusValue(false)
 {
 }
 
@@ -28,7 +29,8 @@ AeonElement::AeonElement(const ElementBounds& bounds, const AeonStyleSheetBase& 
     dirtyState(false),
     dirtyStyle(false),
     sizeUndefined(true),
-    focusable(true)
+    focusable(true),
+    hasFocusValue(false)
 {
 }
 
@@ -186,6 +188,21 @@ bool AeonElement::isFocusable() const
 void AeonElement::setFocusable(bool value)
 {
   focusable = true;
+}
+
+bool AeonElement::hasFocus()
+{
+  return hasFocusValue;
+}
+
+void AeonElement::setFocus(bool value)
+{
+  hasFocusValue = value;
+  if (hasFocusValue) {
+    addState(AeonElementState::FOCUS);
+  } else {
+    removeState(AeonElementState::FOCUS);
+  }
 }
 
 }  // namespace ae

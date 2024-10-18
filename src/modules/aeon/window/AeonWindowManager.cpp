@@ -37,15 +37,20 @@ void AeonWindowManager::handleMouseMoved(const AeMouseMoveEvent& event)
   bool hasIntersection = false;
   for (AeonWindow* entry : entries) {
     hasIntersection = entry->intersects(event.x, event.y);
-    entry->setRingVisibility(hasIntersection);
-    entry->handleMouseMoved(event);
+    entry->setIsHover(hasIntersection);
+    if (hasIntersection) {
+      entry->handleMouseMoved(event);
+    }
+    // entry->setRingVisibility(hasIntersection);
   }
 }
 
 void AeonWindowManager::handleMousePressed(const AeMouseButtonEvent& event)
 {
   for (AeonWindow* entry : entries) {
-    if (entry->intersects(event.x, event.y)) {
+    bool isHover = entry->intersects(event.x, event.y);
+    entry->setIsFocused(isHover);
+    if (isHover) {
       entry->handleMousePressed(event);
     }
   }
@@ -73,11 +78,16 @@ void AeonWindowManager::removeEntry(AeonWindow* entry)
 
 void AeonWindowManager::updateEntries()
 {
-  ts = clock.getElapsedTime().asSeconds();
+  ts = getTimestamp();
 
   for (AeonWindow* entry : entries) {
     entry->handleAeonUpdate(ts);
   }
+}
+
+ULong AeonWindowManager::getTimestamp()
+{
+  return clock.getElapsedTime().asMilliseconds();
 }
 
 }  // namespace ae

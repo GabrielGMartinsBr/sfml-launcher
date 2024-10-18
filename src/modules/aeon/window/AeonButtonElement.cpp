@@ -78,8 +78,8 @@ void AeonButtonElement::applyBounds()
 void AeonButtonElement::applyState()
 {
   applyStyle();
-  applyStateStyle(AeonElementState::HOVER);
   applyStateStyle(AeonElementState::FOCUS);
+  applyStateStyle(AeonElementState::HOVER);
   applyStateStyle(AeonElementState::CLICKED);
 }
 

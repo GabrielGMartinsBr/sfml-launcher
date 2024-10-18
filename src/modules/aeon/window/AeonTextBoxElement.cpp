@@ -5,18 +5,20 @@
 
 #include "aeon/enums/AeonElementState.h"
 #include "aeon/toolkit/ElementBounds.h"
+#include "aeon/window/AeonElement.h"
 #include "aeon/window/AeonStyleSheet.h"
+#include "aeon/window/AeonWindowManager.h"
 #include "engnine/base/Fonts.h"
 
 namespace ae {
 
-static const float cursorBlinkTime = 0.5f;
+static const int cursorBlinkTime = 500;
 
 AeonTextBoxElement::AeonTextBoxElement() :
     AeonElement(ElementBounds(), textBoxDefaultStyle),
     textFont(nullptr),
     fontSize(16),
-    showCursor(true),
+    showCursor(false),
     dirtyTextValue(false)
 {
   applyStyle();
@@ -28,10 +30,9 @@ AeonTextBoxElement::AeonTextBoxElement() :
 
 void AeonTextBoxElement::handleAeonUpdate(ULong ts)
 {
-  timestamp = ts;
-  if (timestamp - lastCursorBlinkTs > cursorBlinkTime) {
+  if (ts - lastCursorBlinkTs > cursorBlinkTime) {
     showCursor = !showCursor;
-    lastCursorBlinkTs = timestamp;
+    lastCursorBlinkTs = ts;
   }
 }
 
@@ -40,7 +41,7 @@ void AeonTextBoxElement::drawTo(RenderTarget& target)
   refreshValues();
   shape.drawTo(target);
   target.draw(text);
-  if (showCursor) {
+  if (hasFocusValue && showCursor) {
     target.draw(cursorShape);
   }
 }
@@ -60,6 +61,15 @@ const sf::String& AeonTextBoxElement::setValue(const sf::String& value)
   valueString = value;
   dirtyTextValue = true;
   return valueString;
+}
+
+void AeonTextBoxElement::setFocus(bool value)
+{
+  AeonElement::setFocus(value);
+  if (hasFocusValue) {
+    lastCursorBlinkTs = AeonWindowManager::Instance().getTimestamp();
+    showCursor = true;
+  }
 }
 
 /*
@@ -97,8 +107,8 @@ void AeonTextBoxElement::applyBounds()
 void AeonTextBoxElement::applyState()
 {
   applyStyle();
-  applyStateStyle(AeonElementState::HOVER);
   applyStateStyle(AeonElementState::FOCUS);
+  applyStateStyle(AeonElementState::HOVER);
   applyStateStyle(AeonElementState::CLICKED);
 }
 

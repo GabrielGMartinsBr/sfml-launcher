@@ -34,6 +34,7 @@ class AeonTextBoxElement : public AeonElement, public AeonIntegrable {
   const sf::String& getValue();
   const sf::String& setValue(const sf::String& value);
 
+  void setFocus(bool value);
 
  private:
   RoundedRectShape shape;
@@ -44,7 +45,6 @@ class AeonTextBoxElement : public AeonElement, public AeonIntegrable {
   sf::Text text;
   size_t cursorIndex;
   bool showCursor;
-  ULong timestamp;
   ULong lastCursorBlinkTs;
   bool dirtyTextValue;
 
@@ -55,7 +55,6 @@ class AeonTextBoxElement : public AeonElement, public AeonIntegrable {
   void applyStyle(const AeonStyleSheet& style);
   void applyStateStyle(AeonElementState state);
   void applyTextValue();
-
 
   const Vector2f getCurrentPadding();
 
