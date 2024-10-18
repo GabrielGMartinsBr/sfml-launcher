@@ -36,6 +36,12 @@ void AeButtonIntegrator::integrate(VALUE aeonModule)
 
   rb_define_method(classObject, "y", RUBY_METHOD_FUNC(getter_y), 0);
   rb_define_method(classObject, "y=", RUBY_METHOD_FUNC(setter_y), 1);
+
+  rb_define_method(classObject, "width", RUBY_METHOD_FUNC(getter_width), 0);
+  rb_define_method(classObject, "height", RUBY_METHOD_FUNC(getter_height), 0);
+
+  // Methods
+  rb_define_method(classObject, "flush", RUBY_METHOD_FUNC(flush), 0);
 }
 
 // Instance allocator
@@ -64,8 +70,7 @@ void AeButtonIntegrator::instanceMark(void *ptr) { }
 
 VALUE AeButtonIntegrator::initialize(int argc, VALUE *argv, VALUE self)
 {
-  ElementBounds bounds(32, 32, 160, 32);
-
+  ElementBounds bounds;
   AeonButtonElement *instance = new AeonButtonElement(bounds);
 
   DATA_PTR(self) = instance;
@@ -133,7 +138,7 @@ VALUE AeButtonIntegrator::getter_x(VALUE self)
 VALUE AeButtonIntegrator::setter_x(VALUE self, VALUE value)
 {
   AeonButtonElement &inst = AeonIntegratorBase::getWrappedObject(self);
-  inst.y(Convert::toCDouble2(value));
+  inst.x(Convert::toCDouble2(value));
   inst.setInstanceVar("@x", value);
   return value;
 }
@@ -151,6 +156,25 @@ VALUE AeButtonIntegrator::setter_y(VALUE self, VALUE value)
   inst.y(Convert::toCDouble2(value));
   inst.setInstanceVar("@y", value);
   return value;
+}
+
+VALUE AeButtonIntegrator::getter_width(VALUE self)
+{
+  AeonButtonElement &inst = AeonIntegratorBase::getWrappedObject(self);
+  return inst.toRubyValue(inst.getBounds().width());
+}
+
+VALUE AeButtonIntegrator::getter_height(VALUE self)
+{
+  AeonButtonElement &inst = AeonIntegratorBase::getWrappedObject(self);
+  return inst.toRubyValue(inst.getBounds().height());
+}
+
+VALUE AeButtonIntegrator::flush(VALUE self)
+{
+  AeonButtonElement &inst = AeonIntegratorBase::getWrappedObject(self);
+  inst.flush();
+  return Qnil;
 }
 
 }  // namespace ae

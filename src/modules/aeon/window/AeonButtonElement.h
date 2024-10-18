@@ -1,5 +1,7 @@
 #pragma once
 
+#include <SFML/Graphics/Font.hpp>
+#include <SFML/Graphics/Text.hpp>
 #include <SFML/System/String.hpp>
 
 #include "aeon/base/AeonIntegrable.h"
@@ -14,7 +16,7 @@ using sf::RenderTarget;
 
 class AeonButtonElement : public AeonElement, public AeonIntegrable {
  public:
-  sf::String text;
+  sf::String textString;
 
   AeonButtonElement(const ElementBounds& bounds);
 
@@ -27,8 +29,13 @@ class AeonButtonElement : public AeonElement, public AeonIntegrable {
 
   const sf::String& setText(const sf::String& value);
 
+  void flush();
+
  private:
   RoundedRectShape shape;
+  const sf::Font* textFont;
+  float fontSize;
+  sf::Text text;
 
   void refreshValues();
   void applyBounds();
@@ -36,6 +43,9 @@ class AeonButtonElement : public AeonElement, public AeonIntegrable {
   void applyStyle();
   void applyStyle(const AeonStyleSheet& style);
   void applyStateStyle(AeonElementState state);
+
+  void adaptToTextSize();
+
 };
 
 }  // namespace ae

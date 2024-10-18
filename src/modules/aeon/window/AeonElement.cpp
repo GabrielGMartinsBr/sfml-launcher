@@ -15,6 +15,7 @@ AeonElement::AeonElement(const ElementBounds& bounds) :
     dirtyBounds(false),
     dirtyState(false),
     dirtyStyle(false),
+    sizeUndefined(true),
     focusable(true)
 {
 }
@@ -26,6 +27,7 @@ AeonElement::AeonElement(const ElementBounds& bounds, const AeonStyleSheetBase& 
     dirtyBounds(false),
     dirtyState(false),
     dirtyStyle(false),
+    sizeUndefined(true),
     focusable(true)
 {
 }
@@ -44,6 +46,9 @@ const ElementBounds& AeonElement::getBounds()
 void AeonElement::setBounds(const ElementBounds& value)
 {
   bounds = value;
+  if (!bounds.isEmpty()) {
+    sizeUndefined = true;
+  }
 }
 
 void AeonElement::setPosition(float x, float y)
@@ -56,6 +61,7 @@ void AeonElement::setSize(float width, float height)
 {
   bounds.width(width);
   bounds.height(height);
+  sizeUndefined = false;
   dirtyBounds = true;
 }
 

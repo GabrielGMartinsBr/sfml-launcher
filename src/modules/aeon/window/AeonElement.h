@@ -68,6 +68,7 @@ class AeonElement {
   bool dirtyBounds;
   bool dirtyState;
   bool dirtyStyle;
+  bool sizeUndefined;
   bool focusable;
 };
 

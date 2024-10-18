@@ -31,9 +31,15 @@ struct AeButtonIntegrator : public AeonIntegratorBase<AeonButtonElement> {
   // Variables
   static VALUE getter_x(VALUE self);
   static VALUE getter_y(VALUE self);
+  static VALUE getter_width(VALUE self);
+  static VALUE getter_height(VALUE self);
 
   static VALUE setter_x(VALUE self, VALUE value);
   static VALUE setter_y(VALUE self, VALUE value);
+
+  // Methods
+
+  static VALUE flush(VALUE self);
 };
 
 }  // namespace ae

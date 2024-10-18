@@ -41,6 +41,18 @@ struct AeElementStyleParser {
     }
 
     switch (hashString(key.second.c_str())) {
+      case hashString("radius"): {
+        style->radius = parseFloat(value);
+        break;
+      }
+      case hashString("borderSize"): {
+        style->borderSize = parseFloat(value);
+        break;
+      }
+      case hashString("fontSize"): {
+        style->fontSize = parseFloat(value);
+        break;
+      }
       case hashString("bgColor"): {
         style->bgColor = parseColor(value);
         break;
@@ -49,12 +61,8 @@ struct AeElementStyleParser {
         style->borderColor = parseColor(value);
         break;
       }
-      case hashString("borderSize"): {
-        style->borderSize = parseFloat(value);
-        break;
-      }
-      case hashString("radius"): {
-        style->radius = parseFloat(value);
+      case hashString("textColor"): {
+        style->textColor = parseColor(value);
         break;
       }
 
