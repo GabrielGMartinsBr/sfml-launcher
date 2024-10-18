@@ -67,7 +67,7 @@ class AeonTextBoxElement : public AeonElement, public AeonIntegrable {
 
   void handleArrowLeftPressed(bool isCtrlPressed);
   void handleArrowRightPressed(bool isCtrlPressed);
-  void handleBackspace(bool isCtrlPressed);
+  void handleBackspacePressed(bool isCtrlPressed);
   void handleInput(sf::Uint32 unicode);
 
 

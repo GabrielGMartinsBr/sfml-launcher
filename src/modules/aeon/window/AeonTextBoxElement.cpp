@@ -20,14 +20,13 @@ AeonTextBoxElement::AeonTextBoxElement() :
     AeonElement(ElementBounds(), textBoxDefaultStyle),
     textFont(nullptr),
     fontSize(16),
+    valueString(""),
+    cursorIndex(0),
     showCursor(false),
     dirtyTextValue(false)
 {
   applyStyle();
   applyBounds();
-  valueString = "TextBox works!";
-  text.setString(valueString);
-  cursorIndex = valueString.getSize();
 }
 
 void AeonTextBoxElement::handleAeonUpdate(ULong ts)
@@ -48,7 +47,7 @@ void AeonTextBoxElement::handleKeyPressed(const AeKeyEvent& event)
       handleArrowRightPressed(event.control);
       break;
     case sf::Keyboard::BackSpace:
-      handleBackspace(event.control);
+      handleBackspacePressed(event.control);
       break;
     default:
       break;
@@ -266,7 +265,7 @@ void AeonTextBoxElement::handleArrowRightPressed(bool isCtrlPressed)
   moveCursorRight(isCtrlPressed);
 }
 
-void AeonTextBoxElement::handleBackspace(bool isCtrlPressed)
+void AeonTextBoxElement::handleBackspacePressed(bool isCtrlPressed)
 {
   if (valueString.isEmpty() || cursorIndex < 1) {
     return;

@@ -4,6 +4,8 @@
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/System/Vector2.hpp>
+#include <SFML/Window/Event.hpp>
+#include <SFML/Window/Keyboard.hpp>
 
 #include "aeon/enums/AeonElementState.h"
 #include "aeon/enums/AeonElementType.h"
@@ -22,11 +24,11 @@ AeonWindow::AeonWindow(VALUE rbObj, Eng::Viewport* viewport) :
     Eng::Window(rbObj, viewport),
     hitBox(),
     focusedElement(nullptr),
+    focusedElementIndex(-1),
     ring(3),
     isRingVisible(false),
     isHover(false),
-    isFocused(false),
-    timestamp(0)
+    isFocused(false)
 {
   addedToEngineCycles = false;
   ring.fillColor("#0000");
@@ -46,7 +48,7 @@ AeonWindow::~AeonWindow()
 
 void AeonWindow::handleAeonUpdate(ULong ts)
 {
-  timestamp = ts;
+  ULong timestamp = ts;
   for (AeonElement* element : elements) {
     if (element->getType() != AeonElementType::TEXT_BOX) {
       continue;
@@ -77,7 +79,7 @@ void AeonWindow::handleMousePressed(const AeMouseButtonEvent& event)
   float evY = event.y - y - 4;
   for (AeonElement* element : elements) {
     if (element->intersects(evX, evY)) {
-      setFocused(element);
+      setFocusedElement(element);
       element->addState(AeonElementState::CLICKED);
     }
   }
@@ -94,6 +96,9 @@ void AeonWindow::handleMouseReleased(const AeMouseButtonEvent& event)
 
 void AeonWindow::handleKeyPressed(const AeKeyEvent& event)
 {
+  if (event.code == sf::Keyboard::Tab) {
+    handleTabKeyPressed(event.shift);
+  }
   if (!focusedElement || focusedElement->getType() != AeonElementType::TEXT_BOX) {
     return;
   }
@@ -259,15 +264,44 @@ void AeonWindow::updateContentDimension()
     aeContentSpr.setTexture(aeContent.getTexture());
   }
 }
+int AeonWindow::getElementIndex(AeonElement* focusedElement) const
+{
+  auto it = std::find(elements.begin(), elements.end(), focusedElement);
+  if (it != elements.end()) {
+    size_t index = std::distance(elements.begin(), it);  // Get the index
+    return index;
+  }
+  return -1;
+}
 
-void AeonWindow::setFocused(AeonElement* element)
+void AeonWindow::setFocusedElement(AeonElement* element)
 {
   if (focusedElement == element) return;
   if (focusedElement) {
     focusedElement->setFocus(false);
   }
-  focusedElement = element;
-  focusedElement->setFocus(true);
+  if (element) {
+    focusedElement = element;
+    focusedElementIndex = getElementIndex(focusedElement);
+    focusedElement->setFocus(true);
+  } else {
+    focusedElement = nullptr;
+    focusedElementIndex = -1;
+  }
+}
+
+void AeonWindow::handleTabKeyPressed(bool isShiftPressed)
+{
+  if (isShiftPressed) {
+    if (focusedElementIndex < 1) {
+      focusedElementIndex = elements.size();
+    } else {
+      focusedElementIndex -= 1;
+    }
+  } else {
+    focusedElementIndex = (focusedElementIndex + 1) % elements.size();
+  }
+  setFocusedElement(elements[focusedElementIndex]);
 }
 
 }  // namespace ae

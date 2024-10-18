@@ -63,7 +63,7 @@ class AeonWindow : public Eng::Window, Eng::IOnRender {
  private:
   Vector<AeonElement*> elements;
   AeonElement* focusedElement;
-  ULong timestamp;
+  int focusedElementIndex;
   AeonHitBox hitBox;
   RoundedRectShape ring;
   sf::RenderTexture aeContent;
@@ -79,7 +79,11 @@ class AeonWindow : public Eng::Window, Eng::IOnRender {
   void updateContentPosition();
   void updateContentDimension();
 
-  void setFocused(AeonElement* element);
+  int getElementIndex(AeonElement* focusedElement) const;
+
+  void setFocusedElement(AeonElement* element);
+
+  void handleTabKeyPressed(bool isShiftPressed);
 };
 
 }  // namespace ae
