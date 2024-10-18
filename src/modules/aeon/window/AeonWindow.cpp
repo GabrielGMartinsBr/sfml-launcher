@@ -128,6 +128,9 @@ void AeonWindow::setIsFocused(bool value)
 {
   isFocused = value;
   isRingVisible = value;
+  if (!isFocused) {
+    setFocusedElement(nullptr);
+  }
 }
 
 /*
