@@ -3,11 +3,11 @@
 #include <ruby.h>
 
 #include "aeon/base/AeonIntegratorBase.hpp"
-#include "aeon/window/AeonButtonElement.h"
+#include "aeon/window/AeonTextBoxElement.h"
 
 namespace ae {
 
-struct AeButtonIntegrator : public AeonIntegratorBase<AeonButtonElement> {
+struct AeTextBoxIntegrator : public AeonIntegratorBase<AeonTextBoxElement> {
   static VALUE classObject;
 
   static void integrate(VALUE aeonModule);
@@ -38,5 +38,4 @@ struct AeButtonIntegrator : public AeonIntegratorBase<AeonButtonElement> {
 
   static VALUE flush(VALUE self);
 };
-
 }  // namespace ae

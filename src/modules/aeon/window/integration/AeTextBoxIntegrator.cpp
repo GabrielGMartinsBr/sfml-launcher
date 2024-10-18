@@ -1,11 +1,10 @@
-#include "./AeButtonIntegrator.h"
+#include "./AeTextBoxIntegrator.h"
 
 #include <SFML/System/String.hpp>
 #include <cassert>
 
 #include "AppDefs.h"
-#include "aeon/window/AeonButtonElement.h"
-#include "aeon/window/AeonStyleSheet.h"
+#include "aeon/window/AeonTextBoxElement.h"
 #include "aeon/window/integration/AeElementStyleParser.hpp"
 #include "integrator/Convert.hpp"
 
@@ -14,13 +13,13 @@ namespace ae {
 using app::CStr;
 using app::String;
 
-VALUE AeButtonIntegrator::classObject;
+VALUE AeTextBoxIntegrator::classObject;
 
 // Integrate to ruby
 
-void AeButtonIntegrator::integrate(VALUE aeonModule)
+void AeTextBoxIntegrator::integrate(VALUE aeonModule)
 {
-  classObject = rb_define_class_under(aeonModule, "Button", rb_cObject);
+  classObject = rb_define_class_under(aeonModule, "TextBox", rb_cObject);
   rb_define_alloc_func(classObject, instanceAllocator);
 
   rb_define_method(classObject, "initialize", RUBY_METHOD_FUNC(initialize), -1);
@@ -45,21 +44,21 @@ void AeButtonIntegrator::integrate(VALUE aeonModule)
 
 // Instance allocator
 
-VALUE AeButtonIntegrator::instanceAllocator(VALUE instanceClass)
+VALUE AeTextBoxIntegrator::instanceAllocator(VALUE instanceClass)
 {
   return Data_Wrap_Struct(instanceClass, instanceMark, instanceFree, nullptr);
 }
 
 // Instance deallocator
 
-void AeButtonIntegrator::instanceFree(void *ptr)
+void AeTextBoxIntegrator::instanceFree(void *ptr)
 {
-  delete static_cast<AeonButtonElement *>(ptr);
+  delete static_cast<AeonTextBoxElement *>(ptr);
 }
 
 // Instance mark
 
-void AeButtonIntegrator::instanceMark(void *ptr) { }
+void AeTextBoxIntegrator::instanceMark(void *ptr) { }
 
 /*
   ⇩⇩⇩ Instance props and methods ⇩⇩⇩
@@ -67,10 +66,9 @@ void AeButtonIntegrator::instanceMark(void *ptr) { }
 
 // Initialize
 
-VALUE AeButtonIntegrator::initialize(int argc, VALUE *argv, VALUE self)
+VALUE AeTextBoxIntegrator::initialize(int argc, VALUE *argv, VALUE self)
 {
-  ElementBounds bounds;
-  AeonButtonElement *instance = new AeonButtonElement(bounds);
+  AeonTextBoxElement *instance = new AeonTextBoxElement();
 
   DATA_PTR(self) = instance;
   instance->handleInitialize(self);
@@ -80,9 +78,9 @@ VALUE AeButtonIntegrator::initialize(int argc, VALUE *argv, VALUE self)
 
 // Set element size
 
-VALUE AeButtonIntegrator::setSize(VALUE self, VALUE _width, VALUE _height)
+VALUE AeTextBoxIntegrator::setSize(VALUE self, VALUE _width, VALUE _height)
 {
-  AeonButtonElement &inst = AeonIntegratorBase::getWrappedObject(self);
+  AeonTextBoxElement &inst = AeonIntegratorBase::getWrappedObject(self);
 
   float width = Convert::toCDouble2(_width);
   float height = Convert::toCDouble2(_height);
@@ -96,9 +94,9 @@ VALUE AeButtonIntegrator::setSize(VALUE self, VALUE _width, VALUE _height)
 
 // Set element position
 
-VALUE AeButtonIntegrator::setPosition(VALUE self, VALUE rbX, VALUE rbY)
+VALUE AeTextBoxIntegrator::setPosition(VALUE self, VALUE rbX, VALUE rbY)
 {
-  AeonButtonElement &inst = AeonIntegratorBase::getWrappedObject(self);
+  AeonTextBoxElement &inst = AeonIntegratorBase::getWrappedObject(self);
 
   float x = Convert::toCDouble2(rbX);
   float y = Convert::toCDouble2(rbY);
@@ -110,68 +108,68 @@ VALUE AeButtonIntegrator::setPosition(VALUE self, VALUE rbX, VALUE rbY)
   return Qnil;
 }
 
-VALUE AeButtonIntegrator::setStyleProp(VALUE self, VALUE propKey, VALUE value)
+VALUE AeTextBoxIntegrator::setStyleProp(VALUE self, VALUE propKey, VALUE value)
 {
-  AeonButtonElement &inst = AeonIntegratorBase::getWrappedObject(self);
+  AeonTextBoxElement &inst = AeonIntegratorBase::getWrappedObject(self);
   AeElementStyleParser::setStyleProp(inst, propKey, value);
   return Qnil;
 }
 
 // Set text var
 
-VALUE AeButtonIntegrator::setText(VALUE self, VALUE value)
+VALUE AeTextBoxIntegrator::setText(VALUE self, VALUE value)
 {
-  AeonButtonElement &inst = AeonIntegratorBase::getWrappedObject(self);
-  const String &resValue = inst.setText(Convert::toCStr(value));
-  inst.setInstanceVar("@text", resValue);
+  AeonTextBoxElement &inst = AeonIntegratorBase::getWrappedObject(self);
+  // const String &resValue = inst.setText(Convert::toCStr(value));
+  // inst.setInstanceVar("@text", resValue);
   return Qnil;
 }
 
-VALUE AeButtonIntegrator::getter_x(VALUE self)
+VALUE AeTextBoxIntegrator::getter_x(VALUE self)
 {
-  AeonButtonElement &inst = AeonIntegratorBase::getWrappedObject(self);
+  AeonTextBoxElement &inst = AeonIntegratorBase::getWrappedObject(self);
   VALUE value = inst.toRubyValue(inst.getBounds().x());
   return value;
 }
 
-VALUE AeButtonIntegrator::setter_x(VALUE self, VALUE value)
+VALUE AeTextBoxIntegrator::setter_x(VALUE self, VALUE value)
 {
-  AeonButtonElement &inst = AeonIntegratorBase::getWrappedObject(self);
+  AeonTextBoxElement &inst = AeonIntegratorBase::getWrappedObject(self);
   inst.x(Convert::toCDouble2(value));
   inst.setInstanceVar("@x", value);
   return value;
 }
 
-VALUE AeButtonIntegrator::getter_y(VALUE self)
+VALUE AeTextBoxIntegrator::getter_y(VALUE self)
 {
-  AeonButtonElement &inst = AeonIntegratorBase::getWrappedObject(self);
+  AeonTextBoxElement &inst = AeonIntegratorBase::getWrappedObject(self);
   VALUE value = inst.toRubyValue(inst.getBounds().y());
   return value;
 }
 
-VALUE AeButtonIntegrator::setter_y(VALUE self, VALUE value)
+VALUE AeTextBoxIntegrator::setter_y(VALUE self, VALUE value)
 {
-  AeonButtonElement &inst = AeonIntegratorBase::getWrappedObject(self);
+  AeonTextBoxElement &inst = AeonIntegratorBase::getWrappedObject(self);
   inst.y(Convert::toCDouble2(value));
   inst.setInstanceVar("@y", value);
   return value;
 }
 
-VALUE AeButtonIntegrator::getter_width(VALUE self)
+VALUE AeTextBoxIntegrator::getter_width(VALUE self)
 {
-  AeonButtonElement &inst = AeonIntegratorBase::getWrappedObject(self);
+  AeonTextBoxElement &inst = AeonIntegratorBase::getWrappedObject(self);
   return inst.toRubyValue(inst.getBounds().width());
 }
 
-VALUE AeButtonIntegrator::getter_height(VALUE self)
+VALUE AeTextBoxIntegrator::getter_height(VALUE self)
 {
-  AeonButtonElement &inst = AeonIntegratorBase::getWrappedObject(self);
+  AeonTextBoxElement &inst = AeonIntegratorBase::getWrappedObject(self);
   return inst.toRubyValue(inst.getBounds().height());
 }
 
-VALUE AeButtonIntegrator::flush(VALUE self)
+VALUE AeTextBoxIntegrator::flush(VALUE self)
 {
-  AeonButtonElement &inst = AeonIntegratorBase::getWrappedObject(self);
+  AeonTextBoxElement &inst = AeonIntegratorBase::getWrappedObject(self);
   inst.flush();
   return Qnil;
 }

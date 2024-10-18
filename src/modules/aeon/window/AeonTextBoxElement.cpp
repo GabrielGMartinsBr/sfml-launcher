@@ -1,46 +1,29 @@
+#include "./AeonTextBoxElement.h"
 
-#include "aeon/window/AeonButtonElement.h"
-
-#include <SFML/Graphics/CircleShape.hpp>
-#include <SFML/Graphics/Color.hpp>
-#include <SFML/Graphics/Font.hpp>
-
-#include "aeon/enums/AeonElementState.h"
+#include "aeon/toolkit/ElementBounds.h"
 #include "aeon/window/AeonStyleSheet.h"
 #include "engnine/base/Fonts.h"
 
 namespace ae {
 
-// Constructor
-
-AeonButtonElement::AeonButtonElement(const ElementBounds& bounds) :
-    AeonElement(bounds, buttonDefaultStyle),
+AeonTextBoxElement::AeonTextBoxElement() :
+    AeonElement(ElementBounds(), textBoxDefaultStyle),
     textFont(nullptr),
     fontSize(16)
 {
   applyStyle();
   applyBounds();
+  text.setString("TextBox works!");
 }
 
-void AeonButtonElement::drawTo(RenderTarget& target)
+void AeonTextBoxElement::drawTo(RenderTarget& target)
 {
   refreshValues();
   shape.drawTo(target);
   target.draw(text);
 }
 
-/*
-  ⇩⇩⇩ Window Elements Methods ⇩⇩⇩
-*/
-
-const sf::String& AeonButtonElement::setText(const sf::String& value)
-{
-  textString = value;
-  text.setString(textString);
-  return textString;
-}
-
-void AeonButtonElement::flush()
+void AeonTextBoxElement::flush()
 {
   refreshValues();
 }
@@ -49,7 +32,7 @@ void AeonButtonElement::flush()
   ⇩⇩⇩ Private ⇩⇩⇩
 */
 
-void AeonButtonElement::refreshValues()
+void AeonTextBoxElement::refreshValues()
 {
   if (dirtyState) {
     applyState();
@@ -59,16 +42,13 @@ void AeonButtonElement::refreshValues()
     applyStyle();
     dirtyStyle = false;
   }
-  if (sizeUndefined) {
-    adaptToTextSize();
-  }
   if (dirtyBounds) {
     applyBounds();
     dirtyBounds = false;
   }
 }
 
-void AeonButtonElement::applyBounds()
+void AeonTextBoxElement::applyBounds()
 {
   shape.position(bounds.position());
   shape.size(bounds.size());
@@ -90,7 +70,7 @@ void AeonButtonElement::applyBounds()
   text.setPosition(bounds.position());
 }
 
-void AeonButtonElement::applyState()
+void AeonTextBoxElement::applyState()
 {
   applyStyle();
   applyStateStyle(AeonElementState::HOVER);
@@ -98,12 +78,12 @@ void AeonButtonElement::applyState()
   applyStateStyle(AeonElementState::CLICKED);
 }
 
-void AeonButtonElement::applyStyle()
+void AeonTextBoxElement::applyStyle()
 {
   applyStyle(defaultStyle);
 }
 
-void AeonButtonElement::applyStyle(const AeonStyleSheet& style)
+void AeonTextBoxElement::applyStyle(const AeonStyleSheet& style)
 {
   if (style.radius.has_value()) shape.radius(style.radius.value());
   if (style.borderSize.has_value()) shape.borderSize(style.borderSize.value());
@@ -124,31 +104,12 @@ void AeonButtonElement::applyStyle(const AeonStyleSheet& style)
   }
 }
 
-void AeonButtonElement::applyStateStyle(AeonElementState state)
+void AeonTextBoxElement::applyStateStyle(AeonElementState state)
 {
   if (!hasState(state)) {
     return;
   }
   applyStyle(getStateStyle(state));
-}
-
-void AeonButtonElement::adaptToTextSize()
-{
-  if (!textFont || textString.isEmpty()) return;
-
-  const sf::FloatRect& globalBounds = text.getGlobalBounds();
-  float px = 0;
-  float py = 0;
-  float border = 0;
-  if (defaultStyle.padding.has_value()) {
-    px = defaultStyle.padding.value().x;
-    py = defaultStyle.padding.value().y;
-  }
-  if (defaultStyle.borderSize.has_value()) {
-    border = defaultStyle.borderSize.value();
-  }
-  bounds.width(globalBounds.width + (px + border) * 2);
-  bounds.height(globalBounds.height + (py + border) * 2);
 }
 
 }  // namespace ae

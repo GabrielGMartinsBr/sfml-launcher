@@ -53,6 +53,10 @@ struct AeElementStyleParser {
         style->fontSize = parseFloat(value);
         break;
       }
+      case hashString("fontName"): {
+        style->fontName = parseString(value);
+        break;
+      }
       case hashString("bgColor"): {
         style->bgColor = parseColor(value);
         break;
@@ -120,6 +124,11 @@ struct AeElementStyleParser {
   static Eng::Color parseColor(VALUE rawValue)
   {
     return ColorParser::hexToNrgssColor(Convert::toCStr(rawValue));
+  }
+
+  static app::String parseString(VALUE rawValue)
+  {
+    return Convert::toCString(rawValue);
   }
 };
 

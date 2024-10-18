@@ -208,7 +208,9 @@ void AeonWindow::updateContentPosition()
 void AeonWindow::updateContentDimension()
 {
   if (width > 0 && height > 0) {
-    aeContent.create(width - 8, height - 8);
+    sf::ContextSettings settings;
+    settings.antialiasingLevel = 0;
+    aeContent.create(width - 8, height - 8, settings);
     aeContentSpr.setTexture(aeContent.getTexture());
   }
 }

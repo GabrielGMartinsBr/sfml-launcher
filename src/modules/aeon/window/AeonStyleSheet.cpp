@@ -36,4 +36,18 @@ AeonStyleSheetBase buttonDefaultStyle = {
   .textColor = "#fff"
 };
 
+AeonStyleSheetBase textBoxDefaultStyle = {
+  .ringSize = 0,
+  .ringOffset = 0,
+  .borderSize = 2.5,
+  .radius = 2,
+  .fontSize = 16,
+  .padding = { 9, 6 },
+  .fontName = "Arial",
+  .ringColor = "#fcbf8199",
+  .borderColor = "#fff",
+  .bgColor = "#fff6",
+  .textColor = "#fff"
+};
+
 }  // namespace ae

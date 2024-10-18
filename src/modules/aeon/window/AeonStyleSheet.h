@@ -44,5 +44,6 @@ struct AeonStyleSheet {
 };
 
 extern AeonStyleSheetBase buttonDefaultStyle;
+extern AeonStyleSheetBase textBoxDefaultStyle;
 
 }  // namespace ae
