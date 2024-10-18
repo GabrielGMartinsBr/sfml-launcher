@@ -4,6 +4,7 @@
 #include <cassert>
 
 #include "AppDefs.h"
+#include "StringUtils.hpp"
 #include "aeon/window/AeonTextBoxElement.h"
 #include "aeon/window/integration/AeElementStyleParser.hpp"
 #include "integrator/Convert.hpp"
@@ -120,7 +121,8 @@ VALUE AeTextBoxIntegrator::setStyleProp(VALUE self, VALUE propKey, VALUE value)
 VALUE AeTextBoxIntegrator::setValue(VALUE self, VALUE value)
 {
   AeonTextBoxElement &inst = AeonIntegratorBase::getWrappedObject(self);
-  const String &resValue = inst.setValue(Convert::toCStr(value));
+  CStr rawStr = Convert::toCStr(value);
+  const String &resValue = inst.setValue(StringUtils::fromUtf8(rawStr));
   inst.setInstanceVar("@value", resValue);
   return Qnil;
 }
