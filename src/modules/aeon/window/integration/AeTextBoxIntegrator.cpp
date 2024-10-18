@@ -29,6 +29,7 @@ void AeTextBoxIntegrator::integrate(VALUE aeonModule)
   rb_define_method(classObject, "setStyle", RUBY_METHOD_FUNC(setStyleProp), 2);
 
   rb_define_method(classObject, "setValue", RUBY_METHOD_FUNC(setValue), 1);
+  rb_define_method(classObject, "setIsPassword", RUBY_METHOD_FUNC(setIsPassword), 1);
 
   rb_define_method(classObject, "x", RUBY_METHOD_FUNC(getter_x), 0);
   rb_define_method(classObject, "x=", RUBY_METHOD_FUNC(setter_x), 1);
@@ -124,6 +125,15 @@ VALUE AeTextBoxIntegrator::setValue(VALUE self, VALUE value)
   CStr rawStr = Convert::toCStr(value);
   const String &resValue = inst.setValue(StringUtils::fromUtf8(rawStr));
   inst.setInstanceVar("@value", resValue);
+  return Qnil;
+}
+
+VALUE AeTextBoxIntegrator::setIsPassword(VALUE self, VALUE value)
+{
+  AeonTextBoxElement &inst = AeonIntegratorBase::getWrappedObject(self);
+  bool isPassword = Convert::toCBool(value);
+  inst.setIsPassword(isPassword);
+  inst.setInstanceVar("@isPassword", value);
   return Qnil;
 }
 

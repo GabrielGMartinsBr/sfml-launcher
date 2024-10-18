@@ -23,6 +23,7 @@ AeonTextBoxElement::AeonTextBoxElement() :
     valueString(""),
     cursorIndex(0),
     showCursor(false),
+    isPassword(false),
     dirtyTextValue(false)
 {
   applyStyle();
@@ -90,6 +91,7 @@ const sf::String& AeonTextBoxElement::getValue()
 const sf::String& AeonTextBoxElement::setValue(const sf::String& value)
 {
   valueString = value;
+  cursorIndex = valueString.getSize();
   dirtyTextValue = true;
   return valueString;
 }
@@ -100,6 +102,12 @@ void AeonTextBoxElement::setFocus(bool value)
   if (hasFocusValue) {
     revealCursor();
   }
+}
+
+void AeonTextBoxElement::setIsPassword(bool value)
+{
+  isPassword = true;
+  dirtyTextValue = true;
 }
 
 /*
@@ -182,8 +190,7 @@ void AeonTextBoxElement::applyStateStyle(AeonElementState state)
 
 void AeonTextBoxElement::applyTextValue()
 {
-  text.setString(valueString);
-  cursorIndex = valueString.getSize();
+  text.setString(isPassword ? getPasswordText() : valueString);
   alignText();
 }
 
@@ -216,6 +223,10 @@ void AeonTextBoxElement::alignText()
     -(bounds.height() - leading - localBounds.top) / 2
   );
 
+  if (isPassword && !valueString.isEmpty()) {
+    textOrigin.y = -(bounds.height() - globalBounds.height) / 2 + localBounds.top;
+  }
+
   text.setOrigin(textOrigin);
   text.setPosition(bounds.position());
 
@@ -227,7 +238,6 @@ void AeonTextBoxElement::alignText()
 void AeonTextBoxElement::alignCursor()
 {
   sf::Vector2f cursorPosition(bounds.position());
-  bool isPassword = false;
 
   if (valueString.getSize() > 0) {
     if (!isPassword && textFont) {
@@ -236,8 +246,12 @@ void AeonTextBoxElement::alignCursor()
       befText.setCharacterSize(fontSize);
       cursorPosition.x = bounds.x() + befText.getGlobalBounds().width + 1;
     } else {
-      int index = std::max<int>(0, cursorIndex - 1);
-      cursorPosition.x = text.findCharacterPos(index).x;
+      int index = std::max<int>(-1, cursorIndex - 1);
+      if (index > -1) {
+        cursorPosition.x = text.findCharacterPos(index).x;
+      } else {
+        cursorPosition.x = bounds.x();
+      }
     }
   }
 
@@ -277,7 +291,7 @@ void AeonTextBoxElement::handleBackspacePressed(bool isCtrlPressed)
     valueString.erase(cursorIndex - 1, 1);
     moveCursorLeft();
   }
-  text.setString(valueString);
+  applyTextValue();
   alignCursor();
   revealCursor();
 }
@@ -286,7 +300,7 @@ void AeonTextBoxElement::handleInput(sf::Uint32 unicode)
 {
   if (unicode < 128 || unicode >= 32) {
     valueString.insert(cursorIndex, unicode);
-    text.setString(valueString);
+    applyTextValue();
     moveCursorRight();
     // revealCursor();
   }
@@ -322,6 +336,19 @@ void AeonTextBoxElement::moveCursorRight(bool isCtrlPressed)
   }
   alignCursor();
   revealCursor();
+}
+
+/*
+  Utils
+*/
+
+sf::String AeonTextBoxElement::getPasswordText()
+{
+  sf::String passText = "";
+  for (int i = 0; i < valueString.getSize(); i++) {
+    passText += "*";
+  }
+  return passText;
 }
 
 }  // namespace ae

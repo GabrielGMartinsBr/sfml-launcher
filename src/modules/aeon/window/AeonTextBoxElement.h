@@ -38,6 +38,7 @@ class AeonTextBoxElement : public AeonElement, public AeonIntegrable {
   const sf::String& setValue(const sf::String& value);
 
   void setFocus(bool value);
+  void setIsPassword(bool value);
 
  private:
   RoundedRectShape shape;
@@ -47,8 +48,9 @@ class AeonTextBoxElement : public AeonElement, public AeonIntegrable {
   sf::String valueString;
   sf::Text text;
   size_t cursorIndex;
-  bool showCursor;
   ULong lastCursorBlinkTs;
+  bool showCursor;
+  bool isPassword;
   bool dirtyTextValue;
 
   void refreshValues();
@@ -70,9 +72,10 @@ class AeonTextBoxElement : public AeonElement, public AeonIntegrable {
   void handleBackspacePressed(bool isCtrlPressed);
   void handleInput(sf::Uint32 unicode);
 
-
   void moveCursorLeft(bool isCtrlPressed = false);
   void moveCursorRight(bool isCtrlPressed = false);
+
+  sf::String getPasswordText();
 };
 
 }  // namespace ae
