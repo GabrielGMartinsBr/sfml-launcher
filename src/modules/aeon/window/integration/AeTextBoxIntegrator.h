@@ -22,6 +22,7 @@ struct AeTextBoxIntegrator : public AeonIntegratorBase<AeonTextBoxElement> {
   static VALUE setSize(VALUE self, VALUE width, VALUE height);
 
   static VALUE setStyleProp(VALUE self, VALUE propKey, VALUE value);
+  static VALUE setStyleSheet(int argc, VALUE *argv, VALUE self);
 
   static VALUE setValue(VALUE self, VALUE value);
   static VALUE setIsPassword(VALUE self, VALUE value);

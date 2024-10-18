@@ -3,7 +3,6 @@
 #include <ruby.h>
 
 #include "AppDefs.h"
-#include "RbUtils.hpp"
 #include "aeon/window/AeonElement.h"
 #include "aeon/window/AeonWindow.h"
 #include "integrator/It_Bitmap.hpp"
@@ -93,10 +92,9 @@ VALUE AeWindowIntegrator::meth_initialize(int argc, VALUE *argv, VALUE self)
     return self;
   }
 
-  RbUtils::raiseRuntimeException(
+  return raiseException(
     "Window initialize takes 0 or 1 argument, but " + std::to_string(argc) + " were received."
   );
-  return Qnil;
 }
 
 VALUE AeWindowIntegrator::addElement(VALUE self, VALUE value)
@@ -225,15 +223,6 @@ VALUE AeWindowIntegrator::setter_height(VALUE self, VALUE value)
 {
   AeonWindow *inst = AeWindowIntegrator::getObjectValue(self);
   return inst->setter_height(value);
-}
-
-/*
-  Utils
-*/
-
-AeonWindow *AeWindowIntegrator::getObjectValue(VALUE rbObj)
-{
-  return (AeonWindow *)DATA_PTR(rbObj);
 }
 
 }  // namespace ae

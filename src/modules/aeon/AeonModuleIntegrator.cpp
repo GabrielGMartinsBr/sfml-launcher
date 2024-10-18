@@ -3,6 +3,7 @@
 #include <ruby.h>
 
 #include "aeon/window/integration/AeButtonIntegrator.h"
+#include "aeon/window/integration/AeStyleSheetIntegrator.h"
 #include "aeon/window/integration/AeTextBoxIntegrator.h"
 #include "aeon/window/integration/AeWindowIntegrator.h"
 
@@ -17,6 +18,7 @@ void AeonModuleIntegrator::integrate()
   AeWindowIntegrator::integrate(aeonModule);
   AeButtonIntegrator::integrate(aeonModule);
   AeTextBoxIntegrator::integrate(aeonModule);
+  AeStyleSheetIntegrator::integrate(aeonModule);
 }
 
 }  // namespace ae

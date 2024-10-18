@@ -5,8 +5,11 @@
 
 #include "AppDefs.h"
 #include "StringUtils.hpp"
+#include "aeon/enums/AeonElementState.h"
+#include "aeon/window/AeonStyleSheet.h"
 #include "aeon/window/AeonTextBoxElement.h"
 #include "aeon/window/integration/AeElementStyleParser.hpp"
+#include "aeon/window/integration/AeStyleSheetIntegrator.h"
 #include "integrator/Convert.hpp"
 
 namespace ae {
@@ -27,6 +30,8 @@ void AeTextBoxIntegrator::integrate(VALUE aeonModule)
   rb_define_method(classObject, "setPosition", RUBY_METHOD_FUNC(setPosition), 2);
   rb_define_method(classObject, "setSize", RUBY_METHOD_FUNC(setSize), 2);
   rb_define_method(classObject, "setStyle", RUBY_METHOD_FUNC(setStyleProp), 2);
+
+  rb_define_method(classObject, "setStyleSheet", RUBY_METHOD_FUNC(setStyleSheet), -1);
 
   rb_define_method(classObject, "setValue", RUBY_METHOD_FUNC(setValue), 1);
   rb_define_method(classObject, "setIsPassword", RUBY_METHOD_FUNC(setIsPassword), 1);
@@ -108,6 +113,31 @@ VALUE AeTextBoxIntegrator::setPosition(VALUE self, VALUE rbX, VALUE rbY)
   inst.setInstanceVar("@y", rbY);
 
   return Qnil;
+}
+
+VALUE AeTextBoxIntegrator::setStyleSheet(int argc, VALUE *argv, VALUE self)
+{
+  AeonTextBoxElement &inst = getWrappedObject(self);
+
+  if (argc == 1) {
+    AeonStyleSheet &style = AeStyleSheetIntegrator::getWrappedObject(argv[0]);
+    inst.setStyle(style);
+    return Qnil;
+  }
+
+  if (argc == 2) {
+    CStr stateName = Convert::toCStr(argv[0]);
+    AeonElementState state = AeElementStyleParser::parseElementState(stateName);
+    if (state != AeonElementState::DEFAULT && state != AeonElementState::UNKNOW) {
+      AeonStyleSheet &style = AeStyleSheetIntegrator::getWrappedObject(argv[1]);
+      inst.setStateStyle(state, style);
+      return Qnil;
+    } else {
+      return raiseException("Invalid Element state received on setStyleSheet method");
+    }
+  }
+
+  return raiseException("setStyleSheet takes 1 or 2 arguments");
 }
 
 VALUE AeTextBoxIntegrator::setStyleProp(VALUE self, VALUE propKey, VALUE value)

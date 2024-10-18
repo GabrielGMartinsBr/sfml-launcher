@@ -7,6 +7,7 @@
 #include "aeon/window/AeonButtonElement.h"
 #include "aeon/window/AeonStyleSheet.h"
 #include "aeon/window/integration/AeElementStyleParser.hpp"
+#include "aeon/window/integration/AeStyleSheetIntegrator.h"
 #include "integrator/Convert.hpp"
 
 namespace ae {
@@ -29,6 +30,7 @@ void AeButtonIntegrator::integrate(VALUE aeonModule)
   rb_define_method(classObject, "setText", RUBY_METHOD_FUNC(setText), 1);
 
   rb_define_method(classObject, "setStyle", RUBY_METHOD_FUNC(setStyleProp), 2);
+  rb_define_method(classObject, "setStyleSheet", RUBY_METHOD_FUNC(setStyleSheet), -1);
 
   rb_define_method(classObject, "x", RUBY_METHOD_FUNC(getter_x), 0);
   rb_define_method(classObject, "x=", RUBY_METHOD_FUNC(setter_x), 1);
@@ -115,6 +117,31 @@ VALUE AeButtonIntegrator::setStyleProp(VALUE self, VALUE propKey, VALUE value)
   AeonButtonElement &inst = AeonIntegratorBase::getWrappedObject(self);
   AeElementStyleParser::setStyleProp(inst, propKey, value);
   return Qnil;
+}
+
+VALUE AeButtonIntegrator::setStyleSheet(int argc, VALUE *argv, VALUE self)
+{
+  AeonButtonElement &inst = getWrappedObject(self);
+
+  if (argc == 1) {
+    AeonStyleSheet &style = AeStyleSheetIntegrator::getWrappedObject(argv[0]);
+    inst.setStyle(style);
+    return Qnil;
+  }
+
+  if (argc == 2) {
+    CStr stateName = Convert::toCStr(argv[0]);
+    AeonElementState state = AeElementStyleParser::parseElementState(stateName);
+    if (state != AeonElementState::DEFAULT && state != AeonElementState::UNKNOW) {
+      AeonStyleSheet &style = AeStyleSheetIntegrator::getWrappedObject(argv[1]);
+      inst.setStateStyle(state, style);
+      return Qnil;
+    } else {
+      return raiseException("Invalid Element state received on setStyleSheet method");
+    }
+  }
+
+  return raiseException("setStyleSheet takes 1 or 2 arguments");
 }
 
 // Set text var

@@ -3,10 +3,13 @@
 #include <ruby.h>
 
 #include "AppDefs.h"
+#include "RbUtils.hpp"
+#include "aeon/base/WrappedList.hpp"
 
 namespace ae {
 
 using app::SPtr;
+using app::String;
 
 template <typename RubyClass>
 struct AeonIntegratorBase {
@@ -27,6 +30,17 @@ struct AeonIntegratorBase {
     SPtr<RubyClass> *ptr = static_cast<SPtr<RubyClass> *>(DATA_PTR(rbId));
     assert(ptr);
     return **ptr;
+  }
+
+  static VALUE raiseException(String msg)
+  {
+    RbUtils::raiseRuntimeException(msg);
+    return Qnil;
+  }
+
+  static WrappedList &wrapList()
+  {
+    return WrappedList::Instance();
   }
 };
 

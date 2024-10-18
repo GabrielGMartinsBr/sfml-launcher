@@ -2,11 +2,12 @@
 
 #include <ruby.h>
 
+#include "aeon/base/AeonIntegratorBase.hpp"
 #include "aeon/window/AeonWindow.h"
 
 namespace ae {
 
-struct AeWindowIntegrator {
+struct AeWindowIntegrator : public AeonIntegratorBase<AeonWindow> {
   static VALUE classObject;
 
   static void integrate(VALUE aeonModule);
@@ -36,9 +37,6 @@ struct AeWindowIntegrator {
   static VALUE setter_height(VALUE self, VALUE value);
 
   static VALUE addElement(VALUE self, VALUE value);
-
-  // Utils
-  static AeonWindow *getObjectValue(VALUE rbObj);
 };
 
 }  // namespace ae

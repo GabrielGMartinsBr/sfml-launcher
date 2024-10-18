@@ -32,8 +32,8 @@ AeonWindow::AeonWindow(VALUE rbObj, Eng::Viewport* viewport) :
 {
   addedToEngineCycles = false;
   ring.fillColor("#0000");
-  ring.borderColor("#fa0d");
-  ring.borderSize(6);
+  ring.borderColor("#fa0c");
+  ring.borderSize(4);
   addToEngineCycles();
 }
 

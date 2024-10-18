@@ -22,6 +22,7 @@ struct AeButtonIntegrator : public AeonIntegratorBase<AeonButtonElement> {
   static VALUE setSize(VALUE self, VALUE width, VALUE height);
 
   static VALUE setStyleProp(VALUE self, VALUE propKey, VALUE value);
+  static VALUE setStyleSheet(int argc, VALUE *argv, VALUE self);
 
   static VALUE setText(VALUE self, VALUE value);
 

@@ -13,6 +13,7 @@
 
 namespace ae {
 
+using app::CStr;
 using app::String;
 using KeyPair = std::pair<String, String>;
 
@@ -33,43 +34,44 @@ struct AeElementStyleParser {
       return;
     }
 
-    AeonStyleSheet* style = nullptr;
     if (state == AeonElementState::DEFAULT) {
-      style = &element.getMutableStyle();
+      setStyleProp(element.getMutableStyle(), key.second.c_str(), value);
     } else {
-      style = &element.getMutableStyle(state);
+      setStyleProp(element.getMutableStyle(state), key.second.c_str(), value);
     }
+  }
 
-    switch (hashString(key.second.c_str())) {
+  static void setStyleProp(AeonStyleSheet& style, CStr name, VALUE value)
+  {
+    switch (hashString(name)) {
       case hashString("radius"): {
-        style->radius = parseFloat(value);
+        style.radius = parseFloat(value);
         break;
       }
       case hashString("borderSize"): {
-        style->borderSize = parseFloat(value);
+        style.borderSize = parseFloat(value);
         break;
       }
       case hashString("fontSize"): {
-        style->fontSize = parseFloat(value);
+        style.fontSize = parseFloat(value);
         break;
       }
       case hashString("fontName"): {
-        style->fontName = parseString(value);
+        style.fontName = parseString(value);
         break;
       }
       case hashString("fillColor"): {
-        style->fillColor = parseColor(value);
+        style.fillColor = parseColor(value);
         break;
       }
       case hashString("borderColor"): {
-        style->borderColor = parseColor(value);
+        style.borderColor = parseColor(value);
         break;
       }
       case hashString("textColor"): {
-        style->textColor = parseColor(value);
+        style.textColor = parseColor(value);
         break;
       }
-
       default: {
         break;
       }
