@@ -44,6 +44,7 @@ class AeonButtonElement : public AeonElement, public AeonIntegrable {
   void applyStyle(const AeonStyleSheet& style);
   void applyStateStyle(AeonElementState state);
 
+  void alignText();
   void adaptToTextSize();
 
 };

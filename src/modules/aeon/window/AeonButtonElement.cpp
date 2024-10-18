@@ -72,22 +72,7 @@ void AeonButtonElement::applyBounds()
 {
   shape.position(bounds.position());
   shape.size(bounds.size());
-
-  if (!textFont) return;
-
-  text.setCharacterSize(fontSize);
-
-  float leading = textFont->getLineSpacing(fontSize);
-  const sf::FloatRect& globalBounds = text.getGlobalBounds();
-  const sf::FloatRect& localBounds = text.getLocalBounds();
-
-  Vector2f textOrigin(
-    -(bounds.width() - globalBounds.width) / 2,
-    -(bounds.height() - leading - localBounds.top) / 2
-  );
-
-  text.setOrigin(textOrigin);
-  text.setPosition(bounds.position());
+  alignText();
 }
 
 void AeonButtonElement::applyState()
@@ -130,6 +115,25 @@ void AeonButtonElement::applyStateStyle(AeonElementState state)
     return;
   }
   applyStyle(getStateStyle(state));
+}
+
+void AeonButtonElement::alignText()
+{
+  if (!textFont) return;
+
+  text.setCharacterSize(fontSize);
+
+  float leading = textFont->getLineSpacing(fontSize);
+  const sf::FloatRect& globalBounds = text.getGlobalBounds();
+  const sf::FloatRect& localBounds = text.getLocalBounds();
+
+  Vector2f textOrigin(
+    -(bounds.width() - globalBounds.width) / 2,
+    -(bounds.height() - leading - localBounds.top) / 2
+  );
+
+  text.setOrigin(textOrigin);
+  text.setPosition(bounds.position());
 }
 
 void AeonButtonElement::adaptToTextSize()

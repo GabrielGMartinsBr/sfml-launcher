@@ -1,5 +1,6 @@
 #include "./AeonTextBoxElement.h"
 
+#include "aeon/enums/AeonElementState.h"
 #include "aeon/toolkit/ElementBounds.h"
 #include "aeon/window/AeonStyleSheet.h"
 #include "engnine/base/Fonts.h"
@@ -36,6 +37,7 @@ void AeonTextBoxElement::refreshValues()
 {
   if (dirtyState) {
     applyState();
+    alignText();
     dirtyState = false;
   }
   if (dirtyStyle) {
@@ -52,22 +54,7 @@ void AeonTextBoxElement::applyBounds()
 {
   shape.position(bounds.position());
   shape.size(bounds.size());
-
-  if (!textFont) return;
-
-  text.setCharacterSize(fontSize);
-
-  float leading = textFont->getLineSpacing(fontSize);
-  const sf::FloatRect& globalBounds = text.getGlobalBounds();
-  const sf::FloatRect& localBounds = text.getLocalBounds();
-
-  Vector2f textOrigin(
-    -(bounds.width() - globalBounds.width) / 2,
-    -(bounds.height() - leading - localBounds.top) / 2
-  );
-
-  text.setOrigin(textOrigin);
-  text.setPosition(bounds.position());
+  alignText();
 }
 
 void AeonTextBoxElement::applyState()
@@ -110,6 +97,39 @@ void AeonTextBoxElement::applyStateStyle(AeonElementState state)
     return;
   }
   applyStyle(getStateStyle(state));
+}
+
+void AeonTextBoxElement::alignText()
+{
+  if (!textFont) return;
+
+  text.setCharacterSize(fontSize);
+
+  float leading = textFont->getLineSpacing(fontSize);
+  const sf::FloatRect& globalBounds = text.getGlobalBounds();
+  const sf::FloatRect& localBounds = text.getLocalBounds();
+
+  const Vector2f padding = getCurrentPadding();
+
+  Vector2f textOrigin(
+    -padding.x,
+    -(bounds.height() - leading - localBounds.top) / 2
+  );
+
+  text.setOrigin(textOrigin);
+  text.setPosition(bounds.position());
+}
+
+const Vector2f AeonTextBoxElement::getCurrentPadding()
+{
+  Vector2f padding = defaultStyle.padding.value_or(Vector2f(0, 0));
+  if (hasState(AeonElementState::HOVER)) {
+    const AeonStyleSheet& style = getStateStyle(AeonElementState::HOVER);
+    if (style.padding.has_value()) {
+      padding = style.padding.value();
+    }
+  }
+  return padding;
 }
 
 }  // namespace ae
