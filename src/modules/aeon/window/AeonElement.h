@@ -17,13 +17,14 @@ using sf::RenderTarget;
 class AeonElement {
  public:
 
-  AeonElement(const ElementBounds& bounds, const AeonStyleSheet& style);
+  AeonElement(const ElementBounds& bounds);
+  AeonElement(const ElementBounds& bounds, const AeonStyleSheet& defaultStyle);
 
   inline virtual AeonElementType getType() const = 0;
 
   inline bool intersects(float x, float y) const
   {
-    return bounds.intersects(x, y, defaultStyle.borderSize);
+    return bounds.intersects(x, y, defaultStyle.borderSize.value_or(0));
   }
 
   virtual void drawTo(RenderTarget& target);
@@ -45,11 +46,15 @@ class AeonElement {
   bool hasState(AeonElementState state) const;
   void clearState();
 
-  const AeonStyleSheet& getStyle();
+  const AeonPartialStyleSheet& getStyle();
   void setStyle(const AeonPartialStyleSheet& style);
 
   const AeonPartialStyleSheet& getStateStyle(AeonElementState state);
   void setStateStyle(AeonElementState state, const AeonPartialStyleSheet& style);
+
+  AeonPartialStyleSheet& getMutableStyle();
+  AeonPartialStyleSheet& getMutableStyle(AeonElementState state);
+  AeonPartialStyleSheet& getMutableStyle(const String& stateName);
 
   bool isFocusable() const;
   void setFocusable(bool value);
@@ -58,7 +63,7 @@ class AeonElement {
  protected:
   ElementBounds bounds;
   uint8_t states;
-  AeonStyleSheet defaultStyle;
+  AeonPartialStyleSheet defaultStyle;
   UnMap<AeonElementState, AeonPartialStyleSheet> stateStyles;
   bool dirtyBounds;
   bool dirtyState;

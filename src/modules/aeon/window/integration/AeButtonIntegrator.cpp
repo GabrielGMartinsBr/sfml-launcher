@@ -7,10 +7,12 @@
 #include "aeon/toolkit/ColorParser.hpp"
 #include "aeon/window/AeonButtonElement.h"
 #include "aeon/window/AeonStyleSheet.h"
+#include "aeon/window/integration/AeElementStyleParser.hpp"
 #include "integrator/Convert.hpp"
 
 namespace ae {
 
+using app::CStr;
 using app::String;
 
 VALUE AeButtonIntegrator::classObject;
@@ -26,6 +28,8 @@ void AeButtonIntegrator::integrate(VALUE aeonModule)
   rb_define_method(classObject, "setPosition", RUBY_METHOD_FUNC(setPosition), 2);
   rb_define_method(classObject, "setSize", RUBY_METHOD_FUNC(setSize), 2);
   rb_define_method(classObject, "setText", RUBY_METHOD_FUNC(setText), 1);
+
+  rb_define_method(classObject, "setStyle", RUBY_METHOD_FUNC(setStyleProp), 2);
 
   rb_define_method(classObject, "x", RUBY_METHOD_FUNC(getter_x), 0);
   rb_define_method(classObject, "x=", RUBY_METHOD_FUNC(setter_x), 1);
@@ -61,21 +65,11 @@ void AeButtonIntegrator::instanceMark(void *ptr) { }
 VALUE AeButtonIntegrator::initialize(int argc, VALUE *argv, VALUE self)
 {
   ElementBounds bounds(32, 32, 160, 32);
-  AeonStyleSheet style;
 
-  AeonButtonElement *instance = new AeonButtonElement(bounds, style);
+  AeonButtonElement *instance = new AeonButtonElement(bounds);
 
   DATA_PTR(self) = instance;
   instance->handleInitialize(self);
-
-  AeonPartialStyleSheet hoverStyle;
-  hoverStyle.borderColor = ColorParser::hexToNrgssColor("#fa4");
-  instance->setStateStyle(AeonElementState::HOVER, hoverStyle);
-
-  AeonPartialStyleSheet clickedStyle;
-  // clickedStyle.borderColor = ColorParser::hexToNrgssColor("#f30");
-  clickedStyle.bgColor = ColorParser::hexToNrgssColor("#fdd");
-  instance->setStateStyle(AeonElementState::CLICKED, clickedStyle);
 
   return self;
 }
@@ -109,6 +103,13 @@ VALUE AeButtonIntegrator::setPosition(VALUE self, VALUE rbX, VALUE rbY)
   inst.setInstanceVar("@x", rbX);
   inst.setInstanceVar("@y", rbY);
 
+  return Qnil;
+}
+
+VALUE AeButtonIntegrator::setStyleProp(VALUE self, VALUE propKey, VALUE value)
+{
+  AeonButtonElement &inst = AeonIntegratorBase::getWrappedObject(self);
+  AeElementStyleParser::setStyleProp(inst, propKey, value);
   return Qnil;
 }
 

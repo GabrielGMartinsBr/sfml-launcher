@@ -9,7 +9,8 @@ enum struct AeonElementState {
   FOCUS_VISIBLE,
   CLICKED,
   DISABLED,
-  INVALID
+  INVALID,
+  UNKNOW
 };
 
 }

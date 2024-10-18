@@ -7,18 +7,33 @@
 
 namespace ae {
 
-AeonStyleSheet::AeonStyleSheet() :
-    ringSize(0),
-    ringOffset(3),
-    borderSize(2),
-    radius(0),
-    fontSize(18),
-    padding(9, 3),
-    fontName("Arial"),
-    ringColor(ColorParser::hexToNrgssColor("#fcbf8199")),
-    borderColor(ColorParser::hexToNrgssColor("#bbb")),
-    bgColor(ColorParser::hexToNrgssColor("#eee")),
-    textColor(ColorParser::hexToNrgssColor("#333"))
+AeonPartialStyleSheet::AeonPartialStyleSheet(const AeonStyleSheet& style) :
+    ringSize(style.ringSize),
+    ringOffset(style.ringOffset),
+    borderSize(style.borderSize),
+    radius(style.radius),
+    fontSize(style.fontSize),
+    padding(style.padding),
+    fontName(style.fontName),
+    ringColor(ColorParser::hexToNrgssColor(style.ringColor)),
+    borderColor(ColorParser::hexToNrgssColor(style.borderColor)),
+    bgColor(ColorParser::hexToNrgssColor(style.bgColor)),
+    textColor(ColorParser::hexToNrgssColor(style.textColor))
 {
 }
+
+AeonStyleSheet buttonDefaultStyle = {
+  .ringSize = 0,
+  .ringOffset = 0,
+  .borderSize = 2.5,
+  .radius = 2,
+  .fontSize = 18,
+  .padding = { 9, 3 },
+  .fontName = "Arial",
+  .ringColor = "#fcbf8199",
+  .borderColor = "#fff",
+  .bgColor = "#34ed",
+  .textColor = "#fff"
+};
+
 }  // namespace ae

@@ -5,13 +5,24 @@
 
 #include "aeon/enums/AeonElementState.h"
 #include "aeon/toolkit/ElementBounds.h"
+#include "aeon/window/AeonStyleSheet.h"
 
 namespace ae {
 
-AeonElement::AeonElement(const ElementBounds& bounds, const AeonStyleSheet& style) :
+AeonElement::AeonElement(const ElementBounds& bounds) :
     bounds(bounds),
     states(static_cast<uint8_t>(AeonElementState::DEFAULT)),
-    defaultStyle(style),
+    dirtyBounds(false),
+    dirtyState(false),
+    dirtyStyle(false),
+    focusable(true)
+{
+}
+
+AeonElement::AeonElement(const ElementBounds& bounds, const AeonStyleSheet& defaultStyle) :
+    bounds(bounds),
+    defaultStyle(defaultStyle),
+    states(static_cast<uint8_t>(AeonElementState::DEFAULT)),
     dirtyBounds(false),
     dirtyState(false),
     dirtyStyle(false),
@@ -93,7 +104,7 @@ void AeonElement::clearState()
   dirtyState = true;
 }
 
-const AeonStyleSheet& AeonElement::getStyle()
+const AeonPartialStyleSheet& AeonElement::getStyle()
 {
   return defaultStyle;
 }
@@ -133,6 +144,32 @@ void AeonElement::setStateStyle(AeonElementState state, const AeonPartialStyleSh
   if (style.borderColor) target.borderColor = *style.borderColor;
   if (style.bgColor) target.bgColor = *style.bgColor;
   if (style.textColor) target.textColor = *style.textColor;
+}
+
+AeonPartialStyleSheet& AeonElement::getMutableStyle()
+{
+  dirtyState = true;
+  return defaultStyle;
+}
+
+AeonPartialStyleSheet& AeonElement::getMutableStyle(AeonElementState state)
+{
+  dirtyState = true;
+  return stateStyles[state];
+}
+
+AeonPartialStyleSheet& AeonElement::getMutableStyle(const String& stateName)
+{
+  if (stateName == "hover") {
+    return getMutableStyle(AeonElementState::HOVER);
+  } else if (stateName == "focus")
+    return getMutableStyle(AeonElementState::FOCUS);
+  else if (stateName == "focusVisible")
+    return getMutableStyle(AeonElementState::FOCUS_VISIBLE);
+  else if (stateName == "clicked")
+    return getMutableStyle(AeonElementState::CLICKED);
+  else
+    return getMutableStyle(AeonElementState::DEFAULT);
 }
 
 bool AeonElement::isFocusable() const

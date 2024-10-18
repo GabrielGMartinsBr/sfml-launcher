@@ -136,6 +136,12 @@ void Engine::pollEvents()
       case sf::Event::MouseMoved:
         aeonWinMng.handleMouseMoved(event.mouseMove);
         break;
+      case sf::Event::MouseButtonPressed:
+        aeonWinMng.handleMousePressed(event.mouseButton);
+        break;
+      case sf::Event::MouseButtonReleased:
+        aeonWinMng.handleMouseReleased(event.mouseButton);
+        break;
       default:
         break;
     }

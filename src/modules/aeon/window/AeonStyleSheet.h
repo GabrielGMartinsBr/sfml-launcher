@@ -20,12 +20,10 @@ struct AeonStyleSheet {
   float fontSize;
   Vector2f padding;
   String fontName;
-  Color ringColor;
-  Color borderColor;
-  Color bgColor;
-  Color textColor;
-
-  AeonStyleSheet();
+  String ringColor;
+  String borderColor;
+  String bgColor;
+  String textColor;
 };
 
 struct AeonPartialStyleSheet {
@@ -40,6 +38,11 @@ struct AeonPartialStyleSheet {
   std::optional<Color> borderColor;
   std::optional<Color> bgColor;
   std::optional<Color> textColor;
+
+  AeonPartialStyleSheet() = default;
+  AeonPartialStyleSheet(const AeonStyleSheet& base);
 };
+
+extern AeonStyleSheet buttonDefaultStyle;
 
 }  // namespace ae

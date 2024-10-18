@@ -271,7 +271,7 @@ void Bitmap::fill_rect(int x, int y, int width, int height, Color* color)
   sf::Sprite sprite;
   sf::Image img;
   sf::Texture text;
-  sf::Color& sfColor = color->getSfColor();
+  const sf::Color& sfColor = color->getSfColor();
 
   img.create(this->width, this->height, sf::Color::Transparent);
 

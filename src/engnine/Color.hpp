@@ -143,7 +143,7 @@ class Color : public EngineBase {
     return value;
   }
 
-  sf::Color &getSfColor()
+  const sf::Color &getSfColor() const
   {
     return sfColor;
   }

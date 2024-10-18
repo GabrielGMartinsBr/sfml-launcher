@@ -16,10 +16,7 @@ class AeonButtonElement : public AeonElement, public AeonIntegrable {
  public:
   sf::String text;
 
-  AeonButtonElement(
-    const ElementBounds& bounds,
-    const AeonStyleSheet& style
-  );
+  AeonButtonElement(const ElementBounds& bounds);
 
   inline AeonElementType getType() const override
   {
@@ -35,8 +32,9 @@ class AeonButtonElement : public AeonElement, public AeonIntegrable {
 
   void refreshValues();
   void applyBounds();
-  void applyStyle();
   void applyState();
+  void applyStyle();
+  void applyStyle(const AeonPartialStyleSheet& style);
   void applyStateStyle(AeonElementState state);
 };
 

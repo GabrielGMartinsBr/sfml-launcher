@@ -179,6 +179,9 @@ float RoundedRectShape::radius() const
 
 void RoundedRectShape::radius(float radius)
 {
+  if (radiusValue == radius) {
+    return;
+  }
   radiusValue = radius;
   dirtyPoints = true;
 }
