@@ -88,7 +88,7 @@ void AeonTextBoxElement::applyStyle(const AeonStyleSheet& style)
   if (style.radius.has_value()) shape.radius(style.radius.value());
   if (style.borderSize.has_value()) shape.borderSize(style.borderSize.value());
   if (style.borderColor.has_value()) shape.borderColor(style.borderColor.value());
-  if (style.bgColor.has_value()) shape.fillColor(style.bgColor.value());
+  if (style.fillColor.has_value()) shape.fillColor(style.fillColor.value());
   if (style.textColor.has_value()) {
     text.setFillColor(style.textColor.value().getSfColor());
   }

@@ -22,7 +22,7 @@ struct AeonStyleSheetBase {
   String fontName;
   String ringColor;
   String borderColor;
-  String bgColor;
+  String fillColor;
   String textColor;
 };
 
@@ -36,7 +36,7 @@ struct AeonStyleSheet {
   std::optional<String> fontName;
   std::optional<Color> ringColor;
   std::optional<Color> borderColor;
-  std::optional<Color> bgColor;
+  std::optional<Color> fillColor;
   std::optional<Color> textColor;
 
   AeonStyleSheet() = default;

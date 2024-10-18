@@ -5,7 +5,6 @@
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/System/Vector2.hpp>
 
-#include "Log.hpp"
 #include "aeon/enums/AeonElementState.h"
 #include "aeon/toolkit/ColorParser.hpp"
 #include "aeon/window/AeonElement.h"

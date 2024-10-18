@@ -57,8 +57,8 @@ struct AeElementStyleParser {
         style->fontName = parseString(value);
         break;
       }
-      case hashString("bgColor"): {
-        style->bgColor = parseColor(value);
+      case hashString("fillColor"): {
+        style->fillColor = parseColor(value);
         break;
       }
       case hashString("borderColor"): {

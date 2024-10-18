@@ -17,7 +17,7 @@ AeonStyleSheet::AeonStyleSheet(const AeonStyleSheetBase& style) :
     fontName(style.fontName),
     ringColor(ColorParser::hexToNrgssColor(style.ringColor)),
     borderColor(ColorParser::hexToNrgssColor(style.borderColor)),
-    bgColor(ColorParser::hexToNrgssColor(style.bgColor)),
+    fillColor(ColorParser::hexToNrgssColor(style.fillColor)),
     textColor(ColorParser::hexToNrgssColor(style.textColor))
 {
 }
@@ -32,7 +32,7 @@ AeonStyleSheetBase buttonDefaultStyle = {
   .fontName = "Arial",
   .ringColor = "#fcbf8199",
   .borderColor = "#fff",
-  .bgColor = "#34ed",
+  .fillColor = "#34ed",
   .textColor = "#fff"
 };
 
@@ -46,7 +46,7 @@ AeonStyleSheetBase textBoxDefaultStyle = {
   .fontName = "Arial",
   .ringColor = "#fcbf8199",
   .borderColor = "#fff",
-  .bgColor = "#fff6",
+  .fillColor = "#fff6",
   .textColor = "#fff"
 };
 

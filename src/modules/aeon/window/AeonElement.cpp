@@ -126,7 +126,7 @@ void AeonElement::setStyle(const AeonStyleSheet& style)
   if (style.fontName) defaultStyle.fontName = *style.fontName;
   if (style.ringColor) defaultStyle.ringColor = *style.ringColor;
   if (style.borderColor) defaultStyle.borderColor = *style.borderColor;
-  if (style.bgColor) defaultStyle.bgColor = *style.bgColor;
+  if (style.fillColor) defaultStyle.fillColor = *style.fillColor;
   if (style.textColor) defaultStyle.textColor = *style.textColor;
   dirtyStyle = true;
 }
@@ -148,7 +148,7 @@ void AeonElement::setStateStyle(AeonElementState state, const AeonStyleSheet& st
   if (style.fontName) target.fontName = *style.fontName;
   if (style.ringColor) target.ringColor = *style.ringColor;
   if (style.borderColor) target.borderColor = *style.borderColor;
-  if (style.bgColor) target.bgColor = *style.bgColor;
+  if (style.fillColor) target.fillColor = *style.fillColor;
   if (style.textColor) target.textColor = *style.textColor;
 }
 
