@@ -11,6 +11,7 @@
 
 namespace ae {
 
+using app::ULong;
 using app::UnMap;
 using sf::RenderTarget;
 
@@ -21,6 +22,10 @@ class AeonElement {
   AeonElement(const ElementBounds& bounds, const AeonStyleSheetBase& defaultStyle);
 
   inline virtual AeonElementType getType() const = 0;
+
+  virtual void handleAeonUpdate(ULong ts);
+  void handleClick();
+  void handleClickRelease();
 
   inline bool intersects(float x, float y) const
   {
@@ -59,8 +64,11 @@ class AeonElement {
   bool isFocusable() const;
   void setFocusable(bool value);
 
-  bool hasFocus();
+  bool getHasFocus();
   void setFocus(bool value);
+
+  bool isClicked();
+  bool isTriggered();
 
  protected:
   ElementBounds bounds;
@@ -71,8 +79,11 @@ class AeonElement {
   bool dirtyState;
   bool dirtyStyle;
   bool sizeUndefined;
+
   bool focusable;
-  bool hasFocusValue;
+  bool hasFocus;
+  bool clicked;
+  bool triggered;
 };
 
 }  // namespace ae

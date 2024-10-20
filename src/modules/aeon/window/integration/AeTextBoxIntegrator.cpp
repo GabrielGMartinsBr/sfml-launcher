@@ -149,6 +149,14 @@ VALUE AeTextBoxIntegrator::setStyleProp(VALUE self, VALUE propKey, VALUE value)
 
 // Set text box value
 
+VALUE AeTextBoxIntegrator::getValue(VALUE self)
+{
+  AeonTextBoxElement &inst = getWrappedObject(self);
+  const sf::String &rawStr = inst.getValue();
+  app::String str  = StringUtils::toUtf8(rawStr.toWideString());
+  return Convert::toRubyString(str);
+}
+
 VALUE AeTextBoxIntegrator::setValue(VALUE self, VALUE value)
 {
   AeonTextBoxElement &inst = AeonIntegratorBase::getWrappedObject(self);

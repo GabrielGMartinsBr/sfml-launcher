@@ -43,6 +43,9 @@ void AeButtonIntegrator::integrate(VALUE aeonModule)
 
   // Methods
   rb_define_method(classObject, "flush", RUBY_METHOD_FUNC(flush), 0);
+
+  rb_define_method(classObject, "isClicked", RUBY_METHOD_FUNC(isClicked), 0);
+  rb_define_method(classObject, "isTriggered", RUBY_METHOD_FUNC(isTriggered), 0);
 }
 
 // Instance allocator
@@ -201,6 +204,18 @@ VALUE AeButtonIntegrator::flush(VALUE self)
   AeonButtonElement &inst = AeonIntegratorBase::getWrappedObject(self);
   inst.flush();
   return Qnil;
+}
+
+VALUE AeButtonIntegrator::isClicked(VALUE self)
+{
+  AeonButtonElement &inst = getWrappedObject(self);
+  return Convert::toRubyBool(inst.isClicked());
+}
+
+VALUE AeButtonIntegrator::isTriggered(VALUE self)
+{
+  AeonButtonElement &inst = getWrappedObject(self);
+  return Convert::toRubyBool(inst.isTriggered());
 }
 
 }  // namespace ae

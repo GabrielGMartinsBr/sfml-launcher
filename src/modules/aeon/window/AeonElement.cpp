@@ -9,15 +9,16 @@
 
 namespace ae {
 
-AeonElement::AeonElement(const ElementBounds& bounds) :
-    bounds(bounds),
+AeonElement::AeonElement() :
     states(static_cast<uint8_t>(AeonElementState::DEFAULT)),
     dirtyBounds(false),
     dirtyState(false),
     dirtyStyle(false),
     sizeUndefined(true),
     focusable(true),
-    hasFocusValue(false)
+    hasFocus(false),
+    clicked(false),
+    triggered(false)
 {
 }
 
@@ -32,6 +33,26 @@ AeonElement::AeonElement(const ElementBounds& bounds, const AeonStyleSheetBase& 
     focusable(true),
     hasFocusValue(false)
 {
+}
+
+void AeonElement::handleAeonUpdate(ULong)
+{
+  if (clicked && !triggered) {
+    triggered = true;
+  }
+}
+
+void AeonElement::handleClick()
+{
+  clicked = true;
+  addState(AeonElementState::CLICKED);
+}
+
+void AeonElement::handleClickRelease()
+{
+  clicked = false;
+  triggered = false;
+  removeState(AeonElementState::CLICKED);
 }
 
 void AeonElement::drawTo(RenderTarget& target) { }
@@ -190,19 +211,29 @@ void AeonElement::setFocusable(bool value)
   focusable = true;
 }
 
-bool AeonElement::hasFocus()
+bool AeonElement::getHasFocus()
 {
-  return hasFocusValue;
+  return hasFocus;
 }
 
 void AeonElement::setFocus(bool value)
 {
-  hasFocusValue = value;
-  if (hasFocusValue) {
+  hasFocus = value;
+  if (hasFocus) {
     addState(AeonElementState::FOCUS);
   } else {
     removeState(AeonElementState::FOCUS);
   }
+}
+
+bool AeonElement::isClicked()
+{
+  return clicked;
+}
+
+bool AeonElement::isTriggered()
+{
+  return clicked && !triggered;
 }
 
 }  // namespace ae

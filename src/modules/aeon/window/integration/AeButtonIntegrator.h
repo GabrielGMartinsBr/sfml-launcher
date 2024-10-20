@@ -38,6 +38,9 @@ struct AeButtonIntegrator : public AeonIntegratorBase<AeonButtonElement> {
   // Methods
 
   static VALUE flush(VALUE self);
+
+  static VALUE isClicked(VALUE self);
+  static VALUE isTriggered(VALUE self);
 };
 
 }  // namespace ae
