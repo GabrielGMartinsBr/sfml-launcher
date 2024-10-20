@@ -24,6 +24,7 @@ AeonWindow::AeonWindow(VALUE rbObj, Eng::Viewport* viewport) :
     Eng::Window(rbObj, viewport),
     hitBox(),
     focusedElement(nullptr),
+    clickedElement(nullptr),
     focusedElementIndex(-1),
     ring(3),
     isRingVisible(false),
@@ -50,11 +51,7 @@ void AeonWindow::handleAeonUpdate(ULong ts)
 {
   ULong timestamp = ts;
   for (AeonElement* element : elements) {
-    if (element->getType() != AeonElementType::TEXT_BOX) {
-      continue;
-    }
-    AeonTextBoxElement* textBox = static_cast<AeonTextBoxElement*>(element);
-    textBox->handleAeonUpdate(ts);
+    element->handleAeonUpdate(ts);
   }
 }
 
@@ -80,17 +77,17 @@ void AeonWindow::handleMousePressed(const AeMouseButtonEvent& event)
   for (AeonElement* element : elements) {
     if (element->intersects(evX, evY)) {
       setFocusedElement(element);
-      element->addState(AeonElementState::CLICKED);
+      clickedElement = element;
+      element->handleClick();
     }
   }
 }
 
 void AeonWindow::handleMouseReleased(const AeMouseButtonEvent& event)
 {
-  float evX = event.x - x - 4;
-  float evY = event.y - y - 4;
-  for (AeonElement* element : elements) {
-    element->removeState(AeonElementState::CLICKED);
+  if (clickedElement) {
+    clickedElement->handleClickRelease();
+    clickedElement = nullptr;
   }
 }
 

@@ -63,6 +63,8 @@ class AeonWindow : public Eng::Window, Eng::IOnRender {
  private:
   Vector<AeonElement*> elements;
   AeonElement* focusedElement;
+  AeonElement* clickedElement;
+
   int focusedElementIndex;
   AeonHitBox hitBox;
   RoundedRectShape ring;

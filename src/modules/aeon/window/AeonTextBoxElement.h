@@ -26,7 +26,7 @@ class AeonTextBoxElement : public AeonElement, public AeonIntegrable {
     return AeonElementType::TEXT_BOX;
   }
 
-  void handleAeonUpdate(ULong ts);
+  void handleAeonUpdate(ULong ts) override;
   void handleKeyPressed(const AeKeyEvent& event);
   void handleTextEntered(const AeTextEvent& event);
 

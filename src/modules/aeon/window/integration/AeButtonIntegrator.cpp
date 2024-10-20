@@ -74,8 +74,7 @@ void AeButtonIntegrator::instanceMark(void *ptr) { }
 
 VALUE AeButtonIntegrator::initialize(int argc, VALUE *argv, VALUE self)
 {
-  ElementBounds bounds;
-  AeonButtonElement *instance = new AeonButtonElement(bounds);
+  AeonButtonElement *instance = new AeonButtonElement();
 
   DATA_PTR(self) = instance;
   instance->handleInitialize(self);

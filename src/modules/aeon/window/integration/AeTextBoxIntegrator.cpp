@@ -36,6 +36,8 @@ void AeTextBoxIntegrator::integrate(VALUE aeonModule)
   rb_define_method(classObject, "setValue", RUBY_METHOD_FUNC(setValue), 1);
   rb_define_method(classObject, "setIsPassword", RUBY_METHOD_FUNC(setIsPassword), 1);
 
+  rb_define_method(classObject, "getValue", RUBY_METHOD_FUNC(getValue), 0);
+
   rb_define_method(classObject, "x", RUBY_METHOD_FUNC(getter_x), 0);
   rb_define_method(classObject, "x=", RUBY_METHOD_FUNC(setter_x), 1);
 

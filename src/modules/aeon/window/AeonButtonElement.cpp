@@ -13,11 +13,11 @@ namespace ae {
 
 // Constructor
 
-AeonButtonElement::AeonButtonElement(const ElementBounds& bounds) :
-    AeonElement(bounds, buttonDefaultStyle),
+AeonButtonElement::AeonButtonElement() :
     textFont(nullptr),
     fontSize(16)
 {
+  setStyle(buttonDefaultStyle);
   applyStyle();
   applyBounds();
 }

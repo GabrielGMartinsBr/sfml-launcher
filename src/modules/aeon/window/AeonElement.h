@@ -18,8 +18,7 @@ using sf::RenderTarget;
 class AeonElement {
  public:
 
-  AeonElement(const ElementBounds& bounds);
-  AeonElement(const ElementBounds& bounds, const AeonStyleSheetBase& defaultStyle);
+  AeonElement();
 
   inline virtual AeonElementType getType() const = 0;
 

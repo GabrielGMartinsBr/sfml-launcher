@@ -6,7 +6,6 @@
 
 #include "aeon/base/AeonIntegrable.h"
 #include "aeon/enums/AeonElementState.h"
-#include "aeon/toolkit/ElementBounds.h"
 #include "aeon/toolkit/RoundedRectShape.h"
 #include "aeon/window/AeonElement.h"
 
@@ -18,7 +17,7 @@ class AeonButtonElement : public AeonElement, public AeonIntegrable {
  public:
   sf::String textString;
 
-  AeonButtonElement(const ElementBounds& bounds);
+  AeonButtonElement();
 
   inline AeonElementType getType() const override
   {
@@ -46,7 +45,6 @@ class AeonButtonElement : public AeonElement, public AeonIntegrable {
 
   void alignText();
   void adaptToTextSize();
-
 };
 
 }  // namespace ae

@@ -17,7 +17,6 @@ namespace ae {
 static const int cursorBlinkTime = 500;
 
 AeonTextBoxElement::AeonTextBoxElement() :
-    AeonElement(ElementBounds(), textBoxDefaultStyle),
     textFont(nullptr),
     fontSize(16),
     valueString(""),
@@ -26,12 +25,14 @@ AeonTextBoxElement::AeonTextBoxElement() :
     isPassword(false),
     dirtyTextValue(false)
 {
+  setStyle(textBoxDefaultStyle);
   applyStyle();
   applyBounds();
 }
 
 void AeonTextBoxElement::handleAeonUpdate(ULong ts)
 {
+  AeonElement::handleAeonUpdate(ts);
   if (ts - lastCursorBlinkTs > cursorBlinkTime) {
     showCursor = !showCursor;
     lastCursorBlinkTs = ts;
@@ -73,7 +74,8 @@ void AeonTextBoxElement::drawTo(RenderTarget& target)
   refreshValues();
   shape.drawTo(target);
   target.draw(text);
-  if (hasFocusValue && showCursor) {
+  
+  if (hasFocus && showCursor) {
     target.draw(cursorShape);
   }
 }
@@ -99,7 +101,7 @@ const sf::String& AeonTextBoxElement::setValue(const sf::String& value)
 void AeonTextBoxElement::setFocus(bool value)
 {
   AeonElement::setFocus(value);
-  if (hasFocusValue) {
+  if (hasFocus) {
     revealCursor();
   }
 }

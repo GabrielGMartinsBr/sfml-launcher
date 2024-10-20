@@ -22,19 +22,6 @@ AeonElement::AeonElement() :
 {
 }
 
-AeonElement::AeonElement(const ElementBounds& bounds, const AeonStyleSheetBase& defaultStyle) :
-    bounds(bounds),
-    defaultStyle(defaultStyle),
-    states(static_cast<uint8_t>(AeonElementState::DEFAULT)),
-    dirtyBounds(false),
-    dirtyState(false),
-    dirtyStyle(false),
-    sizeUndefined(true),
-    focusable(true),
-    hasFocusValue(false)
-{
-}
-
 void AeonElement::handleAeonUpdate(ULong)
 {
   if (clicked && !triggered) {
