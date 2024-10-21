@@ -155,7 +155,7 @@ VALUE AeTextBoxIntegrator::getValue(VALUE self)
 {
   AeonTextBoxElement &inst = getWrappedObject(self);
   const sf::String &rawStr = inst.getValue();
-  app::String str  = StringUtils::toUtf8(rawStr.toWideString());
+  app::String str  = StringUtils::toUtf8(rawStr);
   return Convert::toRubyString(str);
 }
 
@@ -163,7 +163,7 @@ VALUE AeTextBoxIntegrator::setValue(VALUE self, VALUE value)
 {
   AeonTextBoxElement &inst = AeonIntegratorBase::getWrappedObject(self);
   CStr rawStr = Convert::toCStr(value);
-  const String &resValue = inst.setValue(StringUtils::fromUtf8(rawStr));
+  const String &resValue = inst.setValue(StringUtils::toUtf32(rawStr));
   inst.setInstanceVar("@value", resValue);
   return Qnil;
 }

@@ -36,4 +36,11 @@ struct StringUtils {
     sf::Utf8::toUtf32(in.begin(), in.end(), back_inserter(tmp));
     return sf::String(tmp);
   }
+
+  static std::string toUtf8(const sf::String& str)
+  {
+    std::string out;
+    sf::Utf32::toUtf8(str.begin(), str.end(), back_inserter(out));
+    return out;
+  }
 };

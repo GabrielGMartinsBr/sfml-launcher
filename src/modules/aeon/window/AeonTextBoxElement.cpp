@@ -167,7 +167,6 @@ void AeonTextBoxElement::applyStyle(const AeonStyleSheet& style)
     const sf::Color& textColor = style.textColor.value().getSfColor();
     text.setFillColor(textColor);
     text.setOutlineColor(textColor);
-    text.setOutlineThickness(0.1);
     cursorShape.setFillColor(textColor);
   }
   if (style.fontSize.has_value()) {
