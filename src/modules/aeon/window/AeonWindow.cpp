@@ -10,19 +10,22 @@
 #include "aeon/enums/AeonElementState.h"
 #include "aeon/enums/AeonElementType.h"
 #include "aeon/toolkit/ColorParser.hpp"
+#include "aeon/toolkit/ElementBounds.h"
 #include "aeon/window/AeonElement.h"
 #include "aeon/window/AeonTextBoxElement.h"
 #include "aeon/window/AeonWindowManager.h"
+#include "engnine/Engine.h"
 #include "engnine/Lists.hpp"
 #include "engnine/Window.h"
 
 namespace ae {
 
+using Eng::Engine;
 using Eng::Lists;
+using sf::Vector2i;
 
 AeonWindow::AeonWindow(VALUE rbObj, Eng::Viewport* viewport) :
     Eng::Window(rbObj, viewport),
-    hitBox(),
     focusedElement(nullptr),
     clickedElement(nullptr),
     focusedElementIndex(-1),
@@ -137,7 +140,9 @@ void AeonWindow::setIsFocused(bool value)
 void AeonWindow::onRender(sf::RenderTexture& renderTexture)
 {
   if (isRingVisible) ring.drawTo(renderTexture);
+  renderTexture.setView(windowView);
   drawElements(renderTexture);
+  renderTexture.setView(renderTexture.getDefaultView());
 }
 
 bool AeonWindow::shouldRender() const
@@ -156,7 +161,7 @@ int AeonWindow::getZIndex() const
 
 bool AeonWindow::intersects(float x, float y)
 {
-  return hitBox.intersects(x, y);
+  return bounds.intersects(x, y);
 }
 
 void AeonWindow::setRingVisibility(bool value)
@@ -167,6 +172,7 @@ void AeonWindow::setRingVisibility(bool value)
 VALUE AeonWindow::setter_x(VALUE v)
 {
   v = Window::setter_x(v);
+  bounds.x(x);
   hitBox.updateX(x);
   ring.x(Window::x - 6);
   updateContentPosition();
@@ -176,6 +182,7 @@ VALUE AeonWindow::setter_x(VALUE v)
 VALUE AeonWindow::setter_y(VALUE v)
 {
   v = Window::setter_y(v);
+  bounds.y(y);
   hitBox.updateY(y);
   ring.y(y - 6);
   updateContentPosition();
@@ -185,6 +192,7 @@ VALUE AeonWindow::setter_y(VALUE v)
 VALUE AeonWindow::setter_width(VALUE v)
 {
   v = Window::setter_width(v);
+  bounds.width(width);
   hitBox.updateWidth(width);
   ring.width(width + 12);
   updateContentDimension();
@@ -194,6 +202,7 @@ VALUE AeonWindow::setter_width(VALUE v)
 VALUE AeonWindow::setter_height(VALUE v)
 {
   v = Window::setter_height(v);
+  bounds.height(height);
   hitBox.updateHeight(height);
   ring.height(height + 12);
   updateContentDimension();
@@ -218,16 +227,10 @@ void AeonWindow::addElement(AeonElement* element)
 void AeonWindow::drawElements(sf::RenderTarget& target)
 {
   if (width < 1 || height < 1) return;
-
-  aeContent.clear(sf::Color::Transparent);
   for (AeonElement* element : elements) {
     if (!element) continue;
-    element->drawTo(aeContent);
+    element->drawTo(target);
   }
-  aeContent.display();
-
-  aeContentSpr.setPosition(x + 4, y + 4);
-  target.draw(aeContentSpr);
 }
 
 /*
@@ -252,18 +255,33 @@ void AeonWindow::removeFromEngineCycles()
 
 void AeonWindow::updateContentPosition()
 {
-  aeContentSpr.setPosition(x, y);
+  if (!bounds.isEmpty()) {
+    updateViewBounds();
+  }
 }
 
 void AeonWindow::updateContentDimension()
 {
-  if (width > 0 && height > 0) {
-    sf::ContextSettings settings;
-    settings.antialiasingLevel = 0;
-    aeContent.create(width - 8, height - 8, settings);
-    aeContentSpr.setTexture(aeContent.getTexture());
+  if (!bounds.isEmpty()) {
+    updateViewBounds();
   }
 }
+
+void AeonWindow::updateViewBounds()
+{
+  const Vector2i& dimensions = Engine::getInstance().getDimensions();
+  ElementBounds vb = bounds + ElementBounds{ 4, 4, -8, -8 };
+
+  windowView.setSize(vb.size());
+  windowView.setCenter(vb.width() / 2, vb.height() / 2);
+  windowView.setViewport(sf::FloatRect(
+    vb.x() / dimensions.x,
+    vb.y() / dimensions.y,
+    vb.width() / dimensions.x,
+    vb.height() / dimensions.y
+  ));
+}
+
 int AeonWindow::getElementIndex(AeonElement* focusedElement) const
 {
   auto it = std::find(elements.begin(), elements.end(), focusedElement);

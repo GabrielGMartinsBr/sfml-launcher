@@ -43,8 +43,11 @@ Window::Window(VALUE rbObj, Viewport *viewport) :
 
   x = 0;
   y = 0;
+  bounds.position(x, y);
   width = 0;
   height = 0;
+  bounds.size(width, height);
+  
   z = 0;
   ox = 0;
   oy = 0;

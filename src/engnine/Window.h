@@ -8,6 +8,7 @@
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
 
+#include "aeon/toolkit/ElementBounds.h"
 #include "engnine/Bitmap.h"
 #include "engnine/EngineBase.hpp"
 #include "engnine/IOnUpdate.h"
@@ -17,6 +18,8 @@
 #include "engnine/WindowSprite.h"
 
 namespace Eng {
+
+using ae::ElementBounds;
 
 class Window : public IOnUpdate, public EngineBase {
  public:
@@ -127,6 +130,7 @@ class Window : public IOnUpdate, public EngineBase {
   void method_update();
 
  protected:
+  ElementBounds bounds;
   int x;
   int y;
   int z;
@@ -159,7 +163,6 @@ class Window : public IOnUpdate, public EngineBase {
   bool skinDirty;
   bool contentsDirty;
   bool opacityDirty;
-  
 
   int cursorAniAlphaId;
 

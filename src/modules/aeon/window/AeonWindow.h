@@ -64,12 +64,11 @@ class AeonWindow : public Eng::Window, Eng::IOnRender {
   Vector<AeonElement*> elements;
   AeonElement* focusedElement;
   AeonElement* clickedElement;
-
   int focusedElementIndex;
   AeonHitBox hitBox;
+
+  sf::View windowView;
   RoundedRectShape ring;
-  sf::RenderTexture aeContent;
-  sf::Sprite aeContentSpr;
   bool isRingVisible;
   bool isHover;
   bool isFocused;
@@ -80,6 +79,7 @@ class AeonWindow : public Eng::Window, Eng::IOnRender {
 
   void updateContentPosition();
   void updateContentDimension();
+  void updateViewBounds();
 
   int getElementIndex(AeonElement* focusedElement) const;
 
