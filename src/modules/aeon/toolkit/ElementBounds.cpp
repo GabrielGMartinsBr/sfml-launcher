@@ -7,10 +7,10 @@ namespace ae {
 */
 
 ElementBounds::ElementBounds(float x, float y, float width, float height) :
-    xValue(x),
-    yValue(y),
-    wValue(width),
-    hValue(height)
+    xStart(x),
+    yStart(y),
+    _width(width),
+    _height(height)
 {
   recalculateBounds();
 }
@@ -21,121 +21,106 @@ ElementBounds::ElementBounds(float x, float y, float width, float height) :
 
 float ElementBounds::x() const
 {
-  return xValue;
+  return xStart;
 }
 
 float ElementBounds::x(float value)
 {
-  xValue = value;
-  xEndValue = xValue + wValue;
-  positionValue.x = xValue;
-  return xValue;
+  xStart = value;
+  positionVec.x = xStart;
+  xEnd = xStart + _width;
+  return xStart;
 }
 
 float ElementBounds::y() const
 {
-  return yValue;
+  return yStart;
 }
 
 float ElementBounds::y(float value)
 {
-  yValue = value;
-  yEndValue = yValue + hValue;
-  positionValue.y = yValue;
-  return yValue;
-}
-
-float ElementBounds::w() const
-{
-  return wValue;
-}
-
-float ElementBounds::w(float value)
-{
-  wValue = value;
-  xEndValue = xValue + wValue;
-  sizeValue.x = wValue;
-  return wValue;
-}
-
-float ElementBounds::h() const
-{
-  return hValue;
-}
-
-float ElementBounds::h(float value)
-{
-  hValue = value;
-  yEndValue = yValue + hValue;
-  sizeValue.y = hValue;
-  return hValue;
+  yStart = value;
+  positionVec.y = yStart;
+  yEnd = yStart + _height;
+  return yStart;
 }
 
 float ElementBounds::width() const
 {
-  return w();
+  return _width;
 }
 
 float ElementBounds::width(float value)
 {
-  wValue = value;
-  xEndValue = xValue + wValue;
-  sizeValue.x = value;
-  return w(value);
+  _width = value;
+  sizeVec.x = _width;
+  xEnd = xStart + _width;
+  return _width;
 }
 
 float ElementBounds::height() const
 {
-  return h();
+  return _height;
 }
 
 float ElementBounds::height(float value)
 {
-  hValue = value;
-  yEndValue = xValue + hValue;
-  sizeValue.y = value;
-  return h(value);
+  _height = value;
+  sizeVec.y = value;
+  yEnd = yStart + _height;
+  return _height;
 }
 
 const Vector2f& ElementBounds::position() const
 {
-  return positionValue;
+  return positionVec;
 }
 
 const Vector2f& ElementBounds::position(float x, float y)
 {
-  xValue = x;
-  yValue = y;
-  xEndValue = xValue + wValue;
-  yEndValue = yValue + hValue;
-  positionValue.x = xValue;
-  positionValue.y = yValue;
-  return positionValue;
+  xStart = x;
+  yStart = y;
+  positionVec.x = xStart;
+  positionVec.y = yStart;
+  xEnd = xStart + _width;
+  yEnd = yStart + _height;
+  return positionVec;
 }
 
 const Vector2f& ElementBounds::position(const Vector2f& value)
 {
-  positionValue = value;
-  xValue = positionValue.x;
-  yValue = positionValue.y;
-  xEndValue = xValue + wValue;
-  yEndValue = yValue + hValue;
-  return positionValue;
+  positionVec = value;
+  xStart = positionVec.x;
+  yStart = positionVec.y;
+  xEnd = xStart + _width;
+  yEnd = yStart + _height;
+  return positionVec;
 }
 
 const Vector2f& ElementBounds::size() const
 {
-  return sizeValue;
+  return sizeVec;
+}
+
+const Vector2f& ElementBounds::size(float width, float height)
+{
+  _width = width;
+  _height = height;
+  sizeVec.x = _width;
+  sizeVec.y = _height;
+  xEnd = xStart + _width;
+  yEnd = yStart + _height;
+  return sizeVec;
 }
 
 const Vector2f& ElementBounds::size(const Vector2f& value)
 {
-  sizeValue = value;
-  wValue = sizeValue.x;
-  hValue = sizeValue.y;
-  xEndValue = xValue + wValue;
-  yEndValue = yValue + hValue;
-  return sizeValue;
+  sizeVec = value;
+  _width = sizeVec.x;
+  _height = sizeVec.y;
+  xEnd = xStart + _width;
+  yEnd = yStart + _height;
+  return sizeVec;
 }
 
 /*
@@ -148,30 +133,30 @@ ElementBounds& ElementBounds::operator=(const ElementBounds& other)
     return *this;
   }
 
-  xValue = other.xValue;
-  yValue = other.yValue;
-  wValue = other.wValue;
-  hValue = other.hValue;
+  xStart = other.xStart;
+  yStart = other.yStart;
+  _width = other._width;
+  _height = other._height;
   recalculateBounds();
   return *this;
 }
 
 ElementBounds& ElementBounds::operator+=(const ElementBounds& other)
 {
-  xValue += other.xValue;
-  yValue += other.yValue;
-  wValue += other.wValue;
-  hValue += other.hValue;
+  xStart += other.xStart;
+  yStart += other.yStart;
+  _width += other._width;
+  _height += other._height;
   recalculateBounds();
   return *this;
 }
 
 ElementBounds& ElementBounds::operator-=(const ElementBounds& other)
 {
-  xValue -= other.xValue;
-  yValue -= other.yValue;
-  wValue -= other.wValue;
-  hValue -= other.hValue;
+  xStart -= other.xStart;
+  yStart -= other.yStart;
+  _width -= other._width;
+  _height -= other._height;
   recalculateBounds();
   return *this;
 }
@@ -179,39 +164,39 @@ ElementBounds& ElementBounds::operator-=(const ElementBounds& other)
 ElementBounds ElementBounds::operator+(const ElementBounds& other) const
 {
   return ElementBounds(
-    xValue + other.xValue,
-    yValue + other.yValue,
-    wValue + other.wValue,
-    hValue + other.hValue
+    xStart + other.xStart,
+    yStart + other.yStart,
+    _width + other._width,
+    _height + other._height
   );
 }
 
 ElementBounds ElementBounds::operator-(const ElementBounds& other) const
 {
   return ElementBounds(
-    xValue - other.xValue,
-    yValue - other.yValue,
-    wValue - other.wValue,
-    hValue - other.hValue
+    xStart - other.xStart,
+    yStart - other.yStart,
+    _width - other._width,
+    _height - other._height
   );
 }
 
 ElementBounds& ElementBounds::operator+=(float value)
 {
-  xValue += value;
-  yValue += value;
-  wValue += value;
-  hValue += value;
+  xStart += value;
+  yStart += value;
+  _width += value;
+  _height += value;
   recalculateBounds();
   return *this;
 }
 
 ElementBounds& ElementBounds::operator-=(float value)
 {
-  xValue -= value;
-  yValue -= value;
-  wValue -= value;
-  hValue -= value;
+  xStart -= value;
+  yStart -= value;
+  _width -= value;
+  _height -= value;
   recalculateBounds();
   return *this;
 }
@@ -219,20 +204,30 @@ ElementBounds& ElementBounds::operator-=(float value)
 ElementBounds ElementBounds::operator+(float value) const
 {
   return ElementBounds(
-    xValue + value,
-    yValue + value,
-    wValue + value,
-    hValue + value
+    xStart + value,
+    yStart + value,
+    _width + value,
+    _height + value
   );
 }
 
 ElementBounds ElementBounds::operator-(float value) const
 {
   return ElementBounds(
-    xValue - value,
-    yValue - value,
-    wValue - value,
-    hValue - value
+    xStart - value,
+    yStart - value,
+    _width - value,
+    _height - value
+  );
+}
+
+ElementBounds ElementBounds::operator/(float value) const
+{
+  return ElementBounds(
+    xStart / value,
+    yStart / value,
+    _width / value,
+    _height / value
   );
 }
 
@@ -242,14 +237,14 @@ ElementBounds ElementBounds::operator-(float value) const
 
 void ElementBounds::recalculateBounds()
 {
-  xEndValue = xValue + wValue;
-  yEndValue = yValue + hValue;
+  positionVec.x = xStart;
+  positionVec.y = yStart;
 
-  positionValue.x = xValue;
-  positionValue.y = yValue;
+  sizeVec.x = _width;
+  sizeVec.y = _height;
 
-  sizeValue.x = wValue;
-  sizeValue.y = hValue;
+  xEnd = xStart + _width;
+  yEnd = yStart + _height;
 }
 
 }  // namespace ae
