@@ -70,6 +70,17 @@ struct ValueTypeUtils {
     return type == T_FALSE || type == T_TRUE;
   }
 
+  static inline bool isInteger(VALUE var)
+  {
+    int type = TYPE(var);
+    return isInteger(type);
+  }
+
+  static inline bool isInteger(int type)
+  {
+    return type == T_FIXNUM || type == T_BIGNUM;
+  }
+
   static inline bool isNumber(VALUE var)
   {
     int type = TYPE(var);

@@ -8,6 +8,9 @@
 #include <string>
 
 #include "Log.hpp"
+#include "aeon/base/WrappedList.hpp"
+#include "aeon/socket/AeonSocketManager.hpp"
+#include "aeon/window/AeonWindowManager.h"
 #include "base/AppDefs.h"
 #include "base/BacktraceUtils.hpp"
 #include "consts/PackageConsts.h"
@@ -22,7 +25,6 @@
 #include "launcher/ProjectWindow.h"
 #include "loaders/PlayerScript.hpp"
 #include "loaders/ScriptsLoader.hpp"
-#include "aeon/window/AeonWindowManager.h"
 
 class Launcher {
   sf::Vector2i dimensions;
@@ -46,13 +48,16 @@ class Launcher {
 
     ScriptsLoader& scriptsLoader = ScriptsLoader::getInstance();
 
+    ae::WrappedList::Init();
+    ae::AeonWindowManager::Init();
+    ae::AeonSocketManager::Init();
+
     Eng::Fonts::Init();
     Eng::Shaders::Init();
     Eng::Lists::Init();
     Eng::Engine::Init(projectWindow, projectPath);
     Eng::Graphics::Init(projectWindow);
     Eng::Audio::Init();
-    ae::AeonWindowManager::Init();
 
     Integrator integrator;
     integrator.init();
@@ -69,7 +74,10 @@ class Launcher {
     Eng::Shaders::Destroy();
     Eng::Fonts::Destroy();
     pkg::PackageReader::Destroy();
+
+    ae::AeonSocketManager::Destroy();
     ae::AeonWindowManager::Destroy();
+    ae::WrappedList::Destroy();
 
     projectWindow.close();
   }

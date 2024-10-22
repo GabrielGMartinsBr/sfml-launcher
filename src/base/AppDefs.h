@@ -4,6 +4,7 @@
 #include <memory>
 #include <sstream>
 #include <string>
+#include <thread>
 #include <unordered_map>
 
 namespace app {
@@ -34,6 +35,8 @@ template <typename T>
 using VectorPtr = UPtr<Vector<T>>;
 
 using StrVectorPtr = VectorPtr<String>;
+
+using Thread = std::thread;
 
 template <typename Key, typename Tp>
 using UnMap = std::unordered_map<Key, Tp>;

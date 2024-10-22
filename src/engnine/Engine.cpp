@@ -11,6 +11,7 @@
 #include <SFML/Window/VideoMode.hpp>
 
 #include "AppDefs.h"
+#include "aeon/socket/AeonSocketManager.hpp"
 #include "aeon/window/AeonWindowManager.h"
 #include "engnine/FileUtils.hpp"
 #include "engnine/Graphics.h"
@@ -154,6 +155,7 @@ void Engine::pollEvents()
 
 void Engine::handleCloseEvent()
 {
+  ae::AeonSocketManager::Instance().destroyAll();
   ruby_stop(0);
   running = false;
 }

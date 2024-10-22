@@ -2,6 +2,7 @@
 
 #include <ruby.h>
 
+#include "aeon/socket/integration/AeonSocketIntegrator.h"
 #include "aeon/window/integration/AeButtonIntegrator.h"
 #include "aeon/window/integration/AeStyleSheetIntegrator.h"
 #include "aeon/window/integration/AeTextBoxIntegrator.h"
@@ -19,6 +20,7 @@ void AeonModuleIntegrator::integrate()
   AeButtonIntegrator::integrate(aeonModule);
   AeTextBoxIntegrator::integrate(aeonModule);
   AeStyleSheetIntegrator::integrate(aeonModule);
+  AeonSocketIntegrator::integrate(aeonModule);
 }
 
 }  // namespace ae
