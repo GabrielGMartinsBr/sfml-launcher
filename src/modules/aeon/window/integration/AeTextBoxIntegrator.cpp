@@ -33,8 +33,9 @@ void AeTextBoxIntegrator::integrate(VALUE aeonModule)
 
   rb_define_method(classObject, "setStyleSheet", RUBY_METHOD_FUNC(setStyleSheet), -1);
 
-  rb_define_method(classObject, "setValue", RUBY_METHOD_FUNC(setValue), 1);
   rb_define_method(classObject, "setIsPassword", RUBY_METHOD_FUNC(setIsPassword), 1);
+  rb_define_method(classObject, "setPlaceholder", RUBY_METHOD_FUNC(setPlaceholder), 1);
+  rb_define_method(classObject, "setValue", RUBY_METHOD_FUNC(setValue), 1);
 
   rb_define_method(classObject, "getValue", RUBY_METHOD_FUNC(getValue), 0);
 
@@ -149,13 +150,31 @@ VALUE AeTextBoxIntegrator::setStyleProp(VALUE self, VALUE propKey, VALUE value)
   return Qnil;
 }
 
+VALUE AeTextBoxIntegrator::setIsPassword(VALUE self, VALUE value)
+{
+  AeonTextBoxElement &inst = AeonIntegratorBase::getWrappedObject(self);
+  bool isPassword = Convert::toCBool(value);
+  inst.setIsPassword(isPassword);
+  inst.setInstanceVar("@isPassword", value);
+  return Qnil;
+}
+
+VALUE AeTextBoxIntegrator::setPlaceholder(VALUE self, VALUE value)
+{
+  AeonTextBoxElement &inst = AeonIntegratorBase::getWrappedObject(self);
+  CStr rawStr = Convert::toCStr(value);
+  inst.setPlaceholder(StringUtils::toUtf32(rawStr));
+  inst.setInstanceVar("@placeholder", value);
+  return Qnil;
+}
+
 // Set text box value
 
 VALUE AeTextBoxIntegrator::getValue(VALUE self)
 {
   AeonTextBoxElement &inst = getWrappedObject(self);
   const sf::String &rawStr = inst.getValue();
-  app::String str  = StringUtils::toUtf8(rawStr);
+  app::String str = StringUtils::toUtf8(rawStr);
   return Convert::toRubyString(str);
 }
 
@@ -165,15 +184,6 @@ VALUE AeTextBoxIntegrator::setValue(VALUE self, VALUE value)
   CStr rawStr = Convert::toCStr(value);
   const String &resValue = inst.setValue(StringUtils::toUtf32(rawStr));
   inst.setInstanceVar("@value", resValue);
-  return Qnil;
-}
-
-VALUE AeTextBoxIntegrator::setIsPassword(VALUE self, VALUE value)
-{
-  AeonTextBoxElement &inst = AeonIntegratorBase::getWrappedObject(self);
-  bool isPassword = Convert::toCBool(value);
-  inst.setIsPassword(isPassword);
-  inst.setInstanceVar("@isPassword", value);
   return Qnil;
 }
 

@@ -24,10 +24,12 @@ struct AeTextBoxIntegrator : public AeonIntegratorBase<AeonTextBoxElement> {
   static VALUE setStyleProp(VALUE self, VALUE propKey, VALUE value);
   static VALUE setStyleSheet(int argc, VALUE *argv, VALUE self);
 
+  static VALUE setIsPassword(VALUE self, VALUE value);
+  static VALUE setPlaceholder(VALUE self, VALUE value);
+
   static VALUE getValue(VALUE self);
   static VALUE setValue(VALUE self, VALUE value);
 
-  static VALUE setIsPassword(VALUE self, VALUE value);
 
   // Variables
   static VALUE getter_x(VALUE self);

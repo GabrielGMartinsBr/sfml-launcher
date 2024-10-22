@@ -35,11 +35,12 @@ class AeonTextBoxElement : public AeonElement, public AeonIntegrable {
 
   void flush();
 
-  const sf::String& getValue();
-  const sf::String& setValue(const sf::String& value);
-
   void setFocus(bool value);
   void setIsPassword(bool value);
+  void setPlaceholder(const sf::String& value);
+
+  const sf::String& getValue();
+  const sf::String& setValue(const sf::String& value);
 
  private:
   RoundedRectShape shape;
@@ -47,7 +48,9 @@ class AeonTextBoxElement : public AeonElement, public AeonIntegrable {
   const sf::Font* textFont;
   float fontSize;
   sf::String valueString;
+  sf::String placeholderString;
   sf::Text text;
+  sf::Text placeholderText;
   size_t cursorIndex;
   ULong lastCursorBlinkTs;
   bool showCursor;

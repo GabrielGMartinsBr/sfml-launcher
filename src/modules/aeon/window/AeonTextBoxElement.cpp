@@ -22,6 +22,7 @@ AeonTextBoxElement::AeonTextBoxElement() :
     textFont(nullptr),
     fontSize(16),
     valueString(""),
+    placeholderString(""),
     cursorIndex(0),
     showCursor(false),
     isPassword(false),
@@ -44,7 +45,7 @@ void AeonTextBoxElement::drawShapesTo(RenderTarget& target)
 
 void AeonTextBoxElement::drawContentsTo(RenderTarget& target)
 {
-  target.draw(text);
+  target.draw(valueString.isEmpty() ? placeholderText : text);
   if (hasFocus && showCursor) {
     target.draw(cursorShape);
   }
@@ -98,19 +99,6 @@ void AeonTextBoxElement::flush()
   refreshValues();
 }
 
-const sf::String& AeonTextBoxElement::getValue()
-{
-  return valueString;
-}
-
-const sf::String& AeonTextBoxElement::setValue(const sf::String& value)
-{
-  valueString = value;
-  cursorIndex = valueString.getSize();
-  dirtyTextValue = true;
-  return valueString;
-}
-
 void AeonTextBoxElement::setFocus(bool value)
 {
   AeonElement::setFocus(value);
@@ -123,6 +111,26 @@ void AeonTextBoxElement::setIsPassword(bool value)
 {
   isPassword = true;
   dirtyTextValue = true;
+}
+
+void AeonTextBoxElement::setPlaceholder(const sf::String& value)
+{
+  placeholderString = value;
+  placeholderText.setString(placeholderString);
+  dirtyTextValue = true;
+}
+
+const sf::String& AeonTextBoxElement::getValue()
+{
+  return valueString;
+}
+
+const sf::String& AeonTextBoxElement::setValue(const sf::String& value)
+{
+  valueString = value;
+  cursorIndex = valueString.getSize();
+  dirtyTextValue = true;
+  return valueString;
 }
 
 /*
@@ -179,17 +187,22 @@ void AeonTextBoxElement::applyStyle(const AeonStyleSheet& style)
   if (style.textColor.has_value()) {
     const sf::Color& textColor = style.textColor.value().getSfColor();
     text.setFillColor(textColor);
-    text.setOutlineColor(textColor);
     cursorShape.setFillColor(textColor);
+
+    sf::Color placeholderColor = textColor;
+    placeholderColor.a = 128;
+    placeholderText.setFillColor(placeholderColor);
   }
   if (style.fontSize.has_value()) {
     fontSize = style.fontSize.value();
     text.setCharacterSize(fontSize);
+    placeholderText.setCharacterSize(fontSize);
   }
   if (style.fontName.has_value()) {
     textFont = Eng::Fonts::Instance().getFont(style.fontName.value());
     if (textFont) {
       text.setFont(*textFont);
+      placeholderText.setFont(*textFont);
     }
   }
 }
@@ -240,6 +253,9 @@ void AeonTextBoxElement::alignText()
     -padding.x,
     -(height - leading) / 2 + border
   );
+
+  placeholderText.setOrigin(textOrigin);
+  placeholderText.setPosition(0, 0);
 
   if (isPassword && !valueString.isEmpty()) {
     textOrigin.y = -(height - globalBounds.height) / 2 + localBounds.top;
