@@ -8,6 +8,7 @@
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
 
+#include "aeon/base/AeonIntegrable.h"
 #include "aeon/toolkit/ElementBounds.h"
 #include "engnine/Bitmap.h"
 #include "engnine/EngineBase.hpp"
@@ -19,9 +20,10 @@
 
 namespace Eng {
 
+using ae::AeonIntegrable;
 using ae::ElementBounds;
 
-class Window : public IOnUpdate, public EngineBase {
+class Window : public IOnUpdate, public EngineBase, public AeonIntegrable {
  public:
 
   Window(Viewport *viewport = nullptr);
@@ -81,19 +83,15 @@ class Window : public IOnUpdate, public EngineBase {
 
   int getX();
   void setX(int v);
-  VALUE setter_x(VALUE v);
 
   int getY();
   void setY(int v);
-  VALUE setter_y(VALUE v);
 
   int getWidth();
   void setWidth(int v);
-  VALUE setter_width(VALUE v);
 
   int getHeight();
   void setHeight(int v);
-  VALUE setter_height(VALUE v);
 
   int getZ();
   void setZ(int v);
@@ -131,11 +129,7 @@ class Window : public IOnUpdate, public EngineBase {
 
  protected:
   ElementBounds bounds;
-  int x;
-  int y;
   int z;
-  int width;
-  int height;
   bool visible;
   bool isDisposed;
 

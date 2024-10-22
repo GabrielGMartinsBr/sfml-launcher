@@ -329,7 +329,8 @@ class Window {
   static VALUE setter_x(VALUE self, VALUE value)
   {
     Eng::Window *inst = getObjectValue(self);
-    return inst->setter_x(value);
+    inst->setX(Convert::toCInt2(value));
+    return value;
   }
 
   /*
@@ -347,7 +348,8 @@ class Window {
   static VALUE setter_y(VALUE self, VALUE value)
   {
     Eng::Window *inst = getObjectValue(self);
-    return inst->setter_y(value);
+    inst->setY(Convert::toCInt2(value));
+    return value;
   }
 
   /*
@@ -365,7 +367,8 @@ class Window {
   static VALUE setter_width(VALUE self, VALUE value)
   {
     Eng::Window *inst = getObjectValue(self);
-    return inst->setter_width(value);
+    inst->setWidth(Convert::toCInt2(value));
+    return value;
   }
 
   /*
@@ -383,7 +386,8 @@ class Window {
   static VALUE setter_height(VALUE self, VALUE value)
   {
     Eng::Window *inst = getObjectValue(self);
-    return inst->setter_height(value);
+    inst->setHeight(Convert::toCInt2(value));
+    return value;
   }
 
   /*

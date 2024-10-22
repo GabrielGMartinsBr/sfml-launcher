@@ -24,7 +24,9 @@ Window::Window(Viewport *viewport) :
 
 Window::Window(VALUE rbObj, Viewport *viewport) :
     EngineBase(rbObj),
+    AeonIntegrable(rbObj),
     viewport(viewport),
+    bounds(0, 0, 0, 0),
     windowSkin(nullptr),
     contents(nullptr),
     cursor_rect(new Rect(0, 0, 0, 0)),
@@ -41,13 +43,6 @@ Window::Window(VALUE rbObj, Viewport *viewport) :
   visible = true;
   pause = false;
 
-  x = 0;
-  y = 0;
-  bounds.position(x, y);
-  width = 0;
-  height = 0;
-  bounds.size(width, height);
-  
   z = 0;
   ox = 0;
   oy = 0;
@@ -73,13 +68,13 @@ Window::~Window()
 
 void Window::onUpdate()
 {
-  if (isDisposed || width < 1 || height < 1) {
+  if (isDisposed || bounds.isEmpty()) {
     return;
   }
   if (dimensionsDirty) {
-    frame.rendTex.create(width, height);
-    contentsSprite.rendTex.create(width, height);
-    cursorSprite.rendTex.create(width, height);
+    frame.rendTex.create(bounds.width(), bounds.height());
+    contentsSprite.rendTex.create(bounds.width(), bounds.height());
+    cursorSprite.rendTex.create(bounds.width(), bounds.height());
     dimensionsDirty = false;
   }
   updateOpacity();
@@ -128,13 +123,13 @@ void Window::updateFrameSprites()
 {
   frame.visible = visible;
   cursorSprite.visible = visible;
-  frame.width = width;
-  frame.height = height;
+  frame.width = bounds.width();
+  frame.height = bounds.height();
 
   frame.update(windowSkin);
 
-  frame.backSprite.setPosition(x, y);
-  frame.borderSprite.setPosition(x, y);
+  frame.backSprite.setPosition(bounds.position());
+  frame.borderSprite.setPosition(bounds.position());
 }
 
 void Window::updateContentsSprite()
@@ -144,7 +139,7 @@ void Window::updateContentsSprite()
   }
   contentsSprite.texture = contents->getTexture();
   contentsSprite.sprite.setTexture(contentsSprite.texture);
-  contentsSprite.sprite.setPosition(x + 16, y + 16);
+  contentsSprite.sprite.setPosition(bounds.x() + 16, bounds.y() + 16);
   contentsSprite.sprite.setColor(sf::Color(255, 255, 255, contents_opacity));
 }
 
@@ -190,7 +185,7 @@ void Window::updateCursorRect()
   cursorSprite.texture.loadFromImage(buff);
   cursorSprite.sprite.setTexture(cursorSprite.texture);
 
-  cursorSprite.sprite.setPosition(x + 16 + cursor_rect->x.get(), y + 16 + cursor_rect->y.get());
+  cursorSprite.sprite.setPosition(bounds.x() + 16 + cursor_rect->x.get(), bounds.y() + 16 + cursor_rect->y.get());
   cursor_rect->markAsClean();
 }
 

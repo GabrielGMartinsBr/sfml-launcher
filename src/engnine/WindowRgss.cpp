@@ -1,3 +1,5 @@
+#include "aeon/base/AeonIntegrable.h"
+#include "engnine/EngineBase.hpp"
 #include "engnine/Window.h"
 //
 
@@ -56,10 +58,10 @@ void Window::bindRubyVars()
   rb_iv_set(rbObj, "@active", Convert::toRubyBool(active));
   rb_iv_set(rbObj, "@pause", Convert::toRubyBool(pause));
 
-  rb_iv_set(rbObj, "@x", Convert::toRubyNumber(x));
-  rb_iv_set(rbObj, "@y", Convert::toRubyNumber(y));
-  rb_iv_set(rbObj, "@width", Convert::toRubyNumber(width));
-  rb_iv_set(rbObj, "@height", Convert::toRubyNumber(height));
+  AeonIntegrable::setInstanceVar("@x", bounds.x());
+  AeonIntegrable::setInstanceVar("@y", bounds.y());
+  AeonIntegrable::setInstanceVar("@width", bounds.width());
+  AeonIntegrable::setInstanceVar("@height", bounds.height());
   rb_iv_set(rbObj, "@z", Convert::toRubyNumber(z));
   rb_iv_set(rbObj, "@ox", Convert::toRubyNumber(ox));
   rb_iv_set(rbObj, "@oy", Convert::toRubyNumber(oy));
@@ -84,13 +86,13 @@ void Window::setter_windowskin(Bitmap *value)
 
   if (value == nullptr) {
     windowSkin = nullptr;
-    setInstanceVar("@windowskin", Qnil);
+    EngineBase::setInstanceVar("@windowskin", Qnil);
     return;
   }
 
   value->initRubyObj();
   windowSkin = value;
-  setInstanceVar("@windowskin", windowSkin->rbObj);
+  EngineBase::setInstanceVar("@windowskin", windowSkin->rbObj);
 }
 
 Bitmap *Window::getter_contents()
@@ -105,13 +107,13 @@ void Window::setter_contents(Bitmap *value)
 
   if (value == nullptr) {
     contents = nullptr;
-    setInstanceVar("@contents", Qnil);
+    EngineBase::setInstanceVar("@contents", Qnil);
     return;
   }
 
   value->initRubyObj();
   contents = value;
-  setInstanceVar("@contents", contents->rbObj);
+  EngineBase::setInstanceVar("@contents", contents->rbObj);
 }
 
 VALUE Window::getter_stretch()
@@ -124,7 +126,7 @@ VALUE Window::setter_stretch(VALUE v)
   bool value = Convert::toCBool(v);
   if (_stretch == value) return v;
   _stretch = value;
-  setInstanceVar("@stretch", v);
+  EngineBase::setInstanceVar("@stretch", v);
   return v;
 }
 
@@ -133,7 +135,7 @@ void Window::stretch(bool v)
 {
   if (_stretch == v) return;
   _stretch = v;
-  setInstanceVar("@stretch", Convert::toRubyBool(v));
+  EngineBase::setInstanceVar("@stretch", Convert::toRubyBool(v));
 }
 
 Rect *Window::getter_cursor_rect() { return cursor_rect; }
@@ -148,7 +150,7 @@ void Window::setActive(bool v)
 {
   if (active == v) return;
   active = v;
-  setInstanceVar("@active", Convert::toRubyBool(v));
+  EngineBase::setInstanceVar("@active", Convert::toRubyBool(v));
   skinDirty = true;
   contentsDirty = true;
 }
@@ -163,7 +165,7 @@ VALUE Window::setter_active(VALUE v)
   bool value = Convert::toCBool(v);
   if (active == value) return v;
   active = value;
-  setInstanceVar("@active", v);
+  EngineBase::setInstanceVar("@active", v);
   skinDirty = true;
   contentsDirty = true;
   return v;
@@ -180,7 +182,7 @@ void Window::setVisible(bool v)
 {
   if (visible == v) return;
   visible = v;
-  setInstanceVar("@visible", Convert::toRubyBool(v));
+  EngineBase::setInstanceVar("@visible", Convert::toRubyBool(v));
   updateWindowSprite();
 }
 
@@ -194,7 +196,7 @@ VALUE Window::setter_visible(VALUE v)
   bool value = Convert::toCBool(v);
   if (visible == value) return v;
   visible = value;
-  setInstanceVar("@visible", v);
+  EngineBase::setInstanceVar("@visible", v);
   updateWindowSprite();
   return v;
 }
@@ -210,7 +212,7 @@ void Window::setPause(bool v)
 {
   if (pause == v) return;
   pause = v;
-  setInstanceVar("@pause", Convert::toRubyBool(v));
+  EngineBase::setInstanceVar("@pause", Convert::toRubyBool(v));
 }
 
 VALUE Window::getter_pause()
@@ -223,88 +225,67 @@ VALUE Window::setter_pause(VALUE v)
   bool value = Convert::toCBool(v);
   if (pause == value) return v;
   pause = value;
-  setInstanceVar("@pause", v);
+  EngineBase::setInstanceVar("@pause", v);
   return v;
 }
 
 // --------------
 
-int Window::getX() { return x; }
-void Window::setX(int v)
+int Window::getX()
 {
-  if (x == v) return;
-  x = v;
-  setInstanceVar("@x", Convert::toRubyNumber(v));
-  skinDirty = true;
-}
-VALUE Window::setter_x(VALUE v)
-{
-  int value = Convert::toCInt2(v);
-  if (x == value) return v;
-  x = value;
-  setInstanceVar("@x", v);
-  skinDirty = true;
-  return v;
+  return bounds.x();
 }
 
-int Window::getY() { return y; }
-void Window::setY(int v)
+void Window::setX(int v)
 {
-  if (y == v) return;
-  y = v;
-  setInstanceVar("@y", Convert::toRubyNumber(v));
+  if (bounds.x() == v) return;
+  bounds.x(v);
+  AeonIntegrable::setInstanceVar("@x", v);
   skinDirty = true;
 }
-VALUE Window::setter_y(VALUE v)
+
+int Window::getY()
 {
-  int value = Convert::toCInt2(v);
-  if (y == value) return v;
-  y = value;
-  setInstanceVar("@y", v);
+  return bounds.y();
+}
+
+void Window::setY(int v)
+{
+  if (bounds.y() == v) return;
+  bounds.y(v);
+  AeonIntegrable::setInstanceVar("@y", v);
   skinDirty = true;
-  return v;
 }
 
 /*  Property width */
 
-int Window::getWidth() { return width; }
+int Window::getWidth()
+{
+  return bounds.width();
+}
+
 void Window::setWidth(int v)
 {
-  if (width == v) return;
-  width = v;
-  setInstanceVar("@width", Convert::toRubyNumber(v));
+  if (bounds.width() == v) return;
+  bounds.width(v);
+  AeonIntegrable::setInstanceVar("@width", v);
   dimensionsDirty = true;
   skinDirty = true;
-}
-VALUE Window::setter_width(VALUE v)
-{
-  int value = Convert::toCInt2(v);
-  if (width == value) return v;
-  width = value;
-  setInstanceVar("@width", v);
-  dimensionsDirty = true;
-  skinDirty = true;
-  return v;
 }
 
 /*  Property height */
 
-int Window::getHeight() { return height; }
+int Window::getHeight()
+{
+  return bounds.height();
+}
+
 void Window::setHeight(int v)
 {
-  if (height == v) return;
-  height = v;
-  setInstanceVar("@height", Convert::toRubyNumber(v));
+  if (bounds.height() == v) return;
+  bounds.height(v);
+  AeonIntegrable::setInstanceVar("@height", v);
   skinDirty = true;
-}
-VALUE Window::setter_height(VALUE v)
-{
-  int value = Convert::toCInt2(v);
-  if (height == value) return v;
-  height = value;
-  setInstanceVar("@height", v);
-  skinDirty = true;
-  return v;
 }
 
 /*  Property z */
@@ -314,7 +295,7 @@ void Window::setZ(int v)
 {
   if (z == v) return;
   z = v;
-  setInstanceVar("@z", Convert::toRubyNumber(v));
+  EngineBase::setInstanceVar("@z", Convert::toRubyNumber(v));
   updateWindowSpriteZ();
   Lists::Instance().markZOrderDirty();
 }
@@ -323,7 +304,7 @@ VALUE Window::setter_z(VALUE v)
   int value = Convert::toCInt2(v);
   if (z == value) return v;
   z = value;
-  setInstanceVar("@z", v);
+  EngineBase::setInstanceVar("@z", v);
   updateWindowSpriteZ();
   Lists::Instance().markZOrderDirty();
   return v;
@@ -336,7 +317,7 @@ void Window::setter_ox(int v)
 {
   if (ox == v) return;
   ox = v;
-  setInstanceVar("@ox", Convert::toRubyNumber(v));
+  EngineBase::setInstanceVar("@ox", Convert::toRubyNumber(v));
   contentsDirty = true;
 }
 VALUE Window::setter_ox(VALUE v)
@@ -344,7 +325,7 @@ VALUE Window::setter_ox(VALUE v)
   int value = Convert::toCInt2(v);
   if (ox == value) return v;
   ox = value;
-  setInstanceVar("@ox", v);
+  EngineBase::setInstanceVar("@ox", v);
   contentsDirty = true;
   return v;
 }
@@ -356,7 +337,7 @@ void Window::setter_oy(int v)
 {
   if (oy == v) return;
   oy = v;
-  setInstanceVar("@oy", Convert::toRubyNumber(v));
+  EngineBase::setInstanceVar("@oy", Convert::toRubyNumber(v));
   contentsDirty = true;
 }
 VALUE Window::setter_oy(VALUE v)
@@ -364,7 +345,7 @@ VALUE Window::setter_oy(VALUE v)
   int value = Convert::toCInt2(v);
   if (oy == value) return v;
   oy = value;
-  setInstanceVar("@oy", v);
+  EngineBase::setInstanceVar("@oy", v);
   contentsDirty = true;
   return v;
 }
@@ -377,7 +358,7 @@ void Window::setter_opacity(int v)
   int value = Num::clamp(v, 0, 255);
   if (opacity == value) return;
   opacity = value;
-  setInstanceVar("@opacity", Convert::toRubyNumber(value));
+  EngineBase::setInstanceVar("@opacity", Convert::toRubyNumber(value));
   opacityDirty = true;
 }
 VALUE Window::setter_opacity(VALUE v)
@@ -387,7 +368,7 @@ VALUE Window::setter_opacity(VALUE v)
   if (opacity == value) return v;
   v = Convert::toRubyNumber(value);
   opacity = value;
-  setInstanceVar("@opacity", v);
+  EngineBase::setInstanceVar("@opacity", v);
   opacityDirty = true;
   return v;
 }
@@ -400,7 +381,7 @@ void Window::setter_back_opacity(int v)
   int value = Num::clamp(v, 0, 255);
   if (back_opacity == value) return;
   back_opacity = value;
-  setInstanceVar("@back_opacity", Convert::toRubyNumber(value));
+  EngineBase::setInstanceVar("@back_opacity", Convert::toRubyNumber(value));
   opacityDirty = true;
 }
 VALUE Window::setter_back_opacity(VALUE v)
@@ -410,7 +391,7 @@ VALUE Window::setter_back_opacity(VALUE v)
   if (back_opacity == value) return v;
   v = Convert::toRubyNumber(value);
   back_opacity = value;
-  setInstanceVar("@back_opacity", v);
+  EngineBase::setInstanceVar("@back_opacity", v);
   opacityDirty = true;
   return v;
 }
@@ -423,7 +404,7 @@ void Window::setter_contents_opacity(int v)
   int value = Num::clamp(v, 0, 255);
   if (contents_opacity == value) return;
   contents_opacity = value;
-  setInstanceVar("@contents_opacity", Convert::toRubyNumber(value));
+  EngineBase::setInstanceVar("@contents_opacity", Convert::toRubyNumber(value));
   opacityDirty = true;
 }
 VALUE Window::setter_contents_opacity(VALUE v)
@@ -433,7 +414,7 @@ VALUE Window::setter_contents_opacity(VALUE v)
   if (contents_opacity == value) return v;
   v = Convert::toRubyNumber(value);
   contents_opacity = value;
-  setInstanceVar("@contents_opacity", v);
+  EngineBase::setInstanceVar("@contents_opacity", v);
   opacityDirty = true;
   return v;
 }
