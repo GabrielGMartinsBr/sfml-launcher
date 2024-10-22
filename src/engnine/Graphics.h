@@ -51,6 +51,8 @@ class Graphics {
 
   int getWidth();
   int getHeight();
+
+ private:
   /*
     ⇩⇩⇩ Private ⇩⇩⇩
   */

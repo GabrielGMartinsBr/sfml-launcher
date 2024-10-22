@@ -87,6 +87,7 @@ VALUE AeTextBoxIntegrator::initialize(int argc, VALUE *argv, VALUE self)
 
   DATA_PTR(self) = instance;
   instance->handleInitialize(self);
+  instance->rbId = self;
 
   return self;
 }
