@@ -18,6 +18,9 @@ struct AeWindowIntegrator : public AeonIntegratorBase<AeonWindow> {
 
   static VALUE meth_initialize(int argc, VALUE *argv, VALUE self);
 
+  static VALUE disposed(VALUE self);
+  static VALUE dispose(VALUE self);
+  
   static VALUE getter_windowSkin(VALUE self);
   static VALUE setter_windowSkin(VALUE self, VALUE value);
 

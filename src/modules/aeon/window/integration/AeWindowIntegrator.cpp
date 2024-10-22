@@ -5,6 +5,7 @@
 #include "AppDefs.h"
 #include "aeon/window/AeonElement.h"
 #include "aeon/window/AeonWindow.h"
+#include "integrator/Convert.hpp"
 #include "integrator/It_Bitmap.hpp"
 #include "integrator/It_Viewport.hpp"
 
@@ -20,6 +21,9 @@ void AeWindowIntegrator::integrate(VALUE aeonModule)
   rb_define_alloc_func(classObject, instance_allocator);
 
   rb_define_method(classObject, "initialize", RUBY_METHOD_FUNC(meth_initialize), -1);
+
+  rb_define_method(classObject, "disposed", RUBY_METHOD_FUNC(disposed), 0);
+  rb_define_method(classObject, "dispose", RUBY_METHOD_FUNC(dispose), 0);
 
   rb_define_method(classObject, "addElement", RUBY_METHOD_FUNC(addElement), 1);
 
@@ -96,6 +100,27 @@ VALUE AeWindowIntegrator::meth_initialize(int argc, VALUE *argv, VALUE self)
     "Window initialize takes 0 or 1 argument, but " + std::to_string(argc) + " were received."
   );
 }
+
+/*
+  Dispose
+*/
+
+VALUE AeWindowIntegrator::disposed(VALUE self)
+{
+  AeonWindow &inst = getWrappedObject(self);
+  return Convert::toRubyBool(inst.method_disposed());
+}
+
+VALUE AeWindowIntegrator::dispose(VALUE self)
+{
+  AeonWindow &inst = getWrappedObject(self);
+  inst.method_dispose();
+  return Qnil;
+}
+
+/*
+  Add AeonElement to window
+*/
 
 VALUE AeWindowIntegrator::addElement(VALUE self, VALUE value)
 {
