@@ -47,7 +47,7 @@ void AeonTextBoxElement::drawContentsTo(RenderTarget& target)
 {
   target.draw(valueString.isEmpty() ? placeholderText : text);
   if (hasFocus && showCursor) {
-    target.draw(cursorShape);
+    target.draw(cursorShape, sf::BlendAlpha);
   }
 }
 

@@ -1,6 +1,7 @@
 
 #include "aeon/window/AeonButtonElement.h"
 
+#include <SFML/Graphics/BlendMode.hpp>
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Font.hpp>
@@ -26,7 +27,7 @@ void AeonButtonElement::drawShapesTo(RenderTarget& target)
 {
   refreshValues();
   shape.drawTo(target);
-  target.draw(text);
+  target.draw(text, sf::BlendAlpha);
 }
 
 /*
@@ -96,6 +97,7 @@ void AeonButtonElement::applyStyle(const AeonStyleSheet& style)
   if (style.fillColor.has_value()) shape.fillColor(style.fillColor.value());
   if (style.textColor.has_value()) {
     text.setFillColor(style.textColor.value().getSfColor());
+    text.setOutlineThickness(0);
   }
   if (style.fontSize.has_value()) {
     fontSize = style.fontSize.value();

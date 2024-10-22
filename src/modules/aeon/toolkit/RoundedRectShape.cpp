@@ -44,7 +44,7 @@ RoundedRectShape::RoundedRectShape(float x, float y, float width, float height, 
 void RoundedRectShape::drawTo(RenderTarget& target)
 {
   refreshValues();
-  target.draw(shape);
+  target.draw(shape, sf::BlendAlpha);
 }
 
 /*

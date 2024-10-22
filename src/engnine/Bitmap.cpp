@@ -366,7 +366,9 @@ void Bitmap::draw_text(Rect rect, app::CStr str, TextAlign align)
 
 void Bitmap::draw_text(double x, double y, double width, double height, CStr str, TextAlign align)
 {
-  const sf::Font* fontPtr = Fonts::Instance().getFont("Arial-bold");
+  auto fontNames = font->getter_name();
+  app::String fontName = fontNames && fontNames->size() > 0 ? fontNames->at(0) : "Arial";
+  const sf::Font* fontPtr = Fonts::Instance().getFont(fontName);
 
   if (!fontPtr) {
     Log::err() << "Requested font was not found.";
@@ -376,11 +378,13 @@ void Bitmap::draw_text(double x, double y, double width, double height, CStr str
   sf::Text text = Texts::createText(str);
   text.setFont(*fontPtr);
   text.setCharacterSize(font->getter_size());
-  text.setLetterSpacing(1);
-  text.setLineSpacing(1.5);
+  // text.setLetterSpacing(1);
+  // text.setLineSpacing(1.5);
 
   const sf::Color& fillColor = font->getter_color()->getSfColor();
   text.setFillColor(fillColor);
+  text.setOutlineColor(fillColor);
+  text.setOutlineThickness(0.15);
 
   float lineSpacing = fontPtr->getLineSpacing(font->getter_size()) * 1.25;
 
@@ -416,7 +420,7 @@ void Bitmap::draw_text(double x, double y, double width, double height, CStr str
   scale.x -= .1;
   scale.y -= .12;
 
-  text.setScale(scale);
+  // text.setScale(scale);
 
   renderTexture.draw(text, sf::BlendAlpha);
   renderTexture.display();
@@ -426,15 +430,17 @@ void Bitmap::draw_text(double x, double y, double width, double height, CStr str
 
 Eng::Rect* Bitmap::get_text_size(app::CStr str)
 {
-  const sf::Font* fontPtr = Fonts::Instance().getFont("Arial-bold");
+  auto fontNames = font->getter_name();
+  app::String fontName = fontNames && fontNames->size() > 0 ? fontNames->at(0) : "Arial";
+  const sf::Font* fontPtr = Fonts::Instance().getFont(fontName);
   assert(fontPtr);
 
   sf::Text text;
   text.setFont(*fontPtr);
   text.setString(str);
   text.setCharacterSize(font->getter_size());
-  text.setLetterSpacing(0.6);
-  text.setLineSpacing(1.5);
+  // text.setLetterSpacing(0.6);
+  // text.setLineSpacing(1.5);
   sf::FloatRect textBounds = text.getGlobalBounds();
   Eng::Rect* rect = new Eng::Rect(textBounds.left, textBounds.top, textBounds.width + 1, textBounds.height);
   return rect;
