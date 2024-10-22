@@ -32,6 +32,11 @@ void AeButtonIntegrator::integrate(VALUE aeonModule)
   rb_define_method(classObject, "setStyle", RUBY_METHOD_FUNC(setStyleProp), 2);
   rb_define_method(classObject, "setStyleSheet", RUBY_METHOD_FUNC(setStyleSheet), -1);
 
+  rb_define_method(classObject, "key", RUBY_METHOD_FUNC(getKey), 0);
+  rb_define_method(classObject, "key=", RUBY_METHOD_FUNC(setKey), 1);
+  rb_define_method(classObject, "getKey", RUBY_METHOD_FUNC(getKey), 0);
+  rb_define_method(classObject, "setKey", RUBY_METHOD_FUNC(setKey), 1);
+
   rb_define_method(classObject, "x", RUBY_METHOD_FUNC(getter_x), 0);
   rb_define_method(classObject, "x=", RUBY_METHOD_FUNC(setter_x), 1);
 
@@ -154,6 +159,21 @@ VALUE AeButtonIntegrator::setText(VALUE self, VALUE value)
   const String &resValue = inst.setText(Convert::toCStr(value));
   inst.setInstanceVar("@text", resValue);
   return Qnil;
+}
+
+// Element key
+
+VALUE AeButtonIntegrator::getKey(VALUE self)
+{
+  AeonButtonElement &inst = AeonIntegratorBase::getWrappedObject(self);
+  return Convert::toRubyString(inst.getKey());
+}
+
+VALUE AeButtonIntegrator::setKey(VALUE self, VALUE value)
+{
+  AeonButtonElement &inst = AeonIntegratorBase::getWrappedObject(self);
+  inst.setKey(Convert::toCStr(value));
+  return value;
 }
 
 VALUE AeButtonIntegrator::getter_x(VALUE self)

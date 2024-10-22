@@ -35,9 +35,14 @@ void AeTextBoxIntegrator::integrate(VALUE aeonModule)
 
   rb_define_method(classObject, "setIsPassword", RUBY_METHOD_FUNC(setIsPassword), 1);
   rb_define_method(classObject, "setPlaceholder", RUBY_METHOD_FUNC(setPlaceholder), 1);
-  rb_define_method(classObject, "setValue", RUBY_METHOD_FUNC(setValue), 1);
 
+  rb_define_method(classObject, "setValue", RUBY_METHOD_FUNC(setValue), 1);
   rb_define_method(classObject, "getValue", RUBY_METHOD_FUNC(getValue), 0);
+
+  rb_define_method(classObject, "key", RUBY_METHOD_FUNC(getKey), 0);
+  rb_define_method(classObject, "key=", RUBY_METHOD_FUNC(setKey), 1);
+  rb_define_method(classObject, "getKey", RUBY_METHOD_FUNC(getKey), 0);
+  rb_define_method(classObject, "setKey", RUBY_METHOD_FUNC(setKey), 1);
 
   rb_define_method(classObject, "x", RUBY_METHOD_FUNC(getter_x), 0);
   rb_define_method(classObject, "x=", RUBY_METHOD_FUNC(setter_x), 1);
@@ -185,6 +190,21 @@ VALUE AeTextBoxIntegrator::setValue(VALUE self, VALUE value)
   const String &resValue = inst.setValue(StringUtils::toUtf32(rawStr));
   inst.setInstanceVar("@value", resValue);
   return Qnil;
+}
+
+// Element key
+
+VALUE AeTextBoxIntegrator::getKey(VALUE self)
+{
+  AeonTextBoxElement &inst = AeonIntegratorBase::getWrappedObject(self);
+  return Convert::toRubyString(inst.getKey());
+}
+
+VALUE AeTextBoxIntegrator::setKey(VALUE self, VALUE value)
+{
+  AeonTextBoxElement &inst = AeonIntegratorBase::getWrappedObject(self);
+  inst.setKey(Convert::toCStr(value));
+  return value;
 }
 
 VALUE AeTextBoxIntegrator::getter_x(VALUE self)

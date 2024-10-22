@@ -30,6 +30,8 @@ struct AeTextBoxIntegrator : public AeonIntegratorBase<AeonTextBoxElement> {
   static VALUE getValue(VALUE self);
   static VALUE setValue(VALUE self, VALUE value);
 
+  static VALUE getKey(VALUE self);
+  static VALUE setKey(VALUE self, VALUE value);
 
   // Variables
   static VALUE getter_x(VALUE self);

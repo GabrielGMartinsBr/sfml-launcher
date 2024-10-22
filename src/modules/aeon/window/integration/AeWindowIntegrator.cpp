@@ -22,6 +22,11 @@ void AeWindowIntegrator::integrate(VALUE aeonModule)
 
   rb_define_method(classObject, "initialize", RUBY_METHOD_FUNC(meth_initialize), -1);
 
+  rb_define_method(classObject, "getHoverKey", RUBY_METHOD_FUNC(getHoverElementKey), 0);
+  rb_define_method(classObject, "getFocusKey", RUBY_METHOD_FUNC(getFocusElementKey), 0);
+  rb_define_method(classObject, "getClickKey", RUBY_METHOD_FUNC(getClickElementKey), 0);
+  rb_define_method(classObject, "getTriggerKey", RUBY_METHOD_FUNC(getTriggerElementKey), 0);
+
   rb_define_method(classObject, "disposed", RUBY_METHOD_FUNC(disposed), 0);
   rb_define_method(classObject, "dispose", RUBY_METHOD_FUNC(dispose), 0);
 
@@ -99,6 +104,30 @@ VALUE AeWindowIntegrator::meth_initialize(int argc, VALUE *argv, VALUE self)
   return raiseException(
     "Window initialize takes 0 or 1 argument, but " + std::to_string(argc) + " were received."
   );
+}
+
+VALUE AeWindowIntegrator::getHoverElementKey(VALUE self)
+{
+  AeonWindow &inst = getWrappedObject(self);
+  return Convert::toRubyString(inst.getHoverElementKey());
+}
+
+VALUE AeWindowIntegrator::getFocusElementKey(VALUE self)
+{
+  AeonWindow &inst = getWrappedObject(self);
+  return Convert::toRubyString(inst.getFocusElementKey());
+}
+
+VALUE AeWindowIntegrator::getClickElementKey(VALUE self)
+{
+  AeonWindow &inst = getWrappedObject(self);
+  return Convert::toRubyString(inst.getClickElementKey());
+}
+
+VALUE AeWindowIntegrator::getTriggerElementKey(VALUE self)
+{
+  AeonWindow &inst = getWrappedObject(self);
+  return Convert::toRubyString(inst.getTriggerElementKey());
 }
 
 /*

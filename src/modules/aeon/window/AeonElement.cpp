@@ -11,6 +11,7 @@ namespace ae {
 
 AeonElement::AeonElement() :
     states(static_cast<uint8_t>(AeonElementState::DEFAULT)),
+    key(""),
     dirtyBounds(false),
     dirtyState(false),
     dirtyStyle(false),
@@ -188,6 +189,16 @@ AeonStyleSheet& AeonElement::getMutableStyle(const String& stateName)
     return getMutableStyle(AeonElementState::CLICKED);
   else
     return getMutableStyle(AeonElementState::DEFAULT);
+}
+
+const String& AeonElement::getKey()
+{
+  return key;
+}
+
+void AeonElement::setKey(CStr value)
+{
+  key = value;
 }
 
 bool AeonElement::isFocusable() const

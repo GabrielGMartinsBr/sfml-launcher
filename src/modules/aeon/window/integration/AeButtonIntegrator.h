@@ -26,6 +26,9 @@ struct AeButtonIntegrator : public AeonIntegratorBase<AeonButtonElement> {
 
   static VALUE setText(VALUE self, VALUE value);
 
+  static VALUE getKey(VALUE self);
+  static VALUE setKey(VALUE self, VALUE value);
+
   // Variables
   static VALUE getter_x(VALUE self);
   static VALUE getter_y(VALUE self);

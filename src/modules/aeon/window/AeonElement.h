@@ -13,6 +13,7 @@ namespace ae {
 
 using app::ULong;
 using app::UnMap;
+using app::CStr;
 using sf::RenderTarget;
 
 class AeonElement {
@@ -61,6 +62,9 @@ class AeonElement {
   AeonStyleSheet& getMutableStyle(AeonElementState state);
   AeonStyleSheet& getMutableStyle(const String& stateName);
 
+  const String& getKey();
+  void setKey(CStr value);
+
   bool isFocusable() const;
   void setFocusable(bool value);
 
@@ -75,6 +79,7 @@ class AeonElement {
   uint8_t states;
   AeonStyleSheet defaultStyle;
   UnMap<AeonElementState, AeonStyleSheet> stateStyles;
+  String key;
   bool dirtyBounds;
   bool dirtyState;
   bool dirtyStyle;

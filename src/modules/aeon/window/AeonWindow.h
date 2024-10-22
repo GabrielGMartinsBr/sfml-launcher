@@ -18,6 +18,7 @@
 
 namespace ae {
 
+using app::CStr;
 using app::SPtr;
 using app::ULong;
 using app::Vector;
@@ -60,15 +61,20 @@ class AeonWindow : public Eng::Window, Eng::IOnRender {
 
   void drawElements(sf::RenderTarget& target);
 
-  void setTextBoxView();
+  CStr getHoverElementKey();
+  CStr getFocusElementKey();
+  CStr getClickElementKey();
+  CStr getTriggerElementKey();
 
  private:
   sf::View windowView;
   sf::View& textBoxView;
 
   Vector<AeonElement*> elements;
-  AeonElement* focusedElement;
-  AeonElement* clickedElement;
+  AeonElement* hoveredElement = nullptr;
+  AeonElement* focusedElement = nullptr;
+  AeonElement* clickedElement = nullptr;
+  AeonElement* triggeredElement = nullptr;
   int focusedElementIndex;
 
   RoundedRectShape ring;
@@ -87,9 +93,12 @@ class AeonWindow : public Eng::Window, Eng::IOnRender {
 
   int getElementIndex(AeonElement* focusedElement) const;
 
-  void setFocusedElement(AeonElement* element);
-
   void handleTabKeyPressed(bool isShiftPressed);
+
+  void setHoverElement(AeonElement* element);
+  void setFocusedElement(AeonElement* element);
+  void setClickElement(AeonElement* element);
+  void setTriggeredElement(AeonElement* element);
 };
 
 }  // namespace ae

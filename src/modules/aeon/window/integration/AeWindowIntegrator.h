@@ -18,6 +18,11 @@ struct AeWindowIntegrator : public AeonIntegratorBase<AeonWindow> {
 
   static VALUE meth_initialize(int argc, VALUE *argv, VALUE self);
 
+  static VALUE getHoverElementKey(VALUE self);
+  static VALUE getFocusElementKey(VALUE self);
+  static VALUE getClickElementKey(VALUE self);
+  static VALUE getTriggerElementKey(VALUE self);
+
   static VALUE disposed(VALUE self);
   static VALUE dispose(VALUE self);
   

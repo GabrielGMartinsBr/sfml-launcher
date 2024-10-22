@@ -59,6 +59,9 @@ void AeonWindow::handleAeonUpdate(ULong ts)
   for (AeonElement* element : elements) {
     element->handleAeonUpdate(ts);
   }
+  if (triggeredElement && !triggeredElement->isTriggered()) {
+    setTriggeredElement(nullptr);
+  }
 }
 
 void AeonWindow::handleMouseMoved(const AeMouseMoveEvent& event)
@@ -67,15 +70,13 @@ void AeonWindow::handleMouseMoved(const AeMouseMoveEvent& event)
   float y = bounds.y();
   float evX = event.x - x - 4;
   float evY = event.y - y - 4;
-  bool hasIntersection = false;
   for (AeonElement* element : elements) {
-    hasIntersection = element->intersects(evX, evY);
-    if (hasIntersection) {
-      element->addState(AeonElementState::HOVER);
-    } else {
-      element->removeState(AeonElementState::HOVER);
+    if (element->intersects(evX, evY)) {
+      setHoverElement(element);
+      return;
     }
   }
+  setHoverElement(nullptr);
 }
 
 void AeonWindow::handleMousePressed(const AeMouseButtonEvent& event)
@@ -87,17 +88,18 @@ void AeonWindow::handleMousePressed(const AeMouseButtonEvent& event)
   for (AeonElement* element : elements) {
     if (element->intersects(evX, evY)) {
       setFocusedElement(element);
-      clickedElement = element;
-      element->handleClick();
+      setClickElement(element);
+      return;
     }
   }
+  setFocusedElement(nullptr);
+  setClickElement(nullptr);
 }
 
 void AeonWindow::handleMouseReleased(const AeMouseButtonEvent& event)
 {
   if (clickedElement) {
-    clickedElement->handleClickRelease();
-    clickedElement = nullptr;
+    setClickElement(nullptr);
   }
 }
 
@@ -146,13 +148,12 @@ void AeonWindow::setIsFocused(bool value)
 
 void AeonWindow::onRender(sf::RenderTexture& renderTexture)
 {
-  const sf::View& defaultView = renderTexture.getDefaultView();
-  if (isRingVisible) {
-    ring.drawTo(renderTexture);
-  }
+  // if (isRingVisible) {
+  //   ring.drawTo(renderTexture);
+  // }
   renderTexture.setView(windowView);
   drawElements(renderTexture);
-  renderTexture.setView(defaultView);
+  renderTexture.setView(renderTexture.getDefaultView());
 }
 
 bool AeonWindow::shouldRender() const
@@ -253,6 +254,26 @@ void AeonWindow::drawElements(sf::RenderTarget& target)
   target.setView(windowView);
 }
 
+CStr AeonWindow::getHoverElementKey()
+{
+  return hoveredElement ? hoveredElement->getKey().c_str() : "";
+}
+
+CStr AeonWindow::getFocusElementKey()
+{
+  return focusedElement ? focusedElement->getKey().c_str() : "";
+}
+
+CStr AeonWindow::getClickElementKey()
+{
+  return clickedElement ? clickedElement->getKey().c_str() : "";
+}
+
+CStr AeonWindow::getTriggerElementKey()
+{
+  return triggeredElement ? triggeredElement->getKey().c_str() : "";
+}
+
 /*
   ⇩⇩⇩ Private ⇩⇩⇩
 */
@@ -331,6 +352,32 @@ int AeonWindow::getElementIndex(AeonElement* focusedElement) const
   return -1;
 }
 
+void AeonWindow::handleTabKeyPressed(bool isShiftPressed)
+{
+  if (isShiftPressed) {
+    if (focusedElementIndex < 1) {
+      focusedElementIndex = elements.size();
+    } else {
+      focusedElementIndex -= 1;
+    }
+  } else {
+    focusedElementIndex = (focusedElementIndex + 1) % elements.size();
+  }
+  setFocusedElement(elements[focusedElementIndex]);
+}
+
+void AeonWindow::setHoverElement(AeonElement* element)
+{
+  if (hoveredElement == element) return;
+  if (hoveredElement != nullptr) {
+    hoveredElement->removeState(AeonElementState::HOVER);
+  }
+  hoveredElement = element;
+  if (hoveredElement) {
+    hoveredElement->addState(AeonElementState::HOVER);
+  }
+}
+
 void AeonWindow::setFocusedElement(AeonElement* element)
 {
   if (focusedElement == element) return;
@@ -347,18 +394,26 @@ void AeonWindow::setFocusedElement(AeonElement* element)
   }
 }
 
-void AeonWindow::handleTabKeyPressed(bool isShiftPressed)
+void AeonWindow::setClickElement(AeonElement* element)
 {
-  if (isShiftPressed) {
-    if (focusedElementIndex < 1) {
-      focusedElementIndex = elements.size();
-    } else {
-      focusedElementIndex -= 1;
-    }
-  } else {
-    focusedElementIndex = (focusedElementIndex + 1) % elements.size();
+  if (clickedElement == element) return;
+  if (clickedElement) {
+    clickedElement->handleClickRelease();
   }
-  setFocusedElement(elements[focusedElementIndex]);
+  clickedElement = element;
+  if (element) {
+    clickedElement->handleClick();
+  }
+  setTriggeredElement(element);
+}
+
+void AeonWindow::setTriggeredElement(AeonElement* element)
+{
+  if (element && element->isTriggered()) {
+    triggeredElement = element;
+  } else {
+    triggeredElement = nullptr;
+  }
 }
 
 }  // namespace ae
