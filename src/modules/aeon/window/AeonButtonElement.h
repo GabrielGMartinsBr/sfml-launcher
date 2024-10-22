@@ -24,7 +24,7 @@ class AeonButtonElement : public AeonElement, public AeonIntegrable {
     return AeonElementType::BUTTON;
   }
 
-  void drawTo(RenderTarget& target) override;
+  void drawShapesTo(RenderTarget& target) override;
 
   const sf::String& setText(const sf::String& value);
 

@@ -9,9 +9,9 @@
 
 #include "AppDefs.h"
 #include "aeon/base/AeonEvents.h"
-#include "aeon/toolkit/AeonHitbox.hpp"
 #include "aeon/toolkit/RoundedRectShape.h"
 #include "aeon/window/AeonElement.h"
+#include "aeon/window/AeonTextBoxElement.h"
 #include "engnine/IOnRender.h"
 #include "engnine/Viewport.hpp"
 #include "engnine/Window.h"
@@ -60,14 +60,17 @@ class AeonWindow : public Eng::Window, Eng::IOnRender {
 
   void drawElements(sf::RenderTarget& target);
 
+  void setTextBoxView();
+
  private:
+  sf::View windowView;
+  sf::View& textBoxView;
+
   Vector<AeonElement*> elements;
   AeonElement* focusedElement;
   AeonElement* clickedElement;
   int focusedElementIndex;
-  AeonHitBox hitBox;
 
-  sf::View windowView;
   RoundedRectShape ring;
   bool isRingVisible;
   bool isHover;
@@ -80,6 +83,7 @@ class AeonWindow : public Eng::Window, Eng::IOnRender {
   void updateContentPosition();
   void updateContentDimension();
   void updateViewBounds();
+  void updateTextBoxViewBounds(const AeonTextBoxElement& element);
 
   int getElementIndex(AeonElement* focusedElement) const;
 

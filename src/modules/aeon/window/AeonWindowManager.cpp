@@ -115,6 +115,11 @@ ULong AeonWindowManager::getTimestamp()
   return clock.getElapsedTime().asMilliseconds();
 }
 
+sf::View& AeonWindowManager::getTextBoxView()
+{
+  return textBoxView;
+}
+
 void AeonWindowManager::setFocusOn(AeonWindow* window)
 {
   if (focusedWindow == window) return;

@@ -22,6 +22,10 @@ AeonElement::AeonElement() :
 {
 }
 
+void AeonElement::drawShapesTo(RenderTarget& target) { }
+
+void AeonElement::drawContentsTo(RenderTarget& target) { }
+
 void AeonElement::handleAeonUpdate(ULong)
 {
   if (clicked && !triggered) {
@@ -42,13 +46,11 @@ void AeonElement::handleClickRelease()
   removeState(AeonElementState::CLICKED);
 }
 
-void AeonElement::drawTo(RenderTarget& target) { }
-
 /*
   ⇩⇩⇩ Getters And Setters ⇩⇩⇩
 */
 
-const ElementBounds& AeonElement::getBounds()
+const ElementBounds& AeonElement::getBounds() const
 {
   return bounds;
 }
@@ -120,7 +122,7 @@ void AeonElement::clearState()
   dirtyState = true;
 }
 
-const AeonStyleSheet& AeonElement::getStyle()
+const AeonStyleSheet& AeonElement::getStyle() const
 {
   return defaultStyle;
 }

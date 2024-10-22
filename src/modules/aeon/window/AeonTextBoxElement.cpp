@@ -1,7 +1,9 @@
 #include "./AeonTextBoxElement.h"
 
 #include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/Text.hpp>
+#include <SFML/System/Vector2.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include <unordered_set>
 
@@ -29,6 +31,28 @@ AeonTextBoxElement::AeonTextBoxElement() :
   applyStyle();
   applyBounds();
 }
+
+/*
+  Draw methods
+*/
+
+void AeonTextBoxElement::drawShapesTo(RenderTarget& target)
+{
+  refreshValues();
+  shape.drawTo(target);
+}
+
+void AeonTextBoxElement::drawContentsTo(RenderTarget& target)
+{
+  target.draw(text);
+  if (hasFocus && showCursor) {
+    target.draw(cursorShape);
+  }
+}
+
+/*
+  Aeon event handlers
+*/
 
 void AeonTextBoxElement::handleAeonUpdate(ULong ts)
 {
@@ -68,17 +92,6 @@ void AeonTextBoxElement::handleTextEntered(const AeTextEvent& event)
 /*
 
 */
-
-void AeonTextBoxElement::drawTo(RenderTarget& target)
-{
-  refreshValues();
-  shape.drawTo(target);
-  target.draw(text);
-  
-  if (hasFocus && showCursor) {
-    target.draw(cursorShape);
-  }
-}
 
 void AeonTextBoxElement::flush()
 {
@@ -218,45 +231,50 @@ void AeonTextBoxElement::alignText()
   const sf::FloatRect& localBounds = text.getLocalBounds();
 
   const Vector2f padding = getCurrentPadding();
+  float border = defaultStyle.borderSize.value_or(0);
+  float totalBorder = border * 2;
+
+  float height = bounds.height() - totalBorder;
 
   Vector2f textOrigin(
     -padding.x,
-    -(bounds.height() - leading - localBounds.top) / 2
+    -(height - leading) / 2 + border
   );
 
   if (isPassword && !valueString.isEmpty()) {
-    textOrigin.y = -(bounds.height() - globalBounds.height) / 2 + localBounds.top;
+    textOrigin.y = -(height - globalBounds.height) / 2 + localBounds.top;
   }
 
   text.setOrigin(textOrigin);
-  text.setPosition(bounds.position());
+  text.setPosition(0, 0);
 
-  cursorShape.setSize(sf::Vector2f(1, leading + 2));
-  cursorShape.setOrigin(textOrigin);
+  Vector2f cursorSize(1, leading + 2);
+  cursorShape.setSize(cursorSize);
+  sf::Vector2f cursorOrigin(-padding.x, -(height - cursorSize.y) / 2);
+  cursorShape.setOrigin(cursorOrigin);
   alignCursor();
 }
 
 void AeonTextBoxElement::alignCursor()
 {
-  sf::Vector2f cursorPosition(bounds.position());
+  sf::Vector2f cursorPosition(0, 0);
 
   if (valueString.getSize() > 0) {
     if (!isPassword && textFont) {
       sf::String befStr = valueString.substring(0, cursorIndex);
       sf::Text befText(befStr, *textFont);
       befText.setCharacterSize(fontSize);
-      cursorPosition.x = bounds.x() + befText.getGlobalBounds().width + 1;
+      cursorPosition.x = befText.getGlobalBounds().width + 1;
     } else {
       int index = std::max<int>(-1, cursorIndex - 1);
       if (index > -1) {
         cursorPosition.x = text.findCharacterPos(index).x;
       } else {
-        cursorPosition.x = bounds.x();
+        cursorPosition.x = 0;
       }
     }
   }
 
-  cursorPosition.y -= 1;
   cursorShape.setPosition(cursorPosition);
 }
 

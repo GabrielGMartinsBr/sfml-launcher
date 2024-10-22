@@ -26,11 +26,12 @@ class AeonTextBoxElement : public AeonElement, public AeonIntegrable {
     return AeonElementType::TEXT_BOX;
   }
 
+  void drawShapesTo(RenderTarget& target) override;
+  void drawContentsTo(RenderTarget& target) override;
+
   void handleAeonUpdate(ULong ts) override;
   void handleKeyPressed(const AeKeyEvent& event);
   void handleTextEntered(const AeTextEvent& event);
-
-  void drawTo(RenderTarget& target) override;
 
   void flush();
 

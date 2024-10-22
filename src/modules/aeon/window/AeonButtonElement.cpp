@@ -22,7 +22,7 @@ AeonButtonElement::AeonButtonElement() :
   applyBounds();
 }
 
-void AeonButtonElement::drawTo(RenderTarget& target)
+void AeonButtonElement::drawShapesTo(RenderTarget& target)
 {
   refreshValues();
   shape.drawTo(target);

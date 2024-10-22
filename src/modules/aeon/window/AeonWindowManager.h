@@ -1,5 +1,7 @@
 #pragma once
 
+#include <SFML/Graphics/RenderTexture.hpp>
+#include <SFML/Graphics/View.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
 
@@ -41,12 +43,14 @@ struct AeonWindowManager {
   void updateEntries();
 
   ULong getTimestamp();
+  sf::View& getTextBoxView();
 
   void setFocusOn(AeonWindow* window);
 
  private:
-  sf::Clock clock;
   ULong ts;
+  sf::View textBoxView;
+  sf::Clock clock;
 };
 
 }  // namespace ae

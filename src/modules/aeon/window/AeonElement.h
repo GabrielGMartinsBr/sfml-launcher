@@ -22,18 +22,19 @@ class AeonElement {
 
   inline virtual AeonElementType getType() const = 0;
 
+  virtual void drawShapesTo(RenderTarget& target);
+  virtual void drawContentsTo(RenderTarget& target);
+
   virtual void handleAeonUpdate(ULong ts);
-  void handleClick();
-  void handleClickRelease();
+  virtual void handleClick();
+  virtual void handleClickRelease();
 
   inline bool intersects(float x, float y) const
   {
     return bounds.intersects(x, y, defaultStyle.borderSize.value_or(0));
   }
 
-  virtual void drawTo(RenderTarget& target);
-
-  const ElementBounds& getBounds();
+  const ElementBounds& getBounds() const;
   void setBounds(const ElementBounds& value);
 
   void setPosition(float x, float y);
@@ -50,7 +51,7 @@ class AeonElement {
   bool hasState(AeonElementState state) const;
   void clearState();
 
-  const AeonStyleSheet& getStyle();
+  const AeonStyleSheet& getStyle() const;
   void setStyle(const AeonStyleSheet& style);
 
   const AeonStyleSheet& getStateStyle(AeonElementState state);
