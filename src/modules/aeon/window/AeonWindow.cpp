@@ -35,7 +35,8 @@ AeonWindow::AeonWindow(VALUE rbObj, Eng::Viewport* viewport) :
     ring(3),
     isRingVisible(false),
     isHover(false),
-    isFocused(false)
+    isFocused(false),
+    lockedFocus(false)
 {
   addedToEngineCycles = false;
   ring.fillColor("#0000");
@@ -136,10 +137,34 @@ void AeonWindow::setIsHover(bool value)
 void AeonWindow::setIsFocused(bool value)
 {
   isFocused = value;
-  isRingVisible = value;
+  // isRingVisible = value;
   if (!isFocused) {
     setFocusedElement(nullptr);
   }
+}
+
+bool AeonWindow::focus()
+{
+  return isFocused;
+}
+
+void AeonWindow::focus(bool value)
+{
+  if (value) {
+    AeonWindowManager::Instance().setFocusOn(this);
+  } else if (isFocused) {
+    AeonWindowManager::Instance().setFocusOn(nullptr);
+  }
+}
+
+bool AeonWindow::lockFocus()
+{
+  return lockedFocus;
+}
+
+void AeonWindow::lockFocus(bool value)
+{
+  lockedFocus = value;
 }
 
 /*

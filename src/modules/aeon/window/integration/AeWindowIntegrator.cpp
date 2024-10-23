@@ -30,6 +30,9 @@ void AeWindowIntegrator::integrate(VALUE aeonModule)
   rb_define_method(classObject, "disposed", RUBY_METHOD_FUNC(disposed), 0);
   rb_define_method(classObject, "dispose", RUBY_METHOD_FUNC(dispose), 0);
 
+  rb_define_method(classObject, "focus", RUBY_METHOD_FUNC(focus), -1);
+  rb_define_method(classObject, "lockFocus", RUBY_METHOD_FUNC(lockFocus), 1);
+
   rb_define_method(classObject, "addElement", RUBY_METHOD_FUNC(addElement), 1);
 
   rb_define_method(classObject, "windowskin", RUBY_METHOD_FUNC(getter_windowSkin), 0);
@@ -144,6 +147,27 @@ VALUE AeWindowIntegrator::dispose(VALUE self)
 {
   AeonWindow &inst = getWrappedObject(self);
   inst.method_dispose();
+  return Qnil;
+}
+
+VALUE AeWindowIntegrator::focus(int argc, VALUE *argv, VALUE self)
+{
+  AeonWindow &inst = getWrappedObject(self);
+
+  if (argc == 0) {
+    return Convert::toRubyBool(inst.focus());
+  } else if (argc == 1) {
+    inst.focus(Convert::toRubyBool(argv[0]));
+    return Qnil;
+  }
+
+  return raiseArgException("AeonWindow focus", "0 or 1", argc);
+}
+
+VALUE AeWindowIntegrator::lockFocus(VALUE self, VALUE value)
+{
+  AeonWindow &inst = getWrappedObject(self);
+  inst.lockFocus(Convert::toRubyBool(value));
   return Qnil;
 }
 

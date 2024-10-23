@@ -25,7 +25,10 @@ struct AeWindowIntegrator : public AeonIntegratorBase<AeonWindow> {
 
   static VALUE disposed(VALUE self);
   static VALUE dispose(VALUE self);
-  
+
+  static VALUE focus(int argc, VALUE *argv, VALUE self);
+  static VALUE lockFocus(VALUE self, VALUE value);
+
   static VALUE getter_windowSkin(VALUE self);
   static VALUE setter_windowSkin(VALUE self, VALUE value);
 

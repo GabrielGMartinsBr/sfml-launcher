@@ -123,6 +123,11 @@ sf::View& AeonWindowManager::getTextBoxView()
 void AeonWindowManager::setFocusOn(AeonWindow* window)
 {
   if (focusedWindow == window) return;
+
+  if (!window && focusedWindow && focusedWindow->lockFocus()) {
+    return;
+  }
+
   if (focusedWindow) {
     focusedWindow->setIsFocused(false);
   }

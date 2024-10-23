@@ -40,6 +40,12 @@ class AeonWindow : public Eng::Window, Eng::IOnRender {
   void setIsHover(bool value);
   void setIsFocused(bool value);
 
+  bool focus();
+  void focus(bool value);
+
+  bool lockFocus();
+  void lockFocus(bool value);
+
   void onRender(sf::RenderTexture& renderTexture) override;
   bool shouldRender() const override;
   int getZIndex() const override;
@@ -76,6 +82,8 @@ class AeonWindow : public Eng::Window, Eng::IOnRender {
   AeonElement* clickedElement = nullptr;
   AeonElement* triggeredElement = nullptr;
   int focusedElementIndex;
+
+  bool lockedFocus;
 
   RoundedRectShape ring;
   bool isRingVisible;
