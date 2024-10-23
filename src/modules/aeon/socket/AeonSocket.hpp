@@ -116,13 +116,6 @@ struct AeonSocket : public std::enable_shared_from_this<AeonSocket> {
   String port;
   String inData;
   bool running;
-
-  void connect()
-  {
-    tcp::resolver resolver(io_context);
-    tcp::resolver::results_type endpoints = resolver.resolve(host, port);
-    boost::asio::connect(socket, endpoints);
-  }
 };
 
 }  // namespace ae
