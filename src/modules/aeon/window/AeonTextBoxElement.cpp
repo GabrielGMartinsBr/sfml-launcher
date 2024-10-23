@@ -133,6 +133,16 @@ const sf::String& AeonTextBoxElement::setValue(const sf::String& value)
   return valueString;
 }
 
+bool AeonTextBoxElement::isCursorOnBegin()
+{
+  return cursorIndex == 0;
+}
+
+bool AeonTextBoxElement::isCursorOnEnd()
+{
+  return cursorIndex == valueString.getSize();
+}
+
 /*
   ⇩⇩⇩ Private ⇩⇩⇩
 */

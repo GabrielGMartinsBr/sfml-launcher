@@ -72,6 +72,9 @@ class AeonWindow : public Eng::Window, Eng::IOnRender {
   CStr getClickElementKey();
   CStr getTriggerElementKey();
 
+  void focusNext();
+  void focusPrevious();
+
  private:
   sf::View windowView;
   sf::View& textBoxView;
@@ -100,8 +103,6 @@ class AeonWindow : public Eng::Window, Eng::IOnRender {
   void updateTextBoxViewBounds(const AeonTextBoxElement& element);
 
   int getElementIndex(AeonElement* focusedElement) const;
-
-  void handleTabKeyPressed(bool isShiftPressed);
 
   void setHoverElement(AeonElement* element);
   void setFocusedElement(AeonElement* element);

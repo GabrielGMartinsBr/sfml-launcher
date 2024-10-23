@@ -107,13 +107,46 @@ void AeonWindow::handleMouseReleased(const AeMouseButtonEvent& event)
 void AeonWindow::handleKeyPressed(const AeKeyEvent& event)
 {
   if (event.code == sf::Keyboard::Tab) {
-    handleTabKeyPressed(event.shift);
-  }
-  if (!focusedElement || focusedElement->getType() != AeonElementType::TEXT_BOX) {
+    if (event.shift) {
+      focusPrevious();
+    } else {
+      focusNext();
+    }
+  } else if (event.code == sf::Keyboard::Up) {
+    focusPrevious();
+  } else if (event.code == sf::Keyboard::Down) {
+    focusNext();
+  } else if (event.code == sf::Keyboard::Enter) {
+    setClickElement(focusedElement);
     return;
   }
-  AeonTextBoxElement* textBox = static_cast<AeonTextBoxElement*>(focusedElement);
-  textBox->handleKeyPressed(event);
+
+  if (!focusedElement) {
+    return;
+  }
+
+  if (focusedElement->getType() == AeonElementType::TEXT_BOX) {
+    AeonTextBoxElement* textBox = static_cast<AeonTextBoxElement*>(focusedElement);
+
+    if (event.code == sf::Keyboard::Left && textBox->isCursorOnBegin()) {
+      focusPrevious();
+      return;
+    } else if (event.code == sf::Keyboard::Right && textBox->isCursorOnEnd()) {
+      focusNext();
+      return;
+    }
+
+    textBox->handleKeyPressed(event);
+    return;
+  }
+
+  if (focusedElement->getType() == AeonElementType::BUTTON) {
+    if (event.code == sf::Keyboard::Left) {
+      focusPrevious();
+    } else if (event.code == sf::Keyboard::Right) {
+      focusNext();
+    }
+  }
 }
 
 void AeonWindow::handleTextEntered(const AeTextEvent& event)
@@ -299,6 +332,22 @@ CStr AeonWindow::getTriggerElementKey()
   return triggeredElement ? triggeredElement->getKey().c_str() : "";
 }
 
+void AeonWindow::focusNext()
+{
+  focusedElementIndex = (focusedElementIndex + 1) % elements.size();
+  setFocusedElement(elements[focusedElementIndex]);
+}
+
+void AeonWindow::focusPrevious()
+{
+  if (focusedElementIndex <= 0) {
+    focusedElementIndex = elements.size() - 1;
+  } else {
+    focusedElementIndex -= 1;
+  }
+  setFocusedElement(elements[focusedElementIndex]);
+}
+
 /*
   ⇩⇩⇩ Private ⇩⇩⇩
 */
@@ -375,20 +424,6 @@ int AeonWindow::getElementIndex(AeonElement* focusedElement) const
     return index;
   }
   return -1;
-}
-
-void AeonWindow::handleTabKeyPressed(bool isShiftPressed)
-{
-  if (isShiftPressed) {
-    if (focusedElementIndex < 1) {
-      focusedElementIndex = elements.size();
-    } else {
-      focusedElementIndex -= 1;
-    }
-  } else {
-    focusedElementIndex = (focusedElementIndex + 1) % elements.size();
-  }
-  setFocusedElement(elements[focusedElementIndex]);
 }
 
 void AeonWindow::setHoverElement(AeonElement* element)

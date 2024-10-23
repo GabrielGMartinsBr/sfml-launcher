@@ -42,6 +42,9 @@ class AeonTextBoxElement : public AeonElement, public AeonIntegrable {
   const sf::String& getValue();
   const sf::String& setValue(const sf::String& value);
 
+  bool isCursorOnBegin();
+  bool isCursorOnEnd();
+
  private:
   RoundedRectShape shape;
   RectangleShape cursorShape;

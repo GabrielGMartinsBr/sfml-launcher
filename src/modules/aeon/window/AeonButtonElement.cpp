@@ -128,10 +128,13 @@ void AeonButtonElement::alignText()
   float leading = textFont->getLineSpacing(fontSize);
   const sf::FloatRect& globalBounds = text.getGlobalBounds();
   const sf::FloatRect& localBounds = text.getLocalBounds();
+  float border = defaultStyle.borderSize.value_or(0);
+  float totalBorder = border * 2;
+  float height = bounds.height() - totalBorder;
 
   Vector2f textOrigin(
-    -(bounds.width() - globalBounds.width) / 2,
-    -(bounds.height() - leading - localBounds.top) / 2
+    -(bounds.width() - globalBounds.width - totalBorder) / 2,
+    -(height - leading) / 2 
   );
 
   text.setOrigin(textOrigin);
