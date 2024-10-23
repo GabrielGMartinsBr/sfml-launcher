@@ -88,8 +88,6 @@ void AeonSocketWorker::run()
     socket.reset();
   }
 
-  Log::out() << "Stop";
-
   io_context.stop();
   if (io_thread.joinable()) {
     io_thread.join();

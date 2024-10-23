@@ -69,7 +69,7 @@ struct AeonSocket : public std::enable_shared_from_this<AeonSocket> {
       try {
         socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
         socket.close();
-        Log::out() << "Connection closed.";
+        Log::out() << "Socket connection was closed.";
       } catch (const std::exception& e) {
         Log::err() << "Error closing socket: " << e.what();
       }
