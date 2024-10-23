@@ -19,6 +19,7 @@ struct AeonSocketIntegrator : public AeonIntegratorBase<AeonSocketIntegrable> {
   static VALUE initialize(VALUE self);
 
   static VALUE connect(VALUE self, VALUE host, VALUE port);
+  static VALUE close(VALUE self);
   static VALUE disconnect(VALUE self);
 
   static VALUE sendMessage(VALUE self, VALUE message);

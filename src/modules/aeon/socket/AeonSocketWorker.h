@@ -13,6 +13,7 @@ using app::SPtr;
 using app::String;
 using app::Thread;
 using boost::asio::ip::tcp;
+using BoostIoContext = boost::asio::io_context;
 
 struct AeonSocketWorker {
   AeonSocketWorker();
@@ -23,6 +24,7 @@ struct AeonSocketWorker {
 
  protected:
   Thread thread_;
+  BoostIoContext io_context;
   SPtr<ae::AeonSocket> socket;
   std::queue<std::function<void()>> tasks;
   std::mutex queue_mutex;

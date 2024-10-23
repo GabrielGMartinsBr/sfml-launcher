@@ -21,6 +21,7 @@ void AeonSocketIntegrator::integrate(VALUE aeonModule)
   rb_define_method(classObject, "initialize", RUBY_METHOD_FUNC(initialize), 0);
 
   rb_define_method(classObject, "connect", RUBY_METHOD_FUNC(connect), 2);
+  rb_define_method(classObject, "close", RUBY_METHOD_FUNC(close), 0);
   rb_define_method(classObject, "disconnect", RUBY_METHOD_FUNC(disconnect), 0);
 
   rb_define_method(classObject, "send", RUBY_METHOD_FUNC(sendMessage), 1);
@@ -93,6 +94,16 @@ VALUE AeonSocketIntegrator::connect(VALUE self, VALUE hostRb, VALUE portRb)
   VALUE yieldBlock = rb_block_given_p() ? rb_block_proc() : Qnil;
   inst.connect(host, port, yieldBlock);
 
+  return Qnil;
+}
+
+/*
+    Close
+*/
+VALUE AeonSocketIntegrator::close(VALUE self)
+{
+  AeonSocketIntegrable &inst = AeonIntegratorBase::getWrappedObject(self);
+  inst.close();
   return Qnil;
 }
 

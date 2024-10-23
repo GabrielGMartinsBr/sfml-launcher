@@ -27,7 +27,6 @@ AeonSocketManager& AeonSocketManager::Instance()
 void AeonSocketManager::Destroy()
 {
   assert(instance);
-  Log::out() << "Destroying all sockets...";
   instance->destroyAll();
   delete instance;
   instance = nullptr;

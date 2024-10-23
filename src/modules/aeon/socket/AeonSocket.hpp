@@ -4,6 +4,7 @@
 #include <boost/asio/connect.hpp>
 #include <boost/asio/read_until.hpp>
 #include <boost/bind/bind.hpp>
+#include <chrono>
 
 #include "AppDefs.h"
 #include "Log.hpp"
@@ -56,11 +57,23 @@ struct AeonSocket : public std::enable_shared_from_this<AeonSocket> {
       endpoints,
       [callback, this](const boost::system::error_code& ec, const tcp::endpoint& endpoint) {
         if (ec) {
-          socket.close();
+          // socket.close();
         }
         callback(ec, endpoint);
       }
     );
+  }
+
+  void close()
+  {
+    if (socket.is_open()) {
+      try {
+        socket.cancel();
+        socket.close();
+      } catch (const std::exception& e) {
+        Log::err() << "Error closing socket: " << e.what();
+      }
+    }
   }
 
   void disconnect()
@@ -68,8 +81,10 @@ struct AeonSocket : public std::enable_shared_from_this<AeonSocket> {
     if (socket.is_open()) {
       try {
         socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+      } catch (const std::exception&) {
+      }
+      try {
         socket.close();
-        Log::out() << "Socket connection was closed.";
       } catch (const std::exception& e) {
         Log::err() << "Error closing socket: " << e.what();
       }

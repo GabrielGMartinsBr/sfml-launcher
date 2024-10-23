@@ -2,8 +2,6 @@
 
 namespace ae {
 
-using BoostIoContext = boost::asio::io_context;
-
 AeonSocketWorker::AeonSocketWorker() :
     running(false),
     socket(nullptr)
@@ -27,13 +25,16 @@ void AeonSocketWorker::stopWorker()
   {
     std::lock_guard<std::mutex> lock(queue_mutex);
     running = false;
+    io_context.stop();
   }
   condition.notify_all();
   if (thread_.joinable()) {
     thread_.join();
   }
   if (socket) {
-    socket->disconnect();
+    if (socket->socket.is_open()) {
+      socket->disconnect();
+    }
     socket.reset();
   }
 }
@@ -56,7 +57,6 @@ void AeonSocketWorker::enqueueAsyncTask(const std::function<void(SPtr<AeonSocket
 
 void AeonSocketWorker::run()
 {
-  BoostIoContext io_context;
   boost::asio::executor_work_guard<BoostIoContext::executor_type> work_guard(io_context.get_executor());
 
   socket = std::make_shared<AeonSocket>(io_context);

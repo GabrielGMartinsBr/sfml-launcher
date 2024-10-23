@@ -41,8 +41,6 @@ void AeonSocketIntegrable::onUpdate()
     }
     if (connectYieldBlock != Qnil) {
       rb_funcall(connectYieldBlock, rb_intern("call"), 1, connectHandlerResult);
-      rb_gc_unregister_address(&connectYieldBlock);
-      connectYieldBlock = Qnil;
     }
     connectHandlerResult = Qnil;
   }
@@ -58,7 +56,7 @@ void AeonSocketIntegrable::connect(const String &host, const String &port, VALUE
     setConnectYieldBlock(yieldBlock);
   }
 
-  if (socket && socket->isConnected()) {
+  if (socket && socket->socket.is_open()) {
     Log::err() << "Socket is already connected.";
     handleConnectResult(false);
     return;
@@ -72,8 +70,8 @@ void AeonSocketIntegrable::connect(const String &host, const String &port, VALUE
         if (!ec) {
           handleConnectResult(true);
         } else {
-          Log::err() << "Error during connect: " << ec.message();
           handleConnectResult(false);
+          // Log::err() << "Error during connect: " << ec.message();
         }
       }
     );
@@ -91,7 +89,9 @@ void AeonSocketIntegrable::readMessagesByDelimiter(char delim)
         delim,
         [this](const boost::system::error_code &ec, const String &msg) {
           if (ec) {
-            Log::err() << "Error reading message: " << ec.message();
+            if (ec != boost::asio::error::operation_aborted) {
+              Log::err() << "Error reading message: " << ec.message();
+            }
           } else {
             addMessage(std::move(msg));
           }
@@ -119,6 +119,20 @@ void AeonSocketIntegrable::sendMessage(const String &message)
 
 /*
     Close socket connection
+*/
+void AeonSocketIntegrable::close()
+{
+  socket->close();
+}
+
+void AeonSocketIntegrable::shutdown()
+{
+  Log::out() << "shutdown";
+  socket->disconnect();
+}
+
+/*
+    Close and shutdown socket connection
 */
 void AeonSocketIntegrable::disconnect()
 {

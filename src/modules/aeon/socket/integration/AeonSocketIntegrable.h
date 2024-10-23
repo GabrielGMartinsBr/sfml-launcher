@@ -21,6 +21,8 @@ struct AeonSocketIntegrable : public AeonSocketWorker, public AeonIntegrable, pu
   void sendMessage(const String& message);
   void readMessagesByDelimiter(char delim);
 
+  void close();
+  void shutdown();
   void disconnect();
 
   bool isConnected();
