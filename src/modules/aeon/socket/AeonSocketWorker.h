@@ -4,7 +4,7 @@
 #include <queue>
 
 #include "AppDefs.h"
-#include "aeon/socket/AeonSocketBase.hpp"
+#include "aeon/socket/AeonSocket.hpp"
 
 namespace ae {
 
@@ -19,11 +19,11 @@ struct AeonSocketWorker {
 
   void startWorker();
   void stopWorker();
-  void enqueueAsyncTask(const std::function<void(SPtr<ae::AeonSocketBase>&)>& task);
+  void enqueueAsyncTask(const std::function<void(SPtr<ae::AeonSocket>&)>& task);
 
  protected:
   Thread thread_;
-  SPtr<ae::AeonSocketBase> socket;
+  SPtr<ae::AeonSocket> socket;
   std::queue<std::function<void()>> tasks;
   std::mutex queue_mutex;
   std::condition_variable condition;

@@ -41,7 +41,7 @@ void AeonSocketWorker::stopWorker()
 /*
     Add task to queue
 */
-void AeonSocketWorker::enqueueAsyncTask(const std::function<void(SPtr<AeonSocketBase> &)> &task)
+void AeonSocketWorker::enqueueAsyncTask(const std::function<void(SPtr<AeonSocket> &)> &task)
 {
   {
     std::lock_guard<std::mutex> lock(queue_mutex);
@@ -59,7 +59,7 @@ void AeonSocketWorker::run()
   BoostIoContext io_context;
   boost::asio::executor_work_guard<BoostIoContext::executor_type> work_guard(io_context.get_executor());
 
-  socket = std::make_shared<AeonSocketBase>(io_context);
+  socket = std::make_shared<AeonSocket>(io_context);
 
   std::thread io_thread([&]() {
     io_context.run();

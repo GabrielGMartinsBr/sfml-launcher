@@ -19,12 +19,12 @@ using AsyncConnectCallback = std::function<void(const boost::system::error_code&
 using AsyncSendCallback = std::function<void(const boost::system::error_code&, std::size_t)>;
 using AsyncReadCallback = std::function<void(const boost::system::error_code&, const String&)>;
 
-struct AeonSocketBase : public std::enable_shared_from_this<AeonSocketBase> {
+struct AeonSocket : public std::enable_shared_from_this<AeonSocket> {
   boost::asio::io_context& io_context;
   tcp::resolver resolver;
   tcp::socket socket;
 
-  AeonSocketBase(boost::asio::io_context& io_context) :
+  AeonSocket(boost::asio::io_context& io_context) :
       io_context(io_context),
       resolver(io_context),
       socket(io_context)
@@ -32,7 +32,7 @@ struct AeonSocketBase : public std::enable_shared_from_this<AeonSocketBase> {
     running = true;
   }
 
-  ~AeonSocketBase()
+  ~AeonSocket()
   {
   }
 

@@ -64,7 +64,7 @@ void AeonSocketIntegrable::connect(const String &host, const String &port, VALUE
     return;
   }
 
-  enqueueAsyncTask([this, host, port, yieldBlock](SPtr<AeonSocketBase> &socket) {
+  enqueueAsyncTask([this, host, port, yieldBlock](SPtr<AeonSocket> &socket) {
     socket->connectAsync(
       host,
       port,
@@ -85,7 +85,7 @@ void AeonSocketIntegrable::connect(const String &host, const String &port, VALUE
 */
 void AeonSocketIntegrable::readMessagesByDelimiter(char delim)
 {
-  enqueueAsyncTask([delim, this](SPtr<AeonSocketBase> &socket) {
+  enqueueAsyncTask([delim, this](SPtr<AeonSocket> &socket) {
     if (socket) {
       socket->asyncReadUntil(
         delim,
@@ -106,7 +106,7 @@ void AeonSocketIntegrable::readMessagesByDelimiter(char delim)
 */
 void AeonSocketIntegrable::sendMessage(const String &message)
 {
-  enqueueAsyncTask([message](SPtr<AeonSocketBase> &socket) {
+  enqueueAsyncTask([message](SPtr<AeonSocket> &socket) {
     if (socket) {
       socket->asyncSend(message, [](const boost::system::error_code &ec, std::size_t) {
         if (ec) {
@@ -122,7 +122,7 @@ void AeonSocketIntegrable::sendMessage(const String &message)
 */
 void AeonSocketIntegrable::disconnect()
 {
-  enqueueAsyncTask([](std::shared_ptr<ae::AeonSocketBase> &socket) {
+  enqueueAsyncTask([](std::shared_ptr<ae::AeonSocket> &socket) {
     socket->disconnect();
   });
 }
