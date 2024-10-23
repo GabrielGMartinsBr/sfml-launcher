@@ -2,6 +2,7 @@
 #include "aeon/socket/AeonSocketManager.hpp"
 
 #include <cassert>
+
 #include "Log.hpp"
 
 namespace ae {
@@ -40,8 +41,6 @@ void AeonSocketManager::Destroy()
   ⇩⇩⇩ Private ⇩⇩⇩
 */
 
-AeonSocketManager::AeonSocketManager()
-{
-}
+AeonSocketManager::AeonSocketManager() { }
 
 }  // namespace ae

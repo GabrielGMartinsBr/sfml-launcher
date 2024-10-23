@@ -2,8 +2,8 @@
 
 #include "AppDefs.h"
 #include "ValueType.hpp"
-#include "aeon/socket/AeonSocket.hpp"
 #include "aeon/socket/AeonSocketManager.hpp"
+#include "aeon/socket/integration/AeonSocketIntegrable.h"
 #include "integrator/Convert.hpp"
 
 namespace ae {
@@ -24,10 +24,11 @@ void AeonSocketIntegrator::integrate(VALUE aeonModule)
   rb_define_method(classObject, "disconnect", RUBY_METHOD_FUNC(disconnect), 0);
 
   rb_define_method(classObject, "send", RUBY_METHOD_FUNC(sendMessage), 1);
-  rb_define_method(classObject, "onMessage", RUBY_METHOD_FUNC(setOnMessageCallback), 1);
-  rb_define_method(classObject, "pollMessages", RUBY_METHOD_FUNC(pollMessages), 0);
 
   rb_define_method(classObject, "isConnected?", RUBY_METHOD_FUNC(isConnected), 0);
+
+  rb_define_method(classObject, "setConnectHandler", RUBY_METHOD_FUNC(setConnectHandler), 1);
+  rb_define_method(classObject, "setMessageHandler", RUBY_METHOD_FUNC(setMessageHandler), 1);
 }
 
 // Instance allocator
@@ -42,7 +43,7 @@ VALUE AeonSocketIntegrator::instanceAllocator(VALUE instanceClass)
 void AeonSocketIntegrator::instanceFree(void *ptr)
 {
   AeonSocketManager::Instance().destroy(
-    static_cast<AeonSocket *>(ptr)
+    static_cast<AeonSocketIntegrable *>(ptr)
   );
 }
 
@@ -59,11 +60,9 @@ void AeonSocketIntegrator::instanceMark(void *ptr) { }
 */
 VALUE AeonSocketIntegrator::initialize(VALUE self)
 {
-  AeonSocket *instance = AeonSocketManager::Instance().create();
-
+  AeonSocketIntegrable *instance = AeonSocketManager::Instance().create(self);
   DATA_PTR(self) = instance;
-  instance->handleInitialize(self);
-
+  instance->startWorker();
   return self;
 }
 
@@ -72,7 +71,7 @@ VALUE AeonSocketIntegrator::initialize(VALUE self)
 */
 VALUE AeonSocketIntegrator::connect(VALUE self, VALUE hostRb, VALUE portRb)
 {
-  AeonSocket &inst = AeonIntegratorBase::getWrappedObject(self);
+  AeonSocketIntegrable &inst = AeonIntegratorBase::getWrappedObject(self);
 
   if (!ValueTypeUtils::isString(hostRb)) {
     return raiseException("Invalid host param");
@@ -84,16 +83,15 @@ VALUE AeonSocketIntegrator::connect(VALUE self, VALUE hostRb, VALUE portRb)
     char buffer[64];
     long num = NUM2LONG(portRb);
     snprintf(buffer, sizeof(buffer), "%ld", num);
-    port = std::string(buffer);
+    port = String(buffer);
   } else if (ValueTypeUtils::isString(portRb)) {
     port = Convert::toCString(portRb);
   } else {
     return raiseException("Invalid port param");
   }
 
-  VALUE cbBlock = rb_block_given_p() ? rb_block_proc() : Qnil;
-
-  inst.connect(host, port, cbBlock);
+  VALUE yieldBlock = rb_block_given_p() ? rb_block_proc() : Qnil;
+  inst.connect(host, port, yieldBlock);
 
   return Qnil;
 }
@@ -103,8 +101,8 @@ VALUE AeonSocketIntegrator::connect(VALUE self, VALUE hostRb, VALUE portRb)
 */
 VALUE AeonSocketIntegrator::disconnect(VALUE self)
 {
-  AeonSocket &inst = AeonIntegratorBase::getWrappedObject(self);
-  inst.close();
+  AeonSocketIntegrable &inst = AeonIntegratorBase::getWrappedObject(self);
+  inst.disconnect();
   return Qnil;
 }
 
@@ -113,34 +111,34 @@ VALUE AeonSocketIntegrator::disconnect(VALUE self)
 */
 VALUE AeonSocketIntegrator::sendMessage(VALUE self, VALUE message)
 {
-  AeonSocket &inst = AeonIntegratorBase::getWrappedObject(self);
-  inst.send(Convert::toCStr(message));
+  AeonSocketIntegrable &inst = AeonIntegratorBase::getWrappedObject(self);
+  inst.sendMessage(Convert::toCStr(message));
+  return Qnil;
+}
+
+/*
+    Set connection result callback
+*/
+VALUE AeonSocketIntegrator::setConnectHandler(VALUE self, VALUE handler)
+{
+  AeonSocketIntegrable &inst = AeonIntegratorBase::getWrappedObject(self);
+  inst.setConnectHandler(handler);
   return Qnil;
 }
 
 /*
     Set message received callback
 */
-VALUE AeonSocketIntegrator::setOnMessageCallback(VALUE self, VALUE callback)
+VALUE AeonSocketIntegrator::setMessageHandler(VALUE self, VALUE handler)
 {
-  AeonSocket &inst = AeonIntegratorBase::getWrappedObject(self);
-  inst.setOnMessageCallback(callback);
-  return Qnil;
-}
-
-/*
-    Poll messages
-*/
-VALUE AeonSocketIntegrator::pollMessages(VALUE self)
-{
-  AeonSocket &inst = AeonIntegratorBase::getWrappedObject(self);
-  inst.processMessages();
+  AeonSocketIntegrable &inst = AeonIntegratorBase::getWrappedObject(self);
+  inst.setMessageHandler(handler);
   return Qnil;
 }
 
 VALUE AeonSocketIntegrator::isConnected(VALUE self)
 {
-  AeonSocket &inst = AeonIntegratorBase::getWrappedObject(self);
+  AeonSocketIntegrable &inst = AeonIntegratorBase::getWrappedObject(self);
   return Convert::toRubyBool(inst.isConnected());
 }
 

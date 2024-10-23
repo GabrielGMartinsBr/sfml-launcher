@@ -3,12 +3,14 @@
 #include <boost/asio.hpp>
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/registered_buffer.hpp>
+#include <chrono>
 #include <regex>
 #include <string>
+#include <thread>
 
 #include "AppDefs.h"
 #include "Log.hpp"
-#include "aeon/socket/AeonSocketWorker.hpp"
+#include "aeon/socket/AeonSocketWorker.h"
 
 struct AeSockTester {
   ae::AeonSocketWorker socketWorker;
@@ -17,7 +19,7 @@ struct AeSockTester {
   {
     Log::out() << "starting...";
 
-    socketWorker.start();
+    socketWorker.startWorker();
 
     connect("127.0.0.1", "50001");
 
@@ -40,15 +42,15 @@ struct AeSockTester {
   {
     std::regex pattern("^<2>");
     if (std::regex_search(msg, pattern)) {
-    //   Log::out() << "Foi!";
-      //   disconnect();
-      //   connect("127.0.0.1", "50000");
+      Log::out() << "Closing connection and re open on other host...";
+      disconnect();
+      connect("127.0.0.1", "50000");
     }
   }
 
   void stop()
   {
-    socketWorker.stop();
+    socketWorker.stopWorker();
   }
 
   void connect(app::CStr host, app::CStr port)
@@ -69,10 +71,18 @@ struct AeSockTester {
             this->handleConnected();
           } else {
             Log::err() << "Error during connect: " << ec.message();
+            reconnect();
           }
         }
       );
     });
+  }
+
+  void reconnect()
+  {
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+    Log::out() << "=================================";
+    connect("127.0.0.1", "50001");
   }
 
   void readMessagesByDelimiter(char delim)
@@ -85,7 +95,7 @@ struct AeSockTester {
             if (ec) {
               std::cerr << "Error reading message: " << ec.message() << std::endl;
             } else {
-              Log::out() << "receive: " << msg;
+              Log::out() << "[in]: " << msg;
               this->handleTestDisconnect(msg);
             }
           }

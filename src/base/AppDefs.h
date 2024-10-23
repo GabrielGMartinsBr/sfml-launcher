@@ -2,6 +2,7 @@
 
 #include <boost/filesystem/path.hpp>
 #include <memory>
+#include <queue>
 #include <sstream>
 #include <string>
 #include <thread>
@@ -22,6 +23,9 @@ typedef std::stringstream StrStream;
 
 template <typename T>
 using Vector = std::vector<T>;
+
+template <typename T>
+using Queue = std::queue<T>;
 
 using StrVector = Vector<String>;
 

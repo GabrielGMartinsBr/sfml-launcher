@@ -3,8 +3,7 @@
 #include <memory>
 
 #include "AppDefs.h"
-#include "Log.hpp"
-#include "aeon/socket/AeonSocket.hpp"
+#include "aeon/socket/integration/AeonSocketIntegrable.h"
 
 namespace ae {
 
@@ -24,32 +23,33 @@ struct AeonSocketManager {
     ⇩⇩⇩ Instance ⇩⇩⇩
   */
 
-  AeonSocket* create()
+  AeonSocketIntegrable* create(VALUE rbId)
   {
-    UPtr<AeonSocket> socketPtr = std::make_unique<AeonSocket>();
-    AeonSocket* rawPtr = socketPtr.get();
+    UPtr<AeonSocketIntegrable> socketPtr = std::make_unique<AeonSocketIntegrable>(rbId);
+    AeonSocketIntegrable* rawPtr = socketPtr.get();
     clients.push_back(std::move(socketPtr));
     return rawPtr;
   }
 
-  void destroy(AeonSocket* socket)
+  void destroy(AeonSocketIntegrable* socket)
   {
     auto it = std::remove_if(
       clients.begin(),
       clients.end(),
-      [socket](UPtr<AeonSocket>& ptr) {
+      [socket](UPtr<AeonSocketIntegrable>& ptr) {
         return ptr.get() == socket;
       }
     );
     if (it != clients.end()) {
+      socket->stopWorker();
       clients.erase(it, clients.end());
     }
   }
 
   void destroyAll()
   {
-    for (UPtr<AeonSocket>& socket : clients) {
-      socket->close();
+    for (UPtr<AeonSocketIntegrable>& socket : clients) {
+      socket->stopWorker();
     }
     clients.clear();
   }
@@ -59,7 +59,7 @@ struct AeonSocketManager {
     ⇩⇩⇩ Private ⇩⇩⇩
   */
 
-  Vector<UPtr<AeonSocket>> clients;
+  Vector<UPtr<AeonSocketIntegrable>> clients;
 
   AeonSocketManager();
 

@@ -62,8 +62,13 @@ class Launcher {
     Integrator integrator;
     integrator.init();
 
+    // AeSockTester tester;
+    // tester.run();
+
     app::String scriptsPath = Eng::Engine::getInstance().getScriptsPath();
     loadScripts(scriptsPath.c_str());
+
+    // tester.stop();
 
     integrator.cleanup();
 
@@ -120,7 +125,7 @@ class Launcher {
       lineNumber = script.getEndLine();
     }
 
-    // findErrorLine(scripts, 690);
+    // findErrorLine(scripts, 17166);
 
     rb_eval_string_protect(code.c_str(), &errorState);
 

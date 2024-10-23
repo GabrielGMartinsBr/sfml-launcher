@@ -2,12 +2,12 @@
 
 #include <ruby.h>
 
+#include "./AeonSocketIntegrable.h"
 #include "aeon/base/AeonIntegratorBase.hpp"
-#include "aeon/socket/AeonSocket.hpp"
 
 namespace ae {
 
-struct AeonSocketIntegrator : public AeonIntegratorBase<AeonSocket> {
+struct AeonSocketIntegrator : public AeonIntegratorBase<AeonSocketIntegrable> {
   static VALUE classObject;
 
   static void integrate(VALUE aeonModule);
@@ -23,11 +23,10 @@ struct AeonSocketIntegrator : public AeonIntegratorBase<AeonSocket> {
 
   static VALUE sendMessage(VALUE self, VALUE message);
 
-  static VALUE pollMessages(VALUE self);
-
-  static VALUE setOnMessageCallback(VALUE self, VALUE callback);
-
   static VALUE isConnected(VALUE self);
+
+  static VALUE setConnectHandler(VALUE self, VALUE handler);
+  static VALUE setMessageHandler(VALUE self, VALUE handler);
 };
 
 }  // namespace ae

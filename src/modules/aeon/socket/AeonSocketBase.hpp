@@ -17,7 +17,7 @@ using boost::asio::ip::tcp;
 
 using AsyncConnectCallback = std::function<void(const boost::system::error_code&, const tcp::endpoint&)>;
 using AsyncSendCallback = std::function<void(const boost::system::error_code&, std::size_t)>;
-using AsyncReadCallback = std::function<void(const boost::system::error_code&, std::string)>;
+using AsyncReadCallback = std::function<void(const boost::system::error_code&, const String&)>;
 
 struct AeonSocketBase : public std::enable_shared_from_this<AeonSocketBase> {
   boost::asio::io_context& io_context;
@@ -43,6 +43,10 @@ struct AeonSocketBase : public std::enable_shared_from_this<AeonSocketBase> {
 
   void connectAsync(const String& _host, const String& _port, AsyncConnectCallback callback)
   {
+    if (socket.is_open()) {
+      disconnect();
+      std::this_thread::sleep_for(std::chrono::seconds(3));
+    }
     host = _host;
     port = _port;
     tcp::resolver::results_type endpoints = resolver.resolve(host, port);
@@ -50,7 +54,12 @@ struct AeonSocketBase : public std::enable_shared_from_this<AeonSocketBase> {
     boost::asio::async_connect(
       socket,
       endpoints,
-      callback
+      [callback, this](const boost::system::error_code& ec, const tcp::endpoint& endpoint) {
+        if (ec) {
+          socket.close();
+        }
+        callback(ec, endpoint);
+      }
     );
   }
 
@@ -83,17 +92,20 @@ struct AeonSocketBase : public std::enable_shared_from_this<AeonSocketBase> {
   void asyncReadUntil(char delim, AsyncReadCallback callback)
   {
     auto self(shared_from_this());
-    auto read_buffer = std::make_shared<std::string>();
+
     boost::asio::async_read_until(
       socket,
-      boost::asio::dynamic_buffer(*read_buffer), delim,  // Read until we find a newline
-      [this, self, read_buffer, delim, callback](const boost::system::error_code& ec, std::size_t length) {
+      boost::asio::dynamic_buffer(inData),
+      delim,  // Read until we find a newline
+      [this, self, delim, callback](const boost::system::error_code& ec, std::size_t length) {
         if (ec) {
-          Log::err() << "Read error: " << ec.message();
-        } else if (length > 0) {
-          callback(ec, std::string(*read_buffer, 0, length));
+          callback(ec, String());
+        } else {
+          String message = inData.substr(0, length);
+          inData.erase(0, length);
+          callback(ec, std::move(message));
+          asyncReadUntil(delim, callback);
         }
-        asyncReadUntil(delim, callback);
       }
     );
   }
@@ -102,7 +114,7 @@ struct AeonSocketBase : public std::enable_shared_from_this<AeonSocketBase> {
  private:
   String host;
   String port;
-  std::string data_;
+  String inData;
   bool running;
 
   void connect()
