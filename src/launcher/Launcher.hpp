@@ -62,13 +62,8 @@ class Launcher {
     Integrator integrator;
     integrator.init();
 
-    // AeSockTester tester;
-    // tester.run();
-
     app::String scriptsPath = Eng::Engine::getInstance().getScriptsPath();
     loadScripts(scriptsPath.c_str());
-
-    // tester.stop();
 
     integrator.cleanup();
 
