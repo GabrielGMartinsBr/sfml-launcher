@@ -236,7 +236,7 @@ void Bitmap::blt(int x, int y, Bitmap* src_bitmap, Rect* src_rect, int opacity)
   sf::Color color(255, 255, 255, opacity);
   spr.setPosition(x, y);
   spr.setColor(color);
-  renderTexture.draw(spr, sf::BlendNone);
+  renderTexture.draw(spr, sf::BlendAlpha);
   renderTexture.display();
   dirty = true;
 };
@@ -259,7 +259,7 @@ void Bitmap::stretch_blt(Rect* dst_rect, Bitmap* src_bitmap, Rect* src_rect, int
   spr.setScale(scaleX, scaleY);
   spr.setColor(color);
 
-  renderTexture.draw(spr, sf::BlendNone);
+  renderTexture.draw(spr, sf::BlendAlpha);
   renderTexture.display();
   dirty = true;
 };
@@ -337,7 +337,7 @@ void Bitmap::set_pixel(unsigned int x, unsigned int y, Color* _color)
   sf::Sprite sprite;
   sprite.setTexture(texture);
 
-  renderTexture.draw(sprite);
+  renderTexture.draw(sprite, sf::BlendAlpha);
   renderTexture.display();
 
   dirty = true;

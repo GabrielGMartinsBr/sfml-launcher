@@ -37,7 +37,7 @@ void GraphicsRenderer::render()
   setRenderSpriteTexture();
 
   projectWindow.window.clear(sf::Color::Transparent);
-  projectWindow.window.draw(renderSprite);
+  projectWindow.window.draw(renderSprite, sf::BlendAlpha);
   projectWindow.window.display();
 }
 
