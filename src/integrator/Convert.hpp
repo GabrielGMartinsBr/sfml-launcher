@@ -116,36 +116,36 @@ struct Convert {
     return v ? Qtrue : Qfalse;
   }
 
-  static app::Vector<app::String>* toCStringVector(VALUE arr)
+  static app::StrVectorPtr toCStringVector(VALUE val)
   {
-    if (TYPE(arr) == T_STRING) {
-      std::vector<std::string>* vec = new std::vector<std::string>(1);
-      vec->at(0) = arr;
+    app::StrVectorPtr vec = nullptr;
+
+    if (TYPE(val) == T_STRING) {
+      vec = std::make_unique<app::Vector<app::String>>(1);
+      vec->at(0) = Convert::toCStr(val);
       return vec;
     }
 
-    if (TYPE(arr) != T_ARRAY) {
+    if (TYPE(val) != T_ARRAY) {
       rb_raise(rb_eTypeError, "Expected String or Array");
-      return nullptr;
+      return vec;
     }
 
-    int length = RARRAY_LEN(arr);
-    std::vector<std::string>* vec = new std::vector<std::string>(length);
-    const char* str;
+    int length = RARRAY_LEN(val);
+    vec = std::make_unique<app::Vector<app::String>>(length);
     VALUE entry;
 
     for (int i = 0; i < length; i++) {
-      entry = rb_ary_entry(arr, i);
-      str = Convert::toCStr(entry);
-      vec->at(i) = str;
+      entry = rb_ary_entry(val, i);
+      vec->at(i) = Convert::toCStr(entry);
     }
 
-    return vec;
+    return std::move(vec);
   }
 
-  static app::UPtr<app::Vector<app::String>> toCStringVector2(VALUE arr)
+  static app::StrVectorPtr toCStringVector2(VALUE arr)
   {
-    std::unique_ptr<app::Vector<app::String>> vec = nullptr;
+    app::StrVectorPtr vec = nullptr;
 
     if (TYPE(arr) != T_ARRAY) {
       rb_raise(rb_eTypeError, "Expected String or Array");
@@ -153,7 +153,7 @@ struct Convert {
     }
 
     int length = RARRAY_LEN(arr);
-    vec = std::make_unique<app::Vector<app::String>>(length);
+    vec = std::make_unique<app::StrVector>(length);
     VALUE entry;
 
     for (int i = 0; i < length; i++) {
@@ -161,31 +161,31 @@ struct Convert {
       vec->at(i) = Convert::toCStr(entry);
     }
 
-    return vec;
+    return std::move(vec);
   }
 
-  static VALUE toRubyStringArray(app::Vector<app::CStr>* vec)
+  static VALUE toRubyStringArray(const app::Vector<app::CStr>& vec)
   {
-    int length = vec->size();
+    int length = vec.size();
     VALUE rubyArray = rb_ary_new();
     VALUE rbStr;
 
     for (int i = 0; i < length; i++) {
-      rbStr = Convert::toRubyString(vec->at(i));
+      rbStr = Convert::toRubyString(vec.at(i));
       rb_ary_push(rubyArray, rbStr);
     }
 
     return rubyArray;
   }
 
-  static VALUE toRubyStringArray(app::Vector<app::String>* vec)
+  static VALUE toRubyStringArray(const app::StrVector& vec)
   {
-    int length = vec->size();
+    int length = vec.size();
     VALUE rubyArray = rb_ary_new();
     VALUE rbStr;
 
     for (int i = 0; i < length; i++) {
-      rbStr = Convert::toRubyString(vec->at(i));
+      rbStr = Convert::toRubyString(vec.at(i));
       rb_ary_push(rubyArray, rbStr);
     }
 

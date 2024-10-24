@@ -367,7 +367,7 @@ void Bitmap::draw_text(Rect rect, app::CStr str, TextAlign align)
 void Bitmap::draw_text(double x, double y, double width, double height, CStr str, TextAlign align)
 {
   auto fontNames = font->getter_name();
-  app::String fontName = fontNames && fontNames->size() > 0 ? fontNames->at(0) : "Arial";
+  app::String fontName = fontNames.size() > 0 ? fontNames.at(0) : "Arial";
   const sf::Font* fontPtr = Fonts::Instance().getFont(fontName);
 
   if (!fontPtr) {
@@ -431,7 +431,7 @@ void Bitmap::draw_text(double x, double y, double width, double height, CStr str
 Eng::Rect* Bitmap::get_text_size(app::CStr str)
 {
   auto fontNames = font->getter_name();
-  app::String fontName = fontNames && fontNames->size() > 0 ? fontNames->at(0) : "Arial";
+  app::String fontName = fontNames.size() > 0 ? fontNames.at(0) : "Arial";
   const sf::Font* fontPtr = Fonts::Instance().getFont(fontName);
   assert(fontPtr);
 

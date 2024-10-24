@@ -2,8 +2,8 @@
 
 #include <stdexcept>
 #include <string>
-#include <vector>
 
+#include "AppDefs.h"
 #include "Convert.hpp"
 #include "engnine/Color.hpp"
 #include "engnine/Font.hpp"
@@ -13,6 +13,11 @@
 // TODO: Implement methods and attributes
 
 namespace It {
+
+using app::String;
+using app::StrVectorPtr;
+using app::UPtr;
+using app::Vector;
 
 class Font {
  public:
@@ -106,18 +111,18 @@ class Font {
 
   static VALUE method_initialize(int argc, VALUE *argv, VALUE self)
   {
-    Eng::Font *font;
+    Eng::Font *font = nullptr;
     VALUE _names, _size;
 
     if (argc == 1) {
       rb_scan_args(argc, argv, "1", &_names);
-      std::vector<std::string> *names = Convert::toCStringVector(_names);
-      font = new Eng::Font(names);
+      StrVectorPtr names = Convert::toCStringVector(_names);
+      font = new Eng::Font(*names);
     } else if (argc == 2) {
       rb_scan_args(argc, argv, "2", &_names, &_size, _size);
-      std::vector<std::string> *names = Convert::toCStringVector(_names);
+      StrVectorPtr names = Convert::toCStringVector(_names);
       int size = Convert::toCInt(_size);
-      font = new Eng::Font(names, size);
+      font = new Eng::Font(*names, size);
     } else {
       throw std::runtime_error(
         "Font constructor takes 1 or 2 arguments, but received " + std::to_string(argc) + " arguments."
@@ -190,7 +195,7 @@ class Font {
   */
   static VALUE setter_name(VALUE self, VALUE value)
   {
-    std::vector<std::string> *names = Convert::toCStringVector(value);
+    StrVectorPtr names = Convert::toCStringVector(value);
     if (names == nullptr) {
       return Qnil;
     }
