@@ -11,6 +11,7 @@
 #include <SFML/Window/VideoMode.hpp>
 
 #include "AppDefs.h"
+#include "aeon/input/AeonInput.h"
 #include "aeon/socket/AeonSocketManager.hpp"
 #include "aeon/window/AeonWindowManager.h"
 #include "engnine/FileUtils.hpp"
@@ -18,6 +19,8 @@
 #include "engnine/Input.h"
 
 namespace Eng {
+
+using ae::AeonInput;
 
 /*
   ⇩⇩⇩ Static ⇩⇩⇩
@@ -49,7 +52,6 @@ void Engine::Destroy()
 */
 
 Engine::Engine(ProjectWindow& projectWindow, CStr projectPath) :
-    input(Input::Instance()),
     aeonWinMng(ae::AeonWindowManager::Instance()),
     projectWindow(projectWindow),
     projectPath(projectPath)
@@ -118,6 +120,10 @@ void Engine::stop()
 
 void Engine::pollEvents()
 {
+  Graphics& graphics = Graphics::GetInstance();
+  Input& input = Input::Instance();
+  AeonInput& aeonInput = AeonInput::Instance();
+
   sf::Event event;
   while (projectWindow.window.pollEvent(event)) {
     switch (event.type) {
@@ -126,14 +132,16 @@ void Engine::pollEvents()
         break;
       case sf::Event::KeyPressed:
         if (event.key.alt && event.key.code == sf::Keyboard::Enter) {
-          Graphics::GetInstance().toggleFullScreen();
+          graphics.toggleFullScreen();
           continue;
         }
         input.handleKeyPressed(event.key);
+        aeonInput.handleKeyPressed(event.key);
         aeonWinMng.handleKeyPressed(event.key);
         break;
       case sf::Event::KeyReleased:
         input.handleKeyRelease(event.key);
+        aeonInput.handleKeyRelease(event.key);
         break;
       case sf::Event::MouseMoved:
         aeonWinMng.handleMouseMoved(event.mouseMove);

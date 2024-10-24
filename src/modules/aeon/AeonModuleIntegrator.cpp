@@ -2,6 +2,7 @@
 
 #include <ruby.h>
 
+#include "aeon/input/integration/AeonInputIntegrator.h"
 #include "aeon/socket/integration/AeonSocketIntegrator.h"
 #include "aeon/window/integration/AeButtonIntegrator.h"
 #include "aeon/window/integration/AeStyleSheetIntegrator.h"
@@ -16,6 +17,7 @@ void AeonModuleIntegrator::integrate()
 {
   aeonModule = rb_define_module("Aeon");
 
+  AeonInputIntegrator::integrate(aeonModule);
   AeWindowIntegrator::integrate(aeonModule);
   AeButtonIntegrator::integrate(aeonModule);
   AeTextBoxIntegrator::integrate(aeonModule);

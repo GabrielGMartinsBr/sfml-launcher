@@ -7,6 +7,7 @@
 
 #include "AppDefs.h"
 #include "NumberUtils.hpp"
+#include "aeon/input/AeonInput.h"
 #include "aeon/window/AeonWindowManager.h"
 #include "engnine/Audio.h"
 #include "engnine/Engine.h"
@@ -15,6 +16,9 @@
 #include "launcher/ProjectWindow.h"
 
 namespace Eng {
+
+using ae::AeonInput;
+using ae::AeonWindowManager;
 
 /*
   ⇩⇩⇩ Static ⇩⇩⇩
@@ -79,7 +83,6 @@ void Graphics::setFrameRate(unsigned int v)
 
 void Graphics::update()
 {
-  ae::AeonWindowManager::Instance().updateEntries();
   renderer.render();
   frameUpdate();
 }
@@ -177,6 +180,8 @@ void Graphics::setup()
 
 void Graphics::frameUpdate()
 {
+  AeonWindowManager::Instance().updateEntries();
+  AeonInput::Instance().update();
   Engine::getInstance().updateInput();
   Timer::getInstance().controlFrameRate();
   Audio::Instance().update(timestamp);

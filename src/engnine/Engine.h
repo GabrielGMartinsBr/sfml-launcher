@@ -10,7 +10,6 @@
 
 #include "AppDefs.h"
 #include "aeon/window/AeonWindowManager.h"
-#include "engnine/Input.h"
 #include "launcher/ProjectWindow.h"
 
 namespace Eng {
@@ -56,7 +55,6 @@ class Engine {
   void stop();
 
  private:
-  Input& input;
   ae::AeonWindowManager& aeonWinMng;
 
   bool running;

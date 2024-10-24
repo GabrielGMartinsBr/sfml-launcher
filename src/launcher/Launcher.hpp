@@ -9,6 +9,7 @@
 
 #include "Log.hpp"
 #include "aeon/base/WrappedList.hpp"
+#include "aeon/input/AeonInput.h"
 #include "aeon/socket/AeonSocketManager.hpp"
 #include "aeon/window/AeonWindowManager.h"
 #include "base/AppDefs.h"
@@ -51,6 +52,7 @@ class Launcher {
     ae::WrappedList::Init();
     ae::AeonWindowManager::Init();
     ae::AeonSocketManager::Init();
+    ae::AeonInput::Init();
 
     Eng::Fonts::Init();
     Eng::Shaders::Init();
@@ -79,6 +81,7 @@ class Launcher {
     Eng::Fonts::Destroy();
     pkg::PackageReader::Destroy();
 
+    ae::AeonInput::Destroy();
     ae::AeonWindowManager::Destroy();
     ae::WrappedList::Destroy();
     ae::AeonSocketManager::Destroy();
