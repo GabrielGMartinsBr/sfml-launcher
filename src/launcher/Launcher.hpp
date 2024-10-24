@@ -55,9 +55,10 @@ class Launcher {
     Eng::Fonts::Init();
     Eng::Shaders::Init();
     Eng::Lists::Init();
-    Eng::Engine::Init(projectWindow, projectPath);
+    Eng::Input::Init();
     Eng::Graphics::Init(projectWindow);
     Eng::Audio::Init();
+    Eng::Engine::Init(projectWindow, projectPath);
 
     Integrator integrator;
     integrator.init();
@@ -69,9 +70,10 @@ class Launcher {
 
     integrator.cleanup();
 
+    Eng::Engine::Destroy();
     Eng::Audio::Destroy();
     Eng::Graphics::Destroy();
-    Eng::Engine::Destroy();
+    Eng::Input::Destroy();
     Eng::Lists::Destroy();
     Eng::Shaders::Destroy();
     Eng::Fonts::Destroy();

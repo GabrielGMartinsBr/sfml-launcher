@@ -15,7 +15,7 @@
 #include "aeon/window/AeonWindowManager.h"
 #include "engnine/FileUtils.hpp"
 #include "engnine/Graphics.h"
-#include "engnine/Input.hpp"
+#include "engnine/Input.h"
 
 namespace Eng {
 
@@ -49,7 +49,7 @@ void Engine::Destroy()
 */
 
 Engine::Engine(ProjectWindow& projectWindow, CStr projectPath) :
-    input(Input::getInstance()),
+    input(Input::Instance()),
     aeonWinMng(ae::AeonWindowManager::Instance()),
     projectWindow(projectWindow),
     projectPath(projectPath)

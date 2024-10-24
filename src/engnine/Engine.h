@@ -10,7 +10,7 @@
 
 #include "AppDefs.h"
 #include "aeon/window/AeonWindowManager.h"
-#include "engnine/Input.hpp"
+#include "engnine/Input.h"
 #include "launcher/ProjectWindow.h"
 
 namespace Eng {
