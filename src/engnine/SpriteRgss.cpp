@@ -111,7 +111,6 @@ Rect *Sprite::getter_src_rect()
 
 void Sprite::setter_src_rect(Rect *_src_rect)
 {
-  // Log::out() << "(((settings src rect)))";
   src_rect = _src_rect;
   dirty = true;
 }

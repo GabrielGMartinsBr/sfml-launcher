@@ -137,7 +137,6 @@ class Sprite {
 
   static void instance_mark(void *ptr)
   {
-    rb_gc_mark(static_cast<Eng::Sprite *>(ptr)->getter_src_rect()->rbObj);
   }
 
   /*
@@ -232,6 +231,7 @@ class Sprite {
     }
 
     Eng::Sprite *inst = getObjectValue(self);
+    inst->setInstanceVar("@src_rect", value);
     inst->setter_src_rect(
       Rect::getObjectValue(value)
     );
