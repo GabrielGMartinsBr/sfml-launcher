@@ -1,16 +1,16 @@
 #pragma once
 
-#include <string>
-#include <vector>
-
+#include "AppDefs.h"
 #include "engnine/Color.hpp"
 #include "engnine/EngineBase.hpp"
 
 namespace Eng {
 
+using app::StrVector;
+
 class Font : public EngineBase {
  public:
-  // static std::vector<std::string>* default_name;
+  // static StrVector* default_name;
   static int default_size;
   static bool default_bold;
   static bool default_italic;
@@ -23,8 +23,8 @@ class Font : public EngineBase {
 
  public:
 
-  Font(std::vector<std::string>* name, int size = 22) :
-      name(name),
+  Font(const StrVector& names, int size = 22) :
+      name(names),
       size(size),
       bold(false),
       italic(false)
@@ -47,7 +47,7 @@ class Font : public EngineBase {
   // }
 
   Font() :
-      name(new std::vector<std::string>({ "Arial" })),
+      name(StrVector({ "Arial" })),
       size(22),
       bold(false),
       italic(false)
@@ -55,14 +55,14 @@ class Font : public EngineBase {
     color = new Color(255, 255, 255, 255);
   }
 
-  std::vector<std::string>* getter_name()
+  const StrVector& getter_name()
   {
     return name;
   }
 
-  void setter_name(std::vector<std::string>& v)
+  void setter_name(StrVector& v)
   {
-    name->swap(v);
+    name.swap(v);
   }
 
   int getter_size()
@@ -106,7 +106,7 @@ class Font : public EngineBase {
   }
 
  private:
-  std::vector<std::string>* name;
+  StrVector name;
   int size;
   bool bold;
   bool italic;
