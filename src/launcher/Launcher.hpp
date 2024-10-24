@@ -65,6 +65,8 @@ class Launcher {
     app::String scriptsPath = Eng::Engine::getInstance().getScriptsPath();
     loadScripts(scriptsPath.c_str());
 
+    ae::AeonSocketManager::Instance().destroyAll();
+
     integrator.cleanup();
 
     Eng::Audio::Destroy();
@@ -75,9 +77,9 @@ class Launcher {
     Eng::Fonts::Destroy();
     pkg::PackageReader::Destroy();
 
-    ae::AeonSocketManager::Destroy();
     ae::AeonWindowManager::Destroy();
     ae::WrappedList::Destroy();
+    ae::AeonSocketManager::Destroy();
 
     projectWindow.close();
   }
