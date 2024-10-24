@@ -95,6 +95,9 @@ void AeonWindowManager::addEntry(AeonWindow* entry)
 
 void AeonWindowManager::removeEntry(AeonWindow* entry)
 {
+  if (focusedWindow == entry) {
+    focusedWindow = nullptr;
+  }
   auto it = std::find(entries.begin(), entries.end(), entry);
   if (it != entries.end()) {
     entries.erase(it);
