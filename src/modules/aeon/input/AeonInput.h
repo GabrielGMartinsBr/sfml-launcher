@@ -3,7 +3,6 @@
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
-#include <bitset>
 #include <cstdint>
 
 #include "AppDefs.h"
@@ -56,9 +55,9 @@ struct AeonInput {
 
 
  private:
-  std::bitset<SfKey::KeyCount> currentKeys;
-  std::bitset<SfKey::KeyCount> previousKeys;
-  app::UnMap<SfKey, UInt> repeatTs;
+  bool currentKeys[SfKey::KeyCount];
+  bool previousKeys[SfKey::KeyCount];
+  UInt repeatTs[SfKey::KeyCount];
   sf::Clock clock;
 
   const int repeatDelay = sf::milliseconds(500).asMilliseconds();

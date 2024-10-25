@@ -35,25 +35,25 @@ void AeonInput::Destroy()
 
 AeonInput::AeonInput()
 {
+  std::memset(currentKeys, 0, SfKey::KeyCount);
+  std::memset(previousKeys, 0, SfKey::KeyCount);
+  std::memset(repeatTs, 0, SfKey::KeyCount);
 }
 
 void AeonInput::handleKeyPressed(const SfKeyEvent& key)
 {
-  if (!currentKeys[key.code]) {
-    repeatTs[key.code] = clock.getElapsedTime().asMilliseconds();
-  }
+  if (key.code == SfKey::Unknown) return;
   currentKeys[key.code] = true;
 }
 
 void AeonInput::handleKeyRelease(const SfKeyEvent& key)
 {
   currentKeys[key.code] = false;
-  repeatTs.erase(key.code);
 }
 
 void AeonInput::update()
 {
-  previousKeys = currentKeys;
+  std::memcpy(previousKeys, currentKeys, SfKey::KeyCount);
 }
 
 bool AeonInput::isPressed(SfKey key)
@@ -73,17 +73,20 @@ bool AeonInput::isRepeated(SfKey key)
   if (key == SfKey::Unknown || !currentKeys[key]) {
     return false;
   }
+
+  const UInt timestamp = clock.getElapsedTime().asMilliseconds();
+
   if (!previousKeys[key]) {
-    repeatTs[key] = clock.getElapsedTime().asMilliseconds();
+    repeatTs[key] = timestamp;
     return true;
   }
 
-  UInt elapsedTime = clock.getElapsedTime().asMilliseconds() - repeatTs[key];
+  UInt elapsedTime = timestamp - repeatTs[key];
 
   if (elapsedTime > repeatDelay) {
     UInt timeSinceRepeat = elapsedTime - repeatDelay;
     if (timeSinceRepeat >= repeatInterval) {
-      repeatTs[key] = clock.getElapsedTime().asMilliseconds() - repeatDelay;
+      repeatTs[key] = timestamp - repeatDelay;
       return true;
     }
   }
