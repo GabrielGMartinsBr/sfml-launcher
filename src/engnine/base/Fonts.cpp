@@ -57,7 +57,7 @@ void Fonts::loadFonts()
 {
   loadFont("Arial", "Arial.ttf");
   loadFont("Arial Medium", "Arial-Medium.ttf");
-  loadFont("Arial Bold", "Arial-bold.ttf");
+  loadFont("Arial Bold", "Arial-Bold.ttf");
   loadFont("Arial Black", "Arial-Black.ttf");
   loadFont("Arial Bold Ce", "Arial-Bold-Ce.ttf");
   loadFont("Roboto Thin", "Roboto-Thin.ttf");
