@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SFML/System/Clock.hpp>
+#include <SFML/System/Vector2.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Mouse.hpp>
@@ -13,7 +14,10 @@ namespace ae {
 
 using SfKeyEvent = sf::Event::KeyEvent;
 using SfMouseButtonEvent = sf::Event::MouseButtonEvent;
+using SfMouseMoveEvent = sf::Event::MouseMoveEvent;
+
 using app::UInt;
+using sf::Vector2i;
 
 struct AeonInput {
   /*
@@ -24,17 +28,26 @@ struct AeonInput {
   static AeonInput& Instance();
   static void Destroy();
 
+  static inline bool isValidInputCode(int8_t key)
+  {
+    return key > InputCode::Unknown && key < InputCode::Count;
+  }
+
   /*
     ⇩⇩⇩ Instance ⇩⇩⇩
-  */
+  */  static inline bool isValidMouseButton(int8_t key)
+  {
+    return key > InputCode::KeyCount && key < InputCode::MouseButtonCount;
+  }
+
 
   void handleKeyPressed(const SfKeyEvent& key);
-
   void handleKeyRelease(const SfKeyEvent& key);
 
-  void handleMousePressed(const SfMouseButtonEvent& key);
-  
-  void handleMouseRelease(const SfMouseButtonEvent& key);
+  void handleMousePressed(const SfMouseButtonEvent& button);
+  void handleMouseRelease(const SfMouseButtonEvent& button);
+
+  void handleMouseMoved(const SfMouseMoveEvent& mouse);
 
   void update();
 
@@ -49,26 +62,18 @@ struct AeonInput {
     return clock;
   }
 
-  static inline bool isValidInputCode(int8_t key)
+  inline const Vector2i& getMousePosition() const
   {
-    return key > InputCode::Unknown && key < InputCode::Count;
+    return mousePosition;
   }
 
-  static inline bool isValidKey(int8_t key)
-  {
-    return key > InputCode::Unknown && key < InputCode::KeyCount;
-  }
-
-  static inline bool isValidMouseButton(int8_t key)
-  {
-    return key > InputCode::KeyCount && key < InputCode::MouseButtonCount;
-  }
 
  private:
+  sf::Clock clock;
   bool currentKeys[InputCode::Count];
   bool previousKeys[InputCode::Count];
   UInt repeatTs[InputCode::Count];
-  sf::Clock clock;
+  Vector2i mousePosition;
 
   const int repeatDelay = sf::milliseconds(500).asMilliseconds();
   const int repeatInterval = sf::milliseconds(30).asMilliseconds();

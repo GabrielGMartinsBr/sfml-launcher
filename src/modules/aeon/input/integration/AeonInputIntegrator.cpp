@@ -13,6 +13,9 @@ void AeonInputIntegrator::integrate(VALUE aeonModule)
 {
   VALUE moduleObject = rb_define_module_under(aeonModule, "Input");
 
+  rb_define_module_function(moduleObject, "mouse_x", RUBY_METHOD_FUNC(getMouseX), 0);
+  rb_define_module_function(moduleObject, "mouse_y", RUBY_METHOD_FUNC(getMouseY), 0);
+
   rb_define_module_function(moduleObject, "press?", RUBY_METHOD_FUNC(isPressed), 1);
   rb_define_module_function(moduleObject, "trigger?", RUBY_METHOD_FUNC(isTrigger), 1);
   rb_define_module_function(moduleObject, "repeat?", RUBY_METHOD_FUNC(isRepeat), 1);
@@ -127,31 +130,51 @@ void AeonInputIntegrator::integrate(VALUE aeonModule)
   rb_define_const(moduleObject, "Pause", Convert::toRubyNumber(InputCode::Pause));
 }
 
-int8_t AeonInputIntegrator::inputCodeFromValue(VALUE rbValue)
+VALUE AeonInputIntegrator::getMouseX(VALUE self)
 {
-  int8_t value = Convert::toCInt(rbValue);
-  return AeonInput::isValidInputCode(value) ? value : InputCode::Unknown;
+  return Convert::toRubyNumber(
+    AeonInput::Instance().getMousePosition().x
+  );
+}
+
+VALUE AeonInputIntegrator::getMouseY(VALUE self)
+{
+  return Convert::toRubyNumber(
+    AeonInput::Instance().getMousePosition().y
+  );
 }
 
 VALUE AeonInputIntegrator::isPressed(VALUE self, VALUE key)
 {
-  return AeonInput::Instance().isPressed(
-    inputCodeFromValue(key)
+  return Convert::toRubyBool(
+    AeonInput::Instance().isPressed(
+      inputCodeFromValue(key)
+    )
   );
 }
 
 VALUE AeonInputIntegrator::isTrigger(VALUE self, VALUE key)
 {
-  return AeonInput::Instance().isTriggered(
-    inputCodeFromValue(key)
+  return Convert::toRubyBool(
+    AeonInput::Instance().isTriggered(
+      inputCodeFromValue(key)
+    )
   );
 }
 
 VALUE AeonInputIntegrator::isRepeat(VALUE self, VALUE key)
 {
-  return AeonInput::Instance().isRepeated(
-    inputCodeFromValue(key)
+  return Convert::toRubyBool(
+    AeonInput::Instance().isRepeated(
+      inputCodeFromValue(key)
+    )
   );
+}
+
+int8_t AeonInputIntegrator::inputCodeFromValue(VALUE rbValue)
+{
+  int8_t value = Convert::toCInt(rbValue);
+  return AeonInput::isValidInputCode(value) ? value : InputCode::Unknown;
 }
 
 }  // namespace ae

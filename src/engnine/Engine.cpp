@@ -144,12 +144,15 @@ void Engine::pollEvents()
         aeonInput.handleKeyRelease(event.key);
         break;
       case sf::Event::MouseMoved:
+        aeonInput.handleMouseMoved(event.mouseMove);
         aeonWinMng.handleMouseMoved(event.mouseMove);
         break;
       case sf::Event::MouseButtonPressed:
+        aeonInput.handleMousePressed(event.mouseButton);
         aeonWinMng.handleMousePressed(event.mouseButton);
         break;
       case sf::Event::MouseButtonReleased:
+        aeonInput.handleMouseRelease(event.mouseButton);
         aeonWinMng.handleMouseReleased(event.mouseButton);
         break;
       case sf::Event::TextEntered:

@@ -35,7 +35,8 @@ void AeonInput::Destroy()
   ⇩⇩⇩ Instance ⇩⇩⇩
 */
 
-AeonInput::AeonInput()
+AeonInput::AeonInput() :
+    mousePosition(0, 0)
 {
   std::memset(currentKeys, 0, InputCode::Count);
   std::memset(previousKeys, 0, InputCode::Count);
@@ -61,6 +62,12 @@ void AeonInput::handleMousePressed(const SfMouseButtonEvent& button)
 void AeonInput::handleMouseRelease(const SfMouseButtonEvent& button)
 {
   currentKeys[button.button + InputCode::KeyCount] = false;
+}
+
+void AeonInput::handleMouseMoved(const SfMouseMoveEvent& mouse)
+{
+  mousePosition.x = mouse.x;
+  mousePosition.y = mouse.y;
 }
 
 void AeonInput::update()
