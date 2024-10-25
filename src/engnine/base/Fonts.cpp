@@ -56,10 +56,20 @@ const sf::Font* Fonts::getFont(const String& name)
 void Fonts::loadFonts()
 {
   loadFont("Arial", "Arial.ttf");
-  loadFont("Arial-medium", "Arial-medium.ttf");
-  loadFont("Arial-bold", "Arial-bold.ttf");
-  loadFont("Arial-bold-ce", "arialceb.ttf");
-  loadFont("Roboto", "Roboto-medium.ttf");
+  loadFont("Arial Medium", "Arial-Medium.ttf");
+  loadFont("Arial Bold", "Arial-bold.ttf");
+  loadFont("Arial Black", "Arial-Black.ttf");
+  loadFont("Arial Bold Ce", "Arial-Bold-Ce.ttf");
+  loadFont("Roboto Thin", "Roboto-Thin.ttf");
+  loadFont("Roboto Light", "Roboto-Light.ttf");
+  loadFont("Roboto", "Roboto-Regular.ttf");
+  loadFont("Roboto Medium", "Roboto-Medium.ttf");
+  loadFont("Roboto Bold", "Roboto-Bold.ttf");
+  loadFont("Roboto Black", "Roboto-Black.ttf");
+  loadFont("Tahoma", "Tahoma.ttf");
+  loadFont("Tahoma Bold", "Tahoma-Bold.ttf");
+  
+
 }
 
 void Fonts::loadFont(String name, CStr fileName)
