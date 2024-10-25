@@ -2,7 +2,7 @@
 
 #include <ruby.h>
 
-#include "aeon/input/AeonInput.h"
+#include <cstdint>
 
 namespace ae {
 
@@ -11,7 +11,7 @@ struct AeonInputIntegrator {
 
   static void integrate(VALUE aeonModule);
 
-  static SfKey keyFromValue(VALUE rbValue);
+  static int8_t inputCodeFromValue(VALUE rbValue);
 
   static VALUE isPressed(VALUE self, VALUE key);
   static VALUE isTrigger(VALUE self, VALUE key);

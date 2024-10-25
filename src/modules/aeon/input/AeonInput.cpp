@@ -3,6 +3,8 @@
 #include <SFML/Window/Keyboard.hpp>
 #include <cassert>
 
+#include "aeon/input/AeonInputKeys.h"
+
 namespace ae {
 
 /*
@@ -35,9 +37,9 @@ void AeonInput::Destroy()
 
 AeonInput::AeonInput()
 {
-  std::memset(currentKeys, 0, SfKey::KeyCount);
-  std::memset(previousKeys, 0, SfKey::KeyCount);
-  std::memset(repeatTs, 0, SfKey::KeyCount);
+  std::memset(currentKeys, 0, InputCode::Count);
+  std::memset(previousKeys, 0, InputCode::Count);
+  std::memset(repeatTs, 0, InputCode::Count);
 }
 
 void AeonInput::handleKeyPressed(const SfKeyEvent& key)
@@ -51,24 +53,34 @@ void AeonInput::handleKeyRelease(const SfKeyEvent& key)
   currentKeys[key.code] = false;
 }
 
-void AeonInput::update()
+void AeonInput::handleMousePressed(const SfMouseButtonEvent& button)
 {
-  std::memcpy(previousKeys, currentKeys, SfKey::KeyCount);
+  currentKeys[button.button + InputCode::KeyCount] = true;
 }
 
-bool AeonInput::isPressed(SfKey key)
+void AeonInput::handleMouseRelease(const SfMouseButtonEvent& button)
 {
-  if (key == SfKey::Unknown) return false;
+  currentKeys[button.button + InputCode::KeyCount] = false;
+}
+
+void AeonInput::update()
+{
+  std::memcpy(previousKeys, currentKeys, InputCode::Count);
+}
+
+bool AeonInput::isPressed(int8_t key)
+{
+  if (key == InputCode::Unknown) return false;
   return currentKeys[key];
 }
 
-bool AeonInput::isTriggered(SfKey key)
+bool AeonInput::isTriggered(int8_t key)
 {
-  if (key == SfKey::Unknown) return false;
+  if (key == InputCode::Unknown) return false;
   return currentKeys[key] && !previousKeys[key];
 }
 
-bool AeonInput::isRepeated(SfKey key)
+bool AeonInput::isRepeated(int8_t key)
 {
   if (key == SfKey::Unknown || !currentKeys[key]) {
     return false;
