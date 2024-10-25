@@ -372,7 +372,9 @@ void Bitmap::draw_text(double x, double y, double width, double height, CStr str
 
   if (!fontPtr) {
     Log::err() << "Requested font was not found.";
-    return;
+    Log::err() << "FontName: " << fontName;
+    fontPtr = Fonts::Instance().getFont("Roboto");
+    if (!fontPtr) return;
   }
 
   sf::Text text = Texts::createText(str);
