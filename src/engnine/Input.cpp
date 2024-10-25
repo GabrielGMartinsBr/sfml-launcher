@@ -32,177 +32,183 @@ void Input::Destroy()
   ⇩⇩⇩ Instance ⇩⇩⇩
 */
 
-Input::Input()
+Input::Input() :
+    aeonInput(AeonInput::Instance()),
+    clock(AeonInput::Instance().getClock())
 {
-  for (int i = 1; i < InputCode::NUM_KEYS; i++) {
-    keyTimes[i] = 0;
-  }
-  dir4 = InputCode::Directional::DIRECTIONAL_NONE;
+  dir4 = DirectionalCode::DIRECTIONAL_NONE;
+  std::memset(currentKeys, 0, KEY_COUNT);
+  std::memset(previousKeys, 0, KEY_COUNT);
+  std::memset(pressKeys, 0, KEY_COUNT);
+  std::memset(repeatTs, 0, KEY_COUNT);
 }
 
-void Input::handleKeyPressed(sf::Event::KeyEvent& key)
+void Input::handleKeyPressed(const SfKeyEvent& key)
 {
-  InputCode::Key keyCode = mapKey(key);
-  if (keyCode != InputCode::Key::UNKNOW) {
-    keyStates.set(keyCode);
-  }
+  KeyCode keyCode = mapKey(key.code);
+  if (keyCode == KeyCode::UNKNOW) return;
+  currentKeys[keyCode] = true;
 }
 
-void Input::handleKeyRelease(sf::Event::KeyEvent& key)
+void Input::handleKeyRelease(const SfKeyEvent& key)
 {
-  InputCode::Key keyCode = mapKey(key);
-  if (keyCode != InputCode::Key::UNKNOW) {
-    keyStates.reset(keyCode);
+  KeyCode keyCode = mapKey(key.code);
+  if (keyCode != KeyCode::UNKNOW) {
+    currentKeys[keyCode] = false;
   }
 }
 
 void Input::update()
 {
-  // pressStates = keyStates;
-  // Log::out() << "update";
-  for (int i = 1; i < InputCode::NUM_KEYS; i++) {
-    previousKeyStates[i] = pressStates[i];
-    pressStates[i] = keyStates[i];
-    if (pressStates[i]) {
-      keyTimes[i] = keyTimes[i] + 1;
-      if (keyTimes[i] > 6) {
-        keyTimes[i] = 0;
-      }
-    } else if (keyTimes[i] > 0) {
-      keyTimes[i] = 0;
-    }
-  }
+  std::memcpy(previousKeys, pressKeys, KEY_COUNT);
+  std::memcpy(pressKeys, currentKeys, KEY_COUNT);
 
   updateDirectional();
 }
 
-bool Input::isPressed(InputCode::Key key)
+bool Input::isPressed(KeyCode key)
 {
-  return pressStates[key];
+  return pressKeys[key];
 }
 
-bool Input::isTriggered(InputCode::Key key)
+bool Input::isTriggered(KeyCode key)
 {
-  return pressStates[key] && !previousKeyStates[key];
+  return pressKeys[key] && !previousKeys[key];
 }
 
-bool Input::isRepeated(InputCode::Key key)
+bool Input::isRepeated(KeyCode key)
 {
-  return pressStates[key] && keyTimes[key] == 1;
+  if (key == KeyCode::UNKNOW || !pressKeys[key]) {
+    return false;
+  }
+
+  const UInt timestamp = clock.getElapsedTime().asMilliseconds();
+
+  if (!previousKeys[key]) {
+    repeatTs[key] = timestamp;
+    return true;
+  }
+
+  UInt elapsedTime = timestamp - repeatTs[key];
+
+  if (elapsedTime > repeatDelay) {
+    UInt timeSinceRepeat = elapsedTime - repeatDelay;
+    if (timeSinceRepeat >= repeatInterval) {
+      repeatTs[key] = timestamp - repeatDelay;
+      return true;
+    }
+  }
+
+  return false;
 }
 
 bool Input::isValidKey(int num)
 {
-  return num > -1 && num < InputCode::NUM_KEYS;
+  return num > -1 && num < KEY_COUNT;
 }
 
-InputCode::Directional Input::getDir4()
+Input::DirectionalCode Input::getDir4()
 {
   return dir4;
-}
-
-InputCode::Key Input::castKeyCode(int num)
-{
-  return (InputCode::Key)num;
 }
 
 /*
   ⇩⇩⇩ Private ⇩⇩⇩
 */
 
-InputCode::Key Input::mapKey(sf::Event::KeyEvent& key)
+void Input::updateDirectional()
 {
-  switch (key.code) {
+  if (currentKeys[KeyCode::UP] && dir4 != DirectionalCode::DIRECTIONAL_DOWN) {
+    dir4 = DirectionalCode::DIRECTIONAL_UP;
+    return;
+  } else if (currentKeys[KeyCode::DOWN] && dir4 != DirectionalCode::DIRECTIONAL_UP) {
+    dir4 = DirectionalCode::DIRECTIONAL_DOWN;
+    return;
+  }
+
+  if (currentKeys[KeyCode::LEFT] && dir4 != DirectionalCode::DIRECTIONAL_RIGHT) {
+    dir4 = DirectionalCode::DIRECTIONAL_LEFT;
+    return;
+  } else if (currentKeys[KeyCode::RIGHT] && dir4 != DirectionalCode::DIRECTIONAL_LEFT) {
+    dir4 = DirectionalCode::DIRECTIONAL_RIGHT;
+    return;
+  }
+
+  dir4 = DirectionalCode::DIRECTIONAL_NONE;
+}
+
+Input::KeyCode Input::mapKey(const SfKey& key) const
+{
+  switch (key) {
     case sf::Keyboard::Down: {
-      return InputCode::Key::DOWN;
+      return KeyCode::DOWN;
     }
     case sf::Keyboard::Left: {
-      return InputCode::Key::LEFT;
+      return KeyCode::LEFT;
     }
     case sf::Keyboard::Right: {
-      return InputCode::Key::RIGHT;
+      return KeyCode::RIGHT;
     }
     case sf::Keyboard::Up: {
-      return InputCode::Key::UP;
+      return KeyCode::UP;
     }
     case sf::Keyboard::Z:
-      return InputCode::Key::A;
+      return KeyCode::A;
     case sf::Keyboard::Escape:
     case sf::Keyboard::X: {
-      return InputCode::Key::B;
+      return KeyCode::B;
     }
     case sf::Keyboard::Enter:
     case sf::Keyboard::Space:
     case sf::Keyboard::C: {
-      return InputCode::Key::C;
+      return KeyCode::C;
     }
     case sf::Keyboard::A: {
-      return InputCode::Key::X;
+      return KeyCode::X;
     }
     case sf::Keyboard::S: {
-      return InputCode::Key::Y;
+      return KeyCode::Y;
     }
     case sf::Keyboard::D: {
-      return InputCode::Key::Z;
+      return KeyCode::Z;
     }
     case sf::Keyboard::Q: {
-      return InputCode::Key::L;
+      return KeyCode::L;
     }
     case sf::Keyboard::W: {
-      return InputCode::Key::R;
+      return KeyCode::R;
     }
     case sf::Keyboard::LShift:
     case sf::Keyboard::RShift: {
-      return InputCode::Key::SHIFT;
+      return KeyCode::SHIFT;
     }
     case sf::Keyboard::LControl:
     case sf::Keyboard::RControl: {
-      return InputCode::Key::CTRL;
+      return KeyCode::CTRL;
     }
     case sf::Keyboard::LAlt:
     case sf::Keyboard::RAlt: {
-      return InputCode::Key::ALT;
+      return KeyCode::ALT;
     }
     case sf::Keyboard::F5: {
-      return InputCode::Key::F5;
+      return KeyCode::F5;
     }
     case sf::Keyboard::F6: {
-      return InputCode::Key::F6;
+      return KeyCode::F6;
     }
     case sf::Keyboard::F7: {
-      return InputCode::Key::F7;
+      return KeyCode::F7;
     }
     case sf::Keyboard::F8: {
-      return InputCode::Key::F8;
+      return KeyCode::F8;
     }
     case sf::Keyboard::F9: {
-      return InputCode::Key::F9;
+      return KeyCode::F9;
     }
     default:
-      return InputCode::Key::UNKNOW;
+      return KeyCode::UNKNOW;
       break;
   }
-}
-
-void Input::updateDirectional()
-{
-  if (pressStates[InputCode::Key::UP] && dir4 != InputCode::Directional::DIRECTIONAL_DOWN) {
-    dir4 = InputCode::Directional::DIRECTIONAL_UP;
-    return;
-  } else if (pressStates[InputCode::Key::DOWN] && dir4 != InputCode::Directional::DIRECTIONAL_UP) {
-    dir4 = InputCode::Directional::DIRECTIONAL_DOWN;
-    return;
-  }
-
-  if (pressStates[InputCode::Key::LEFT] && dir4 != InputCode::Directional::DIRECTIONAL_RIGHT) {
-    dir4 = InputCode::Directional::DIRECTIONAL_LEFT;
-    return;
-  } else if (pressStates[InputCode::Key::RIGHT] && dir4 != InputCode::Directional::DIRECTIONAL_LEFT) {
-    dir4 = InputCode::Directional::DIRECTIONAL_RIGHT;
-    return;
-  }
-
-  dir4 = InputCode::Directional::DIRECTIONAL_NONE;
 }
 
 }  // namespace Eng

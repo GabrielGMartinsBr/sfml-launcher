@@ -39,6 +39,11 @@ struct AeonInput {
 
   bool isRepeated(SfKey key);
 
+  inline const sf::Clock& getClock()
+  {
+    return clock;
+  }
+
   static inline bool isValidKey(SfKey key)
   {
     return key > SfKey::Unknown && key < SfKey::KeyCount;

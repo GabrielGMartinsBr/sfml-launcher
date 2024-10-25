@@ -2,46 +2,15 @@
 
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
-#include <bitset>
+
+#include "aeon/input/AeonInput.h"
 
 namespace Eng {
 
-namespace InputCode {
-
-enum Directional {
-  DIRECTIONAL_NONE = 0,
-  DIRECTIONAL_DOWN = 2,
-  DIRECTIONAL_UP = 8,
-  DIRECTIONAL_LEFT = 4,
-  DIRECTIONAL_RIGHT = 6
-};
-
-enum Key {
-  UNKNOW,
-  DOWN,
-  LEFT,
-  RIGHT,
-  UP,
-  A,
-  B,
-  C,
-  X,
-  Y,
-  Z,
-  L,
-  R,
-  SHIFT,
-  CTRL,
-  ALT,
-  F5,
-  F6,
-  F7,
-  F8,
-  F9,
-  NUM_KEYS
-};
-
-}  // namespace Code
+using ae::AeonInput;
+using SfKeyEvent = sf::Event::KeyEvent;
+using SfKey = sf::Keyboard::Key;
+using app::UInt;
 
 class Input {
  public:
@@ -53,43 +22,77 @@ class Input {
   static Input& Instance();
   static void Destroy();
 
+  enum DirectionalCode {
+    DIRECTIONAL_NONE = 0,
+    DIRECTIONAL_DOWN = 2,
+    DIRECTIONAL_UP = 8,
+    DIRECTIONAL_LEFT = 4,
+    DIRECTIONAL_RIGHT = 6
+  };
+
+  enum KeyCode {
+    UNKNOW = -1,
+    DOWN = 0,
+    LEFT,
+    RIGHT,
+    UP,
+    A,
+    B,
+    C,
+    X,
+    Y,
+    Z,
+    L,
+    R,
+    SHIFT,
+    CTRL,
+    ALT,
+    F5,
+    F6,
+    F7,
+    F8,
+    F9,
+    KEY_COUNT
+  };
+
   /*
     ⇩⇩⇩ Instance ⇩⇩⇩
   */
-
-  void handleKeyPressed(sf::Event::KeyEvent& key);
-
-  void handleKeyRelease(sf::Event::KeyEvent& key);
+  void handleKeyPressed(const SfKeyEvent& key);
+  void handleKeyRelease(const SfKeyEvent& key);
 
   void update();
 
-  bool isPressed(InputCode::Key key);
+  bool isPressed(KeyCode key);
 
-  bool isTriggered(InputCode::Key key);
+  bool isTriggered(KeyCode key);
 
-  bool isRepeated(InputCode::Key key);
+  bool isRepeated(KeyCode key);
 
   bool isValidKey(int num);
 
-  InputCode::Directional getDir4();
-
-  InputCode::Key castKeyCode(int num);
+  DirectionalCode getDir4();
 
  private:
-  std::bitset<InputCode::NUM_KEYS> keyStates;
-  bool previousKeyStates[InputCode::NUM_KEYS];
-  bool pressStates[InputCode::NUM_KEYS];
-  unsigned short keyTimes[InputCode::NUM_KEYS];
-  InputCode::Directional dir4;
+  AeonInput& aeonInput;
+  const sf::Clock& clock;
+  bool currentKeys[KEY_COUNT];
+  bool previousKeys[KEY_COUNT];
+  bool pressKeys[KEY_COUNT];
+  UInt repeatTs[KEY_COUNT];
+  DirectionalCode dir4;
+
+  const int repeatDelay = sf::milliseconds(500).asMilliseconds();
+  const int repeatInterval = sf::milliseconds(30).asMilliseconds();
 
   Input();
 
   Input(const Input&);
   Input& operator=(const Input&);
 
-  InputCode::Key mapKey(sf::Event::KeyEvent& key);
-
   void updateDirectional();
+
+  KeyCode mapKey(const SfKey& key) const;
 };
 
 }  // namespace Eng
