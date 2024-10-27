@@ -7,8 +7,8 @@
 
 namespace ae {
 
+using app::UnMap;
 using app::UPtr;
-using app::Vector;
 
 struct AeonSocketManager {
   /*
@@ -27,29 +27,24 @@ struct AeonSocketManager {
   {
     UPtr<AeonSocketIntegrable> socketPtr = std::make_unique<AeonSocketIntegrable>(rbId);
     AeonSocketIntegrable* rawPtr = socketPtr.get();
-    clients.push_back(std::move(socketPtr));
+    clients[rbId] = std::move(socketPtr);
     return rawPtr;
   }
 
   void destroy(AeonSocketIntegrable* socket)
   {
-    auto it = std::remove_if(
-      clients.begin(),
-      clients.end(),
-      [socket](UPtr<AeonSocketIntegrable>& ptr) {
-        return ptr.get() == socket;
-      }
-    );
-    if (it != clients.end()) {
+    if (socket) {
       socket->stopWorker();
-      clients.erase(it, clients.end());
+      clients[socket->rbId].reset();
     }
   }
 
   void destroyAll()
   {
-    for (UPtr<AeonSocketIntegrable>& socket : clients) {
-      socket->stopWorker();
+    for (auto it = clients.begin(); it != clients.end(); ++it) {
+      VALUE key = it->first;
+      UPtr<AeonSocketIntegrable>& value = it->second;
+      value->stopWorker();
     }
     clients.clear();
   }
@@ -59,7 +54,7 @@ struct AeonSocketManager {
     ⇩⇩⇩ Private ⇩⇩⇩
   */
 
-  Vector<UPtr<AeonSocketIntegrable>> clients;
+  UnMap<VALUE, UPtr<AeonSocketIntegrable>> clients;
 
   AeonSocketManager();
 
