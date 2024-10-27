@@ -10,11 +10,13 @@
 #include <SFML/Graphics/Texture.hpp>
 #include <cmath>
 
+#include "aeon/toolkit/ElementBounds.h"
 #include "engnine/Bitmap.h"
 #include "engnine/Engine.h"
 #include "engnine/Lists.hpp"
 #include "engnine/Rect.hpp"
 #include "engnine/Viewport.hpp"
+#include "engnine/WindowCursor.hpp"
 
 namespace Eng {
 
@@ -33,7 +35,8 @@ Window::Window(VALUE rbObj, Viewport *viewport) :
     cursor_rect(new Rect(0, 0, 0, 0)),
     frame(viewport),
     contentsSprite(bounds, view, frame.backSprite, viewport),
-    cursorSprite(bounds, view, frame.backSprite, viewport)
+    cursorSprite(bounds, view, frame.backSprite, viewport),
+    cursor(view, viewport)
 {
   contentsDirty = true;
   skinDirty = true;
@@ -94,6 +97,8 @@ void Window::onUpdate()
       contents->dirty = false;
     }
   }
+  cursor.setZIndex(z);
+  cursor.update();
 }
 
 /*
@@ -129,6 +134,8 @@ void Window::updateFrameSprites()
 
   frame.backSprite.setPosition(bounds.position());
   frame.borderSprite.setPosition(bounds.position());
+
+  cursor.setWindowSkin(windowSkin);
 }
 
 void Window::updateContentsSprite()
@@ -143,6 +150,15 @@ void Window::updateContentsSprite()
 
 void Window::updateCursorRect()
 {
+  cursor.setBounds(
+    ae::ElementBounds(
+      cursor_rect->x.get() + 16,
+      cursor_rect->y.get() + 16,
+      cursor_rect->width.get(),
+      cursor_rect->height.get()
+    )
+  );
+
   cursorSprite.visible = visible && !cursor_rect->isEmpty();
   if (windowSkin == nullptr || cursor_rect->isEmpty()) {
     return;

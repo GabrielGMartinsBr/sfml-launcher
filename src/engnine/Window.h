@@ -16,6 +16,7 @@
 #include "engnine/IOnUpdate.h"
 #include "engnine/Rect.hpp"
 #include "engnine/Viewport.hpp"
+#include "engnine/WindowCursor.hpp"
 #include "engnine/WindowFrame.h"
 #include "engnine/WindowSprite.h"
 
@@ -156,6 +157,7 @@ class Window : public IOnUpdate, public EngineBase, public AeonIntegrable {
   WindowFrame frame;
   WindowSprite contentsSprite;
   WindowSprite cursorSprite;
+  WindowCursor cursor;
 
   bool dimensionsDirty;
   bool skinDirty;
