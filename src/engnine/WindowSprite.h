@@ -4,19 +4,22 @@
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 
+#include "aeon/toolkit/ElementBounds.h"
 #include "engnine/IOnRender.h"
 #include "engnine/Viewport.hpp"
 
 namespace Eng {
 
+using ae::ElementBounds;
+
 struct WindowSprite : IOnRender {
+  ElementBounds& bounds;
+  sf::View& view;
   sf::Sprite sprite;
-  sf::Texture texture;
-  sf::RenderTexture rendTex;
 
   int visible;
 
-  WindowSprite(Viewport* viewport);
+  WindowSprite(ElementBounds& bounds, sf::View& view, Viewport* viewport);
 
   ~WindowSprite();
 

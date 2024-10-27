@@ -11,6 +11,7 @@
 #include <cmath>
 
 #include "engnine/Bitmap.h"
+#include "engnine/Engine.h"
 #include "engnine/Lists.hpp"
 #include "engnine/Rect.hpp"
 #include "engnine/Viewport.hpp"
@@ -31,8 +32,8 @@ Window::Window(VALUE rbObj, Viewport *viewport) :
     contents(nullptr),
     cursor_rect(new Rect(0, 0, 0, 0)),
     frame(viewport),
-    contentsSprite(viewport),
-    cursorSprite(viewport)
+    contentsSprite(bounds, view, viewport),
+    cursorSprite(bounds, view, viewport)
 {
   contentsDirty = true;
   skinDirty = true;
@@ -73,8 +74,6 @@ void Window::onUpdate()
   }
   if (dimensionsDirty) {
     frame.rendTex.create(bounds.width(), bounds.height());
-    contentsSprite.rendTex.create(bounds.width(), bounds.height());
-    cursorSprite.rendTex.create(bounds.width(), bounds.height());
     dimensionsDirty = false;
   }
   updateOpacity();
@@ -137,9 +136,8 @@ void Window::updateContentsSprite()
   if (contents == nullptr) {
     return;
   }
-  contentsSprite.texture = contents->getTexture();
-  contentsSprite.sprite.setTexture(contentsSprite.texture);
-  contentsSprite.sprite.setPosition(bounds.x() + 16, bounds.y() + 16);
+  contentsSprite.sprite.setTexture(contents->getTexture());
+  contentsSprite.sprite.setPosition(16, 16);
   contentsSprite.sprite.setColor(sf::Color(255, 255, 255, contents_opacity));
 }
 
@@ -182,10 +180,11 @@ void Window::updateCursorRect()
     }
   }
 
-  cursorSprite.texture.loadFromImage(buff);
-  cursorSprite.sprite.setTexture(cursorSprite.texture);
+  
+  cursorTexture.loadFromImage(buff);
+  cursorSprite.sprite.setTexture(cursorTexture);
 
-  cursorSprite.sprite.setPosition(bounds.x() + 16 + cursor_rect->x.get(), bounds.y() + 16 + cursor_rect->y.get());
+  cursorSprite.sprite.setPosition(16 + cursor_rect->x.get(), 16 + cursor_rect->y.get());
   cursor_rect->markAsClean();
 }
 
@@ -213,6 +212,20 @@ void Window::updateOpacity()
   contentsSprite.setOpacity(contents_opacity);
 
   opacityDirty = false;
+}
+
+void Window::updateViewBounds()
+{
+  const sf::Vector2i &dimensions = Engine::getInstance().getDimensions();
+  ElementBounds vb = bounds + ElementBounds{ 4, 4, -8, -8 };
+  view.setSize(vb.size());
+  view.setCenter(vb.width() / 2, vb.height() / 2);
+  view.setViewport(sf::FloatRect(
+    vb.x() / dimensions.x,
+    vb.y() / dimensions.y,
+    vb.width() / dimensions.x,
+    vb.height() / dimensions.y
+  ));
 }
 
 }  // namespace Eng

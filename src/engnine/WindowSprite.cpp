@@ -1,5 +1,9 @@
 #include "engnine/WindowSprite.h"
 
+#include <SFML/Graphics/BlendMode.hpp>
+#include <SFML/Graphics/RenderTexture.hpp>
+
+#include "engnine/Engine.h"
 #include "engnine/Lists.hpp"
 
 namespace Eng {
@@ -8,7 +12,9 @@ namespace Eng {
   ⇩⇩⇩ Public ⇩⇩⇩
 */
 
-WindowSprite::WindowSprite(Viewport* viewport) :
+WindowSprite::WindowSprite(ElementBounds& bounds, sf::View& view, Viewport* viewport) :
+    bounds(bounds),
+    view(view),
     viewport(viewport),
     color(255, 255, 255, 255)
 {
@@ -27,7 +33,9 @@ WindowSprite::~WindowSprite()
 
 void WindowSprite::onRender(sf::RenderTexture& renderTexture)
 {
-  renderTexture.draw(sprite);
+  renderTexture.setView(view);
+  renderTexture.draw(sprite, sf::BlendAlpha);
+  renderTexture.setView(renderTexture.getDefaultView());
 }
 
 bool WindowSprite::shouldRender() const

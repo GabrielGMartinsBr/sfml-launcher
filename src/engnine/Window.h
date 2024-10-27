@@ -7,6 +7,7 @@
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
+#include <SFML/Graphics/View.hpp>
 
 #include "aeon/base/AeonIntegrable.h"
 #include "aeon/toolkit/ElementBounds.h"
@@ -149,6 +150,9 @@ class Window : public IOnUpdate, public EngineBase, public AeonIntegrable {
   int back_opacity;
   int contents_opacity;
 
+  sf::View view;
+  sf::Texture cursorTexture;
+
   WindowFrame frame;
   WindowSprite contentsSprite;
   WindowSprite cursorSprite;
@@ -176,6 +180,8 @@ class Window : public IOnUpdate, public EngineBase, public AeonIntegrable {
   void updateWindowSprite();
 
   void updateOpacity();
+
+  void updateViewBounds();
 };
 
 }  // namespace Eng

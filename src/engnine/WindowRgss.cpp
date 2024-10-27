@@ -241,6 +241,7 @@ void Window::setX(int v)
   if (bounds.x() == v) return;
   bounds.x(v);
   AeonIntegrable::setInstanceVar("@x", v);
+  updateViewBounds();
   skinDirty = true;
 }
 
@@ -254,6 +255,7 @@ void Window::setY(int v)
   if (bounds.y() == v) return;
   bounds.y(v);
   AeonIntegrable::setInstanceVar("@y", v);
+  updateViewBounds();
   skinDirty = true;
 }
 
@@ -269,6 +271,7 @@ void Window::setWidth(int v)
   if (bounds.width() == v) return;
   bounds.width(v);
   AeonIntegrable::setInstanceVar("@width", v);
+  updateViewBounds();
   dimensionsDirty = true;
   skinDirty = true;
 }
@@ -285,6 +288,8 @@ void Window::setHeight(int v)
   if (bounds.height() == v) return;
   bounds.height(v);
   AeonIntegrable::setInstanceVar("@height", v);
+  updateViewBounds();
+  dimensionsDirty = true;
   skinDirty = true;
 }
 
