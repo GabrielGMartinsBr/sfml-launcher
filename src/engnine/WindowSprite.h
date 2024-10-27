@@ -16,10 +16,12 @@ struct WindowSprite : IOnRender {
   ElementBounds& bounds;
   sf::View& view;
   sf::Sprite sprite;
+  sf::Texture text;
+  const sf::Sprite& backSprite;
 
   int visible;
 
-  WindowSprite(ElementBounds& bounds, sf::View& view, Viewport* viewport);
+  WindowSprite(ElementBounds& bounds, sf::View& view, const sf::Sprite& backSprite, Viewport* viewport);
 
   ~WindowSprite();
 

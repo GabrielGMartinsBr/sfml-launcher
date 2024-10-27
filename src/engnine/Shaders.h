@@ -28,6 +28,7 @@ struct Shaders {
   UPtr<Shader> spriteFlash;
   UPtr<Shader> spriteColor;
   UPtr<Shader> changeHue;
+  UPtr<Shader> backTextureBlend;
 
   Shaders();
 

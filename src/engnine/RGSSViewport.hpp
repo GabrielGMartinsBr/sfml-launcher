@@ -72,9 +72,6 @@ class Viewport {
 
   void setSize(unsigned int _width, unsigned int _height)
   {
-    // Try to release previous resources
-    renderTexture.clear();
-
     width = _width;
     height = _height;
     renderTexture.create(width, height);

@@ -51,6 +51,7 @@ Shaders::Shaders()
   spriteFlash = loadFragment("SpriteFlash.frag");
   spriteColor = loadFragment("SpriteColor.frag");
   changeHue = loadFragment("ChangeHue.frag");
+  backTextureBlend = loadFragment("BackTextureBlend.frag");
 }
 
 UPtr<Shader> Shaders::loadFragment(CStr fileName)

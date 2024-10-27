@@ -32,8 +32,8 @@ Window::Window(VALUE rbObj, Viewport *viewport) :
     contents(nullptr),
     cursor_rect(new Rect(0, 0, 0, 0)),
     frame(viewport),
-    contentsSprite(bounds, view, viewport),
-    cursorSprite(bounds, view, viewport)
+    contentsSprite(bounds, view, frame.backSprite, viewport),
+    cursorSprite(bounds, view, frame.backSprite, viewport)
 {
   contentsDirty = true;
   skinDirty = true;
@@ -180,7 +180,6 @@ void Window::updateCursorRect()
     }
   }
 
-  
   cursorTexture.loadFromImage(buff);
   cursorSprite.sprite.setTexture(cursorTexture);
 
@@ -217,7 +216,7 @@ void Window::updateOpacity()
 void Window::updateViewBounds()
 {
   const sf::Vector2i &dimensions = Engine::getInstance().getDimensions();
-  ElementBounds vb = bounds + ElementBounds{ 4, 4, -8, -8 };
+  ElementBounds vb = bounds;
   view.setSize(vb.size());
   view.setCenter(vb.width() / 2, vb.height() / 2);
   view.setViewport(sf::FloatRect(

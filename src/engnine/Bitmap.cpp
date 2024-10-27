@@ -10,7 +10,9 @@
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Text.hpp>
 #include <SFML/Graphics/Texture.hpp>
+#include <SFML/Graphics/View.hpp>
 #include <SFML/System/Vector2.hpp>
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <stdexcept>
@@ -18,6 +20,7 @@
 #include "AppDefs.h"
 #include "Log.hpp"
 #include "engnine/Color.hpp"
+#include "engnine/Engine.h"
 #include "engnine/FileUtils.hpp"
 #include "engnine/Font.hpp"
 #include "engnine/Rect.hpp"
@@ -79,7 +82,7 @@ Bitmap::Bitmap(unsigned int _width, unsigned int _height, VALUE rbObj) :
   height = _height;
 
   sf::ContextSettings settings;
-  settings.antialiasingLevel = 0;
+  // settings.antialiasingLevel = 0;
   renderTexture.create(width, height, settings);
   renderTexture.clear(sf::Color::Transparent);
 
@@ -107,11 +110,13 @@ Bitmap::Bitmap(Bitmap* bitmap) :
   sf::ContextSettings settings;
   settings.antialiasingLevel = 0;
   renderTexture.create(width, height, settings);
+  // renderTexture.clear(sf::Color(255, 255, 255, 0));
   renderTexture.clear(sf::Color::Transparent);
 
   texture = bitmap->getTexture();
   sf::Sprite contents(texture);
-  renderTexture.draw(contents, sf::BlendAlpha);
+  // renderTexture.draw(contents, sf::BlendNone);
+  renderTexture.draw(contents);
   renderTexture.display();
 }
 
@@ -380,36 +385,16 @@ void Bitmap::draw_text(double x, double y, double width, double height, CStr str
   sf::Text text = Texts::createText(str);
   text.setFont(*fontPtr);
   text.setCharacterSize(font->getter_size());
-  // text.setLetterSpacing(1);
-  // text.setLineSpacing(1.5);
 
   const sf::Color& fillColor = font->getter_color()->getSfColor();
   text.setFillColor(fillColor);
-  text.setOutlineColor(fillColor);
-  text.setOutlineThickness(0.15);
 
   float lineSpacing = fontPtr->getLineSpacing(font->getter_size()) * 1.25;
 
   sf::Vector2f position;
   sf::Vector2f origin(0, lineSpacing / 2.0f);
-  // text.setOrigin(0, bounds.top + bounds.height / 2.0f);
 
   sf::FloatRect bounds = text.getGlobalBounds();
-
-  if (align == TextAlign::TEXT_LEFT) {
-    position.x = x;
-  } else if (align == TextAlign::TEXT_RIGHT) {
-    position.x = std::floor(x + width);
-    origin.x = std::round(bounds.width + bounds.left + 3.3);
-  } else if (align == TextAlign::TEXT_CENTER) {
-    origin.x = bounds.left;
-    position.x = x + (width - bounds.width) / 2;
-  }
-
-  position.y = y + height / 2;
-  text.setPosition(position);
-
-  text.setOrigin(origin);
 
   sf::Vector2f scale(1, 1);
   if (bounds.width > width) {
@@ -419,13 +404,31 @@ void Bitmap::draw_text(double x, double y, double width, double height, CStr str
     scale.y = height / bounds.height;
   }
 
-  scale.x -= .1;
-  scale.y -= .12;
+  text.setScale(scale);
 
-  // text.setScale(scale);
+  if (align == TextAlign::TEXT_LEFT) {
+    position.x = x;
+  } else if (align == TextAlign::TEXT_RIGHT) {
+    position.x = std::floor(x + width);
+    origin.x = std::round(bounds.width * scale.x + bounds.left * scale.x);
+  } else if (align == TextAlign::TEXT_CENTER) {
+    origin.x = bounds.left * scale.x;
+    position.x = x + (width - bounds.width * scale.x) / 2;
+  }
 
-  renderTexture.draw(text, sf::BlendAlpha);
+  position.y = y + height / 2;
+  text.setPosition(position);
+  text.setOrigin(origin);
+
+  sf::FloatRect localBounds = text.getLocalBounds();
+
+  sf::RectangleShape shape(sf::Vector2f(width, height));
+  shape.setFillColor(sf::Color::Blue);
+
+  renderTexture.draw(text, sf::BlendNone);
   renderTexture.display();
+
+  dirty = true;
 }
 
 // Method get_text_size
@@ -441,8 +444,6 @@ Eng::Rect* Bitmap::get_text_size(app::CStr str)
   text.setFont(*fontPtr);
   text.setString(str);
   text.setCharacterSize(font->getter_size());
-  // text.setLetterSpacing(0.6);
-  // text.setLineSpacing(1.5);
   sf::FloatRect textBounds = text.getGlobalBounds();
   Eng::Rect* rect = new Eng::Rect(textBounds.left, textBounds.top, textBounds.width + 1, textBounds.height);
   return rect;
