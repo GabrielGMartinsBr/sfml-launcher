@@ -7,6 +7,8 @@ namespace ae {
 using sf::Vector2f;
 
 struct ElementBounds {
+  ElementBounds(const Vector2f& position, const Vector2f& size);
+
   ElementBounds(float x = 0, float y = 0, float width = 0, float height = 0);
 
   float x() const;
@@ -17,6 +19,9 @@ struct ElementBounds {
   float width(float value);
   float height() const;
   float height(float value);
+
+  inline float endX() const { return xEnd; }
+  inline float endY() const { return yEnd; }
 
   const Vector2f& position() const;
   const Vector2f& position(float x, float y);
@@ -60,6 +65,17 @@ struct ElementBounds {
   ElementBounds operator+(float value) const;
   ElementBounds operator-(float value) const;
   ElementBounds operator/(float value) const;
+
+  inline ElementBounds& operator/=(const Vector2f& other)
+  {
+    xStart -= other.x;
+    yStart -= other.y;
+    _width -= other.x;
+    _height -= other.y;
+    recalculateBounds();
+    return *this;
+  }
+
 
  private:
   float xStart;

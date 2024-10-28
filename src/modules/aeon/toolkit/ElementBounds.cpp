@@ -6,6 +6,9 @@ namespace ae {
   ⇩⇩⇩ Constructor ⇩⇩⇩
 */
 
+ElementBounds::ElementBounds(const Vector2f& position, const Vector2f& size) :
+    ElementBounds(position.x, position.y, size.x, size.y) { }
+
 ElementBounds::ElementBounds(float x, float y, float width, float height) :
     xStart(x),
     yStart(y),
