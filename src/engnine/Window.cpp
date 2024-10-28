@@ -97,7 +97,6 @@ void Window::onUpdate()
       contents->dirty = false;
     }
   }
-  cursor.setZIndex(z);
   cursor.update();
 }
 
@@ -126,7 +125,7 @@ void Window::removeFromEngineCycles()
 void Window::updateFrameSprites()
 {
   frame.visible = visible;
-  cursorSprite.visible = visible;
+  cursorSprite.visible = false;
   frame.width = bounds.width();
   frame.height = bounds.height();
 
@@ -159,47 +158,47 @@ void Window::updateCursorRect()
     )
   );
 
-  cursorSprite.visible = visible && !cursor_rect->isEmpty();
-  if (windowSkin == nullptr || cursor_rect->isEmpty()) {
-    return;
-  }
+  // cursorSprite.visible = visible && !cursor_rect->isEmpty();
+  // if (windowSkin == nullptr || cursor_rect->isEmpty()) {
+  //   return;
+  // }
 
-  sf::Image src = windowSkin->renderTexture.getTexture().copyToImage();
+  // sf::Image src = windowSkin->renderTexture.getTexture().copyToImage();
 
-  sf::Image buff;
-  buff.create(cursor_rect->width.get(), cursor_rect->height.get(), sf::Color::Transparent);
+  // sf::Image buff;
+  // buff.create(cursor_rect->width.get(), cursor_rect->height.get(), sf::Color::Transparent);
 
-  float xa = cursor_rect->width.get() / 32.0;
-  float ya = cursor_rect->height.get() / 32.0;
+  // float xa = cursor_rect->width.get() / 32.0;
+  // float ya = cursor_rect->height.get() / 32.0;
 
-  int lastLine = cursor_rect->height.get() - 1;
-  for (int i = 0; i < cursor_rect->width.get(); i++) {
-    buff.setPixel(i, 0, src.getPixel(128 + i / xa, 64));
-    buff.setPixel(i, lastLine, src.getPixel(128 + i / xa, 95));
-  }
+  // int lastLine = cursor_rect->height.get() - 1;
+  // for (int i = 0; i < cursor_rect->width.get(); i++) {
+  //   buff.setPixel(i, 0, src.getPixel(128 + i / xa, 64));
+  //   buff.setPixel(i, lastLine, src.getPixel(128 + i / xa, 95));
+  // }
 
-  int lastCol = cursor_rect->width.get() - 1;
-  for (int i = 0; i < cursor_rect->height.get(); i++) {
-    buff.setPixel(0, i, src.getPixel(128, 64 + i / ya));
-    buff.setPixel(lastCol, i, src.getPixel(159, 64 + i / ya));
-  }
+  // int lastCol = cursor_rect->width.get() - 1;
+  // for (int i = 0; i < cursor_rect->height.get(); i++) {
+  //   buff.setPixel(0, i, src.getPixel(128, 64 + i / ya));
+  //   buff.setPixel(lastCol, i, src.getPixel(159, 64 + i / ya));
+  // }
 
-  int limitX = cursor_rect->width.get() - 1;
-  int limitY = cursor_rect->height.get() - 1;
-  xa = 30.0 / (limitX - 1);
-  ya = 30.0 / (limitY - 1);
-  for (int i = 1; i < limitX; i++) {
-    for (int j = 1; j < limitY; j++) {
-      buff.setPixel(
-        i, j, src.getPixel(129 + std::floor((i - 1) * xa), 65 + std::floor((j - 1) * ya))
-      );
-    }
-  }
+  // int limitX = cursor_rect->width.get() - 1;
+  // int limitY = cursor_rect->height.get() - 1;
+  // xa = 30.0 / (limitX - 1);
+  // ya = 30.0 / (limitY - 1);
+  // for (int i = 1; i < limitX; i++) {
+  //   for (int j = 1; j < limitY; j++) {
+  //     buff.setPixel(
+  //       i, j, src.getPixel(129 + std::floor((i - 1) * xa), 65 + std::floor((j - 1) * ya))
+  //     );
+  //   }
+  // }
 
-  cursorTexture.loadFromImage(buff);
-  cursorSprite.sprite.setTexture(cursorTexture);
+  // cursorTexture.loadFromImage(buff);
+  // cursorSprite.sprite.setTexture(cursorTexture);
 
-  cursorSprite.sprite.setPosition(16 + cursor_rect->x.get(), 16 + cursor_rect->y.get());
+  // cursorSprite.sprite.setPosition(16 + cursor_rect->x.get(), 16 + cursor_rect->y.get());
   cursor_rect->markAsClean();
 }
 
@@ -208,13 +207,14 @@ void Window::updateWindowSpriteZ()
   frame.setZ(z);
   contentsSprite.setZ(z + 2);
   cursorSprite.setZ(z + 1);
+  cursor.setZIndex(z + 1);
   Lists::Instance().markZOrderDirty();
 }
 void Window::updateWindowSprite()
 {
   frame.visible = visible;
   contentsSprite.visible = visible;
-  cursorSprite.visible = visible;
+  // cursorSprite.visible = visible;
 }
 
 void Window::updateOpacity()

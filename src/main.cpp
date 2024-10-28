@@ -11,11 +11,16 @@
 #include "base/AppDefs.h"
 #include "debugger/Debugger.h"
 #include "launcher/Launcher.hpp"
+#include "msgPackTest.hpp"
 
 using dbg::Debugger;
 
 int main(int argc, char** argv)
 {
+  // MsgPackTest test;
+  // test.run();
+  
+
   Launcher launcher;
   Debugger& debugger = Debugger::getInstance();
 
@@ -32,7 +37,8 @@ int main(int argc, char** argv)
   } else if (argc == 1) {
     // app::CStr devScriptPath = "../../projects/Project1";
     // app::CStr devScriptPath = "../../projects/dev-project-graphics";
-    app::CStr devScriptPath = "../../projects/Project2";
+    // app::CStr devScriptPath = "../../projects/Project2";
+    app::CStr devScriptPath = "/run/media/home/common/gabrielmartins.dev/dev/cpp/orm-xp/projects/aeon/Old Aeon Netplay";
     launcher.run(devScriptPath);
   }
 

@@ -30,6 +30,8 @@ struct Shaders {
   UPtr<Shader> changeHue;
   UPtr<Shader> backTextureBlend;
 
+  UPtr<Shader> windowCursorBg;
+
   Shaders();
 
   UPtr<Shader> loadFragment(CStr fileName);

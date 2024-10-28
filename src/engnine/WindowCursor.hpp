@@ -1,8 +1,13 @@
 #pragma once
 
+#include <SFML/Graphics/BlendMode.hpp>
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
+#include <SFML/Graphics/RenderTexture.hpp>
+#include <SFML/Graphics/Shader.hpp>
 #include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/Texture.hpp>
+#include <SFML/System/Vector2.hpp>
 
 #include "aeon/toolkit/ElementBounds.h"
 #include "engnine/Bitmap.h"
@@ -14,6 +19,7 @@ namespace Eng {
 
 using ae::ElementBounds;
 using sf::RectangleShape;
+using sf::RenderTexture;
 using SfSprite = sf::Sprite;
 
 class WindowCursor : public EngineRenderEntity {
@@ -37,7 +43,7 @@ class WindowCursor : public EngineRenderEntity {
   void onRender(sf::RenderTexture& renderTexture) override
   {
     renderTexture.setView(view);
-    renderTexture.draw(shape);
+    renderTexture.draw(cursorSprite, sf::BlendAdd);
     renderTexture.display();
     renderTexture.setView(renderTexture.getDefaultView());
   }
@@ -109,8 +115,11 @@ class WindowCursor : public EngineRenderEntity {
   bool isReady;
 
   ElementBounds bounds;
-  SfSprite sprite;
-  RectangleShape shape;
+  RenderTexture skinTexture;
+  SfSprite skinSprite;
+  RenderTexture cursorRenderTexture;
+  RectangleShape cursorShape;
+  SfSprite cursorSprite;
 
   Shaders& shaders;
 
@@ -122,10 +131,31 @@ class WindowCursor : public EngineRenderEntity {
       return;
     }
 
-    shape.setSize(bounds.size());
-    shape.setPosition(bounds.position());
+    static const sf::Vector2f textSize = sf::Vector2f(32.0f, 32.0f);
 
-    shape.setFillColor(sf::Color::Blue);
+    skinSprite.setTexture(windowSkin->renderTexture.getTexture());
+    skinSprite.setTextureRect(sf::IntRect(128, 64, 32, 32));
+    skinSprite.setPosition(0, 0);
+
+    skinTexture.create(textSize.x, textSize.y);
+    skinTexture.clear(sf::Color::Transparent);
+    skinTexture.draw(skinSprite, sf::BlendAdd);
+    skinTexture.display();
+
+    shaders.windowCursorBg->setUniform("skinTexture", skinTexture.getTexture());
+    shaders.windowCursorBg->setUniform("textureSize", textSize);
+    shaders.windowCursorBg->setUniform("outputSize", bounds.size());
+
+    cursorShape.setSize(bounds.size());
+    cursorShape.setPosition(0, 0);
+
+    cursorRenderTexture.create(bounds.size().x, bounds.size().y);
+    cursorRenderTexture.clear(sf::Color::Transparent);
+    cursorRenderTexture.draw(cursorShape, shaders.windowCursorBg.get());
+    cursorRenderTexture.display();
+
+    cursorSprite.setTexture(cursorRenderTexture.getTexture());
+    cursorSprite.setPosition(bounds.position());
 
     isReady = true;
   }
