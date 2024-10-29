@@ -52,6 +52,7 @@ Shaders::Shaders()
   spriteColor = loadFragment("SpriteColor.frag");
   changeHue = loadFragment("ChangeHue.frag");
   backTextureBlend = loadFragment("BackTextureBlend.frag");
+  opacityBlend = loadFragment("OpacityBlend.frag");
 }
 
 UPtr<Shader> Shaders::loadFragment(CStr fileName)
