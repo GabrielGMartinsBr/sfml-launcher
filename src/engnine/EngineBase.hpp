@@ -1,6 +1,9 @@
 #pragma once
 
+#include <string>
+
 #include "AppDefs.h"
+#include "integrator/Convert.hpp"
 #include "ruby.h"
 
 namespace Eng {
@@ -13,7 +16,16 @@ class EngineBase {
 
   EngineBase(VALUE rbObj = Qnil) :
       rbObj(rbObj),
-      dirty(false) { }
+      dirty(false)
+  {
+    bindRubyId();
+  }
+
+  void setRbId(VALUE value)
+  {
+    rbObj = value;
+    bindRubyId();
+  }
 
   inline bool hasRbObj() const
   {
@@ -44,6 +56,13 @@ class EngineBase {
 
  private:
   bool dirty;
+
+  void bindRubyId()
+  {
+    if (hasRbObj()) {
+      setInstanceVar("@rbId", Convert::toRubyString(std::to_string(rbObj)));
+    }
+  }
 };
 
 }  // namespace Eng

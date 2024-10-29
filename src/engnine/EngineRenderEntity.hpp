@@ -18,7 +18,7 @@ class EngineRenderEntity : public IOnRender {
 
   ~EngineRenderEntity()
   {
-    removeToRenderList();
+    removeFromRenderList();
   }
 
   virtual void onRender(sf::RenderTexture& renderTexture) = 0;
@@ -37,7 +37,7 @@ class EngineRenderEntity : public IOnRender {
     addedToRenderList = true;
   }
 
-  void removeToRenderList()
+  void removeFromRenderList()
   {
     if (!addedToRenderList) return;
     Lists::Instance().removeRenderEntry(this);
