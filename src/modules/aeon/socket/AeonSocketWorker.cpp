@@ -22,6 +22,7 @@ void AeonSocketWorker::startWorker()
 */
 void AeonSocketWorker::stopWorker()
 {
+  if (!running) return;
   {
     std::lock_guard<std::mutex> lock(queue_mutex);
     running = false;

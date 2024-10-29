@@ -44,7 +44,9 @@ struct AeonSocketManager {
     for (auto it = clients.begin(); it != clients.end(); ++it) {
       VALUE key = it->first;
       UPtr<AeonSocketIntegrable>& value = it->second;
-      value->stopWorker();
+      if (value != nullptr) {
+        value->stopWorker();
+      }
     }
     clients.clear();
   }
