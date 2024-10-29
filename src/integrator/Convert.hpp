@@ -91,6 +91,11 @@ struct Convert {
     return LONG2NUM(v);
   }
 
+    static VALUE toRubyBigNumber(unsigned long v)
+  {
+    return LONG2NUM(v);
+  }
+
   static VALUE uToRubyNumber(unsigned int v)
   {
     return UINT2NUM(v);
