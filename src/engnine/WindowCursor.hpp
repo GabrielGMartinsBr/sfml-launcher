@@ -8,15 +8,12 @@
 #include <SFML/Graphics/Shader.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
-#include <SFML/System/Vector2.hpp>
 
 #include "aeon/toolkit/ElementBounds.h"
-#include "core/Vec2f.hpp"
 #include "engnine/Bitmap.h"
 #include "engnine/EngineRenderEntity.hpp"
 #include "engnine/Lists.hpp"
 #include "engnine/Shaders.h"
-#include "engnine/WindowFrame.h"
 
 namespace Eng {
 
@@ -24,15 +21,12 @@ using ae::ElementBounds;
 using sf::RectangleShape;
 using sf::RenderTexture;
 using SfSprite = sf::Sprite;
-using Core::Vec2f;
 
 class WindowCursor : public EngineRenderEntity {
  public:
-  const WindowFrame& frame;
 
-  WindowCursor(sf::View& view, const WindowFrame& frame, const Viewport* viewport) :
+  WindowCursor(sf::View& view, const Viewport* viewport) :
       view(view),
-      frame(frame),
       viewport(viewport),
       shaders(Shaders::Instance()),
       cursorColor(sf::Color::White)
@@ -53,75 +47,8 @@ class WindowCursor : public EngineRenderEntity {
 
   void onRender(sf::RenderTexture& renderTexture) override
   {
-    // Set the current view for rendering
     renderTexture.setView(view);
-
-    // Obtain frame's sprite and texture details
-    const sf::Sprite& frameSprite = frame.backSprite;
-    backTexture = *frameSprite.getTexture();
-
-    // const sf::Vector2f& size = bounds.size();
-
-    // frame.getZIndex()
-
-    // Define texture size, rectangle position, and size in texture coordinates
-    sf::Vector2f backTextureSize(frame.width, frame.height);
-    // sf::Vector2f backTextureSize(backTexture.getSize());
-    sf::Vector2f rectPos(frameSprite.getTextureRect().left, frameSprite.getTextureRect().top);
-    sf::Vector2f rectSize(frameSprite.getTextureRect().width, frameSprite.getTextureRect().height);
-
-    // Calculate the scaling ratio between the cursor sprite and frame texture
-    sf::Vector2u rSize = backTexture.getSize();
-    sf::Vector2u sSize = cursorSprite.getTexture()->getSize();
-    // sf::Vector2f sSize = bounds.size();
-    // sf::Vector2f size(static_cast<float>(sSize.x) / rSize.x, static_cast<float>(sSize.y) / rSize.y);
-
-    // Calculate the offset for the center of the cursor within the frame
-    sf::Vector2f offset(
-      ((backTextureSize.x - sSize.x) / 2) / backTextureSize.x,
-      ((backTextureSize.y - sSize.y) / 2) / backTextureSize.y
-    );
-
-    Vec2f textureSize(cursorSprite.getTexture()->getSize());
-
-    Vec2f size(sSize);
-    size /= backTextureSize;
-    // size /= rSize;
-
-    // Scale the rectangle coordinates to a normalized range (0.0 to 1.0)
-    ElementBounds frameCoord(rectPos, rectSize);
-    frameCoord /= textureSize.sfVector2f();
-
-    sf::Vector2f texCoordEnd(frameCoord.endX(), frameCoord.endY());
-
-    // Set uniforms for the shader
-    shaders.backTextureRectBlend->setUniform("backTexture", backTexture);
-    shaders.backTextureRectBlend->setUniform("backTextureSize", backTextureSize);
-    shaders.backTextureRectBlend->setUniform("backOpacity", frameSprite.getColor().a / 255.f);
-    shaders.backTextureRectBlend->setUniform("texCoordStart", frameCoord.position());
-    shaders.backTextureRectBlend->setUniform("texCoordSize", frameCoord.size());
-    shaders.backTextureRectBlend->setUniform("texCoordEnd", texCoordEnd);
-    shaders.backTextureRectBlend->setUniform("offset", offset);
-    shaders.backTextureRectBlend->setUniform("size", size.sfVector2f());
-    shaders.backTextureRectBlend->setUniform("spriteSize", bounds.size());
-
-    shaders.backTextureRectBlend->setUniform("textureSize", textureSize.sfVector2f());
-    shaders.backTextureRectBlend->setUniform("opacity", opacity / 255.f);
-
-    // Render cursor sprite with the shader
-    sf::RenderStates state;
-    state.shader = shaders.backTextureRectBlend.get();
-    // state.blendMode = sf::BlendAlpha;
-
-    // renderTexture.draw(cursorSprite, state);
     renderTexture.draw(cursorSprite, sf::BlendAdd);
-
-    // Log::out() << "texCoordEnd";
-    // Log::out() << backTextureSize.x;
-    // Log::out() << backTextureSize.y;
-    // Log::out() << "opacity: " << frameSprite.getColor().a / 255.f;
-
-    // Display renderTexture and reset to default view
     renderTexture.display();
     renderTexture.setView(renderTexture.getDefaultView());
   }
