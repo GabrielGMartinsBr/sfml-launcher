@@ -33,6 +33,7 @@ class WindowCursor : public EngineRenderEntity {
   {
     z = 0;
     opacity = 255;
+    visible = true;
     isDisposed = false;
     isDirty = false;
     isReady = false;
@@ -55,7 +56,7 @@ class WindowCursor : public EngineRenderEntity {
 
   bool shouldRender() const override
   {
-    return !isDisposed && isReady;
+    return !isDisposed && visible && isReady;
   }
 
   int getZIndex() const override
@@ -118,6 +119,11 @@ class WindowCursor : public EngineRenderEntity {
     Lists::Instance().markZOrderDirty();
   }
 
+  void setVisible(bool value)
+  {
+    visible = value;
+  }
+
   void dispose()
   {
     isDisposed = true;
@@ -140,6 +146,7 @@ class WindowCursor : public EngineRenderEntity {
   int z;
   uint8_t opacity;
   uint8_t animationPosition;
+  bool visible;
   bool isDisposed;
   bool isDirty;
   bool isReady;

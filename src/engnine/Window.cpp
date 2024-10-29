@@ -94,6 +94,7 @@ void Window::onUpdate()
       contents->dirty = false;
     }
   }
+  cursor.setVisible(visible);
   cursor.update();
 }
 
