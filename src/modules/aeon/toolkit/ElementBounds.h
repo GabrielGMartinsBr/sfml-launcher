@@ -68,10 +68,10 @@ struct ElementBounds {
 
   inline ElementBounds& operator/=(const Vector2f& other)
   {
-    xStart -= other.x;
-    yStart -= other.y;
-    _width -= other.x;
-    _height -= other.y;
+    xStart /= other.x;
+    yStart /= other.y;
+    _width /= other.x;
+    _height /= other.y;
     recalculateBounds();
     return *this;
   }
