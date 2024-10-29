@@ -37,6 +37,7 @@ struct WindowFrame : IOnRender {
   void setZ(int v);
 
   void setOpacity(int v);
+  int getOpacity();
 
   void update(Bitmap* windowSkin);
 

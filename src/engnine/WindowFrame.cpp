@@ -34,6 +34,7 @@ void WindowFrame::onRender(sf::RenderTexture& renderTexture)
 {
   renderTexture.draw(backSprite);
   renderTexture.draw(borderSprite);
+  renderTexture.display();
 }
 
 bool WindowFrame::shouldRender() const
@@ -63,6 +64,11 @@ void WindowFrame::setOpacity(int v)
   opacity = v;
   color.a = opacity;
   backSprite.setColor(color);
+}
+
+int WindowFrame::getOpacity()
+{
+  return opacity;
 }
 
 void WindowFrame::update(Bitmap* windowSkin)
