@@ -11,16 +11,11 @@
 #include "base/AppDefs.h"
 #include "debugger/Debugger.h"
 #include "launcher/Launcher.hpp"
-#include "msgPackTest.hpp"
 
 using dbg::Debugger;
 
 int main(int argc, char** argv)
 {
-  // MsgPackTest test;
-  // test.run();
-  
-
   Launcher launcher;
   Debugger& debugger = Debugger::getInstance();
 
