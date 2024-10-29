@@ -81,6 +81,8 @@ class Window {
     rb_define_method(windowClass, "dispose", RUBY_METHOD_FUNC(method_dispose), 0);
     rb_define_method(windowClass, "disposed?", RUBY_METHOD_FUNC(method_disposed), 0);
     rb_define_method(windowClass, "update", RUBY_METHOD_FUNC(method_update), 0);
+
+    rb_define_method(windowClass, "debug=", RUBY_METHOD_FUNC(setDebug), 1);
   }
 
   // Utils
@@ -555,6 +557,13 @@ class Window {
 
     inst->method_update();
 
+    return Qnil;
+  }
+
+  static VALUE setDebug(VALUE self, VALUE value)
+  {
+    Eng::Window *inst = getObjectValue(self);
+    inst->debug = Convert::toCBool(value);
     return Qnil;
   }
 };

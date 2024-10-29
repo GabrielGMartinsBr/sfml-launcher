@@ -39,7 +39,6 @@ using app::CStr;
 
 Bitmap::Bitmap(const char* assetName, VALUE rbObj) :
     EngineBase(rbObj),
-    font(new Font()),
     renderTexture(),
     texture()
 {
@@ -60,7 +59,7 @@ Bitmap::Bitmap(const char* assetName, VALUE rbObj) :
 
   texture.loadFromImage(image);
   sf::Sprite spr(texture);
-  renderTexture.draw(spr, sf::BlendAlpha);
+  renderTexture.draw(spr, sf::BlendAdd);
   renderTexture.display();
 
   isDisposed = false;
@@ -75,7 +74,6 @@ Bitmap::Bitmap(const char* assetName, VALUE rbObj) :
 
 Bitmap::Bitmap(unsigned int _width, unsigned int _height, VALUE rbObj) :
     EngineBase(rbObj),
-    font(new Font()),
     renderTexture()
 {
   width = _width;
@@ -96,10 +94,9 @@ Bitmap::Bitmap(unsigned int _width, unsigned int _height, VALUE rbObj) :
 
 // Clone constructor
 
-Bitmap::Bitmap(Bitmap* bitmap) :
+Bitmap::Bitmap(const Bitmap* bitmap) :
     EngineBase(Qnil),
-    renderTexture(),
-    font(new Font())
+    renderTexture()
 {
   width = bitmap->width;
   height = bitmap->height;
@@ -110,13 +107,10 @@ Bitmap::Bitmap(Bitmap* bitmap) :
   sf::ContextSettings settings;
   settings.antialiasingLevel = 0;
   renderTexture.create(width, height, settings);
-  // renderTexture.clear(sf::Color(255, 255, 255, 0));
   renderTexture.clear(sf::Color::Transparent);
 
-  texture = bitmap->getTexture();
-  sf::Sprite contents(texture);
-  // renderTexture.draw(contents, sf::BlendNone);
-  renderTexture.draw(contents);
+  sf::Sprite contents(bitmap->getTexture());
+  renderTexture.draw(contents, sf::BlendAdd);
   renderTexture.display();
 }
 
@@ -133,7 +127,8 @@ void Bitmap::initRubyObj()
   if (hasRbObj()) {
     return;
   }
-  rbObj = It::Bitmap::createRubyObject(this);
+  VALUE rbId = It::Bitmap::createRubyObject(this);
+  setRbId(rbId);
   bindRubyVars();
 }
 
@@ -144,21 +139,21 @@ void Bitmap::bindRubyVars()
   if (rbObj == Qnil) {
     throw std::runtime_error("Bitmap doesn't have rbObj defined.");
   }
-
-  if (font->rbObj == Qnil) {
-    font->rbObj = It::Font::createRubyObject(font);
-  }
-
   rb_iv_set(rbObj, "@width", Convert::toRubyNumber(width));
   rb_iv_set(rbObj, "@height", Convert::toRubyNumber(height));
-
-  rb_iv_set(rbObj, "@font", font->rbObj);
+  if (!font) {
+    rb_iv_set(rbObj, "@font", Qnil);
+  } else if (font->rbObj == Qnil) {
+    font->setRbId(It::Font::createRubyObject(font));
+    rb_iv_set(rbObj, "@font", font->rbObj);
+  }
 }
 
 // Engine
 
-const sf::Texture& Bitmap::getTexture()
+const sf::Texture& Bitmap::getTexture() const
 {
+  // renderTexture.display();
   return renderTexture.getTexture();
 }
 
@@ -175,21 +170,17 @@ Font* Bitmap::getter_font()
 
 // Setter font
 
-void Bitmap::setter_font(Font* v)
+void Bitmap::setter_font(Font* value)
 {
-  if (font == v) {
+  if (font == value) {
     return;
   }
 
-  VALUE fontValue = Qnil;
-  if (v) {
-    if (!v->hasRbObj()) {
-      font->rbObj = It::Font::createRubyObject(font);
-    }
-    fontValue = v->rbObj;
+  font = value;
+  if (!font->hasRbObj()) {
+    font->rbObj = It::Font::createRubyObject(value);
   }
-  rb_iv_set(rbObj, "@font", fontValue);
-  font = v;
+  rb_iv_set(rbObj, "@font", font->rbObj);
 }
 
 /*

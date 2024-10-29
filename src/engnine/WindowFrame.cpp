@@ -1,5 +1,7 @@
 #include "engnine/WindowFrame.h"
 
+#include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/Texture.hpp>
 #include <cmath>
 
 #include "engnine/Bitmap.h"
@@ -11,30 +13,28 @@ namespace Eng {
   ⇩⇩⇩ Public ⇩⇩⇩
 */
 
-WindowFrame::WindowFrame(Viewport* viewport) :
+WindowFrame::WindowFrame(const sf::View& view, Viewport* viewport) :
+    view(view),
     viewport(viewport),
-    color(255, 255, 255, 255)
+    backColor(sf::Color::White),
+    borderColor(sf::Color::White)
 {
+  z = 0;
   width = 0;
   height = 0;
-  z = 0;
   opacity = 255;
+  backOpacity = 255;
   visible = true;
-  addedToEngineCycles = false;
   isDisposed = false;
-  addToEngineCycles();
-}
-
-WindowFrame::~WindowFrame()
-{
-  removeFromEngineCycles();
 }
 
 void WindowFrame::onRender(sf::RenderTexture& renderTexture)
 {
+  renderTexture.setView(view);
   renderTexture.draw(backSprite);
   renderTexture.draw(borderSprite);
   renderTexture.display();
+  renderTexture.setView(renderTexture.getDefaultView());
 }
 
 bool WindowFrame::shouldRender() const
@@ -47,28 +47,28 @@ int WindowFrame::getZIndex() const
   return z;
 }
 
-void WindowFrame::dispose()
-{
-  isDisposed = true;
-  removeFromEngineCycles();
-}
-
 void WindowFrame::setZ(int v)
 {
   z = v;
   Lists::Instance().markZOrderDirty();
 }
 
-void WindowFrame::setOpacity(int v)
+void WindowFrame::setOpacity(uint8_t value)
 {
-  opacity = v;
-  color.a = opacity;
-  backSprite.setColor(color);
+  opacity = value;
+  borderColor.a = opacity;
+  backColor.a = (opacity / 255.f) * (backOpacity / 255.f) * 255.f;
+  borderSprite.setColor(borderColor);
+  backSprite.setColor(backColor);
 }
 
-int WindowFrame::getOpacity()
+void WindowFrame::setBackOpacity(uint8_t value)
 {
-  return opacity;
+  backOpacity = value;
+  borderColor.a = opacity;
+  backColor.a = (opacity / 255.f) * (backOpacity / 255.f) * 255.f;
+  borderSprite.setColor(borderColor);
+  backSprite.setColor(backColor);
 }
 
 void WindowFrame::update(Bitmap* windowSkin)
@@ -77,27 +77,15 @@ void WindowFrame::update(Bitmap* windowSkin)
   updateBorder(windowSkin);
 }
 
+void WindowFrame::dispose()
+{
+  isDisposed = true;
+  removeFromRenderList();
+}
+
 /*
   ⇩⇩⇩ Private ⇩⇩⇩
 */
-
-void WindowFrame::addToEngineCycles()
-{
-  if (addedToEngineCycles) {
-    return;
-  }
-  Lists::Instance().addRenderEntry(this);
-  addedToEngineCycles = true;
-}
-
-void WindowFrame::removeFromEngineCycles()
-{
-  if (!addedToEngineCycles) {
-    return;
-  }
-  Lists::Instance().removeRenderEntry(this);
-  addedToEngineCycles = false;
-}
 
 void WindowFrame::updateBackgroundSprite(Bitmap* windowSkin)
 {
@@ -108,17 +96,17 @@ void WindowFrame::updateBackgroundSprite(Bitmap* windowSkin)
   float scaleX = (width - 2) / 128.0;
   float scaleY = (height - 2) / 128.0;
 
-  sf::Sprite spr;
-  spr.setTexture(windowSkin->getTexture());
+  backTexture = windowSkin->getTexture();
+  backSprite.setTexture(backTexture);
 
-  sf::IntRect dstRect(0, 0, 128, 128);
-  spr.setTextureRect(dstRect);
+  backSprite.setTextureRect(sf::IntRect(
+    0, 0,
+    128, 128
+  ));
 
-  spr.setScale(scaleX, scaleY);
-  spr.setPosition(1, 1);
-
-  spr.setColor(color);
-  backSprite = spr;
+  backSprite.setScale(scaleX, scaleY);
+  backSprite.setPosition(1, 1);
+  backSprite.setColor(backColor);
 }
 
 void WindowFrame::updateBorder(Bitmap* windowSkin)
@@ -298,6 +286,8 @@ void WindowFrame::updateBorder(Bitmap* windowSkin)
 
   texture = rd.getTexture();
   borderSprite.setTexture(texture);
+  borderSprite.setColor(borderColor);
+  borderSprite.setPosition(0, 0);
 }
 
 }  // namespace Eng

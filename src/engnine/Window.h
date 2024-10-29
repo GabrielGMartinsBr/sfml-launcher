@@ -27,6 +27,7 @@ using ae::ElementBounds;
 
 class Window : public IOnUpdate, public EngineBase, public AeonIntegrable {
  public:
+  bool debug = false;
 
   Window(Viewport *viewport = nullptr);
 

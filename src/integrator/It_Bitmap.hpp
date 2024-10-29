@@ -1,9 +1,7 @@
 #pragma once
 
 #include "Convert.hpp"
-#include "Log.hpp"
 #include "RbUtils.hpp"
-#include "debugger/DebugUtils.hpp"
 #include "engnine/Bitmap.h"
 #include "engnine/Rect.hpp"
 #include "integrator/It_Color.hpp"

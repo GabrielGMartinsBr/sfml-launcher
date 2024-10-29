@@ -33,14 +33,14 @@ Window::Window(VALUE rbObj, Viewport *viewport) :
     windowSkin(nullptr),
     contents(nullptr),
     cursor_rect(new Rect(0, 0, 0, 0)),
-    frame(viewport),
-    contentsSprite(bounds, view, frame.backSprite, viewport),
+    frame(view, viewport),
+    contentsSprite(view, bounds, frame.backSprite, viewport),
     cursor(view, viewport)
 {
   contentsDirty = true;
   skinDirty = true;
-  dimensionsDirty = false;
-  opacityDirty = false;
+  dimensionsDirty = true;
+  opacityDirty = true;
 
   active = true;
   visible = true;
@@ -74,18 +74,22 @@ void Window::onUpdate()
   }
   if (dimensionsDirty) {
     frame.rendTex.create(bounds.width(), bounds.height());
-    dimensionsDirty = false;
-  }
-  updateOpacity();
-  if (skinDirty) {
+    updateViewBounds();
     updateFrameSprites();
-    updateCursorRect();
-    skinDirty = false;
-    cursor_rect->markAsClean();
+    dimensionsDirty = false;
+  } else {
+    if (skinDirty) {
+      updateFrameSprites();
+      updateCursorRect();
+      skinDirty = false;
+    }
   }
   if (cursor_rect->isDirty()) {
     updateCursorRect();
-    cursor_rect->markAsClean();
+  }
+  if (opacityDirty) {
+    updateOpacity();
+    opacityDirty = false;
   }
   if (contentsDirty || (contents && contents->dirty)) {
     updateContentsSprite();
@@ -128,9 +132,6 @@ void Window::updateFrameSprites()
 
   frame.update(windowSkin);
 
-  frame.backSprite.setPosition(bounds.position());
-  frame.borderSprite.setPosition(bounds.position());
-
   cursor.setWindowSkin(windowSkin);
 }
 
@@ -141,7 +142,6 @@ void Window::updateContentsSprite()
   }
   contentsSprite.sprite.setTexture(contents->getTexture());
   contentsSprite.sprite.setPosition(16, 16);
-  contentsSprite.sprite.setColor(sf::Color(255, 255, 255, contents_opacity));
 }
 
 void Window::updateCursorRect()
@@ -164,6 +164,7 @@ void Window::updateWindowSpriteZ()
   cursor.setZIndex(z + 1);
   Lists::Instance().markZOrderDirty();
 }
+
 void Window::updateWindowSprite()
 {
   frame.visible = visible;
@@ -172,14 +173,9 @@ void Window::updateWindowSprite()
 
 void Window::updateOpacity()
 {
-  if (!opacityDirty) {
-    return;
-  }
-
-  frame.setOpacity(back_opacity);
+  frame.setOpacity(opacity);
+  frame.setBackOpacity(back_opacity);
   contentsSprite.setOpacity(contents_opacity);
-
-  opacityDirty = false;
 }
 
 void Window::updateViewBounds()

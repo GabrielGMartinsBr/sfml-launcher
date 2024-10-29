@@ -127,7 +127,7 @@ class WindowCursor : public EngineRenderEntity {
   void dispose()
   {
     isDisposed = true;
-    removeToRenderList();
+    removeFromRenderList();
   }
 
   bool disposed()

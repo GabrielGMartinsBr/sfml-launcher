@@ -13,9 +13,9 @@ namespace Eng {
   ⇩⇩⇩ Public ⇩⇩⇩
 */
 
-WindowSprite::WindowSprite(ElementBounds& bounds, sf::View& view, const sf::Sprite& backSprite, Viewport* viewport) :
-    bounds(bounds),
+WindowSprite::WindowSprite(sf::View const& view, ElementBounds const& bounds, sf::Sprite const& backSprite, Viewport* viewport) :
     view(view),
+    bounds(bounds),
     backSprite(backSprite),
     viewport(viewport),
     color(255, 255, 255, 255)

@@ -13,15 +13,13 @@ namespace Eng {
 using ae::ElementBounds;
 
 struct WindowSprite : IOnRender {
-  ElementBounds& bounds;
-  sf::View& view;
   sf::Sprite sprite;
   sf::Texture text;
   const sf::Sprite& backSprite;
 
   int visible;
 
-  WindowSprite(ElementBounds& bounds, sf::View& view, const sf::Sprite& backSprite, Viewport* viewport);
+  WindowSprite(sf::View const& view, ElementBounds const& bounds, sf::Sprite const& backSprite, Viewport* viewport);
 
   ~WindowSprite();
 
@@ -40,6 +38,8 @@ struct WindowSprite : IOnRender {
   void setOpacity(int v);
 
  private:
+  const ElementBounds& bounds;
+  const sf::View& view;
   Viewport* viewport;
   int z;
   int opacity;

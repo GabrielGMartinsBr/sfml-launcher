@@ -1,4 +1,5 @@
 #include "aeon/base/AeonIntegrable.h"
+#include "engnine/Bitmap.h"
 #include "engnine/EngineBase.hpp"
 #include "engnine/Window.h"
 //
@@ -39,7 +40,7 @@ void Window::bindRubyVars()
   rb_iv_set(rbObj, "@viewport", viewportVal);
   rb_iv_set(rbObj, "@cursor_rect", cursor_rect->rbObj);
 
-  rb_iv_set(rbObj, "@windowSkin", Qnil);
+  rb_iv_set(rbObj, "@windowskin", Qnil);
   rb_iv_set(rbObj, "@contents", Qnil);
 
   rb_iv_set(rbObj, "@stretch", Convert::toRubyBool(_stretch));
@@ -79,8 +80,10 @@ void Window::setter_windowskin(Bitmap *value)
     return;
   }
 
-  value->initRubyObj();
   windowSkin = value;
+  windowSkin->initRubyObj();
+  skinDirty = true;
+
   EngineBase::setInstanceVar("@windowskin", windowSkin->rbObj);
 }
 
@@ -346,7 +349,10 @@ VALUE Window::setter_oy(VALUE v)
 
 /*  Property opacity */
 
-int Window::getter_opacity() { return opacity; }
+int Window::getter_opacity()
+{
+  return opacity;
+}
 void Window::setter_opacity(int v)
 {
   int value = Num::clamp(v, 0, 255);
@@ -369,7 +375,10 @@ VALUE Window::setter_opacity(VALUE v)
 
 /*  Property back_opacity */
 
-int Window::getter_back_opacity() { return back_opacity; }
+int Window::getter_back_opacity()
+{
+  return back_opacity;
+}
 void Window::setter_back_opacity(int v)
 {
   int value = Num::clamp(v, 0, 255);
@@ -392,7 +401,10 @@ VALUE Window::setter_back_opacity(VALUE v)
 
 /*  Property contents_opacity */
 
-int Window::getter_contents_opacity() { return contents_opacity; }
+int Window::getter_contents_opacity()
+{
+  return contents_opacity;
+}
 void Window::setter_contents_opacity(int v)
 {
   int value = Num::clamp(v, 0, 255);
@@ -448,7 +460,7 @@ void Window::method_update()
     return;
   }
   cursor.updateAnimation();
-  contentsDirty = contents->dirty;
+  // contentsDirty = contents->dirty;
 }
 
 }  // namespace Eng

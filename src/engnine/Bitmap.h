@@ -32,14 +32,14 @@ class Bitmap : public EngineBase {
 
   Bitmap(const char* assetName, VALUE rbObj = Qnil);
   Bitmap(unsigned int _width, unsigned int _height, VALUE rbObj = Qnil);
-  Bitmap(Bitmap* bitmap);
+  Bitmap(const Bitmap* bitmap);
   ~Bitmap();
 
   void initRubyObj();
 
   // Engine
 
-  const sf::Texture& getTexture();
+  const sf::Texture& getTexture() const;
 
   // Properties
 
@@ -74,8 +74,7 @@ class Bitmap : public EngineBase {
   Eng::Rect* get_text_size(app::CStr str);
 
  private:
-
-  Font* font;
+  Font* font = new Font();
   sf::Texture texture;
   sf::Sprite sprite;
   unsigned int width;
