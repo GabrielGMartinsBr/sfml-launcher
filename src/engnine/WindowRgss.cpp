@@ -10,17 +10,6 @@
 
 namespace Eng {
 
-static const uint8_t cursorAniAlpha[] = {
-  /* Fade out */
-  0xFF, 0xF7, 0xEF, 0xE7, 0xDF, 0xD7, 0xCF, 0xC7,
-  0xBF, 0xB7, 0xAF, 0xA7, 0x9F, 0x97, 0x8F, 0x87,
-  /* Fade in */
-  0x7F, 0x87, 0x8F, 0x97, 0x9F, 0xA7, 0xAF, 0xB7,
-  0xBF, 0xC7, 0xCF, 0xD7, 0xDF, 0xE7, 0xEF, 0xF7
-};
-
-static const int cursorAniAlphaN = sizeof(cursorAniAlpha);
-
 /*
   Rgss
 */
@@ -458,8 +447,7 @@ void Window::method_update()
   if (isDisposed || contents == nullptr || contents->disposed()) {
     return;
   }
-  cursorAniAlphaId = (cursorAniAlphaId + 1) % cursorAniAlphaN;
-  cursorSprite.setOpacity(cursorAniAlpha[cursorAniAlphaId]);
+  cursor.updateAnimation();
   contentsDirty = contents->dirty;
 }
 

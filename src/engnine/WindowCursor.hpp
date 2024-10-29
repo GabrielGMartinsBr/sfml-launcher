@@ -42,6 +42,7 @@ class WindowCursor : public EngineRenderEntity {
     isDisposed = false;
     isDirty = false;
     isReady = false;
+    animationPosition = 0;
   }
 
   /*
@@ -127,7 +128,7 @@ class WindowCursor : public EngineRenderEntity {
 
   bool shouldRender() const override
   {
-    return isReady && !isDisposed;
+    return !isDisposed && isReady;
   }
 
   int getZIndex() const override
@@ -144,6 +145,29 @@ class WindowCursor : public EngineRenderEntity {
     if (isDirty) {
       refresh();
     }
+  }
+
+  void updateAnimation()
+  {
+    if (!shouldRender()) {
+      return;
+    }
+
+    static const uint8_t animationAlphaValues[] = {
+      /* Fade out */
+      0xFF, 0xF7, 0xEF, 0xE7, 0xDF, 0xD7, 0xCF, 0xC7,
+      0xBF, 0xB7, 0xAF, 0xA7, 0x9F, 0x97, 0x8F, 0x87,
+      /* Fade in */
+      0x7F, 0x87, 0x8F, 0x97, 0x9F, 0xA7, 0xAF, 0xB7,
+      0xBF, 0xC7, 0xCF, 0xD7, 0xDF, 0xE7, 0xEF, 0xF7
+    };
+
+    static const int animationValuesSize = sizeof(animationAlphaValues);
+
+    animationPosition = (animationPosition + 1) % animationValuesSize;
+    opacity = animationAlphaValues[animationPosition];
+    cursorColor.a = opacity;
+    cursorSprite.setColor(cursorColor);
   }
 
   void setBounds(const ElementBounds& value)
@@ -187,6 +211,8 @@ class WindowCursor : public EngineRenderEntity {
   const Viewport* viewport;
   const Bitmap* windowSkin;
   int z;
+  uint8_t opacity;
+  uint8_t animationPosition;
   bool isDisposed;
   bool isDirty;
   bool isReady;
@@ -197,6 +223,7 @@ class WindowCursor : public EngineRenderEntity {
   RenderTexture cursorRenderTexture;
   RectangleShape cursorShape;
   SfSprite cursorSprite;
+  sf::Color cursorColor;
 
   Shaders& shaders;
 

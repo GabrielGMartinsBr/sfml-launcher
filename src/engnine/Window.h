@@ -156,15 +156,12 @@ class Window : public IOnUpdate, public EngineBase, public AeonIntegrable {
 
   WindowFrame frame;
   WindowSprite contentsSprite;
-  WindowSprite cursorSprite;
   WindowCursor cursor;
 
   bool dimensionsDirty;
   bool skinDirty;
   bool contentsDirty;
   bool opacityDirty;
-
-  int cursorAniAlphaId;
 
   void addToEngineCycles();
   void removeFromEngineCycles();
