@@ -29,7 +29,9 @@ struct Shaders {
   UPtr<Shader> spriteColor;
   UPtr<Shader> changeHue;
   UPtr<Shader> backTextureBlend;
+  UPtr<Shader> backTextureRectBlend;
   UPtr<Shader> opacityBlend;
+  
 
   UPtr<Shader> windowCursorBg;
 

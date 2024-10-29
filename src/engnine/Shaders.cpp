@@ -52,6 +52,7 @@ Shaders::Shaders()
   spriteColor = loadFragment("SpriteColor.frag");
   changeHue = loadFragment("ChangeHue.frag");
   backTextureBlend = loadFragment("BackTextureBlend.frag");
+  backTextureRectBlend = loadFragment("BackTextureRectBlend.frag");
   windowCursorBg = loadFragment("WindowCursorBg.frag");
   opacityBlend = loadFragment("OpacityBlend.frag");
 }

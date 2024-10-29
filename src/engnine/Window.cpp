@@ -35,8 +35,7 @@ Window::Window(VALUE rbObj, Viewport *viewport) :
     cursor_rect(new Rect(0, 0, 0, 0)),
     frame(viewport),
     contentsSprite(bounds, view, frame.backSprite, viewport),
-    cursorSprite(bounds, view, frame.backSprite, viewport),
-    cursor(view, viewport)
+    cursor(view, frame, viewport)
 {
   contentsDirty = true;
   skinDirty = true;
