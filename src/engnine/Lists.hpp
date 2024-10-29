@@ -88,6 +88,7 @@ struct Lists {
 
   void addRenderEntry(IOnRender* instance)
   {
+    instance->__listAddNum = renderListCounter++;
     renderList.push_back(instance);
   }
 
@@ -105,6 +106,7 @@ struct Lists {
 
  private:
   bool zDirty;
+  static unsigned int renderListCounter;
 
   Lists();
 

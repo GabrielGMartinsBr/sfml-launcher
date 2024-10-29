@@ -4,6 +4,10 @@
 
 namespace Eng {
 
+/*
+  ⇩⇩⇩ Static ⇩⇩⇩
+*/
+
 static Lists* instance = nullptr;
 
 void Lists::Init()
@@ -24,6 +28,12 @@ void Lists::Destroy()
   delete instance;
   instance = nullptr;
 }
+
+/*
+  ⇩⇩⇩ Instance ⇩⇩⇩
+*/
+
+unsigned int Lists::renderListCounter = 0;
 
 Lists::Lists() { }
 
@@ -46,7 +56,13 @@ void Lists::sortZ()
 
 bool Lists::compareZ(const IOnRender* a, const IOnRender* b)
 {
-  return a->getZIndex() < b->getZIndex();
+  int zIndexA = a->getZIndex();
+  int zIndexB = b->getZIndex();
+
+  if (zIndexA == zIndexB) {
+    return a->__listAddNum < b->__listAddNum;
+  }
+  return zIndexA < zIndexB;
 }
 
 }  // namespace Eng
