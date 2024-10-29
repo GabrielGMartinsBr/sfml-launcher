@@ -140,7 +140,7 @@ VALUE AeWindowIntegrator::getTriggerElementKey(VALUE self)
 VALUE AeWindowIntegrator::disposed(VALUE self)
 {
   AeonWindow &inst = getWrappedObject(self);
-  return Convert::toRubyBool(inst.method_disposed());
+  return Convert::toRubyBool(inst.disposed());
 }
 
 VALUE AeWindowIntegrator::dispose(VALUE self)

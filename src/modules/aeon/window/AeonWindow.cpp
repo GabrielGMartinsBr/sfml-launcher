@@ -276,7 +276,7 @@ VALUE AeonWindow::setter_height(VALUE v)
 
 void AeonWindow::method_dispose()
 {
-  Window::method_dispose();
+  Window::dispose();
   removeFromEngineCycles();
 }
 

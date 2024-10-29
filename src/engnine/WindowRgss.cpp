@@ -437,18 +437,18 @@ Viewport *Window::method_viewport()
 
 // Method dispose
 
-void Window::method_dispose()
+void Window::dispose()
 {
   isDisposed = true;
   frame.dispose();
   contentsSprite.dispose();
-  cursorSprite.dispose();
+  cursor.dispose();
   removeFromEngineCycles();
 }
 
 // Method disposed?
 
-bool Window::method_disposed()
+bool Window::disposed()
 {
   return isDisposed;
 }

@@ -525,7 +525,7 @@ class Window {
       return Qnil;
     }
 
-    inst->method_dispose();
+    inst->dispose();
 
     return Qnil;
   }
@@ -537,7 +537,7 @@ class Window {
       return Qnil;
     }
 
-    bool result = inst->method_disposed();
+    bool result = inst->disposed();
 
     return result ? Qtrue : Qfalse;
   }

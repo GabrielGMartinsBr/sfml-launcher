@@ -123,11 +123,11 @@ class Window : public IOnUpdate, public EngineBase, public AeonIntegrable {
 
   Viewport *method_viewport();
 
-  void method_dispose();
-
-  bool method_disposed();
-
   void method_update();
+
+  bool disposed();
+
+  void dispose();
 
  protected:
   ElementBounds bounds;
