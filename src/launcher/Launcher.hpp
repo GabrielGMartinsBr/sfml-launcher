@@ -19,6 +19,7 @@
 #include "engnine/Engine.h"
 #include "engnine/Graphics.h"
 #include "engnine/Lists.hpp"
+#include "engnine/MidiPlayer.hpp"
 #include "engnine/Shaders.h"
 #include "engnine/base/Fonts.h"
 #include "integrator/Integrator.hpp"
@@ -65,11 +66,15 @@ class Launcher {
     Integrator integrator;
     integrator.init();
 
+    Eng::MidiPlayer midiPlayer;
+    midiPlayer.test();
+
     app::String scriptsPath = Eng::Engine::getInstance().getScriptsPath();
     loadScripts(scriptsPath.c_str());
 
     ae::AeonSocketManager::Instance().destroyAll();
 
+    midiPlayer.dispose();
     integrator.cleanup();
 
     Eng::Engine::Destroy();

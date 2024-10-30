@@ -1,40 +1,41 @@
 cmake_minimum_required(VERSION 3.5.0)
 project(ORM-SLauncher VERSION 0.1.0)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+set(CPACK_PROJECT_NAME ${PROJECT_NAME})
+set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(CMAKE_CXX_STANDARD 17)
 
+# Source Files
+file(GLOB_RECURSE source_files src/*.cpp src/*.hpp)
+
+# Executable
+add_executable(${PROJECT_NAME} ${source_files})
 
 # Debug
 include(CTest)
 enable_testing()
 
-# Source Files
-file(GLOB_RECURSE source_files src/*.cpp src/*.hpp)
-
-include_directories(src/base)
-include_directories(GLOB_RECURSE src/modules)
-include_directories(src)
-
+# FetchContent
+include(FetchContent)
 
 # CPack 
-set(CPACK_PROJECT_NAME ${PROJECT_NAME})
-set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)
+
+target_include_directories(${PROJECT_NAME} PRIVATE src)
+target_include_directories(${PROJECT_NAME} PRIVATE src/base)
+target_include_directories(${PROJECT_NAME} PRIVATE GLOB_RECURSE src/modules)
+
 
 # SFML
 find_package(SFML 2.5 COMPONENTS system window graphics network audio REQUIRED)
-link_libraries(sfml-system sfml-window sfml-graphics sfml-network sfml-audio)
-
-
-# Executable
-add_executable(${PROJECT_NAME} ${source_files})
+target_link_libraries(${PROJECT_NAME} sfml-system sfml-window sfml-graphics sfml-network sfml-audio)
 
 
 # Ruby
 find_package(RubyStatic REQUIRED)
-include_directories(${RubyStatic_INCLUDE_DIRS})
+target_include_directories(${PROJECT_NAME} PRIVATE ${RubyStatic_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} ${RubyStatic_LIBRARIES} -lcrypt)
 target_compile_options(${PROJECT_NAME} PRIVATE -Wno-register)
 
@@ -56,3 +57,23 @@ target_link_libraries(
   ${PROJECT_NAME}
   ZLIB::ZLIB
 )
+
+# Fluidsynth
+FetchContent_Declare(
+    fluidsynth
+    GIT_REPOSITORY https://github.com/FluidSynth/fluidsynth.git
+    GIT_TAG v2.3.7
+)
+
+# set(ENABLE_ALSA OFF CACHE BOOL "Disable ALSA support" FORCE)
+# set(ENABLE_JACK OFF CACHE BOOL "Disable JACK support" FORCE)
+# set(ENABLE_PULSEAUDIO OFF CACHE BOOL "Disable PulseAudio support" FORCE)
+set(ENABLE_READLINE OFF CACHE BOOL "Disable readline support" FORCE)
+set(ENABLE_DBUS OFF CACHE BOOL "Disable D-Bus support" FORCE)
+set(ENABLE_SOUNDFONTS_INSTALL OFF CACHE BOOL "Disable SoundFont installation" FORCE)
+set(ENABLE_SHARED OFF CACHE BOOL "Build as static library" FORCE)
+set(ENABLE_NETWORK OFF CACHE BOOL "Disable network support" FORCE)
+
+FetchContent_MakeAvailable(fluidsynth)
+
+target_link_libraries(${PROJECT_NAME} libfluidsynth)
