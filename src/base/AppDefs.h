@@ -1,6 +1,7 @@
 #pragma once
 
 #include <boost/filesystem/path.hpp>
+#include <condition_variable>
 #include <memory>
 #include <queue>
 #include <sstream>
@@ -24,9 +25,6 @@ typedef std::stringstream StrStream;
 template <typename T>
 using Vector = std::vector<T>;
 
-template <typename T>
-using Queue = std::queue<T>;
-
 using StrVector = Vector<String>;
 
 template <typename T>
@@ -44,6 +42,13 @@ using Thread = std::thread;
 
 template <typename T>
 using Atomic = std::atomic<T>;
+
+template <typename T>
+using Queue = std::queue<T>;
+
+using Mutex = std::mutex;
+
+using ConditionVariable = std::condition_variable;
 
 template <typename Key, typename Tp>
 using UnMap = std::unordered_map<Key, Tp>;

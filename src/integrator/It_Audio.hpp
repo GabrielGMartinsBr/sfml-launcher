@@ -4,7 +4,6 @@
 #include <string>
 
 #include "AppDefs.h"
-#include "Log.hpp"
 #include "RbUtils.hpp"
 #include "engnine/Audio.h"
 #include "integrator/Convert.hpp"
@@ -23,6 +22,7 @@ class Audio {
     rb_define_module_function(audioModule, "bgm_play", RUBY_METHOD_FUNC(bgm_play), -1);
     rb_define_module_function(audioModule, "bgm_stop", RUBY_METHOD_FUNC(bgm_stop), 0);
     rb_define_module_function(audioModule, "bgm_fade", RUBY_METHOD_FUNC(bgm_fade), 1);
+    rb_define_module_function(audioModule, "bgm_reset", RUBY_METHOD_FUNC(bgmReset), 0);
 
     rb_define_module_function(audioModule, "bgs_play", RUBY_METHOD_FUNC(bgs_play), -1);
     rb_define_module_function(audioModule, "bgs_stop", RUBY_METHOD_FUNC(bgs_stop), 0);
@@ -83,6 +83,12 @@ class Audio {
 
     // Eng::Audio::Instance().bgm_fade(time);
     Eng::Audio::Instance().bgm_stop();
+    return Qnil;
+  }
+
+  static VALUE bgmReset(VALUE self)
+  {
+    Eng::Audio::Instance().bgmReset();
     return Qnil;
   }
 

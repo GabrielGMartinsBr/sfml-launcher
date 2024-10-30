@@ -18,6 +18,8 @@ void Audio::Init()
 {
   assert(!instance);
   instance = new Audio();
+  instance->bgm.startWorker();
+  instance->me.startWorker();
 }
 
 Audio& Audio::Instance()
@@ -29,6 +31,10 @@ Audio& Audio::Instance()
 void Audio::Destroy()
 {
   assert(instance);
+
+  instance->bgm.startWorker();
+  instance->me.startWorker();
+
   delete instance;
   instance = nullptr;
 }
@@ -69,6 +75,12 @@ void Audio::bgm_stop()
 void Audio::bgm_fade(int time)
 {
   bgm.fade(time);
+}
+
+// Stop
+void Audio::bgmReset()
+{
+  bgm.reset();
 }
 
 /*

@@ -20,13 +20,14 @@ using app::FilePath;
 
 class MidiPlayer {
  public:
-  /*
-    ⇩⇩⇩ Public ⇩⇩⇩
-  */
+
+  /*--------------------------------------
+   *    ⇩⇩⇩   Public    ⇩⇩⇩
+   *--------------------------------------*/
 
   /*
-    MidiPlayer constructor
-  */
+   *  MidiPlayer constructor
+   */
   MidiPlayer() :
       settings(nullptr),
       synth(nullptr),
@@ -38,8 +39,8 @@ class MidiPlayer {
   }
 
   /*
-    Initialize MidiPlayer core components
-  */
+   * Initialize MidiPlayer core components
+   */
   bool init()
   {
     if (initialized) {
@@ -54,25 +55,23 @@ class MidiPlayer {
   }
 
   /*
-    Load MIDI file to player and starts the playback
-  */
+   * Load MIDI file to player and starts the playback
+   */
   bool play(CStr fileName, float volume, float pitch)
   {
-    bool res;
-
     if (!initialized) {
       init();
     }
 
     if (isPlaying()) {
-      stop();
+      fluid_player_stop(player);
       fluid_player_join(player);
     }
 
     fluid_player_seek(player, fluid_player_get_total_ticks(player));
     setVolume(volume);
-    // setProgress(0);
 
+    bool res;
     res = loadMidiFile(fileName);
     if (!res) {
       return false;
@@ -93,62 +92,86 @@ class MidiPlayer {
     return true;
   }
 
+  /*
+   * Stop playback
+   */
   void stop()
   {
     stopPlayback();
   }
 
   /*
-    Stop playback and release all FluidSynth resources
-  */
+   * Restart playback from beginning
+   */
+  void reset()
+  {
+    setProgress(0);
+    if (!isPlaying()) {
+      startsPlayback();
+    }
+  }
+
+  /*
+   * Stop playback with fade effect
+   */
+  void fade(int ts) { }
+
+  /*
+   * Stop playback and release all FluidSynth resources
+   */
   void destroy()
   {
     if (initialized) {
+      fluid_player_stop(player);
+      fluid_player_join(player);
       cleanup();
     }
   }
 
   /*
-    Checks if the player is ready to start playback.
-  */
+   * Checks if the player is ready to start playback
+   */
   inline bool isPlayerReady() const
   {
-    return fluid_player_get_status(player) == FLUID_PLAYER_READY;
+    return player && fluid_player_get_status(player) == FLUID_PLAYER_READY;
   }
 
   /*
-    Checks if the player is in the process of stopping.
-  */
+   * Checks if the player is in the process of stopping
+   */
   inline bool isStopping() const
   {
-    return fluid_player_get_status(player) == FLUID_PLAYER_STOPPING;
+    return player && fluid_player_get_status(player) == FLUID_PLAYER_STOPPING;
   }
 
   /*
-    Checks if playback is currently active.
-  */
+   * Checks if playback is currently active
+   */
   inline bool isPlaying() const
   {
-    return fluid_player_get_status(player) == FLUID_PLAYER_PLAYING;
+    return player && fluid_player_get_status(player) == FLUID_PLAYER_PLAYING;
   }
 
   /*
-    Checks if playback has finished.
-  */
+   * Checks if playback has finished all MIDI events
+   */
   inline bool isPlayerDone() const
   {
-    return fluid_player_get_status(player) == FLUID_PLAYER_DONE;
+    return player && fluid_player_get_status(player) == FLUID_PLAYER_DONE;
   }
 
+  /*
+   * Checks if playback has reached the end of the MIDI track
+   */
   inline bool isPlaybackFinished() const
   {
     return fluid_player_get_current_tick(player) >= fluid_player_get_total_ticks(player);
   }
 
  private:
-  /*
-    ⇩⇩⇩ Private ⇩⇩⇩
-  */
+  /*--------------------------------------
+   *    ⇩⇩⇩   Private    ⇩⇩⇩
+   *--------------------------------------*/
 
   fluid_settings_t* settings;
   fluid_synth_t* synth;
@@ -160,13 +183,13 @@ class MidiPlayer {
 
   bool endEmitted = false;
 
-  /*
-    ⇩⇩⇩ Handlers ⇩⇩⇩
-  */
+  /*--------------------------------------
+   *    ⇩⇩⇩   Handlers    ⇩⇩⇩
+   *--------------------------------------*/
 
   /*
-    On player tick
-  */
+   * On player tick
+   */
   static int onTick(void* data, int tick)
   {
     MidiPlayer* inst = static_cast<MidiPlayer*>(data);
@@ -177,8 +200,8 @@ class MidiPlayer {
   }
 
   /*
-    On playback end
-  */
+   * On playback end
+   */
   void onPlaybackEnd()
   {
     endEmitted = true;
@@ -197,13 +220,13 @@ class MidiPlayer {
     }
   }
 
-  /*
-    ⇩⇩⇩ Private Methods ⇩⇩⇩
-  */
+  /*--------------------------------------
+   *    ⇩⇩⇩   Private Methods   ⇩⇩⇩
+   *--------------------------------------*/
 
   /*
-    Configure loggers behavior by log level
-  */
+   * Configure loggers behavior by log level
+   */
   void setLogFunctions()
   {
     fluid_set_log_function(fluid_log_level::FLUID_WARN, nullptr, nullptr);
@@ -212,8 +235,8 @@ class MidiPlayer {
   }
 
   /*
-    Initialize settings object to FluidSynth instance
-  */
+   * Initialize settings object to FluidSynth instance
+   */
   void initSettings()
   {
     settings = new_fluid_settings();
@@ -223,16 +246,16 @@ class MidiPlayer {
   }
 
   /*
-    Initialize FluidSynth instance
-  */
+   * Initialize FluidSynth instance
+   */
   void initSynth()
   {
     synth = new_fluid_synth(settings);
   }
 
   /*
-    Load SoundFont to FluidSynth instance
-  */
+   * Load SoundFont to FluidSynth instance
+   */
   bool loadSoundFont()
   {
     CStr filename = "/run/media/home/common/gabrielmartins.dev/dev/cpp/orm-xp/arl-sound/GMGSx.sf2";
@@ -249,11 +272,10 @@ class MidiPlayer {
   }
 
   /*
-    Initialize MIDI player
-  */
+   * Initialize MIDI player
+   */
   void initPlayer()
   {
-    Log::out() << "initPlayer";
     aDriver = new_fluid_audio_driver(settings, synth);
     if (!player) {
       player = new_fluid_player(synth);
@@ -262,16 +284,14 @@ class MidiPlayer {
   }
 
   /*
-    Load MIDI file to player queue
-  */
+   * Load MIDI file to player queue
+   */
   bool loadMidiFile(CStr fileName)
   {
     // Combine base dir with file name and extension
     FilePath filePath = FileUtils::getRtpPath();
     filePath.append(fileName);
     filePath.replace_extension(".mid");
-
-    Log::out() << filePath.c_str();
 
     // Load file and add to queue
     int sFid = fluid_player_add(player, filePath.c_str());
@@ -286,16 +306,16 @@ class MidiPlayer {
   }
 
   /*
-    Set playback Volume
-  */
+   * Set playback Volume
+   */
   void setVolume(float gain)
   {
     fluid_synth_set_gain(synth, gain);
   }
 
   /*
-    Set playback speed
-  */
+   * Set playback speed
+   */
   bool setSpeed(double tempo)
   {
     int sFid = fluid_player_set_tempo(player, FLUID_PLAYER_TEMPO_INTERNAL, tempo);
@@ -307,8 +327,8 @@ class MidiPlayer {
   }
 
   /*
-    Set playback position
-  */
+   * Set playback position
+   */
   bool setProgress(float value)
   {
     int totalTicks = fluid_player_get_total_ticks(player);
@@ -318,8 +338,8 @@ class MidiPlayer {
   }
 
   /*
-    Start playback
-  */
+   * Start playback
+   */
   bool startsPlayback()
   {
     Log::out() << "player status: " << getPlayerStatusString();
@@ -334,15 +354,15 @@ class MidiPlayer {
   }
 
   /*
-    Pause playback
-  */
+   * Pause playback
+   */
   void pausePlayback()
   {
   }
 
   /*
-    Stop playback
-  */
+   * Stop playback
+   */
   bool stopPlayback()
   {
     if (player && isPlaying()) {
@@ -352,54 +372,9 @@ class MidiPlayer {
     return false;
   }
 
-  void resetPlayer()
-  {
-    deletePlayer();
-    deletedSynth();
-    initSynth();
-    initPlayer();
-  }
-
-  void deletePlayer()
-  {
-    if (player) {
-      bool result = stopPlayback();
-      if (result) {
-        fluid_player_join(player);
-      }
-      delete_fluid_player(player);
-      player = nullptr;
-    }
-  }
-
-  void deletedSynth()
-  {
-    if (synth) {
-      delete_fluid_synth(synth);
-      synth = nullptr;
-    }
-  }
-
   /*
-    Cleanup
-  */
-  void cleanup()
-  {
-    Log::out() << "Cleanup";
-    deletePlayer();
-    if (aDriver) {
-      delete_fluid_audio_driver(aDriver);
-      aDriver = nullptr;
-    }
-    deletedSynth();
-    if (settings) {
-      delete_fluid_settings(settings);
-      settings = nullptr;
-    }
-    delete_fluid_audio_driver(aDriver);
-    initialized = false;
-  }
-
+   * Return player status name string
+   */
   inline CStr getPlayerStatusString() const
   {
     const int status = fluid_player_get_status(player);
@@ -415,6 +390,33 @@ class MidiPlayer {
       default:
         return "Unknow";
     }
+  }
+
+  /*
+   * Cleanup
+   */
+  void cleanup()
+  {
+    initialized = false;
+    if (player) {
+      stopPlayback();
+      fluid_player_join(player);
+      delete_fluid_player(player);
+      player = nullptr;
+    }
+    if (aDriver) {
+      delete_fluid_audio_driver(aDriver);
+      aDriver = nullptr;
+    }
+    if (synth) {
+      delete_fluid_synth(synth);
+      synth = nullptr;
+    }
+    if (settings) {
+      delete_fluid_settings(settings);
+      settings = nullptr;
+    }
+    delete_fluid_audio_driver(aDriver);
   }
 };
 

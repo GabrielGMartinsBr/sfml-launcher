@@ -35,6 +35,7 @@ class Audio {
   void bgm_play(CStr fileName, float volume = 100, float pitch = 100);
   void bgm_stop();
   void bgm_fade(int time);
+  void bgmReset();
 
   // BGS
   void bgs_play(String fileName, float volume = 100, float pitch = 100);
