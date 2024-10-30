@@ -49,53 +49,91 @@ void Audio::update(UInt ts)
   bgs.update(ts);
 }
 
-void Audio::bgm_play()
+/*
+  ⇩⇩⇩   BGM  ⇩⇩⇩
+*/
+
+// Play
+void Audio::bgm_play(CStr fileName, float volume, float pitch)
 {
-  //   Log::out() << "Audio bgm_play was called, but it is not implemented yet.";
+  bgm.play(fileName, volume / 100.0f, pitch / 100.0f);
 }
+
+// Stop
 void Audio::bgm_stop()
 {
-  //   Log::out() << "Audio bgm_stop was called, but it is not implemented yet.";
+  bgm.stop();
 }
+
+// Fade
 void Audio::bgm_fade(int time)
 {
-  //   Log::out() << "Audio bgm_fade was called, but it is not implemented yet.";
+  bgm.fade(time);
 }
+
+/*
+  ⇩⇩⇩   BGS   ⇩⇩⇩
+*/
+
+// Play
 void Audio::bgs_play(String fileName, float volume, float pitch)
 {
   fileName.append(".ogg");
   bgs.play(fileName, volume, pitch, true);
 }
+
+// Stop
 void Audio::bgs_stop()
 {
   bgs.stop();
 }
+
+// Fade
 void Audio::bgs_fade(int time)
 {
   bgs.startFade(timestamp, time / 1e3);
 }
 
-void Audio::me_play()
+/*
+  ⇩⇩⇩   ME   ⇩⇩⇩
+*/
+
+// Play
+void Audio::me_play(CStr fileName, float volume, float pitch)
 {
-  //   Log::out() << "Audio me_play was called, but it is not implemented yet.";
+  me.play(fileName, volume / 100.0f, pitch / 100.0f);
 }
+
+// Stop
 void Audio::me_stop()
 {
-  //   Log::out() << "Audio me_stop was called, but it is not implemented yet.";
+  me.stop();
 }
+
+// Fade
 void Audio::me_fade(int time)
 {
-  //   Log::out() << "Audio me_fade was called, but it is not implemented yet.";
+  me.fade(time);
 }
+
+/*
+  ⇩⇩⇩   SE   ⇩⇩⇩
+*/
+
+// Play
 void Audio::se_play(String fileName, float volume, float pitch)
 {
   fileName.append(".ogg");
   se.play(fileName, volume, pitch, false);
 }
+
+// Stop
 void Audio::se_stop()
 {
   se.stop();
 }
+
+// Fade
 void Audio::se_fade(int time)
 {
   se.startFade(timestamp, time / 1e3);

@@ -3,6 +3,7 @@
 #include <SFML/Audio.hpp>
 
 #include "AppDefs.h"
+#include "engnine/MidiPlayerWorker.hpp"
 #include "engnine/base/AudioState.hpp"
 
 namespace Eng {
@@ -29,18 +30,19 @@ class Audio {
 
   void update(UInt timestamp);
 
+
   // BGM
-  void bgm_play();
+  void bgm_play(CStr fileName, float volume = 100, float pitch = 100);
   void bgm_stop();
   void bgm_fade(int time);
 
   // BGS
-  void bgs_play(String fileName, float volume = 100, float pitch = 1.0f);
+  void bgs_play(String fileName, float volume = 100, float pitch = 100);
   void bgs_stop();
   void bgs_fade(int time);
 
   // ME
-  void me_play();
+  void me_play(CStr fileName, float volume = 100, float pitch = 100);
   void me_stop();
   void me_fade(int time);
 
@@ -55,6 +57,8 @@ class Audio {
   */
 
   UInt timestamp;
+  MidiPlayerWorker bgm;
+  MidiPlayerWorker me;
   AudioState bgs;
   AudioState se;
 };

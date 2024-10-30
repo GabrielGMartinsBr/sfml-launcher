@@ -42,6 +42,9 @@ using StrVectorPtr = VectorPtr<String>;
 
 using Thread = std::thread;
 
+template <typename T>
+using Atomic = std::atomic<T>;
+
 template <typename Key, typename Tp>
 using UnMap = std::unordered_map<Key, Tp>;
 

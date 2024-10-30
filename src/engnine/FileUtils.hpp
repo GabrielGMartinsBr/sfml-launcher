@@ -31,6 +31,11 @@ struct FileUtils {
     return nullptr;
   }
 
+  inline static FilePath getRtpPath()
+  {
+    return FilePath(RTP_PATH);
+  }
+
   static String resolveRtpPath(CStr assetName)
   {
     FilePath path(RTP_PATH);

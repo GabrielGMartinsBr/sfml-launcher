@@ -4,6 +4,8 @@
 #include <string>
 
 #include "AppDefs.h"
+#include "Log.hpp"
+#include "RbUtils.hpp"
 #include "engnine/Audio.h"
 #include "integrator/Convert.hpp"
 #include "ruby.h"
@@ -38,32 +40,34 @@ class Audio {
  private:
 
   /*
-    BGM
+    ⇩⇩⇩   BGM  ⇩⇩⇩
   */
 
   static VALUE bgm_play(int argc, VALUE *argv, VALUE self)
   {
     VALUE _filename, _volume, _pitch;
-    switch (argc) {
-      case 1: {
-        rb_scan_args(argc, argv, "1", &_filename);
-        Eng::Audio::Instance().bgm_play();
-        break;
-      }
-      case 2: {
-        rb_scan_args(argc, argv, "2", &_filename, &_volume);
-        Eng::Audio::Instance().bgm_play();
-        break;
-      }
-      case 3: {
-        rb_scan_args(argc, argv, "3", &_filename, &_volume, &_pitch);
-        Eng::Audio::Instance().bgm_play();
-        break;
-      }
-      default: {
-        throw std::runtime_error("Audio.bgm_play takes 1 to 3 arguments, but were received " + std::to_string(argc));
-      }
+
+    if (argc == 0 || argc > 3) {
+      RbUtils::raiseRuntimeException(
+        "Audio.bgm_play takes 1 to 3 arguments, but were received " + std::to_string(argc)
+      );
+      return Qnil;
     }
+
+    CStr filename = Convert::toCStr(argv[0]);
+    if (argc == 1) {
+      Eng::Audio::Instance().bgm_play(filename);
+      return Qnil;
+    }
+
+    float volume = Convert::toCDouble2(argv[1]);
+    if (argc == 2) {
+      Eng::Audio::Instance().bgm_play(filename, volume);
+      return Qnil;
+    }
+
+    float pitch = Convert::toCDouble2(argv[2]);
+    Eng::Audio::Instance().bgm_play(filename, volume, pitch);
     return Qnil;
   }
 
@@ -77,12 +81,13 @@ class Audio {
   {
     int time = Convert::toCInt(_time);
 
-    Eng::Audio::Instance().bgm_fade(time);
+    // Eng::Audio::Instance().bgm_fade(time);
+    Eng::Audio::Instance().bgm_stop();
     return Qnil;
   }
 
   /*
-    BGS
+    ⇩⇩⇩   BGS   ⇩⇩⇩
   */
 
   static VALUE bgs_play(int argc, VALUE *argv, VALUE self)
@@ -126,32 +131,34 @@ class Audio {
   }
 
   /*
-    ME
+    ⇩⇩⇩   ME   ⇩⇩⇩
   */
 
   static VALUE me_play(int argc, VALUE *argv, VALUE self)
   {
     VALUE _filename, _volume, _pitch;
-    switch (argc) {
-      case 1: {
-        rb_scan_args(argc, argv, "1", &_filename);
-        Eng::Audio::Instance().me_play();
-        break;
-      }
-      case 2: {
-        rb_scan_args(argc, argv, "2", &_filename, &_volume);
-        Eng::Audio::Instance().me_play();
-        break;
-      }
-      case 3: {
-        rb_scan_args(argc, argv, "3", &_filename, &_volume, &_pitch);
-        Eng::Audio::Instance().me_play();
-        break;
-      }
-      default: {
-        throw std::runtime_error("Audio.bgm_play takes 1 to 3 arguments, but were received " + std::to_string(argc));
-      }
+
+    if (argc == 0 || argc > 3) {
+      RbUtils::raiseRuntimeException(
+        "Audio.bgm_play takes 1 to 3 arguments, but were received " + std::to_string(argc)
+      );
+      return Qnil;
     }
+
+    CStr filename = Convert::toCStr(argv[0]);
+    if (argc == 1) {
+      Eng::Audio::Instance().me_play(filename);
+      return Qnil;
+    }
+
+    float volume = Convert::toCDouble2(argv[1]);
+    if (argc == 2) {
+      Eng::Audio::Instance().me_play(filename, volume);
+      return Qnil;
+    }
+
+    float pitch = Convert::toCDouble2(argv[2]);
+    Eng::Audio::Instance().me_play(filename, volume, pitch);
     return Qnil;
   }
 
@@ -165,12 +172,13 @@ class Audio {
   {
     int time = Convert::toCInt(_time);
 
-    Eng::Audio::Instance().me_fade(time);
+    // Eng::Audio::Instance().me_fade(time);
+    Eng::Audio::Instance().me_stop();
     return Qnil;
   }
 
   /*
-    SE
+    ⇩⇩⇩   SE   ⇩⇩⇩
   */
 
   static VALUE se_play(int argc, VALUE *argv, VALUE self)
