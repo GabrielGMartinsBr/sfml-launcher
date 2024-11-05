@@ -1,6 +1,5 @@
 
 #include "aeon/window/AeonWindowManager.h"
-#include "engnine/Engine.h"
 
 namespace ae {
 
@@ -110,11 +109,6 @@ void AeonWindowManager::updateEntries(int ts)
   for (AeonWindow* entry : entries) {
     entry->handleAeonUpdate(ts);
   }
-}
-
-int AeonWindowManager::getTimestamp() const
-{
-  return Eng::Engine::getInstance().clock.getTotalElapsedTime();
 }
 
 sf::View& AeonWindowManager::getTextBoxView()

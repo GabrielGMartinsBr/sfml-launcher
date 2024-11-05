@@ -12,9 +12,12 @@
 #include "aeon/window/AeonElement.h"
 #include "aeon/window/AeonStyleSheet.h"
 #include "aeon/window/AeonWindowManager.h"
+#include "engine/EngineClock.h"
 #include "engnine/base/Fonts.h"
 
 namespace ae {
+
+using Eng::EngineClock;
 
 static const int cursorBlinkTime = 500;
 
@@ -306,7 +309,7 @@ void AeonTextBoxElement::alignCursor()
 
 void AeonTextBoxElement::revealCursor()
 {
-  lastCursorBlinkTs = AeonWindowManager::Instance().getTimestamp();
+  lastCursorBlinkTs = EngineClock::Instance().getTotalElapsedTime();
   showCursor = true;
 }
 

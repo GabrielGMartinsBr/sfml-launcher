@@ -42,7 +42,6 @@ struct AeonWindowManager {
   void removeEntry(AeonWindow* entry);
   void updateEntries(int ts);
 
-  int getTimestamp() const;
   sf::View& getTextBoxView();
 
   void setFocusOn(AeonWindow* window);
