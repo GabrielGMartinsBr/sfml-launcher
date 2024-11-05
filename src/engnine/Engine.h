@@ -10,7 +10,7 @@
 
 #include "AppDefs.h"
 #include "aeon/window/AeonWindowManager.h"
-#include "engine/EngineClock.hpp"
+#include "engine/EngineClock.h"
 #include "launcher/ProjectWindow.h"
 
 namespace Eng {
@@ -33,7 +33,7 @@ class Engine {
 
   // Getters
 
-  EngineClock clock;
+  EngineClock& clock;
 
   bool isRunning();
 
@@ -48,7 +48,7 @@ class Engine {
   void run();
 
   void loopUpdate();
-  
+
   void update();
 
   void cleanup();

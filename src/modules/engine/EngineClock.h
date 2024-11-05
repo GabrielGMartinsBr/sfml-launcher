@@ -7,8 +7,17 @@ namespace Eng {
 struct EngineClock {
   using Clock = sf::Clock;
 
-  // Constructor
-  EngineClock(float frameRate = 40.0f);
+  /*
+    ⇩⇩⇩ Static ⇩⇩⇩
+  */
+
+  static void Init();
+  static EngineClock& Instance();
+  static void Destroy();
+
+  /*
+    ⇩⇩⇩ Instance ⇩⇩⇩
+  */
 
   void restart();
 
@@ -37,6 +46,12 @@ struct EngineClock {
   float targetFrameTime;
   float accumulatedTs;
   float fps;
+
+  // Constructor
+  EngineClock(float frameRate = 40.0f);
+
+  EngineClock(const EngineClock&) = delete;
+  EngineClock& operator=(const EngineClock&) = delete;
 };
 
 }  // namespace Eng

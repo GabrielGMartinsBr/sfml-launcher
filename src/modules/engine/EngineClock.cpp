@@ -1,5 +1,6 @@
-#include "engine/EngineClock.hpp"
+#include "engine/EngineClock.h"
 
+#include <cassert>
 #include <chrono>
 #include <thread>
 
@@ -7,6 +8,33 @@ namespace Eng {
 
 namespace ThisThread = std::this_thread;
 namespace Chrono = std::chrono;
+/*
+  ⇩⇩⇩ Static ⇩⇩⇩
+*/
+static EngineClock* instance = nullptr;
+
+void EngineClock::Init()
+{
+  assert(!instance);
+  instance = new EngineClock();
+}
+
+EngineClock& EngineClock::Instance()
+{
+  assert(instance);
+  return *instance;
+}
+
+void EngineClock::Destroy()
+{
+  assert(instance);
+  delete instance;
+  instance = nullptr;
+}
+
+/*
+  ⇩⇩⇩ Instance ⇩⇩⇩
+*/
 
 /*
  * Initializes EngineClock with specified frame rate.

@@ -15,6 +15,7 @@
 #include "base/AppDefs.h"
 #include "base/BacktraceUtils.hpp"
 #include "consts/PackageConsts.h"
+#include "engine/EngineClock.h"
 #include "engnine/Audio.h"
 #include "engnine/Engine.h"
 #include "engnine/Graphics.h"
@@ -57,6 +58,7 @@ class Launcher {
     Eng::Fonts::Init();
     Eng::Shaders::Init();
     Eng::Lists::Init();
+    Eng::EngineClock::Init();
     Eng::Engine::Init(projectWindow, projectPath);
     Eng::Input::Init();
     Eng::Graphics::Init(projectWindow);
@@ -77,6 +79,7 @@ class Launcher {
     Eng::Graphics::Destroy();
     Eng::Input::Destroy();
     Eng::Lists::Destroy();
+    Eng::EngineClock::Destroy();
     Eng::Shaders::Destroy();
     Eng::Fonts::Destroy();
     pkg::PackageReader::Destroy();

@@ -37,9 +37,6 @@ void Engine::Init(ProjectWindow& projectWindow, CStr projectPath)
 
 Engine& Engine::getInstance()
 {
-  if (!instance) {
-    Log::out() << "null";
-  }
   assert(instance);
   return *instance;
 }
@@ -56,6 +53,7 @@ void Engine::Destroy()
 */
 
 Engine::Engine(ProjectWindow& projectWindow, CStr projectPath) :
+    clock(EngineClock::Instance()),
     aeonWinMng(ae::AeonWindowManager::Instance()),
     projectWindow(projectWindow),
     projectPath(projectPath)
