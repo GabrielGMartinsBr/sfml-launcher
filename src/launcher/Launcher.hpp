@@ -50,15 +50,16 @@ class Launcher {
 
     ScriptsLoader& scriptsLoader = ScriptsLoader::getInstance();
 
+    Eng::Fonts::Init();
+    Eng::Shaders::Init();
+    Eng::EngineClock::Init();
+
     ae::WrappedList::Init();
     ae::AeonWindowManager::Init();
     ae::AeonSocketManager::Init();
     ae::AeonInput::Init();
 
-    Eng::Fonts::Init();
-    Eng::Shaders::Init();
     Eng::Lists::Init();
-    Eng::EngineClock::Init();
     Eng::Engine::Init(projectWindow, projectPath);
     Eng::Input::Init();
     Eng::Graphics::Init(projectWindow);
@@ -79,15 +80,16 @@ class Launcher {
     Eng::Graphics::Destroy();
     Eng::Input::Destroy();
     Eng::Lists::Destroy();
-    Eng::EngineClock::Destroy();
-    Eng::Shaders::Destroy();
-    Eng::Fonts::Destroy();
     pkg::PackageReader::Destroy();
 
     ae::AeonInput::Destroy();
     ae::AeonWindowManager::Destroy();
     ae::WrappedList::Destroy();
     ae::AeonSocketManager::Destroy();
+
+    Eng::Shaders::Destroy();
+    Eng::Fonts::Destroy();
+    Eng::EngineClock::Destroy();
 
     projectWindow.close();
   }

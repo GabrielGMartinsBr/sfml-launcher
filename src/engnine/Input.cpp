@@ -33,8 +33,7 @@ void Input::Destroy()
 */
 
 Input::Input() :
-    aeonInput(AeonInput::Instance()),
-    clock(AeonInput::Instance().getClock())
+    clock(EngineClock::Instance())
 {
   dir4 = DirectionalCode::DIRECTIONAL_NONE;
   std::memset(currentKeys, 0, KEY_COUNT);
@@ -82,7 +81,7 @@ bool Input::isRepeated(KeyCode key)
     return false;
   }
 
-  const UInt timestamp = clock.getElapsedTime().asMilliseconds();
+  const UInt timestamp = clock.getTotalElapsedTime();
 
   if (!previousKeys[key]) {
     repeatTs[key] = timestamp;

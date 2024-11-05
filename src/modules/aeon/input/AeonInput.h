@@ -1,6 +1,5 @@
 #pragma once
 
-#include <SFML/System/Clock.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
@@ -9,6 +8,7 @@
 
 #include "AppDefs.h"
 #include "aeon/input/AeonInputKeys.h"
+#include "engine/EngineClock.h"
 
 namespace ae {
 
@@ -17,6 +17,7 @@ using SfMouseButtonEvent = sf::Event::MouseButtonEvent;
 using SfMouseMoveEvent = sf::Event::MouseMoveEvent;
 
 using app::UInt;
+using Eng::EngineClock;
 using sf::Vector2i;
 
 struct AeonInput {
@@ -35,11 +36,11 @@ struct AeonInput {
 
   /*
     ⇩⇩⇩ Instance ⇩⇩⇩
-  */  static inline bool isValidMouseButton(int8_t key)
+  */
+  static inline bool isValidMouseButton(int8_t key)
   {
     return key > InputCode::KeyCount && key < InputCode::MouseButtonCount;
   }
-
 
   void handleKeyPressed(const SfKeyEvent& key);
   void handleKeyRelease(const SfKeyEvent& key);
@@ -57,11 +58,6 @@ struct AeonInput {
 
   bool isRepeated(int8_t key);
 
-  inline const sf::Clock& getClock()
-  {
-    return clock;
-  }
-
   inline const Vector2i& getMousePosition() const
   {
     return mousePosition;
@@ -69,7 +65,7 @@ struct AeonInput {
 
 
  private:
-  sf::Clock clock;
+  EngineClock& clock;
   bool currentKeys[InputCode::Count];
   bool previousKeys[InputCode::Count];
   UInt repeatTs[InputCode::Count];

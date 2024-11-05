@@ -36,6 +36,7 @@ void AeonInput::Destroy()
 */
 
 AeonInput::AeonInput() :
+    clock(EngineClock::Instance()),
     mousePosition(0, 0)
 {
   std::memset(currentKeys, 0, InputCode::Count);
@@ -93,7 +94,7 @@ bool AeonInput::isRepeated(int8_t key)
     return false;
   }
 
-  const UInt timestamp = clock.getElapsedTime().asMilliseconds();
+  const UInt timestamp = clock.getTotalElapsedTime();
 
   if (!previousKeys[key]) {
     repeatTs[key] = timestamp;

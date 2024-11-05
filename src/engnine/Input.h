@@ -74,8 +74,7 @@ class Input {
   DirectionalCode getDir4();
 
  private:
-  AeonInput& aeonInput;
-  const sf::Clock& clock;
+  EngineClock& clock;
   bool currentKeys[KEY_COUNT];
   bool previousKeys[KEY_COUNT];
   bool pressKeys[KEY_COUNT];
