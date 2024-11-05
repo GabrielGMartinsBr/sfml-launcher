@@ -1,7 +1,7 @@
 #pragma once
 
 #include "AppDefs.h"
-#include "engnine/MidiPlayer.hpp"
+#include "engnine/MidiPlayer.h"
 
 namespace Eng {
 
