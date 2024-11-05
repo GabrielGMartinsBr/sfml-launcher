@@ -40,17 +40,15 @@ struct AeonWindowManager {
 
   void addEntry(AeonWindow* entry);
   void removeEntry(AeonWindow* entry);
-  void updateEntries();
+  void updateEntries(int ts);
 
-  ULong getTimestamp();
+  int getTimestamp() const;
   sf::View& getTextBoxView();
 
   void setFocusOn(AeonWindow* window);
 
  private:
-  ULong ts;
   sf::View textBoxView;
-  sf::Clock clock;
 };
 
 }  // namespace ae

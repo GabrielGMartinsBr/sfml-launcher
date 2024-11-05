@@ -6,12 +6,13 @@
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Window/Window.hpp>
+#include <cmath>
 
+#include "engnine/Engine.h"
 #include "engnine/IOnUpdate.h"
 #include "engnine/Lists.hpp"
 #include "engnine/Performance.hpp"
 #include "engnine/Shaders.h"
-#include "engnine/Timer.hpp"
 #include "engnine/base/Fonts.h"
 
 namespace Eng {
@@ -159,7 +160,9 @@ void GraphicsRenderer::renderSprites()
 
 void GraphicsRenderer::renderFpsSprite()
 {
-  fpsSprite.setString(std::to_string(Timer::getInstance().getFps()));
+  fpsSprite.setString(std::to_string(
+    std::round(Engine::getInstance().clock.getFps())
+  ));
   renderTexture.draw(fpsSprite);
 }
 

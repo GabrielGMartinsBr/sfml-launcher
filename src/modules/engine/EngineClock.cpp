@@ -19,6 +19,10 @@ EngineClock::EngineClock(float frameRate) :
     accumulatedTs(0.0f),
     fps(0.0f)
 {
+}
+
+void EngineClock::restart()
+{
   clock.restart();
   frameClock.restart();
 }
@@ -36,16 +40,18 @@ void EngineClock::update()
  */
 void EngineClock::updateBatterySaving()
 {
+  // Restart clock and measure time taken for the frame
   float elapsed = frameClock.restart().asMilliseconds();
 
   // Enforce target frame rate
   if (elapsed < targetFrameTime) {
-    float sleepTime = targetFrameTime - elapsed;
+    float sleepTime = targetFrameTime - elapsed;  // Calculate the time to sleep to match target frame time
     ThisThread::sleep_for(Chrono::milliseconds(static_cast<int>(sleepTime)));
-    elapsed = targetFrameTime;
+    elapsed = frameClock.restart().asMilliseconds();
   }
 
-  float fps = 1000.0f / elapsed;
+  // Update engine components
+  fps = 1000.0f / elapsed;
 
   // Update engine components
   updateEngineComponents(fixedDeltaTime);
@@ -63,10 +69,14 @@ void EngineClock::updateHighResponsiveness()
   accumulatedTs += frameDuration;
 
   // Calculate sleep time to maintain target frame rate
-  float sleepTime = (1.0f / (targetFrameTime / 1000.0f)) - frameDuration;
+  float sleepTime = targetFrameTime / 1000.0f - frameDuration;
   if (sleepTime > 0) {
     ThisThread::sleep_for(Chrono::milliseconds(static_cast<int>(sleepTime * 1000)));
+    frameDuration = frameClock.restart().asSeconds();
   }
+
+  // Update FPS after the frame adjustment
+  fps = 1.0f / frameDuration;
 
   // Update engine components at fixed intervals
   while (accumulatedTs >= fixedDeltaTime) {
@@ -80,7 +90,9 @@ void EngineClock::updateHighResponsiveness()
 /*
  * Updates the engine components
  */
-void EngineClock::updateEngineComponents(float deltaTime) { }
+void EngineClock::updateEngineComponents(float deltaTime)
+{
+}
 
 /*
  * Update frame rate values

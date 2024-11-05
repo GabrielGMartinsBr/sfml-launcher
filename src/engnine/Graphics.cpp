@@ -7,18 +7,11 @@
 
 #include "AppDefs.h"
 #include "NumberUtils.hpp"
-#include "aeon/input/AeonInput.h"
-#include "aeon/window/AeonWindowManager.h"
 #include "engnine/Audio.h"
-#include "engnine/Engine.h"
 #include "engnine/FileUtils.hpp"
-#include "engnine/Timer.hpp"
 #include "launcher/ProjectWindow.h"
 
 namespace Eng {
-
-using ae::AeonInput;
-using ae::AeonWindowManager;
 
 /*
   ⇩⇩⇩ Static ⇩⇩⇩
@@ -49,6 +42,7 @@ void Graphics::Destroy()
 */
 
 Graphics::Graphics(ProjectWindow& projectWindow) :
+    engine(Engine::getInstance()),
     projectWindow(projectWindow),
     gameView(sf::FloatRect(0, 0, projectWindow.width(), projectWindow.height())),
     renderer(projectWindow, rdt)
@@ -78,7 +72,7 @@ void Graphics::setFrameRate(unsigned int v)
     v = 120;
   }
   frame_rate = v;
-  Timer::getInstance().setFrameRate(frame_rate);
+  engine.clock.setFrameRate(frame_rate);
 }
 
 void Graphics::update()
@@ -180,14 +174,11 @@ void Graphics::setup()
 
 void Graphics::frameUpdate()
 {
-  AeonWindowManager::Instance().updateEntries();
-  AeonInput::Instance().update();
-  Engine::getInstance().updateInput();
-  Timer::getInstance().controlFrameRate();
-  Audio::Instance().update(timestamp);
+  engine.loopUpdate();
 
   frame_count++;
   timestamp = frame_count / frame_rate;
+  // timestamp = engine.clock.getTotalElapsedTime();
 }
 
 void Graphics::doFadeTransition(int duration)

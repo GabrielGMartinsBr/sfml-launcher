@@ -8,7 +8,9 @@ struct EngineClock {
   using Clock = sf::Clock;
 
   // Constructor
-  EngineClock(float frameRate = 60.0f);
+  EngineClock(float frameRate = 40.0f);
+
+  void restart();
 
   // Public methods for updating the engine
   void update();
@@ -18,7 +20,7 @@ struct EngineClock {
 
   // Public getters
   inline const Clock& getClock() const { return clock; }
-  inline float getTotalElapsedTime() const { return clock.getElapsedTime().asMilliseconds(); }
+  inline int getTotalElapsedTime() const { return clock.getElapsedTime().asMilliseconds(); }
   inline float getFps() const { return fps; }
   inline bool isBatterySavingMode() const { return batterySavingMode; }
 

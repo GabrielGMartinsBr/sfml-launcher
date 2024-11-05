@@ -14,6 +14,7 @@
 #include "aeon/input/AeonInput.h"
 #include "aeon/socket/AeonSocketManager.hpp"
 #include "aeon/window/AeonWindowManager.h"
+#include "engnine/Audio.h"
 #include "engnine/FileUtils.hpp"
 #include "engnine/Graphics.h"
 #include "engnine/Input.h"
@@ -36,6 +37,9 @@ void Engine::Init(ProjectWindow& projectWindow, CStr projectPath)
 
 Engine& Engine::getInstance()
 {
+  if (!instance) {
+    Log::out() << "null";
+  }
   assert(instance);
   return *instance;
 }
@@ -63,7 +67,7 @@ Engine::Engine(ProjectWindow& projectWindow, CStr projectPath) :
 void Engine::run()
 {
   running = true;
-
+  clock.restart();
   projectWindow.window.display();
 }
 
@@ -95,18 +99,23 @@ const app::String& Engine::getScriptsPath() const
   Methods
 */
 
+void Engine::loopUpdate()
+{
+  clock.update();
+  update();
+}
+
 void Engine::update()
 {
+  int ts = clock.getTotalElapsedTime();
+  aeonWinMng.updateEntries(ts);
   pollEvents();
+  AeonInput::Instance().update();
+  Audio::Instance().update(ts);
 }
 
 void Engine::cleanup()
 {
-}
-
-void Engine::updateInput()
-{
-  pollEvents();
 }
 
 void Engine::stop()

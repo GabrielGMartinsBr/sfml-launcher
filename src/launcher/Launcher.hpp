@@ -57,10 +57,10 @@ class Launcher {
     Eng::Fonts::Init();
     Eng::Shaders::Init();
     Eng::Lists::Init();
+    Eng::Engine::Init(projectWindow, projectPath);
     Eng::Input::Init();
     Eng::Graphics::Init(projectWindow);
     Eng::Audio::Init();
-    Eng::Engine::Init(projectWindow, projectPath);
 
     Integrator integrator;
     integrator.init();

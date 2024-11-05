@@ -10,6 +10,7 @@
 
 #include "AppDefs.h"
 #include "aeon/window/AeonWindowManager.h"
+#include "engine/EngineClock.hpp"
 #include "launcher/ProjectWindow.h"
 
 namespace Eng {
@@ -32,6 +33,8 @@ class Engine {
 
   // Getters
 
+  EngineClock clock;
+
   bool isRunning();
 
   const sf::Vector2i& getDimensions() const;
@@ -44,13 +47,13 @@ class Engine {
 
   void run();
 
+  void loopUpdate();
+  
   void update();
 
   void cleanup();
 
   // Engine update methods
-
-  void updateInput();
 
   void stop();
 

@@ -5,6 +5,7 @@
 #include <SFML/Graphics/Sprite.hpp>
 
 #include "AppDefs.h"
+#include "engnine/Engine.h"
 #include "engnine/GraphicsRenderer.h"
 #include "launcher/ProjectWindow.h"
 
@@ -56,6 +57,7 @@ class Graphics {
   /*
     ⇩⇩⇩ Private ⇩⇩⇩
   */
+  Engine& engine;
   ProjectWindow& projectWindow;
 
   bool isFullScreen;
