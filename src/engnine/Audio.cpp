@@ -77,7 +77,7 @@ void Audio::bgm_fade(int time)
   bgm.fade(time);
 }
 
-// Stop
+// Reset
 void Audio::bgmReset()
 {
   bgm.reset();
@@ -126,6 +126,12 @@ void Audio::me_stop()
 void Audio::me_fade(int time)
 {
   me.fade(time);
+}
+
+// Reset
+void Audio::meReset()
+{
+  me.reset();
 }
 
 /*

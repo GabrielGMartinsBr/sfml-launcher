@@ -31,6 +31,7 @@ class Audio {
     rb_define_module_function(audioModule, "me_play", RUBY_METHOD_FUNC(me_play), -1);
     rb_define_module_function(audioModule, "me_stop", RUBY_METHOD_FUNC(me_stop), 0);
     rb_define_module_function(audioModule, "me_fade", RUBY_METHOD_FUNC(me_fade), 1);
+    rb_define_module_function(audioModule, "me_reset", RUBY_METHOD_FUNC(meReset), 0);
 
     rb_define_module_function(audioModule, "se_play", RUBY_METHOD_FUNC(se_play), -1);
     rb_define_module_function(audioModule, "se_stop", RUBY_METHOD_FUNC(se_stop), 0);
@@ -81,8 +82,7 @@ class Audio {
   {
     int time = Convert::toCInt(_time);
 
-    // Eng::Audio::Instance().bgm_fade(time);
-    Eng::Audio::Instance().bgm_stop();
+    Eng::Audio::Instance().bgm_fade(time);
     return Qnil;
   }
 
@@ -178,8 +178,13 @@ class Audio {
   {
     int time = Convert::toCInt(_time);
 
-    // Eng::Audio::Instance().me_fade(time);
-    Eng::Audio::Instance().me_stop();
+    Eng::Audio::Instance().me_fade(time);
+    return Qnil;
+  }
+
+  static VALUE meReset(VALUE self)
+  {
+    Eng::Audio::Instance().bgmReset();
     return Qnil;
   }
 

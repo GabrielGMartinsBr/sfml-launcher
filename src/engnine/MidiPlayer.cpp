@@ -47,6 +47,7 @@ bool MidiPlayer::init()
 bool MidiPlayer::play(CStr fileName, float volume_, float pitch)
 {
   volume = volume_;
+  fading = false;
 
   if (!initialized) {
     init();
@@ -55,16 +56,22 @@ bool MidiPlayer::play(CStr fileName, float volume_, float pitch)
   if (isPlaying()) {
     fluid_player_stop(player);
     fluid_player_join(player);
+    for (int i = 0; i < 16; i++) {
+      fluid_synth_all_sounds_off(synth, i);
+    }
   }
 
-  fluid_player_seek(player, fluid_player_get_total_ticks(player));
-  setVolume(volume);
+  delete_fluid_audio_driver(aDriver);
+  delete_fluid_player(player);
+  initPlayer();
 
   bool res;
   res = loadMidiFile(fileName);
   if (!res) {
     return false;
   }
+
+  setVolume(volume);
 
   res = setSpeed(pitch);
   if (!res) {
@@ -103,7 +110,13 @@ void MidiPlayer::reset()
 /*
  * Stop playback with fade effect
  */
-void MidiPlayer::fade(int ts) { }
+void MidiPlayer::fade(int ts)
+{
+  fadeDuration = ts;
+  fadeStartTs = clock.getTotalElapsedTime();
+  initialVolume = volume;
+  fading = true;
+}
 
 /*
  * Stop playback and release all FluidSynth resources
@@ -118,11 +131,7 @@ void MidiPlayer::destroy()
 }
 
 /*--------------------------------------
- *    ⇩⇩⇩   Private    ⇩⇩⇩
- *--------------------------------------*/
-
-/*--------------------------------------
- *    ⇩⇩⇩   Handlers    ⇩⇩⇩
+ *    ⇩⇩⇩   Private Handlers    ⇩⇩⇩
  *--------------------------------------*/
 
 /*
@@ -174,6 +183,18 @@ void MidiPlayer::updateVolumeFade()
   if (!fading || !isPlaying()) {
     return;
   }
+  float elapsed = clock.getTotalElapsedTime() - fadeStartTs;
+  if (elapsed >= fadeDuration) {
+    // volume = 0;
+    setVolume(0);
+    fluid_player_stop(player);
+    fluid_player_join(player);
+    setVolume(initialVolume);
+    fading = false;
+  } else {
+    float p = 1.0 - (elapsed / fadeDuration);
+    setVolume(initialVolume * p);
+  }
 }
 
 /*
@@ -195,6 +216,7 @@ void MidiPlayer::initSettings()
   fluid_settings_setint(settings, "audio.periods", 3);
   fluid_settings_setint(settings, "audio.period-size", 64);
   fluid_settings_setint(settings, "audio.realtime-prio", 0);
+  fluid_settings_setint(settings, "player.reset-synth", 1);
 }
 
 /*
@@ -228,11 +250,9 @@ bool MidiPlayer::loadSoundFont()
  */
 void MidiPlayer::initPlayer()
 {
+  player = new_fluid_player(synth);
+  fluid_player_set_tick_callback(player, onTick, this);
   aDriver = new_fluid_audio_driver(settings, synth);
-  if (!player) {
-    player = new_fluid_player(synth);
-    fluid_player_set_tick_callback(player, onTick, this);
-  }
 }
 
 /*
@@ -294,9 +314,7 @@ bool MidiPlayer::setProgress(float value)
  */
 bool MidiPlayer::startsPlayback()
 {
-  Log::out() << "player status: " << getPlayerStatusString();
   int result = fluid_player_play(player);
-  Log::out() << "startsPlayback: " << result;
   if (result == FLUID_OK) {
     endCbEmitted = false;
     return true;
@@ -333,12 +351,14 @@ void MidiPlayer::cleanup()
   if (player) {
     stopPlayback();
     fluid_player_join(player);
-    delete_fluid_player(player);
-    player = nullptr;
   }
   if (aDriver) {
     delete_fluid_audio_driver(aDriver);
     aDriver = nullptr;
+  }
+  if (player) {
+    delete_fluid_player(player);
+    player = nullptr;
   }
   if (synth) {
     delete_fluid_synth(synth);

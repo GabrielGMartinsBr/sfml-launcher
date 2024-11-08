@@ -30,7 +30,6 @@ class Audio {
 
   void update(UInt timestamp);
 
-
   // BGM
   void bgm_play(CStr fileName, float volume = 100, float pitch = 100);
   void bgm_stop();
@@ -46,6 +45,7 @@ class Audio {
   void me_play(CStr fileName, float volume = 100, float pitch = 100);
   void me_stop();
   void me_fade(int time);
+  void meReset();
 
   // SE
   void se_play(String fileName, float volume = 100, float pitch = 1.0f);
