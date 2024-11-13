@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5.0)
+cmake_minimum_required(VERSION 3.12)
 project(ORM-SLauncher VERSION 0.1.0)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
@@ -17,11 +17,11 @@ add_executable(${PROJECT_NAME} ${source_files})
 include(CTest)
 enable_testing()
 
-# FetchContent
-include(FetchContent)
-
 # CPack 
 include(CPack)
+
+# FetchContent
+include(FetchContent)
 
 target_include_directories(${PROJECT_NAME} PRIVATE src)
 target_include_directories(${PROJECT_NAME} PRIVATE src/base)
@@ -29,7 +29,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE GLOB_RECURSE src/modules)
 
 
 # SFML
-find_package(SFML 2.5 COMPONENTS system window graphics network audio REQUIRED)
+find_package(SFML 2.6 COMPONENTS system window graphics network audio REQUIRED)
 target_link_libraries(${PROJECT_NAME} sfml-system sfml-window sfml-graphics sfml-network sfml-audio)
 
 
@@ -40,12 +40,7 @@ target_link_libraries(${PROJECT_NAME} ${RubyStatic_LIBRARIES} -lcrypt)
 target_compile_options(${PROJECT_NAME} PRIVATE -Wno-register)
 
 
-# Boost Filesystem
-find_package(Boost COMPONENTS system filesystem thread REQUIRED)
-target_link_libraries(${PROJECT_NAME} 
-  ${Boost_FILESYSTEM_LIBRARY}
-  ${Boost_SYSTEM_LIBRARY}
-)
+
 
 # Zlib
 find_package(ZLIB REQUIRED)
@@ -77,3 +72,21 @@ set(ENABLE_NETWORK OFF CACHE BOOL "Disable network support" FORCE)
 FetchContent_MakeAvailable(fluidsynth)
 
 target_link_libraries(${PROJECT_NAME} libfluidsynth)
+
+# Boost Filesystem
+# Configure FetchContent to download Boost
+FetchContent_Declare(
+  Boost
+  GIT_REPOSITORY https://github.com/boostorg/boost.git
+  GIT_TAG boost-1.86.0
+)
+
+# Initialize and configure Boost
+FetchContent_MakeAvailable(Boost)
+
+# Link Boost components to the target
+target_link_libraries(${PROJECT_NAME} 
+  Boost::system
+  Boost::filesystem
+  Boost::thread
+)
