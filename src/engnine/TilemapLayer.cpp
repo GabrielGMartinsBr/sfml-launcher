@@ -8,16 +8,15 @@
 
 namespace Eng {
 
-TilemapLayer::TilemapLayer(Viewport* viewport, int width, int height, int y, int priority, int oy) :
+TilemapLayer::TilemapLayer(Viewport* viewport, int width, int height, int y, int priority, int oy, int* frameId) :
     viewport(viewport),
     y(y),
     oy(oy),
-    priority(priority)
+    priority(priority),
+    frameId(frameId)
 {
   isDisposed = false;
   addedToEngineCycles = false;
-  visible = true;
-  // visible = false;
 
   create(width, height);
   calcZ();
@@ -37,6 +36,12 @@ void TilemapLayer::create(int width, int height)
   rendTex.create(width, height);
   rendTex.clear(sf::Color::Transparent);
   sprite.setTexture(rendTex.getTexture());
+
+  for (int i = 0; i < 4; i++) {
+    frameRn[i].create(width, height);
+    frameRn[i].clear(sf::Color::Transparent);
+    frameSpr[i].setTexture(frameRn[i].getTexture());
+  }
 }
 
 void TilemapLayer::calcZ()
@@ -59,6 +64,15 @@ void TilemapLayer::update(int oy)
   }
 }
 
+void TilemapLayer::updateSrcRect(const sf::IntRect& srcRect)
+{
+  sprite.setTextureRect(srcRect);
+  frameSpr[0].setTextureRect(srcRect);
+  frameSpr[1].setTextureRect(srcRect);
+  frameSpr[2].setTextureRect(srcRect);
+  frameSpr[3].setTextureRect(srcRect);
+}
+
 Viewport* TilemapLayer::getViewport() const
 {
   return viewport;
@@ -76,9 +90,8 @@ inline bool TilemapLayer::shouldRender() const
 
 void TilemapLayer::onRender(sf::RenderTexture& renderTexture)
 {
-  if (visible) {
-    renderTexture.draw(sprite);
-  }
+  renderTexture.draw(frameSpr[*frameId]);
+  renderTexture.draw(sprite);
 }
 
 void TilemapLayer::dispose()

@@ -13,9 +13,10 @@ class TilemapLayer : IViewportChild {
  public:
   sf::Sprite sprite;
   sf::RenderTexture rendTex;
-  bool visible;
+  sf::RenderTexture frameRn[4];
+  sf::Sprite frameSpr[4];
 
-  TilemapLayer(Viewport* viewport, int width, int height, int y, int priority, int oy);
+  TilemapLayer(Viewport* viewport, int width, int height, int y, int priority, int oy, int* frameId);
 
   ~TilemapLayer();
 
@@ -31,6 +32,8 @@ class TilemapLayer : IViewportChild {
 
   void update(int oy);
 
+  void updateSrcRect(const sf::IntRect& srcRect);
+
   // Self
 
   void dispose();
@@ -44,6 +47,7 @@ class TilemapLayer : IViewportChild {
   bool isDisposed;
   bool addedToEngineCycles;
   Viewport* viewport;
+  int* frameId;
 
   void create(int width, int height);
 

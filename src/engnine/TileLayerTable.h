@@ -11,6 +11,8 @@ using app::Vector;
 struct TileLayerTable {
   TileLayerTable(int x, int y = 1);
 
+  const UPtr<TilemapLayer>& operator[](size_t index) const;
+
   bool isEmpty(int x, int y = 0);
 
   TilemapLayer& getValue(int x, int y = 0);

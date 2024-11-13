@@ -16,6 +16,11 @@ TileLayerTable::TileLayerTable(int x, int y) :
 {
 }
 
+const UPtr<TilemapLayer>& TileLayerTable::operator[](size_t index) const
+{
+  return values[index];
+}
+
 bool TileLayerTable::isEmpty(int x, int y)
 {
   return values[calcIndex(x, y)] == nullptr;
@@ -67,6 +72,7 @@ void TileLayerTable::resize(int x, int y)
   }
   xSizeVal = x;
   ySizeVal = y;
+  sizeVal = x * y;
 
   for (size_t i = 0; i < values.size(); ++i) {
     values[i]->dispose();
