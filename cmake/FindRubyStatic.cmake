@@ -6,7 +6,7 @@ find_path(RUBY_STATIC_INCLUDE_DIR
 )
 
 find_library(RUBY_STATIC_LIBRARY
-    NAMES ruby-static
+    NAMES ruby-static libmsvcrt-ruby18-static
     HINTS ${CMAKE_SOURCE_DIR}/3rd/ruby-1.8.7
 )
 

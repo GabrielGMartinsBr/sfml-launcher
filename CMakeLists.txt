@@ -109,3 +109,31 @@ set(FLUIDSYNTH_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(fluidsynth)
 
 target_link_libraries(${PROJECT_NAME} libfluidsynth)
+
+
+
+# ==============================
+#
+#   Glib
+#
+
+# Check if the platform is Windows
+if(WIN32)
+    # Set the GLib2 paths for Windows
+    set(GLIB2_INCLUDE_DIRS "C:/msys64/mingw64/include")
+    set(GLIB2_LIBRARY "C:/msys64/mingw64/lib/libglib-2.0.a")
+    
+    # Optionally, add message to verify that the paths are set correctly
+    message(STATUS "Using GLib2 on Windows: Include - ${GLIB2_INCLUDE_DIRS}, Library - ${GLIB2_LIBRARY}")
+endif()
+
+# Find GLib2 package using the configured paths
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(GLIB2 REQUIRED glib-2.0)
+
+# Include directories and link libraries
+include_directories(${GLIB2_INCLUDE_DIRS})
+link_directories(${GLIB2_LIBRARY})
+
+# If you need to use the variable globally or link with it
+target_link_libraries(${PROJECT_NAME} ${GLIB2_LIBRARY})
