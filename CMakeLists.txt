@@ -40,8 +40,6 @@ target_link_libraries(${PROJECT_NAME} ${RubyStatic_LIBRARIES} -lcrypt)
 target_compile_options(${PROJECT_NAME} PRIVATE -Wno-register)
 
 
-
-
 # Zlib
 find_package(ZLIB REQUIRED)
 target_include_directories(
@@ -52,6 +50,28 @@ target_link_libraries(
   ${PROJECT_NAME}
   ZLIB::ZLIB
 )
+
+
+
+# Boost Filesystem
+# Configure FetchContent to download Boost
+FetchContent_Declare(
+  Boost
+  GIT_REPOSITORY https://github.com/boostorg/boost.git
+  GIT_TAG boost-1.86.0
+)
+
+# Initialize and configure Boost
+FetchContent_MakeAvailable(Boost)
+
+# Link Boost components to the target
+target_link_libraries(${PROJECT_NAME} 
+  Boost::system
+  Boost::filesystem
+  Boost::thread
+)
+
+
 
 # Fluidsynth
 FetchContent_Declare(
@@ -72,21 +92,3 @@ set(ENABLE_NETWORK OFF CACHE BOOL "Disable network support" FORCE)
 FetchContent_MakeAvailable(fluidsynth)
 
 target_link_libraries(${PROJECT_NAME} libfluidsynth)
-
-# Boost Filesystem
-# Configure FetchContent to download Boost
-FetchContent_Declare(
-  Boost
-  GIT_REPOSITORY https://github.com/boostorg/boost.git
-  GIT_TAG boost-1.86.0
-)
-
-# Initialize and configure Boost
-FetchContent_MakeAvailable(Boost)
-
-# Link Boost components to the target
-target_link_libraries(${PROJECT_NAME} 
-  Boost::system
-  Boost::filesystem
-  Boost::thread
-)
