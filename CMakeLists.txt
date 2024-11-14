@@ -27,9 +27,34 @@ target_include_directories(${PROJECT_NAME} PRIVATE src)
 target_include_directories(${PROJECT_NAME} PRIVATE src/base)
 target_include_directories(${PROJECT_NAME} PRIVATE GLOB_RECURSE src/modules)
 
+# Boost Filesystem
+# Configure FetchContent to download Boost
+FetchContent_Declare(
+  Boost
+  GIT_REPOSITORY https://github.com/boostorg/boost.git
+  GIT_TAG boost-1.86.0
+)
+
+# Initialize and configure Boost
+FetchContent_MakeAvailable(Boost)
+
+# Link Boost components to the target
+target_link_libraries(${PROJECT_NAME} 
+  Boost::system
+  Boost::filesystem
+  Boost::thread
+)
+
+
 
 # SFML
-find_package(SFML 2.6 COMPONENTS system window graphics network audio REQUIRED)
+FetchContent_Declare(
+  Sfml
+  GIT_REPOSITORY https://github.com/SFML/SFML.git
+  GIT_TAG 2.6.2
+)
+FetchContent_MakeAvailable(Sfml)
+# find_package(SFML 2.6 COMPONENTS system window graphics network audio REQUIRED)
 target_link_libraries(${PROJECT_NAME} sfml-system sfml-window sfml-graphics sfml-network sfml-audio)
 
 
@@ -52,24 +77,6 @@ target_link_libraries(
 )
 
 
-
-# Boost Filesystem
-# Configure FetchContent to download Boost
-FetchContent_Declare(
-  Boost
-  GIT_REPOSITORY https://github.com/boostorg/boost.git
-  GIT_TAG boost-1.86.0
-)
-
-# Initialize and configure Boost
-FetchContent_MakeAvailable(Boost)
-
-# Link Boost components to the target
-target_link_libraries(${PROJECT_NAME} 
-  Boost::system
-  Boost::filesystem
-  Boost::thread
-)
 
 
 
