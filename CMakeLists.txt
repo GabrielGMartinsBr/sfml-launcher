@@ -27,6 +27,25 @@ target_include_directories(${PROJECT_NAME} PRIVATE src)
 target_include_directories(${PROJECT_NAME} PRIVATE src/base)
 target_include_directories(${PROJECT_NAME} PRIVATE GLOB_RECURSE src/modules)
 
+
+
+# Zlib
+# Fetch Zlib
+FetchContent_Declare(
+    Zlib
+    GIT_REPOSITORY https://github.com/madler/zlib
+    GIT_TAG v1.3.1
+)
+set(ZLIB_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+
+# Download and add Zlib to your project
+FetchContent_MakeAvailable(Zlib)
+
+target_link_libraries(${PROJECT_NAME} zlib)
+
+
+
+
 # Boost Filesystem
 # Configure FetchContent to download Boost
 FetchContent_Declare(
@@ -47,6 +66,7 @@ target_link_libraries(${PROJECT_NAME}
 
 
 
+
 # SFML
 FetchContent_Declare(
   Sfml
@@ -58,24 +78,13 @@ FetchContent_MakeAvailable(Sfml)
 target_link_libraries(${PROJECT_NAME} sfml-system sfml-window sfml-graphics sfml-network sfml-audio)
 
 
+
+
 # Ruby
 find_package(RubyStatic REQUIRED)
 target_include_directories(${PROJECT_NAME} PRIVATE ${RubyStatic_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} ${RubyStatic_LIBRARIES} -lcrypt)
 target_compile_options(${PROJECT_NAME} PRIVATE -Wno-register)
-
-
-# Zlib
-find_package(ZLIB REQUIRED)
-target_include_directories(
-  ${PROJECT_NAME} PRIVATE
-  ${ZLIB_INCLUDE_DIRS}
-)
-target_link_libraries(
-  ${PROJECT_NAME}
-  ZLIB::ZLIB
-)
-
 
 
 
@@ -95,6 +104,7 @@ set(ENABLE_DBUS OFF CACHE BOOL "Disable D-Bus support" FORCE)
 set(ENABLE_SOUNDFONTS_INSTALL OFF CACHE BOOL "Disable SoundFont installation" FORCE)
 set(ENABLE_SHARED OFF CACHE BOOL "Build as static library" FORCE)
 set(ENABLE_NETWORK OFF CACHE BOOL "Disable network support" FORCE)
+set(FLUIDSYNTH_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 FetchContent_MakeAvailable(fluidsynth)
 
